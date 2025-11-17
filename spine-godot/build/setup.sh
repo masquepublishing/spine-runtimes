@@ -72,31 +72,47 @@ fi
 
 popd
 
-# Generate compile_commands.json for IDE integration
-echo "Generating compile_commands.json for IDE integration..."
-pushd ../godot > /dev/null
+# Generate compile_commands.json for IDE integration (only in dev mode)
+if [ $dev = "true" ]; then
+	echo "Generating compile_commands.json for IDE integration..."
+	pushd ../godot > /dev/null
 
-# Detect architecture for macOS
-arch=""
-if [[ "$OSTYPE" == "darwin"* ]]; then
-	if [ `uname -m` == "arm64" ]; then
-		arch="arch=arm64"
+	# Detect architecture for macOS
+	arch=""
+	platform=""
+	if [[ "$OSTYPE" == "darwin"* ]]; then
+		if [ `uname -m` == "arm64" ]; then
+			arch="arch=arm64"
+		else
+			arch="arch=x86_64"
+		fi
+		platform="platform=osx"
+	elif [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "win32"* ]]; then
+		platform="platform=windows"
 	else
-		arch="arch=x86_64"
+		# Linux - only generate if X11 dev libraries are available
+		if pkg-config --exists x11 2>/dev/null; then
+			platform="platform=x11"
+		else
+			echo "Skipping compile_commands.json generation (X11 libraries not available)"
+			popd > /dev/null
+			popd > /dev/null
+			exit 0
+		fi
 	fi
+
+	# Generate compilation database without building
+	scons compiledb=yes custom_modules="../spine_godot" opengl3=yes $platform $arch compiledb
+
+	# Copy to parent directory for easy IDE access
+	if [ -f compile_commands.json ]; then
+		cp compile_commands.json ..
+		echo "compile_commands.json generated successfully and copied to spine-godot/"
+	else
+		echo "Warning: Failed to generate compile_commands.json"
+	fi
+
+	popd > /dev/null
 fi
-
-# Generate compilation database without building
-scons compiledb=yes custom_modules="../spine_godot" opengl3=yes $arch compiledb
-
-# Copy to parent directory for easy IDE access
-if [ -f compile_commands.json ]; then
-	cp compile_commands.json ..
-	echo "compile_commands.json generated successfully and copied to spine-godot/"
-else
-	echo "Warning: Failed to generate compile_commands.json"
-fi
-
-popd > /dev/null
 
 popd > /dev/null
