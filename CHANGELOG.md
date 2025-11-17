@@ -363,6 +363,7 @@
   - The same applies to the `TrackEntry.Start`, `Interrupt`, `End`, `Dispose`, `Complete`, and `Event` events. If you need these callbacks to run on the main thread instead of worker threads, you should register them using the corresponding `SkeletonAnimation.MainThreadStart`, `MainThreadInterrupt`, etc. callbacks. Note that this does require a small code change, since these events are **not** automatically unregistered when the `TrackEntry` is removed. You’ll need to handle that manually, typically with logic such as `if (trackEntry.Animation == attackAnimation) ..`.
   - Added `SkeletonUpdateSystem.Instance.GroupRenderersBySkeletonType` and `GroupAnimationBySkeletonType` properties. Defaults to disabled. Later when smart partitioning is implemented, enabling this parameter might slightly improve cache locality. Until then having it enabled combined with different skeleton complexity would lead to worse load balancing.
   - Added previously missing editor drag & drop skeleton instantiation option *SkeletonGraphic (UI) Mecanim* combining components `SkeletonGraphic` and `SkeletonMecanim`.
+  - Added define `SPINE_DISABLE_THREADING` to disable threaded animation and mesh generation entirely, removing the respective code. This define can be set as `Scripting Define Symbols` globally or for selective build profiles where desired.
 
 - **Deprecated**
 

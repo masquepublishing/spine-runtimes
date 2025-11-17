@@ -27,8 +27,10 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if !SPINE_DISABLE_THREADING
 #define USE_THREADED_SKELETON_UPDATE
 #define USE_THREADED_ANIMATION_UPDATE // requires USE_THREADED_SKELETON_UPDATE enabled
+#endif
 
 #define READ_VOLATILE_ONCE
 #if UNITY_2017_3_OR_NEWER
