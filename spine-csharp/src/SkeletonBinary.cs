@@ -192,7 +192,7 @@ namespace Spine {
 					o[i] = input.ReadString();
 
 				// Bones.
-				BoneData[] bones = skeletonData.bones.Resize(n = input.ReadInt(true)).Items;
+				BoneData[] bones = skeletonData.bones.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++) {
 					string name = input.ReadString();
 					BoneData parent = i == 0 ? null : bones[input.ReadInt(true)];
@@ -217,7 +217,7 @@ namespace Spine {
 				}
 
 				// Slots.
-				SlotData[] slots = skeletonData.slots.Resize(n = input.ReadInt(true)).Items;
+				SlotData[] slots = skeletonData.slots.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++) {
 					string slotName = input.ReadString();
 
@@ -239,7 +239,7 @@ namespace Spine {
 
 				// Constraints.
 				int constraintCount = input.ReadInt(true);
-				IConstraintData[] constraints = skeletonData.constraints.Resize(constraintCount).Items;
+				IConstraintData[] constraints = skeletonData.constraints.EnsureSize(constraintCount).Items;
 				for (int i = 0; i < constraintCount; i++) {
 					string name = input.ReadString();
 					int nn;
@@ -247,7 +247,7 @@ namespace Spine {
 					switch (input.ReadUByte()) {
 					case CONSTRAINT_IK: {
 						var data = new IkConstraintData(name);
-						BoneData[] constraintBones = data.bones.Resize(nn = input.ReadInt(true)).Items;
+						BoneData[] constraintBones = data.bones.EnsureSize(nn = input.ReadInt(true)).Items;
 						for (int ii = 0; ii < nn; ii++)
 							constraintBones[ii] = bones[input.ReadInt(true)];
 						data.target = bones[input.ReadInt(true)];
@@ -265,7 +265,7 @@ namespace Spine {
 					}
 					case CONSTRAINT_TRANSFORM: {
 						var data = new TransformConstraintData(name);
-						BoneData[] constraintBones = data.bones.Resize(nn = input.ReadInt(true)).Items;
+						BoneData[] constraintBones = data.bones.EnsureSize(nn = input.ReadInt(true)).Items;
 						for (int ii = 0; ii < nn; ii++)
 							constraintBones[ii] = bones[input.ReadInt(true)];
 						data.source = bones[input.ReadInt(true)];
@@ -275,7 +275,7 @@ namespace Spine {
 						data.localTarget = (flags & 4) != 0;
 						data.additive = (flags & 8) != 0;
 						data.clamp = (flags & 16) != 0;
-						FromProperty[] froms = data.properties.Resize(nn = flags >> 5).Items;
+						FromProperty[] froms = data.properties.EnsureSize(nn = flags >> 5).Items;
 						for (int ii = 0, tn; ii < nn; ii++) {
 							float fromScale = 1;
 							FromProperty from;
@@ -297,7 +297,7 @@ namespace Spine {
 							default: from = null; break;
 							}
 							from.offset = input.ReadFloat() * fromScale;
-							ToProperty[] tos = from.to.Resize(tn = input.ReadSByte()).Items;
+							ToProperty[] tos = from.to.EnsureSize(tn = input.ReadSByte()).Items;
 							for (int t = 0; t < tn; t++) {
 								float toScale = 1;
 								ToProperty to;
@@ -345,7 +345,7 @@ namespace Spine {
 					}
 					case CONSTRAINT_PATH: {
 						var data = new PathConstraintData(name);
-						BoneData[] constraintBones = data.bones.Resize(nn = input.ReadInt(true)).Items;
+						BoneData[] constraintBones = data.bones.EnsureSize(nn = input.ReadInt(true)).Items;
 						for (int ii = 0; ii < nn; ii++)
 							constraintBones[ii] = bones[input.ReadInt(true)];
 						data.slot = slots[input.ReadInt(true)];
@@ -447,7 +447,7 @@ namespace Spine {
 				// Skins.
 				{
 					int i = skeletonData.skins.Count;
-					o = skeletonData.skins.Resize(n = i + input.ReadInt(true)).Items;
+					o = skeletonData.skins.EnsureSize(n = i + input.ReadInt(true)).Items;
 					for (; i < n; i++)
 						o[i] = ReadSkin(input, skeletonData, false, nonessential);
 				}
@@ -466,7 +466,7 @@ namespace Spine {
 				linkedMeshes.Clear();
 
 				// Events.
-				o = skeletonData.events.Resize(n = input.ReadInt(true)).Items;
+				o = skeletonData.events.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++) {
 					var data = new EventData(input.ReadString());
 					data.Int = input.ReadInt(false);
@@ -481,7 +481,7 @@ namespace Spine {
 				}
 
 				// Animations.
-				Animation[] animations = skeletonData.animations.Resize(n = input.ReadInt(true)).Items;
+				Animation[] animations = skeletonData.animations.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++)
 					animations[i] = ReadAnimation(input, input.ReadString(), skeletonData);
 
@@ -513,12 +513,12 @@ namespace Spine {
 				if (nonessential) input.ReadInt(); // discard, Color.rgba8888ToColor(skin.color, input.readInt());
 
 				int n;
-				object[] from = skeletonData.bones.Items, to = skin.bones.Resize(n = input.ReadInt(true)).Items;
+				object[] from = skeletonData.bones.Items, to = skin.bones.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++)
 					to[i] = from[input.ReadInt(true)];
 
 				from = skeletonData.constraints.Items;
-				to = skin.constraints.Resize(n = input.ReadInt(true)).Items;
+				to = skin.constraints.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++)
 					to[i] = from[input.ReadInt(true)];
 

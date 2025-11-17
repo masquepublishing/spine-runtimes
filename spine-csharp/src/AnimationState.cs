@@ -274,7 +274,7 @@ namespace Spine {
 
 					bool shortestRotation = current.shortestRotation;
 					bool firstFrame = !shortestRotation && current.timelinesRotation.Count != timelineCount << 1;
-					if (firstFrame) current.timelinesRotation.Resize(timelineCount << 1);
+					if (firstFrame) current.timelinesRotation.EnsureSize(timelineCount << 1);
 					float[] timelinesRotation = current.timelinesRotation.Items;
 
 					for (int ii = 0; ii < timelineCount; ii++) {
@@ -390,7 +390,7 @@ namespace Spine {
 
 				bool shortestRotation = from.shortestRotation;
 				bool firstFrame = !shortestRotation && from.timelinesRotation.Count != timelineCount << 1;
-				if (firstFrame) from.timelinesRotation.Resize(timelineCount << 1);
+				if (firstFrame) from.timelinesRotation.EnsureSize(timelineCount << 1);
 				float[] timelinesRotation = from.timelinesRotation.Items;
 
 				from.totalAlpha = 0;
@@ -827,7 +827,7 @@ namespace Spine {
 
 		private TrackEntry ExpandToIndex (int index) {
 			if (index < tracks.Count) return tracks.Items[index];
-			tracks.Resize(index + 1);
+			tracks.EnsureSize(index + 1);
 			return null;
 		}
 
@@ -898,7 +898,7 @@ namespace Spine {
 			TrackEntry to = entry.mixingTo;
 			Timeline[] timelines = entry.animation.timelines.Items;
 			int timelinesCount = entry.animation.timelines.Count;
-			int[] timelineMode = entry.timelineMode.Resize(timelinesCount).Items;
+			int[] timelineMode = entry.timelineMode.EnsureSize(timelinesCount).Items;
 			entry.timelineHoldMix.Clear();
 			TrackEntry[] timelineHoldMix = entry.timelineHoldMix.Resize(timelinesCount).Items;
 			HashSet<string> propertyIds = this.propertyIds;

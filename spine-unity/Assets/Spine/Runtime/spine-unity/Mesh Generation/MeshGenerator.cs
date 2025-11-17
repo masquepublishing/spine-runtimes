@@ -558,9 +558,7 @@ namespace Spine.Unity {
 			Settings settings = this.settings;
 
 			int newSubmeshCount = submeshIndex + 1;
-			if (submeshes.Items.Length < newSubmeshCount)
-				submeshes.Resize(newSubmeshCount);
-			submeshes.Count = newSubmeshCount;
+			submeshes.EnsureSize(newSubmeshCount);
 			ExposedList<int> submesh = submeshes.Items[submeshIndex];
 			if (submesh == null)
 				submeshes.Items[submeshIndex] = submesh = new ExposedList<int>();
@@ -1078,7 +1076,7 @@ namespace Spine.Unity {
 			if (updateTriangles) {
 				// Match submesh buffers count with submeshInstruction count.
 				if (this.submeshes.Items.Length < submeshInstructionCount) {
-					this.submeshes.Resize(submeshInstructionCount);
+					this.submeshes.EnsureSize(submeshInstructionCount);
 					for (int i = 0, n = submeshInstructionCount; i < n; i++) {
 						ExposedList<int> submeshBuffer = this.submeshes.Items[i];
 						if (submeshBuffer == null)
@@ -1329,8 +1327,8 @@ namespace Spine.Unity {
 						uv2 = new ExposedList<Vector2>(minimumVertexCount);
 						uv3 = new ExposedList<Vector2>(minimumVertexCount);
 					}
-					uv2.Resize(minimumVertexCount);
-					uv3.Resize(minimumVertexCount);
+					uv2.EnsureSize(minimumVertexCount);
+					uv3.EnsureSize(minimumVertexCount);
 				}
 
 				if (includeNormals) {
