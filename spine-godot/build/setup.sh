@@ -70,6 +70,14 @@ if [ "$branch" = "4.3-stable" ]; then
     popd
 fi
 
+# Apply iOS Vulkan fix for C++ module imports in extern "C" blocks
+# This fixes compilation errors with newer Xcode versions
+pushd godot
+if [ -f ../build/ios-vulkan-fix.patch ]; then
+    git apply ../build/ios-vulkan-fix.patch
+fi
+popd
+
 popd
 
 # Generate compile_commands.json for IDE integration (only in dev mode)
