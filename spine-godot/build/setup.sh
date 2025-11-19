@@ -71,12 +71,23 @@ if [ "$branch" = "4.3-stable" ]; then
 fi
 
 # Apply iOS Vulkan fix for C++ module imports in extern "C" blocks
-# This fixes compilation errors with newer Xcode versions
-pushd godot
-if [ -f ../build/ios-vulkan-fix.patch ]; then
-    git apply ../build/ios-vulkan-fix.patch
+# This fixes compilation errors with newer Xcode versions on Godot 4.x
+if [[ "$branch" == 4* ]]; then
+    pushd godot
+    if [ -f platform/ios/detect.py ]; then
+        # Check if the fix is already applied
+        if ! grep -q "Wno-error=module-import-in-extern-c" platform/ios/detect.py; then
+            # Insert the fix after the -Wno-ambiguous-macro line
+            sed -i.bak '/Wno-ambiguous-macro/a\
+\
+    # Fix for C++ module imports in extern "C" blocks in Vulkan headers\
+    env.Append(CCFLAGS=["-Wno-error=module-import-in-extern-c"])
+' platform/ios/detect.py && rm platform/ios/detect.py.bak
+            echo "Applied iOS Vulkan fix to platform/ios/detect.py"
+        fi
+    fi
+    popd
 fi
-popd
 
 popd
 
