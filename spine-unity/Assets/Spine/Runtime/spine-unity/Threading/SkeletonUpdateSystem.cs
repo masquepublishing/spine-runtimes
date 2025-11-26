@@ -155,7 +155,7 @@ namespace Spine.Unity {
 		volatile protected int numExceptionsSet = 0;
 		protected int usedThreadCount = -1;
 
-		public void DeferredLogException(Exception exc, UnityEngine.Object context, int threadIndex) {
+		public void DeferredLogException (Exception exc, UnityEngine.Object context, int threadIndex) {
 			exceptions[threadIndex] = exc;
 			exceptionObjects[threadIndex] = context;
 			numExceptionsSet++;
@@ -287,7 +287,12 @@ namespace Spine.Unity {
 					genericSkeletonTasks[t] = new WorkerPoolTask();
 				}
 			}
-		
+#if ENABLE_THREAD_PROFILING
+			if (profilerSamplerUpdate == null) {
+				profilerSamplerUpdate = new CustomSampler[numThreads];
+			}
+#endif
+
 			for (int t = 0; t < updateDone.Count; ++t) {
 				updateDone[t].Reset();
 			}
@@ -388,7 +393,7 @@ namespace Spine.Unity {
 					};
 
 					UpdateSkeletonsAsyncSplit(range, t);
-	
+
 					start = end;
 					if (start >= skeletonEnd) {
 						while (++t < numAsyncThreads) {
@@ -422,7 +427,7 @@ namespace Spine.Unity {
 				// The explicit memory barrier below is added to ensure a memory barrier is in place on the many
 				// Unity target platforms.
 				Thread.MemoryBarrier();
-		
+
 				// process main thread callback part
 				anyWorkLeft = UpdateSkeletonsMainThreadSplit(skeletons, endIndexThreaded, Time.deltaTime, Time.frameCount);
 				isFirstIteration = false;
@@ -472,7 +477,12 @@ namespace Spine.Unity {
 					genericSkeletonTasks[t] = new WorkerPoolTask();
 				}
 			}
-		
+#if ENABLE_THREAD_PROFILING
+			if (profilerSamplerLateUpdate == null) {
+				profilerSamplerLateUpdate = new CustomSampler[numThreads];
+			}
+#endif
+
 			for (int t = 0; t < lateUpdateDone.Count; ++t) {
 				lateUpdateDone[t].Reset();
 			}
@@ -481,7 +491,7 @@ namespace Spine.Unity {
 					lateUpdateDone.Add(new ResetEvent(false));
 				}
 			}
-	
+
 			int rangePerThread = Mathf.CeilToInt((float)skeletonRenderers.Count / (float)numThreads);
 			int skeletonEnd = skeletonRenderers.Count;
 #if DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
@@ -638,8 +648,8 @@ namespace Spine.Unity {
 		}
 
 #if ENABLE_THREAD_PROFILING
-		CustomSampler[] profilerSamplerUpdate = new CustomSampler[16];
-		CustomSampler[] profilerSamplerLateUpdate = new CustomSampler[16];
+		CustomSampler[] profilerSamplerUpdate = null;
+		CustomSampler[] profilerSamplerLateUpdate = null;
 #endif
 
 		/// <summary>Perform Update at all SkeletonRenderers asynchronously.</summary>
@@ -689,7 +699,7 @@ namespace Spine.Unity {
 		/// <summary>Perform Update at all SkeletonRenderers asynchronously and split off at
 		/// main-thread callbacks.</summary>
 		void UpdateSkeletonsAsyncSplit (SkeletonUpdateRange range, int threadIndex) {
-			
+
 #if ENABLE_THREAD_PROFILING
 			if (profilerSamplerUpdate[threadIndex] == null) {
 				profilerSamplerUpdate[threadIndex] = CustomSampler.Create("Spine Update " + threadIndex);
@@ -763,7 +773,7 @@ namespace Spine.Unity {
 		void UpdateSkeletonsSynchronous (List<SkeletonAnimationBase> skeletons, SkeletonUpdateRange range) {
 			int start = range.rangeStart;
 			int end = range.rangeEndExclusive;
-			
+
 			for (int r = start; r < end; ++r) {
 				skeletons[r].UpdateInternal(range.deltaTime, range.frameCount, calledFromOnlyMainThread: true);
 			}
