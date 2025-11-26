@@ -43,6 +43,10 @@
 #define NEW_PREFERENCES_SETTINGS_PROVIDER
 #endif
 
+#if UNITY_2017_3_OR_NEWER
+#define ALLOWS_CUSTOM_PROFILING
+#endif
+
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
 #define AUTO_UPGRADE_TO_43_COMPONENTS
 #endif
@@ -507,6 +511,20 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.BoolRuntimePropertiesField(
 						() => RuntimeSettings.UseThreadedAnimation, value => RuntimeSettings.UseThreadedAnimation = value,
 						new GUIContent("Threaded Animation", "Global setting for the equally named SkeletonAnimation and SkeletonGraphic Inspector parameter."));
+
+#if ALLOWS_CUSTOM_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
+					bool threadProfilingEnabled = true;
+#else
+					bool threadProfilingEnabled = false;
+#endif
+					using (new GUILayout.HorizontalScope()) {
+						EditorGUILayout.PrefixLabel(new GUIContent("Thread Profiling",
+							"Enable profiling of Spine worker threads in the Unity Profiler. " +
+							"Enable only when needed, as it adds some overhead."));
+						EnableDisableDefineButtons(SpineBuildEnvUtility.SPINE_ENABLE_THREAD_PROFILING, threadProfilingEnabled);
+					}
+#endif
 				}
 
 				GUILayout.Space(20);

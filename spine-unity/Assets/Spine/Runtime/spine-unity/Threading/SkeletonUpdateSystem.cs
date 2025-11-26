@@ -33,9 +33,6 @@
 #endif
 
 #define READ_VOLATILE_ONCE
-#if UNITY_2017_3_OR_NEWER
-#define ENABLE_THREAD_PROFILING
-#endif
 
 #define DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS // enabled improves performance a bit.
 
@@ -54,7 +51,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 using UnityEngine.Profiling;
 #endif
 
@@ -287,7 +284,7 @@ namespace Spine.Unity {
 					genericSkeletonTasks[t] = new WorkerPoolTask();
 				}
 			}
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			if (profilerSamplerUpdate == null) {
 				profilerSamplerUpdate = new CustomSampler[numThreads];
 			}
@@ -477,7 +474,7 @@ namespace Spine.Unity {
 					genericSkeletonTasks[t] = new WorkerPoolTask();
 				}
 			}
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			if (profilerSamplerLateUpdate == null) {
 				profilerSamplerLateUpdate = new CustomSampler[numThreads];
 			}
@@ -647,14 +644,14 @@ namespace Spine.Unity {
 			}
 		}
 
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 		CustomSampler[] profilerSamplerUpdate = null;
 		CustomSampler[] profilerSamplerLateUpdate = null;
 #endif
 
 		/// <summary>Perform Update at all SkeletonRenderers asynchronously.</summary>
 		void UpdateSkeletonsAsync (SkeletonUpdateRange range, int threadIndex) {
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			if (profilerSamplerUpdate[threadIndex] == null) {
 				profilerSamplerUpdate[threadIndex] = CustomSampler.Create("Spine Update " + threadIndex);
 			}
@@ -671,7 +668,7 @@ namespace Spine.Unity {
 		static Action<SkeletonUpdateRange, int> cachedUpdateSkeletonsAsyncImpl = UpdateSkeletonsAsyncImpl;
 		static void UpdateSkeletonsAsyncImpl (SkeletonUpdateRange range, int threadIndex) {
 			var instance = Instance;
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			instance.profilerSamplerUpdate[threadIndex].Begin();
 #endif
 			float deltaTime = range.deltaTime;
@@ -690,7 +687,7 @@ namespace Spine.Unity {
 				}
 			}
 			instance.updateDone[threadIndex].Set();
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			instance.profilerSamplerUpdate[threadIndex].End();
 #endif
 		}
@@ -700,7 +697,7 @@ namespace Spine.Unity {
 		/// main-thread callbacks.</summary>
 		void UpdateSkeletonsAsyncSplit (SkeletonUpdateRange range, int threadIndex) {
 
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			if (profilerSamplerUpdate[threadIndex] == null) {
 				profilerSamplerUpdate[threadIndex] = CustomSampler.Create("Spine Update " + threadIndex);
 			}
@@ -727,7 +724,7 @@ namespace Spine.Unity {
 
 			var splitUpdateMethod = instance.splitUpdateMethod;
 
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			instance.profilerSamplerUpdate[threadIndex].Begin();
 #endif
 			for (int r = start; r < end; ++r) {
@@ -742,7 +739,7 @@ namespace Spine.Unity {
 			}
 			instance.updateDone[threadIndex].Set();
 
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			instance.profilerSamplerUpdate[threadIndex].End();
 #endif
 		}
@@ -782,7 +779,7 @@ namespace Spine.Unity {
 		/// <summary>Perform LateUpdate at all SkeletonRenderers asynchronously.</summary>
 		static Action<SkeletonUpdateRange, int> cachedLateUpdateSkeletonsAsyncImpl = LateUpdateSkeletonsAsyncImpl;
 		void LateUpdateSkeletonsAsync (SkeletonUpdateRange range, int threadIndex) {
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			if (profilerSamplerLateUpdate[threadIndex] == null) {
 				profilerSamplerLateUpdate[threadIndex] = CustomSampler.Create("Spine LateUpdate " + threadIndex);
 			}
@@ -801,7 +798,7 @@ namespace Spine.Unity {
 			int end = range.rangeEndExclusive;
 			var instance = Instance;
 
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			instance.profilerSamplerLateUpdate[threadIndex].Begin();
 #endif
 #if DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
@@ -821,7 +818,7 @@ namespace Spine.Unity {
 #if !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
 			instance.lateUpdateDone[threadIndex].Set(); // signal once after all work is done
 #endif
-#if ENABLE_THREAD_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
 			instance.profilerSamplerLateUpdate[threadIndex].End();
 #endif
 		}

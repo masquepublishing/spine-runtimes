@@ -47,6 +47,10 @@
 #define HAS_ANY_UNSAFE_OPTIONS
 #endif
 
+#if UNITY_2017_3_OR_NEWER
+#define ALLOWS_CUSTOM_PROFILING
+#endif
+
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
 #define AUTO_UPGRADE_TO_43_COMPONENTS
 #endif
@@ -347,9 +351,9 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.FloatPropertyField(settings.FindProperty("defaultScale"), new GUIContent("Default SkeletonData Scale", "The Default skeleton import scale for newly imported SkeletonDataAssets."), min: 0.0000001f);
 
 					SpineEditorUtilities.ShaderPropertyField(settings.FindProperty("defaultShader"), new GUIContent("Default Shader"), SpinePreferences.DEFAULT_DEFAULT_SHADER);
-					
+
 					TextureWorkflowProperties textureProperties = new TextureWorkflowProperties(settings);
-					
+
 					EditorGUILayout.Space();
 					using (new GUILayout.HorizontalScope()) {
 						EditorGUILayout.PrefixLabel("Switch Texture Workflow");
@@ -517,6 +521,20 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.BoolRuntimePropertiesField(
 						() => RuntimeSettings.UseThreadedAnimation, value => RuntimeSettings.UseThreadedAnimation = value,
 						new GUIContent("Threaded Animation", "Global setting for the equally named SkeletonAnimation and SkeletonGraphic Inspector parameter."));
+
+#if ALLOWS_CUSTOM_PROFILING
+#if SPINE_ENABLE_THREAD_PROFILING
+					bool threadProfilingEnabled = true;
+#else
+					bool threadProfilingEnabled = false;
+#endif
+					using (new GUILayout.HorizontalScope()) {
+						EditorGUILayout.PrefixLabel(new GUIContent("Thread Profiling",
+							"Enable profiling of Spine worker threads in the Unity Profiler. " +
+							"Enable only when needed, as it adds some overhead."));
+						SpineEditorUtilities.EnableDisableDefineButtons(SpineBuildEnvUtility.SPINE_ENABLE_THREAD_PROFILING, threadProfilingEnabled);
+					}
+#endif
 				}
 
 				GUILayout.Space(20);
