@@ -29,6 +29,7 @@
 
 package spine;
 
+import haxe.DynamicAccess;
 import spine.animation.BoneTimeline2;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
@@ -504,7 +505,7 @@ class SkeletonJson {
 		// Events.
 		var events:Dynamic = Reflect.getProperty(root, "events");
 		for (eventName in Reflect.fields(events)) {
-			var eventMap:Map<String, Dynamic> = Reflect.field(events, eventName);
+			var eventMap:DynamicAccess<Dynamic> = Reflect.field(events, eventName);
 			var eventData:EventData = new EventData(eventName);
 			eventData.intValue = getInt(eventMap, "int");
 			eventData.floatValue = getFloat(eventMap, "float");
@@ -646,11 +647,10 @@ class SkeletonJson {
 					return null;
 				path.closed = Reflect.hasField(map, "closed") ? cast(Reflect.field(map, "closed"), Bool) : false;
 				path.constantSpeed = Reflect.hasField(map, "constantSpeed") ? cast(Reflect.field(map, "constantSpeed"), Bool) : true;
-				var vertexCount:Int = getInt(map, "vertexCount", 0);
-				readVertices(map, path, vertexCount << 1);
+				readVertices(map, path, getInt(map, "vertexCount", 0) << 1);
 				var lengths:Array<Float> = new Array<Float>();
 				for (curves in cast(Reflect.field(map, "lengths"), Array<Dynamic>)) {
-					lengths.push(Std.parseFloat(curves) * scale);
+					lengths.push(curves * scale);
 				}
 				path.lengths = lengths;
 				return path;
@@ -677,8 +677,7 @@ class SkeletonJson {
 						throw new SpineException("Clipping end slot not found: " + end);
 					clip.endSlot = slot;
 				}
-				var vertexCount:Int = getInt(map, "vertexCount", 0);
-				readVertices(map, clip, vertexCount << 1);
+				readVertices(map, clip, getInt(map, "vertexCount", 0) << 1);
 				color = Reflect.getProperty(map, "color");
 				if (color != null) {
 					clip.color.setFromString(color);

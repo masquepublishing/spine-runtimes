@@ -180,7 +180,7 @@ class Skeleton {
 		for (c in constraints) {
 			var constraint:Constraint<Dynamic, Dynamic, Dynamic> = c;
 			constraint.active = constraint.isSourceActive()
-				&& (!constraint.data.skinRequired || (skin != null && contains(skin.constraints, constraint.data)));
+				&& (!constraint.data.skinRequired || (skin != null && contains(skin.constraints, cast constraint.data)));
 			if (constraint.active)
 				constraint.sort(this);
 		}

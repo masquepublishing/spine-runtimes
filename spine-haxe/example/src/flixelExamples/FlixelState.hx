@@ -190,7 +190,7 @@ class FlixelState extends FlxState {
 		// FlxG.debugger.visible = !FlxG.debugger.visible;
 		// debug ui
 		// FlxG.debugger.visible = true;
-		FlxG.debugger.drawDebug = true;
+		// FlxG.debugger.drawDebug = true;
 		// FlxG.log.redirectTraces = true;
 
 		// FlxG.debugger.track(spineSprite);

@@ -598,7 +598,7 @@ class SkeletonBinary {
 				region.height = height * scale;
 				region.color.setFromRgba8888(color);
 				region.sequence = sequence;
-				if (region.region == null)
+				if (region.region != null)
 					region.updateRegion();
 				return region;
 			case AttachmentType.boundingbox:
@@ -643,7 +643,7 @@ class SkeletonBinary {
 				mesh.worldVerticesLength = vertices.length;
 				mesh.triangles = triangles;
 				mesh.regionUVs = uvs;
-				if (mesh.region == null)
+				if (mesh.region != null)
 					mesh.updateRegion();
 				mesh.hullLength = hullLength << 1;
 				mesh.sequence = sequence;
