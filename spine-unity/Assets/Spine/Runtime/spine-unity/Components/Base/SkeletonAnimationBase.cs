@@ -94,8 +94,21 @@ namespace Spine.Unity {
 #endif
 #if USE_THREADED_ANIMATION_UPDATE
 		#region Threaded update system
+		protected static float externalDeltaTime = 0f;
+		protected static float unscaledDeltaTime = 0f;
+
 		[SerializeField] protected SettingsTriState threadedAnimation = SettingsTriState.UseGlobalSetting;
 		protected bool isUpdatedExternally = false;
+
+		public static float ExternalDeltaTime {
+			get { return externalDeltaTime; }
+			set { externalDeltaTime = value; }
+		}
+		public static float ExternalUnscaledDeltaTime {
+			get { return unscaledDeltaTime; }
+			set { unscaledDeltaTime = value; }
+		}
+		public virtual float UsedExternalDeltaTime { get { return ExternalDeltaTime; } }
 
 		public bool IsUpdatedExternally {
 			get { return isUpdatedExternally; }
@@ -381,6 +394,11 @@ namespace Spine.Unity {
 
 		public virtual void MainThreadAfterUpdateInternal () { }
 
+#if USE_THREADED_ANIMATION_UPDATE
+		public virtual void UpdateExternal (int currentFrameCount, bool calledFromOnlyMainThread = true) {
+			UpdateInternal(UsedExternalDeltaTime, currentFrameCount, calledFromOnlyMainThread);
+		}
+#endif
 		public virtual void UpdateInternal (float deltaTime, int currentFrameCount, bool calledFromOnlyMainThread = true) {
 			if (skipUpdate)
 				return;
@@ -395,9 +413,10 @@ namespace Spine.Unity {
 			ApplyAnimation(calledFromOnlyMainThread);
 		}
 
+#if USE_THREADED_ANIMATION_UPDATE
 		/// <summary>Progresses the AnimationState according to the given deltaTime, and applies it to the Skeleton.
 		/// Use Time.deltaTime to update manually. Use deltaTime 0 to update without progressing the time.</summary>
-		public virtual CoroutineIterator UpdateInternalSplit (CoroutineIterator coroutineIterator, float deltaTime,
+		public virtual CoroutineIterator UpdateInternalSplit (CoroutineIterator coroutineIterator,
 			int currentFrameCount) {
 
 			if (coroutineIterator.IsDone)
@@ -410,7 +429,7 @@ namespace Spine.Unity {
 				if (skipUpdate)
 					return CoroutineIterator.Done;
 				frameOfLastUpdate = currentFrameCount;
-				UpdateAnimationStatus(deltaTime);
+				UpdateAnimationStatus(UsedExternalDeltaTime);
 				skeletonRenderer.ApplyTransformMovementToPhysics();
 
 				if (skeletonRenderer.UpdateMode == UpdateMode.OnlyAnimationStatus)
@@ -426,6 +445,7 @@ namespace Spine.Unity {
 				return CoroutineIterator.Done;
 			}
 		}
+#endif
 
 		/// <summary>Progresses the AnimationState according to the given deltaTime, and applies it to the Skeleton.
 		/// Use Time.deltaTime to update manually. Use deltaTime 0 to update without progressing the time.</summary>

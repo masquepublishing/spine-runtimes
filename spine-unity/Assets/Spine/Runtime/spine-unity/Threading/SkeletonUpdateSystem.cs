@@ -125,7 +125,6 @@ namespace Spine.Unity {
 			public int rangeStart;
 			public int rangeEndExclusive;
 			public int frameCount;
-			public float deltaTime;
 			public UpdateTiming updateTiming;
 		}
 
@@ -306,15 +305,16 @@ namespace Spine.Unity {
 			numExceptionsSet = 0;
 
 			int rangePerThread = Mathf.CeilToInt((float)skeletons.Count / (float)numThreads);
-
 			int skeletonEnd = skeletons.Count;
-
 			int endIndexThreaded = Math.Min(skeletonEnd, rangePerThread * numAsyncThreads);
+
+			SkeletonAnimationBase.ExternalDeltaTime = Time.deltaTime;
+			SkeletonAnimationBase.ExternalUnscaledDeltaTime = Time.unscaledDeltaTime;
 			MainThreadBeforeUpdate(skeletons, skeletonEnd);
 
 #if RUN_ALL_ON_MAIN_THREAD
 			for (int r = 0; r < skeletons.Count; ++r) {
-				skeletons[r].UpdateInternal(Time.deltaTime, Time.frameCount, calledFromOnlyMainThread: true);
+				skeletons[r].UpdateExternal(Time.frameCount, calledFromOnlyMainThread: true);
 			}
 #else
 			if (!mainThreadUpdateCallbacks)
@@ -338,7 +338,6 @@ namespace Spine.Unity {
 				var range = new SkeletonUpdateRange() {
 					rangeStart = start,
 					rangeEndExclusive = end,
-					deltaTime = Time.deltaTime,
 					frameCount = Time.frameCount,
 					updateTiming = timing
 				};
@@ -384,7 +383,6 @@ namespace Spine.Unity {
 					var range = new SkeletonUpdateRange() {
 						rangeStart = start,
 						rangeEndExclusive = end,
-						deltaTime = Time.deltaTime,
 						frameCount = Time.frameCount,
 						updateTiming = timing
 					};
@@ -406,7 +404,6 @@ namespace Spine.Unity {
 					var range = new SkeletonUpdateRange() {
 						rangeStart = start,
 						rangeEndExclusive = end,
-						deltaTime = Time.deltaTime,
 						frameCount = Time.frameCount,
 						updateTiming = timing
 					};
@@ -426,7 +423,7 @@ namespace Spine.Unity {
 				Thread.MemoryBarrier();
 
 				// process main thread callback part
-				anyWorkLeft = UpdateSkeletonsMainThreadSplit(skeletons, endIndexThreaded, Time.deltaTime, Time.frameCount);
+				anyWorkLeft = UpdateSkeletonsMainThreadSplit(skeletons, endIndexThreaded, Time.frameCount);
 				isFirstIteration = false;
 			} while (anyWorkLeft && ++timeoutCounter < TimeoutIterationCount);
 
@@ -517,7 +514,6 @@ namespace Spine.Unity {
 				var range = new SkeletonUpdateRange() {
 					rangeStart = start,
 					rangeEndExclusive = end,
-					deltaTime = Time.deltaTime,
 					frameCount = Time.frameCount,
 					updateTiming = UpdateTiming.InLateUpdate
 				};
@@ -671,7 +667,6 @@ namespace Spine.Unity {
 #if SPINE_ENABLE_THREAD_PROFILING
 			instance.profilerSamplerUpdate[threadIndex].Begin();
 #endif
-			float deltaTime = range.deltaTime;
 			int frameCount = range.frameCount;
 			int start = range.rangeStart;
 			int end = range.rangeEndExclusive;
@@ -681,7 +676,7 @@ namespace Spine.Unity {
 
 			for (int r = start; r < end; ++r) {
 				try {
-					skeletonAnimations[r].UpdateInternal(deltaTime, frameCount, calledFromOnlyMainThread: false);
+					skeletonAnimations[r].UpdateExternal(frameCount, calledFromOnlyMainThread: false);
 				} catch (Exception exc) {
 					instance.DeferredLogException(exc, skeletonAnimations[r], threadIndex);
 				}
@@ -713,7 +708,6 @@ namespace Spine.Unity {
 		// avoid allocation, unfortunately this is really necessary
 		static Action<SkeletonUpdateRange, int> cachedUpdateSkeletonsAsyncSplitImpl = UpdateSkeletonsAsyncSplitImpl;
 		static void UpdateSkeletonsAsyncSplitImpl (SkeletonUpdateRange range, int threadIndex) {
-			float deltaTime = range.deltaTime;
 			int frameCount = range.frameCount;
 			int start = range.rangeStart;
 			int end = range.rangeEndExclusive;
@@ -731,7 +725,7 @@ namespace Spine.Unity {
 				try {
 					SkeletonAnimationBase targetSkeletonAnimation = skeletonAnimations[r];
 					if (!splitUpdateMethod[r].IsDone) {
-						splitUpdateMethod[r] = targetSkeletonAnimation.UpdateInternalSplit(splitUpdateMethod[r], deltaTime, frameCount);
+						splitUpdateMethod[r] = targetSkeletonAnimation.UpdateInternalSplit(splitUpdateMethod[r], frameCount);
 					}
 				} catch (Exception exc) {
 					instance.DeferredLogException(exc, skeletonAnimations[r], threadIndex);
@@ -745,7 +739,7 @@ namespace Spine.Unity {
 		}
 
 		bool UpdateSkeletonsMainThreadSplit (List<SkeletonAnimationBase> skeletons, int endIndexThreaded,
-			float deltaTime, int frameCount) {
+			int frameCount) {
 			bool anyWorkLeft = false;
 
 			for (int r = 0; r < endIndexThreaded; ++r) {
@@ -756,7 +750,7 @@ namespace Spine.Unity {
 					} else {
 						if (!splitUpdateMethod[r].IsDone) {
 							anyWorkLeft = true;
-							splitUpdateMethod[r] = targetSkeletonAnimation.UpdateInternalSplit(splitUpdateMethod[r], deltaTime, frameCount);
+							splitUpdateMethod[r] = targetSkeletonAnimation.UpdateInternalSplit(splitUpdateMethod[r], frameCount);
 						}
 					}
 				} catch (Exception exc) {
@@ -770,9 +764,10 @@ namespace Spine.Unity {
 		void UpdateSkeletonsSynchronous (List<SkeletonAnimationBase> skeletons, SkeletonUpdateRange range) {
 			int start = range.rangeStart;
 			int end = range.rangeEndExclusive;
+			int frameCount = range.frameCount;
 
 			for (int r = start; r < end; ++r) {
-				skeletons[r].UpdateInternal(range.deltaTime, range.frameCount, calledFromOnlyMainThread: true);
+				skeletons[r].UpdateExternal(frameCount, calledFromOnlyMainThread: true);
 			}
 		}
 

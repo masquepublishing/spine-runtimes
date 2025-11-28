@@ -388,6 +388,13 @@ namespace Spine.Unity {
 			}
 		}
 
+#if USE_THREADED_ANIMATION_UPDATE
+		public override float UsedExternalDeltaTime {
+			get {
+				return unscaledTime ? ExternalUnscaledDeltaTime : ExternalDeltaTime;
+			}
+		}
+#endif
 		protected override float DeltaTime {
 			get {
 				return unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
