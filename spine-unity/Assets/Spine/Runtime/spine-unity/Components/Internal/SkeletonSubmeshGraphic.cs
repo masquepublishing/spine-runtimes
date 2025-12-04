@@ -33,7 +33,9 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+#if HAS_LIST_POOL
 using UnityEngine.Pool;
+#endif
 using UnityEngine.UI;
 
 namespace Spine.Unity {
