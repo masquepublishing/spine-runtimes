@@ -68,7 +68,7 @@ namespace Spine.Unity {
 			GetComponents<IMaterialModifier>(modifierComponents);
 
 			Material currentMaterial = baseMaterial;
-			for (var i = 0; i < modifierComponents.Count; i++)
+			for (int i = 0; i < modifierComponents.Count; i++)
 				currentMaterial = modifierComponents[i].GetModifiedMaterial(currentMaterial);
 			ListPool<IMaterialModifier>.Release(modifierComponents);
 			return currentMaterial;
