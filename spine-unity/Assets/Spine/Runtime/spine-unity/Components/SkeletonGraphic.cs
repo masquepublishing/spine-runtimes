@@ -1193,7 +1193,7 @@ namespace Spine.Unity {
 
 			if (!UsesSingleSubmesh) {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
-					sharedMaterials[i] = submeshGraphics[i].GetModifiedMaterial(sharedMaterials[i]);
+					sharedMaterials[i] = submeshGraphics[i].UpdateModifiedMaterial(sharedMaterials[i]);
 				}
 			}
 		}
