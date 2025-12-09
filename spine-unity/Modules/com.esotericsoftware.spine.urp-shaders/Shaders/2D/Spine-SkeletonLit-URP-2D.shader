@@ -96,6 +96,7 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 			TEXTURE2D(_MaskTex);
 			SAMPLER(sampler_MaskTex);
 
+		#if UNITY_VERSION < 60030000 // before Unity 6000.3
 			#if USE_SHAPE_LIGHT_TYPE_0
 			SHAPE_LIGHT(0)
 			#endif
@@ -111,6 +112,7 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton Lit" {
 			#if USE_SHAPE_LIGHT_TYPE_3
 			SHAPE_LIGHT(3)
 			#endif
+		#endif
 
 			Varyings CombinedShapeLightVertex(Attributes v)
 			{
