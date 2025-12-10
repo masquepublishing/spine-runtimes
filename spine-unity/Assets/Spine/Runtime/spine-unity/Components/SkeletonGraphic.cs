@@ -1157,14 +1157,13 @@ namespace Spine.Unity {
 			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
 			bool hasBlendModeMaterials = blendModeMaterials.RequiresBlendModeMaterials;
 			bool hasMaterialOrTextureOverride = HasMaterialOrTextureOverride;
+			bool hasPMAAdditiveSlots = HasPMAAdditiveSlots(instructions);
 			MeshGenerator meshGenerator = meshGenerators.Items[0];
 			bool pmaVertexColors = meshGenerator.settings.pmaVertexColors;
-			bool allowCullTransparentMesh = true;
 #if HAS_CULL_TRANSPARENT_MESH
 			bool mainCullTransparentMesh = this.canvasRenderer.cullTransparentMesh;
 #endif
-
-			if (HasMaterialOrTextureOverride || hasBlendModeMaterials) {
+			if (HasMaterialOrTextureOverride || hasBlendModeMaterials || hasPMAAdditiveSlots) {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
 					Texture originalTexture = instructionItems[i].material.mainTexture;
 
@@ -1177,7 +1176,8 @@ namespace Spine.Unity {
 							customTextureOverride.TryGetValue(Texture2D.whiteTexture, out replacementTexture)) // white texture entry = replace-all
 							usedTextureItems[i] = replacementTexture;
 					}
-					if (hasBlendModeMaterials) {
+					if (hasBlendModeMaterials || hasPMAAdditiveSlots) {
+						bool allowCullTransparentMesh = true;
 						Material blendModeMaterial = GetBlendModeMaterial(instructionItems[i], blendModeMaterials,
 							pmaVertexColors, ref allowCullTransparentMesh);
 						if (blendModeMaterial != null)
@@ -1196,6 +1196,17 @@ namespace Spine.Unity {
 					sharedMaterials[i] = submeshGraphics[i].UpdateModifiedMaterial(sharedMaterials[i]);
 				}
 			}
+		}
+
+		/// <returns>True if any element of the given <c>instructions</c> list has
+		/// <see cref="SubmeshInstruction.hasPMAAdditiveSlot"/> set, false otherwise.</returns>
+		protected bool HasPMAAdditiveSlots (ExposedList<SubmeshInstruction> instructions) {
+			SubmeshInstruction[] items = instructions.Items;
+			for (int i = 0, count = instructions.Count; i < count; ++i) {
+				if (items[i].hasPMAAdditiveSlot)
+					return true;
+			}
+			return false;
 		}
 
 		/// <returns>The respective blend mode material, or null if no blend mode material is required.</returns>
