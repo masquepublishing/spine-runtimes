@@ -573,6 +573,7 @@
   - Added `Animation.getBones()` to get bone indices used by an animation
   - Added `Skeleton` methods `getGravityX()`, `getGravityY()`, `getWindX()`, `getWindY()` to allow rotating physics force directions
   - Added `SequenceTimeline` for sequence animation
+  - Added `allowMissingRegions` parameter to `AtlasAttachmentLoader` constructor to support skeletons exported with per-skin atlases
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
@@ -756,6 +757,7 @@
   - Added `Animation.getBones()` to get bone indices used by an animation
   - Added `Skeleton` properties `windX`, `windY`, `gravityX`, `gravityY` to allow rotating physics force directions
   - Added `SequenceTimeline` for sequence animation
+  - Added `allowMissingRegions` parameter to `AtlasAttachmentLoader` constructor to support skeletons exported with per-skin atlases
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
@@ -891,13 +893,25 @@
 
 ### Pixi v7
 
+- **Additions**
+  - Added static `createOptions` method for Spine initialization config to simplify subclassing
+  - Added `allowMissingRegions` parameter to game object factory
+
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - Deprecated `from()` method in favor of constructor accepting both `SpineOptions` and `SpineFromOptions`
+  - Removed deprecated methods
 
 ### Pixi v8
 
+- **Additions**
+  - Added static `createOptions` method for Spine initialization config to simplify subclassing
+  - Added `allowMissingRegions` parameter to game object factory
+  - Restored control bones example
+
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
+  - Deprecated `from()` method in favor of constructor accepting both `SpineOptions` and `SpineFromOptions`
 
 ### Phaser v3
 
