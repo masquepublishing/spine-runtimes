@@ -40,7 +40,7 @@ export class SkeletonRendererCore {
 	private clipping = new SkeletonClipping();
 	private renderCommands: RenderCommand[] = [];
 
-	render (skeleton: Skeleton): RenderCommand | undefined {
+	render (skeleton: Skeleton, pma = false, inColor?: [number, number, number, number], stride = 2): RenderCommand | undefined {
 		this.commandPool.reset();
 		this.renderCommands.length = 0;
 
@@ -56,8 +56,8 @@ export class SkeletonRendererCore {
 			}
 
 			const slotApplied = slot.applied;
-			const color = slotApplied.color;
-			const alpha = color.a;
+			const slotColor = slotApplied.color;
+			const alpha = slotColor.a;
 			if ((alpha === 0 || !slot.bone.active) && !(attachment instanceof ClippingAttachment)) {
 				clipper.clipEnd(slot);
 				continue;
@@ -80,7 +80,7 @@ export class SkeletonRendererCore {
 					continue;
 				}
 
-				attachment.computeWorldVertices(slot, this.worldVertices, 0, 2);
+				attachment.computeWorldVertices(slot, this.worldVertices, 0, stride);
 				vertices = this.worldVertices;
 				verticesCount = 4;
 				uvs = attachment.uvs as Float32Array;
@@ -99,7 +99,7 @@ export class SkeletonRendererCore {
 				if (this.worldVertices.length < attachment.worldVerticesLength)
 					this.worldVertices = new Float32Array(attachment.worldVerticesLength);
 
-				attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, this.worldVertices, 0, 2);
+				attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, this.worldVertices, 0, stride);
 				vertices = this.worldVertices;
 				verticesCount = attachment.worldVerticesLength >> 1;
 				uvs = attachment.uvs as Float32Array;
@@ -115,38 +115,71 @@ export class SkeletonRendererCore {
 			}
 
 			const skelColor = skeleton.color;
-			const r = Math.floor(skelColor.r * slotApplied.color.r * attachmentColor.r * 255);
-			const g = Math.floor(skelColor.g * slotApplied.color.g * attachmentColor.g * 255);
-			const b = Math.floor(skelColor.b * slotApplied.color.b * attachmentColor.b * 255);
-			const a = Math.floor(skelColor.a * slotApplied.color.a * attachmentColor.a * 255);
+			let color: number, darkColor: number;
+			if (pma) {
+				let a: number;
+				if (inColor) {
+					a = Math.floor(inColor[3] * skelColor.a * slotColor.a * attachmentColor.a * 255);
+					const r = Math.floor(a * inColor[0] * skelColor.r * slotColor.r * attachmentColor.r);
+					const g = Math.floor(a * inColor[1] * skelColor.g * slotColor.g * attachmentColor.g);
+					const b = Math.floor(a * inColor[2] * skelColor.b * slotColor.b * attachmentColor.b);
+					color = (a << 24) | (r << 16) | (g << 8) | b;
+				} else {
+					a = Math.floor(skelColor.a * slotColor.a * attachmentColor.a * 255);
+					const r = Math.floor(a * skelColor.r * slotColor.r * attachmentColor.r);
+					const g = Math.floor(a * skelColor.g * slotColor.g * attachmentColor.g);
+					const b = Math.floor(a * skelColor.b * slotColor.b * attachmentColor.b);
+					color = (a << 24) | (r << 16) | (g << 8) | b;
+				}
 
-			let darkColor = 0xff000000;
-			if (slotApplied.darkColor) {
-				const { r, g, b } = slotApplied.darkColor;
-				darkColor = 0xff000000 |
-					(Math.floor(r * 255) << 16) |
-					(Math.floor(g * 255) << 8) |
-					Math.floor(b * 255);
+				darkColor = 0xff000000;
+				if (slotApplied.darkColor) {
+					const { r, g, b } = slotApplied.darkColor;
+					darkColor = 0xff000000 |
+						(Math.floor(r * a) << 16) |
+						(Math.floor(g * a) << 8) |
+						Math.floor(b * a);
+				}
+			} else {
+				if (inColor) {
+					const a = Math.floor(inColor[3] * skelColor.a * slotColor.a * attachmentColor.a * 255);
+					const r = Math.floor(inColor[0] * skelColor.r * slotColor.r * attachmentColor.r * 255);
+					const g = Math.floor(inColor[1] * skelColor.g * slotColor.g * attachmentColor.g * 255);
+					const b = Math.floor(inColor[2] * skelColor.b * slotColor.b * attachmentColor.b * 255);
+					color = (a << 24) | (r << 16) | (g << 8) | b;
+				} else {
+					const a = Math.floor(skelColor.a * slotColor.a * attachmentColor.a * 255);
+					const r = Math.floor(skelColor.r * slotColor.r * attachmentColor.r * 255);
+					const g = Math.floor(skelColor.g * slotColor.g * attachmentColor.g * 255);
+					const b = Math.floor(skelColor.b * slotColor.b * attachmentColor.b * 255);
+					color = (a << 24) | (r << 16) | (g << 8) | b;
+				}
+
+				darkColor = 0;
+				if (slotApplied.darkColor) {
+					const { r, g, b } = slotApplied.darkColor;
+					darkColor = (Math.floor(r * 255) << 16) | (Math.floor(g * 255) << 8) | Math.floor(b * 255);
+				}
 			}
 
 			if (clipper.isClipping()) {
-				clipper.clipTrianglesUnpacked(vertices, indices, indicesCount, uvs);
+				clipper.clipTrianglesUnpacked(vertices, indices, indicesCount, uvs, stride);
 				vertices = clipper.clippedVerticesTyped;
-				verticesCount = clipper.clippedVerticesLength >> 1;
+				verticesCount = clipper.clippedVerticesLength / stride;
 				uvs = clipper.clippedUVsTyped;
 				indices = clipper.clippedTrianglesTyped;
 				indicesCount = clipper.clippedTrianglesLength;
 			}
 
-			const cmd = this.commandPool.getCommand(verticesCount, indicesCount);
+			const cmd = this.commandPool.getCommand(verticesCount, indicesCount, stride);
 			cmd.blendMode = slot.data.blendMode;
 			cmd.texture = texture;
 
-			cmd.positions.set(vertices.subarray(0, verticesCount << 1));
+			cmd.positions.set(vertices.subarray(0, verticesCount * stride));
 			cmd.uvs.set(uvs.subarray(0, verticesCount << 1));
 
 			for (let j = 0; j < verticesCount; j++) {
-				cmd.colors[j] = (a << 24) | (r << 16) | (g << 8) | b;
+				cmd.colors[j] = color;
 				cmd.darkColors[j] = darkColor;
 			}
 
@@ -161,14 +194,14 @@ export class SkeletonRendererCore {
 		}
 
 		clipper.clipEnd();
-		return this.batchCommands();
+		return this.batchCommands(stride);
 	}
 
 	private batchSubCommands (commands: RenderCommand[], first: number, last: number,
-		numVertices: number, numIndices: number): RenderCommand {
+		numVertices: number, numIndices: number, stride: number): RenderCommand {
 
 		const firstCmd = commands[first];
-		const batched = this.commandPool.getCommand(numVertices, numIndices);
+		const batched = this.commandPool.getCommand(numVertices, numIndices, stride);
 
 		batched.blendMode = firstCmd.blendMode;
 		batched.texture = firstCmd.texture;
@@ -183,7 +216,7 @@ export class SkeletonRendererCore {
 			const cmd = commands[i];
 
 			batched.positions.set(cmd.positions, positionsOffset);
-			positionsOffset += cmd.numVertices << 1;
+			positionsOffset += cmd.numVertices * stride;
 
 			batched.uvs.set(cmd.uvs, uvsOffset);
 			uvsOffset += cmd.numVertices << 1;
@@ -203,7 +236,7 @@ export class SkeletonRendererCore {
 		return batched;
 	}
 
-	private batchCommands (): RenderCommand | undefined {
+	private batchCommands (stride: number): RenderCommand | undefined {
 		if (this.renderCommands.length === 0) return undefined;
 
 		let root: RenderCommand | undefined;
@@ -234,7 +267,7 @@ export class SkeletonRendererCore {
 				numIndices += cmd.numIndices;
 			} else {
 				const batched = this.batchSubCommands(this.renderCommands, startIndex, i - 1,
-					numVertices, numIndices);
+					numVertices, numIndices, stride);
 
 				if (!last) {
 					root = last = batched;
@@ -257,6 +290,8 @@ export class SkeletonRendererCore {
 	}
 }
 
+// values with under score is the original sized array, bigger than necessary
+// values without under score is a view of the orignal array, sized as needed
 interface RenderCommand {
 	positions: Float32Array;
 	uvs: Float32Array;
@@ -280,17 +315,17 @@ class CommandPool {
 	private pool: RenderCommand[] = [];
 	private inUse: RenderCommand[] = [];
 
-	getCommand (numVertices: number, numIndices: number): RenderCommand {
+	getCommand (numVertices: number, numIndices: number, stride: number): RenderCommand {
 		let cmd: RenderCommand | undefined;
 		for (const c of this.pool) {
-			if (c._positions.length >= numVertices << 1 && c._indices.length >= numIndices) {
+			if (c._positions.length >= numVertices * stride && c._indices.length >= numIndices) {
 				cmd = c;
 				break;
 			}
 		}
 
 		if (!cmd) {
-			const _positions = new Float32Array(numVertices << 1);
+			const _positions = new Float32Array(numVertices * stride);
 			const _uvs = new Float32Array(numVertices << 1);
 			const _colors = new Uint32Array(numVertices);
 			const _darkColors = new Uint32Array(numVertices);
@@ -317,8 +352,8 @@ class CommandPool {
 			cmd.numVertices = numVertices;
 			cmd.numIndices = numIndices;
 
-			cmd.positions = cmd._positions.subarray(0, numVertices << 1);
-			cmd.uvs = cmd._uvs.subarray(0, numVertices * 2);
+			cmd.positions = cmd._positions.subarray(0, numVertices * stride);
+			cmd.uvs = cmd._uvs.subarray(0, numVertices << 1);
 			cmd.colors = cmd._colors.subarray(0, numVertices);
 			cmd.darkColors = cmd._darkColors.subarray(0, numVertices);
 			cmd.indices = cmd._indices.subarray(0, numIndices);
