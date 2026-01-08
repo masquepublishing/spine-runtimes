@@ -121,7 +121,7 @@ namespace Spine.Unity {
 
 #if BUILT_IN_SPRITE_MASK_COMPONENT
 		/// <seealso cref="MaskInteraction"/>
-		protected SpriteMaskInteraction maskInteraction = SpriteMaskInteraction.None;
+		[SerializeField] protected SpriteMaskInteraction maskInteraction = SpriteMaskInteraction.None;
 
 		/// <summary>Cached reference to the already setup material override set at the respective
 		/// SkeletonDataAsset.atlasAssets array entry.</summary>

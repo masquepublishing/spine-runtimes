@@ -37,10 +37,6 @@
 #define PER_MATERIAL_PROPERTY_BLOCKS
 #endif
 
-#if UNITY_2017_1_OR_NEWER
-#define BUILT_IN_SPRITE_MASK_COMPONENT
-#endif
-
 using UnityEditor;
 using UnityEngine;
 
