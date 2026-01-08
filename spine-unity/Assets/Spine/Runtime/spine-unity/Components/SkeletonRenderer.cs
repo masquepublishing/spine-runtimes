@@ -534,8 +534,7 @@ namespace Spine.Unity {
 			materialsNeedUpdate = false;
 		}
 
-		protected virtual void ConfigureMaterials (ExposedList<SubmeshInstruction> instructions) {
-			Material[] sharedMaterials = rendererBuffers.sharedMaterials;
+		public virtual void ConfigureMaterials (Material[] sharedMaterials, ExposedList<SubmeshInstruction> instructions) {
 			if (customMaterialOverride.Count > 0) {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
 					Material material = sharedMaterials[i];
@@ -568,6 +567,10 @@ namespace Spine.Unity {
 				}
 			}
 #endif
+		}
+
+		protected virtual void ConfigureMaterials (ExposedList<SubmeshInstruction> instructions) {
+			ConfigureMaterials(rendererBuffers.sharedMaterials, instructions);
 		}
 
 #if BUILT_IN_SPRITE_MASK_COMPONENT

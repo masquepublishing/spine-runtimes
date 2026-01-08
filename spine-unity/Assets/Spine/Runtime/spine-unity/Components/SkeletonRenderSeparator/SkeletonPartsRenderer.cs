@@ -94,7 +94,9 @@ namespace Spine.Unity {
 			meshFilter.sharedMesh = null;
 		}
 
-		public void RenderParts (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh) {
+		public void RenderParts (SkeletonRenderer skeletonRenderer, ExposedList<SubmeshInstruction> instructions,
+			int startSubmesh, int endSubmesh) {
+
 			LazyIntialize();
 
 			// STEP 1: Create instruction
@@ -125,9 +127,12 @@ namespace Spine.Unity {
 				meshGenerator.FillVertexData(mesh);
 				if (updateTriangles) {
 					meshGenerator.FillTriangles(mesh);
-					meshRenderer.sharedMaterials = buffers.UpdateSharedMaterialsArray();
-				} else if (materialsChanged) {
-					meshRenderer.sharedMaterials = buffers.UpdateSharedMaterialsArray();
+				}
+				if (updateTriangles || materialsChanged) {
+					Material[] materials = buffers.UpdateSharedMaterialsArray();
+					if (skeletonRenderer)
+						skeletonRenderer.ConfigureMaterials(materials, currentInstructions.submeshInstructions);
+					meshRenderer.sharedMaterials = materials;
 				}
 				meshGenerator.FillLateVertexData(mesh);
 			}

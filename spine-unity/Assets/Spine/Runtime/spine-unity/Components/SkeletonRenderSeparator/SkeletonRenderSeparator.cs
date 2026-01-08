@@ -281,7 +281,7 @@ namespace Spine.Unity {
 					if (assignPropertyBlock)
 						currentRenderer.SetPropertyBlock(copiedBlock);
 					// Render
-					currentRenderer.RenderParts(instruction.submeshInstructions, start, si + 1);
+					currentRenderer.RenderParts(skeletonRenderer, instruction.submeshInstructions, start, si + 1);
 
 					start = si + 1;
 					rendererIndex++;
