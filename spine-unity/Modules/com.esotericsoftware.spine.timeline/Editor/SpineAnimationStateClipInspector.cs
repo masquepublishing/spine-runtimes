@@ -97,14 +97,12 @@ namespace Spine.Unity.Editor {
 		}
 
 		protected TimelineClip FindTimelineClip (SpineAnimationStateClip targetClip) {
-			string[] guids = AssetDatabase.FindAssets("t:TimelineAsset");
-			foreach (string guid in guids) {
-				TimelineAsset timeline = (TimelineAsset)AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid), typeof(TimelineAsset));
-				foreach (TrackAsset track in timeline.GetOutputTracks()) {
-					foreach (TimelineClip clip in track.GetClips()) {
-						if (clip.asset.GetType() == typeof(SpineAnimationStateClip) && object.ReferenceEquals(clip.asset, targetClip)) {
-							return clip;
-						}
+			string assetPath = AssetDatabase.GetAssetPath(targetClip);
+			TimelineAsset timeline = AssetDatabase.LoadAssetAtPath<TimelineAsset>(assetPath);
+			foreach (TrackAsset track in timeline.GetOutputTracks()) {
+				foreach (TimelineClip clip in track.GetClips()) {
+					if (clip.asset.GetType() == typeof(SpineAnimationStateClip) && object.ReferenceEquals(clip.asset, targetClip)) {
+						return clip;
 					}
 				}
 			}
