@@ -377,7 +377,8 @@ export class SpineGameObject extends DepthMixin(
 		const transform = Phaser.GameObjects.GetCalcMatrix(
 			src,
 			camera,
-			parentMatrix
+			parentMatrix,
+			!drawingContext.useCanvas,
 		).calc;
 		const a = transform.a,
 			b = transform.b,
