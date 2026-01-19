@@ -522,6 +522,19 @@ namespace Spine.Unity.Editor {
 						() => RuntimeSettings.UseThreadedAnimation, value => RuntimeSettings.UseThreadedAnimation = value,
 						new GUIContent("Threaded Animation", "Global setting for the equally named SkeletonAnimation and SkeletonGraphic Inspector parameter."));
 
+#if SPINE_DISABLE_LOAD_BALANCING
+					bool loadBalancingEnabled = false;
+#else
+					bool loadBalancingEnabled = true;
+#endif
+					using (new GUILayout.HorizontalScope()) {
+						EditorGUILayout.PrefixLabel(new GUIContent("Load Balancing",
+							"Enable load balancing to better utilize threads." +
+							"Only has an effect when using threaded animation or threaded mesh generation."));
+						SpineEditorUtilities.EnableDisableDefineButtons(SpineBuildEnvUtility.SPINE_DISABLE_LOAD_BALANCING,
+							loadBalancingEnabled, invert: true);
+					}
+
 #if ALLOWS_CUSTOM_PROFILING
 #if SPINE_ENABLE_THREAD_PROFILING
 					bool threadProfilingEnabled = true;

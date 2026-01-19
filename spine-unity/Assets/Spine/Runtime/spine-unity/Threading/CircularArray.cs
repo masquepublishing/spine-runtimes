@@ -31,50 +31,37 @@ using System;
 using System.Threading;
 
 /// <summary>
-/// A generic lock-free single-producer single-consumer queue.
+/// An array with wrap-around access for LockFreeWorkStealingDeque based on the paper
+/// "Dynamic Circular Work-Stealing Deque", authors David Chase and Yossi Lev.
+/// https://www.dre.vanderbilt.edu/~schmidt/PDF/work-stealing-dequeue.pdf
+/// Modified to support negative indices.
 /// </summary>
-public class LockFreeSPSCQueue<T> {
-	private readonly int capacity;
-	private readonly T[] circularBuffer;
-	private int headIndex;
-	private int tailIndex;
+public class CircularArray<T> {
+	private int size;
+	private T[] segment;
+	private uint mask;
 
-	public LockFreeSPSCQueue (int allocatedCapacity) {
-		capacity = allocatedCapacity;
-		circularBuffer = new T[allocatedCapacity];
-		headIndex = tailIndex = 0;
+	public int Size { get { return size; } }
+
+	public CircularArray (int sizePoT) {
+		this.size = sizePoT;
+		segment = new T[sizePoT];
+		mask = (uint)(sizePoT - 1);
 	}
 
-	/// <summary>Enqueues an item if there is space available.</summary>
-	/// <returns>True if the item was successfully enqueued, false otherwise.</returns>
-	public bool Enqueue (T item) {
-		int head = Thread.VolatileRead(ref headIndex);
-		int nextHead = (head + 1) % capacity;
-
-		if (nextHead == Thread.VolatileRead(ref tailIndex))
-			return false; // queue is full
-
-		circularBuffer[head] = item;
-		Thread.VolatileWrite(ref headIndex, nextHead);
-		return true;
+	public T Get (int i) {
+		return this.segment[((uint)i) & mask];
 	}
 
-	/// <summary>
-	/// Dequeues an item unless the queue is empty.
-	/// </summary>
-	/// <param name="item">The dequeued item, or the default element if empty.</param>
-	/// <returns>True if the item was successfully dequeued, false otherwise.</returns>
-	public bool Dequeue (out T item) {
-		int tail = Thread.VolatileRead(ref tailIndex);
+	public void Put (int i, T item) {
+		this.segment[((uint)i) & mask] = item;
+	}
 
-		if (tail == Thread.VolatileRead(ref headIndex)) {
-			item = default(T); // queue is empty
-			return false;
+	public CircularArray<T> Grow (int b, int t, int newSizePoT) {
+		CircularArray<T> a = new CircularArray<T>(newSizePoT);
+		for (int i = t; i < b; i++) {
+			a.Put(i, this.Get(i));
 		}
-
-		item = circularBuffer[tail];
-		int nextTail = (tail + 1) % capacity;
-		Thread.VolatileWrite(ref tailIndex, nextTail);
-		return true;
+		return a;
 	}
 }

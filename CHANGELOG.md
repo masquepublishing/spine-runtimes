@@ -364,6 +364,8 @@
   - Added `SkeletonUpdateSystem.Instance.GroupRenderersBySkeletonType` and `GroupAnimationBySkeletonType` properties. Defaults to disabled. Later when smart partitioning is implemented, enabling this parameter might slightly improve cache locality. Until then having it enabled combined with different skeleton complexity would lead to worse load balancing.
   - Added previously missing editor drag & drop skeleton instantiation option *SkeletonGraphic (UI) Mecanim* combining components `SkeletonGraphic` and `SkeletonMecanim`.
   - Added define `SPINE_DISABLE_THREADING` to disable threaded animation and mesh generation entirely, removing the respective code. This define can be set as `Scripting Define Symbols` globally or for selective build profiles where desired.
+  - Added automatic load balancing (work stealing) for improved performance when using threaded animation and mesh generation, enabled by default. Load balancing can be disabled via a new Spine preferences parameter `Threading Defaults - Load Balancing` setting a build define accordingly. 
+    Additional configuration parameters `SkeletonUpdateSystem.UpdateChunksPerThread` and `LateUpdateChunksPerThread` are available to fine-tune the chunk count for load balancing. A minimum of 8 chunks is recommended with load balancing enabled. Higher values add higher overhead with potentially detrimental effect on performance.
 
 - **Deprecated**
 

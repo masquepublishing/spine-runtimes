@@ -27,6 +27,8 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#define ENABLE_WORK_STEALING
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -37,7 +39,7 @@ using UnityEngine.Profiling;
 /// Class to distribute work items like ThreadPool.QueueUserWorkItem but keep the same tasks at the same thread
 /// across frames, increasing core affinity (and in some scenarios with lower cache pressure on secondary cores,
 /// perhaps even reduce cache eviction).
-public class LockFreeWorkerPool<T> : IDisposable {
+public class LockFreeWorkStealingWorkerPool<T> : IDisposable {
 	public class Task {
 		public T parameters;
 		public Action<T, int> function;
@@ -45,39 +47,48 @@ public class LockFreeWorkerPool<T> : IDisposable {
 
 	private readonly int _threadCount;
 	private readonly Thread[] _threads;
-	private readonly LockFreeSPSCQueue<Task>[] _taskQueues;
+	private readonly LockFreeWorkStealingDeque<Task>[] _taskQueues;
 	private readonly AutoResetEvent[] _taskAvailable;
 	private volatile bool _running = true;
 
-	public LockFreeWorkerPool (int threadCount, int queueCapacity = 2) {
+	public LockFreeWorkStealingWorkerPool (int threadCount, int queueCapacity = 8) {
 		_threadCount = threadCount;
 		_threads = new Thread[_threadCount];
-		_taskQueues = new LockFreeSPSCQueue<Task>[_threadCount];
+		_taskQueues = new LockFreeWorkStealingDeque<Task>[_threadCount];
 		_taskAvailable = new AutoResetEvent[_threadCount];
 
 		for (int i = 0; i < _threadCount; i++) {
-			_taskQueues[i] = new LockFreeSPSCQueue<Task>(queueCapacity);
+			_taskQueues[i] = new LockFreeWorkStealingDeque<Task>(queueCapacity);
 			_taskAvailable[i] = new AutoResetEvent(false);
-
 			int index = i; // Capture the index for the thread
 			_threads[i] = new Thread(() => WorkerLoop(index));
+		}
+		for (int i = 0; i < _threadCount; i++) {
 			_threads[i].Start();
 		}
 	}
 
-	/// <summary>Enqueues a task item if there is space available.</summary>
+	/// <summary>Enqueues a task item if there is space available, but does
+	/// not start processing until <see cref="AllowTaskProcessing"/> is called.</summary>
 	/// <returns>True if the item was successfully enqueued, false otherwise.</returns>
 	public bool EnqueueTask (int threadIndex, Task task) {
 		if (threadIndex < 0 || threadIndex >= _threadCount)
 			throw new ArgumentOutOfRangeException("threadIndex");
 
-		bool success = _taskQueues[threadIndex].Enqueue(task);
-		if (!success) {
-			return false;
-		}
-
-		_taskAvailable[threadIndex].Set();
+		_taskQueues[threadIndex].PushTop(task);
 		return true;
+	}
+
+	/// <summary>
+	/// Call this method after <see cref="EnqueueTaskWithoutProcessing"/> to start processing all enqueued tasks.
+	/// This limitation comes from LockFreeWorkStealingDeque requiring the same thread calling Push and Pop,
+	/// which would not be the case here.
+	/// </summary>
+	/// <param name="numAsyncThreads">Limits the number of active worker threads. Note that when work stealing is
+	/// enabled, empty threads steal tasks from other threads even if no tasks were originally enqueued at them.</param>
+	public void AllowTaskProcessing (int numAsyncThreads) {
+		for (int t = 0; t < numAsyncThreads; ++t)
+			_taskAvailable[t].Set();
 	}
 
 	private void WorkerLoop (int threadIndex) {
@@ -85,13 +96,29 @@ public class LockFreeWorkerPool<T> : IDisposable {
 		Profiler.BeginThreadProfiling("Spine Threads", "Spine Thread " + threadIndex);
 #endif
 		while (_running) {
+			_taskAvailable[threadIndex].WaitOne();
 			Task task = null;
-			bool success = _taskQueues[threadIndex].Dequeue(out task);
-			if (success) {
-				task.function(task.parameters, threadIndex);
-			} else {
-				_taskAvailable[threadIndex].WaitOne();
-			}
+			bool success;
+			do {
+				success = _taskQueues[threadIndex].Pop(out task);
+				if (success) {
+					task.function(task.parameters, threadIndex);
+				} else {
+	#if ENABLE_WORK_STEALING
+					int stealThreadIndex = (threadIndex + 1) % _threadCount;
+					while (stealThreadIndex != threadIndex) { // circle complete
+						while (true) {
+							task = null;
+							bool stealSuccessful = _taskQueues[stealThreadIndex].Steal(out task);
+							if (!stealSuccessful)
+								break;
+							task.function(task.parameters, threadIndex);
+						}
+						stealThreadIndex = (stealThreadIndex + 1) % _threadCount;
+					}
+	#endif
+				}
+			} while (success);
 		}
 #if SPINE_ENABLE_THREAD_PROFILING
 		Profiler.EndThreadProfiling();
@@ -100,12 +127,15 @@ public class LockFreeWorkerPool<T> : IDisposable {
 
 	public void Dispose () {
 		_running = false;
+
 		for (int i = 0; i < _threadCount; i++) {
 			_taskAvailable[i].Set(); // Wake up threads to exit
 		}
+		
 		foreach (var thread in _threads) {
 			thread.Join();
 		}
+
 		for (int i = 0; i < _threadCount; i++) {
 			_taskAvailable[i].Close();
 		}
