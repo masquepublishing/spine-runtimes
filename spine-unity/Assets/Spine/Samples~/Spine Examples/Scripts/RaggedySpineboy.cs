@@ -109,7 +109,11 @@ namespace Spine.Unity.Examples {
 
 			float t = 0;
 			while (t < 0.5f) {
+#if RIGIDBODY2D_USES_LINEAR_VELOCITY
 				t = (ragdoll.RootRigidbody.linearVelocity.magnitude > 0.09f) ? 0 : t + Time.deltaTime;
+#else
+				t = (ragdoll.RootRigidbody.velocity.magnitude > 0.09f) ? 0 : t + Time.deltaTime;
+#endif
 				yield return null;
 			}
 
