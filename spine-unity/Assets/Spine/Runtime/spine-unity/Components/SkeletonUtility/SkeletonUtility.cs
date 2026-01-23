@@ -31,6 +31,10 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
+#if UNITY_6000_0_OR_NEWER
+#define USE_RIGIDBODY_BODY_TYPE
+#endif
+
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
 #define AUTO_UPGRADE_TO_43_COMPONENTS
 #endif
@@ -128,7 +132,11 @@ namespace Spine.Unity {
 			Rigidbody2D rb = gameObject.GetComponent<Rigidbody2D>();
 			if (rb == null) {
 				rb = gameObject.AddComponent<Rigidbody2D>();
+#if USE_RIGIDBODY_BODY_TYPE
+				rb.bodyType = isKinematic ? RigidbodyType2D.Kinematic : RigidbodyType2D.Dynamic;
+#else
 				rb.isKinematic = isKinematic;
+#endif
 				rb.gravityScale = gravityScale;
 			}
 			return rb;

@@ -27,7 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if !SPINE_DISABLE_THREADING
 #define USE_THREADED_SKELETON_UPDATE
+#endif
 
 using System;
 using System.Collections;

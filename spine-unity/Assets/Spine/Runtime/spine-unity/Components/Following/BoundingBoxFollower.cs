@@ -31,6 +31,10 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
+#if UNITY_2023_1_OR_NEWER
+#define USE_COLLIDER_COMPOSITE_OPERATION
+#endif
+
 #if !SPINE_AUTO_UPGRADE_COMPONENTS_OFF
 #define AUTO_UPGRADE_TO_43_COMPONENTS
 #endif
@@ -177,7 +181,12 @@ namespace Spine.Unity {
 						SkeletonUtility.SetColliderPointsLocal(bbCollider, skeleton, slot, boundingBoxAttachment);
 						bbCollider.isTrigger = isTrigger;
 						bbCollider.usedByEffector = usedByEffector;
+#if USE_COLLIDER_COMPOSITE_OPERATION
+						bbCollider.compositeOperation = usedByComposite ?
+							Collider2D.CompositeOperation.Merge : Collider2D.CompositeOperation.None;
+#else
 						bbCollider.usedByComposite = usedByComposite;
+#endif
 						bbCollider.enabled = false;
 						bbCollider.hideFlags = HideFlags.NotEditable;
 						colliderTable.Add(boundingBoxAttachment, bbCollider);
@@ -217,7 +226,7 @@ namespace Spine.Unity {
 						DestroyImmediate(collider);
 					else
 #endif
-					Destroy(collider);
+						Destroy(collider);
 				}
 			}
 		}

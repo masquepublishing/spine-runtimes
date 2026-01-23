@@ -27,6 +27,10 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2022_2_OR_NEWER
+#define USE_FIND_OBJECTS_BY_TYPE
+#endif
+
 #if !SPINE_DISABLE_THREADING
 #define USE_THREADED_SKELETON_UPDATE
 #define USE_THREADED_ANIMATION_UPDATE // requires USE_THREADED_SKELETON_UPDATE enabled
@@ -101,7 +105,11 @@ namespace Spine.Unity {
 		public static SkeletonUpdateSystem Instance {
 			get {
 				if (singletonInstance == null) {
+#if USE_FIND_OBJECTS_BY_TYPE
+					singletonInstance = FindFirstObjectByType<SkeletonUpdateSystem>();
+#else
 					singletonInstance = FindObjectOfType<SkeletonUpdateSystem>();
+#endif
 					if (singletonInstance == null) {
 						GameObject singletonGameObject = new GameObject("SkeletonUpdateSystem");
 						singletonInstance = singletonGameObject.AddComponent<SkeletonUpdateSystem>();

@@ -27,7 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if !SPINE_DISABLE_THREADING
 #define USE_THREADED_ANIMATION_UPDATE
+#endif
 
 using Spine.Unity;
 using System.Collections;
