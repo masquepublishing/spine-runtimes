@@ -31,6 +31,10 @@
 #define USE_COLLIDER_COMPOSITE_OPERATION
 #endif
 
+#if UNITY_6000_0_OR_NEWER
+#define RIGIDBODY2D_USES_LINEAR_VELOCITY
+#endif
+
 using Spine.Unity;
 using System.Collections;
 using UnityEngine;
@@ -69,7 +73,12 @@ namespace Spine.Unity.Examples {
 		void Launch () {
 			RemoveRigidbody();
 			ragdoll.Apply();
-			ragdoll.RootRigidbody.linearVelocity = new Vector2(Random.Range(-launchVelocity.x, launchVelocity.x), launchVelocity.y);
+			Vector2 velocity = new Vector2(Random.Range(-launchVelocity.x, launchVelocity.x), launchVelocity.y);
+#if RIGIDBODY2D_USES_LINEAR_VELOCITY
+			ragdoll.RootRigidbody.linearVelocity = velocity;
+#else
+			ragdoll.RootRigidbody.velocity = velocity;
+#endif
 			StartCoroutine(WaitUntilStopped());
 		}
 
