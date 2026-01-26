@@ -148,7 +148,11 @@ namespace Spine.Unity.Examples {
 		void UpdateMaterials () {
 #if UNITY_EDITOR
 			if (!referenceRenderer) return;
-			if (!referenceMeshFilter) Reset();
+			if (!referenceMeshFilter) {
+				referenceMeshFilter = referenceRenderer.GetComponent<MeshFilter>();
+				if (!referenceMeshFilter)
+					Reset();
+			}
 #endif
 			ownMeshFilter.sharedMesh = referenceMeshFilter.sharedMesh;
 
