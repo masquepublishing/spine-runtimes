@@ -334,7 +334,7 @@
 
 ### Unity
 
-- **Officially supported Unity versions are 2017.1-6000.1**.
+- **Officially supported Unity versions are 2017.1-6000.3**.
 
 - **Breaking changes**
   - Updated to use new C# runtime with all breaking changes above
