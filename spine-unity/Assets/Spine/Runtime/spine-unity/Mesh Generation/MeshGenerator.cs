@@ -1230,6 +1230,33 @@ namespace Spine.Unity {
 				}
 			}
 		}
+
+		public void FlipBackfaceWindingOrder () {
+			int submeshCount = submeshes.Count;
+			ExposedList<int>[] submeshesItems = submeshes.Items;
+			Vector3[] vertexPositions = vertexBuffer.Items;
+
+			for (int s = 0; s < submeshCount; ++s) {
+				ExposedList<int> submeshIndices = submeshesItems[s];
+				int indexCount = submeshIndices.Count;
+				int[] indices = submeshIndices.Items;
+				for (int i = 0; i < indexCount; i += 3) {
+					int iA = indices[i];
+					int iB = indices[i + 1];
+					int iC = indices[i + 2];
+					Vector3 a = vertexPositions[iA];
+					Vector3 b = vertexPositions[iB];
+					Vector3 c = vertexPositions[iC];
+					Vector2 d1 = new Vector2(b.x - a.x, b.y - a.y);
+					Vector2 d2 = new Vector2(c.x - b.x, c.y - b.y);
+					float z = d1.x * d2.y - d1.y * d2.x;
+					if (z < 0.0f) {
+						indices[i + 1] = iC;
+						indices[i + 2] = iB;
+					}
+				}
+			}
+		}
 		#endregion
 
 		#region Step 3 : Transfer vertex and triangle data to UnityEngine.Mesh

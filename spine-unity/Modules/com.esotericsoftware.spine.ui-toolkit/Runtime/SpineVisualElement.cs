@@ -95,6 +95,9 @@ namespace Spine.Unity {
 		}
 		public string initialSkinName;
 
+		/// <summary>Flip indices of back-faces to correct winding order during mesh generation.
+		/// UI Elements otherwise does not draw back-faces.</summary>
+		[UxmlAttribute] public bool flipBackFaces { get; set; } = true;
 		[UxmlAttribute] public bool startingLoop { get; set; } = true;
 		[UxmlAttribute] public float timeScale { get; set; } = 1.0f;
 
@@ -335,6 +338,8 @@ namespace Spine.Unity {
 				// clipping is done, vertex counts are final.
 
 				PrepareUISubmesh(uiSubmesh, meshGenerator.VertexCount, meshGenerator.SubmeshIndexCount(0));
+				if (flipBackFaces)
+					meshGenerator.FlipBackfaceWindingOrder();
 				meshGenerator.FillVertexData(ref uiSubmesh.verticesSlice);
 				meshGenerator.FillTrianglesSingleSubmesh(ref uiSubmesh.indicesSlice);
 
