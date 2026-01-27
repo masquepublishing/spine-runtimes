@@ -540,25 +540,16 @@ export class Spine extends Container {
 		slotObject.visible = this.skeleton.drawOrder.includes(slot) && followAttachmentValue;
 
 		if (slotObject.visible) {
-			const applied = slot.bone.applied;
-			slotObject.position.set(applied.worldX, applied.worldY);
-			slotObject.angle = applied.getWorldRotationX();
+			let applied = slot.bone.applied;
 
-			let bone: Bone | null = slot.bone;
-			let cumulativeScaleX = 1;
-			let cumulativeScaleY = 1;
-			while (bone) {
-				cumulativeScaleX *= bone.applied.scaleX;
-				cumulativeScaleY *= bone.applied.scaleY;
-				bone = bone.parent;
-			};
-
-			if (cumulativeScaleX < 0) slotObject.angle -= 180;
-
-			slotObject.scale.set(
-				applied.getWorldScaleX() * Math.sign(cumulativeScaleX),
-				applied.getWorldScaleY() * Math.sign(cumulativeScaleY),
-			);
+			const matrix = slotObject.localTransform;
+			matrix.a = applied.a;
+			matrix.b = applied.c;
+			matrix.c = -applied.b;
+			matrix.d = -applied.d;
+			matrix.tx = applied.worldX;
+			matrix.ty = applied.worldY;
+			slotObject.transform.setFromMatrix(matrix);
 
 			slotObject.zIndex = zIndex + 1;
 			slotObject.alpha = this.skeleton.color.a * pose.color.a;

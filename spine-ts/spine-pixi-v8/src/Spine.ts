@@ -785,26 +785,16 @@ export class Spine extends ViewContainer {
 		container.visible = this.skeleton.drawOrder.includes(slot) && followAttachmentValue;
 
 		if (container.visible) {
-			let bone: Bone | null = slot.bone;
+			let applied = slot.bone.applied;
 
-			const applied = bone.applied;
-			container.position.set(applied.worldX, applied.worldY);
-			container.angle = applied.getWorldRotationX();
-
-			let cumulativeScaleX = 1;
-			let cumulativeScaleY = 1;
-			while (bone) {
-				cumulativeScaleX *= bone.applied.scaleX;
-				cumulativeScaleY *= bone.applied.scaleY;
-				bone = bone.parent;
-			};
-
-			if (cumulativeScaleX < 0) container.angle -= 180;
-
-			container.scale.set(
-				applied.getWorldScaleX() * Math.sign(cumulativeScaleX),
-				applied.getWorldScaleY() * Math.sign(cumulativeScaleY),
-			);
+			const matrix = container.localTransform;
+			matrix.a = applied.a;
+			matrix.b = applied.c;
+			matrix.c = -applied.b;
+			matrix.d = -applied.d;
+			matrix.tx = applied.worldX;
+			matrix.ty = applied.worldY;
+			container.setFromMatrix(matrix);
 
 			container.alpha = this.skeleton.color.a * pose.color.a;
 		}
