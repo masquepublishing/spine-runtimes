@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "com.unity.modules.uielements": "1.0.0",
-    "com.esotericsoftware.spine.spine-unity": "4.3.0"
+    "com.esotericsoftware.spine.spine-unity": "4.3.41"
   },
   "keywords": [
     "spine",
