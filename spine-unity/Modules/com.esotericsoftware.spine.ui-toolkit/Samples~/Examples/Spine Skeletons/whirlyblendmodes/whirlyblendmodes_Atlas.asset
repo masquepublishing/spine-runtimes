@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6b194f808b1af6499c93410e504af42, type: 3}
-  m_Name: raptor_Atlas
-  m_EditorClassIdentifier: 
+  m_Name: whirlyblendmodes_Atlas
+  m_EditorClassIdentifier: spine-unity::Spine.Unity.SpineAtlasAsset
   serializedMaterialOverrides: []
   textureLoadingMode: 0
   onDemandTextureLoader: {fileID: 0}
-  atlasFile: {fileID: 4900000, guid: 93456ae5f468800499b80d92a05282f3, type: 3}
+  atlasFile: {fileID: 4900000, guid: d4fe1661c50e86b4a951b11855a4f44f, type: 3}
   materials:
-  - {fileID: 2100000, guid: f88a0ab51f5e5a84bb56248a0cb5884e, type: 2}
+  - {fileID: 2100000, guid: 17b5573ded7e02d49a155f13d7e8a6a6, type: 2}

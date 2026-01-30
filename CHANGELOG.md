@@ -366,6 +366,9 @@
   - Added define `SPINE_DISABLE_THREADING` to disable threaded animation and mesh generation entirely, removing the respective code. This define can be set as `Scripting Define Symbols` globally or for selective build profiles where desired.
   - Added automatic load balancing (work stealing) for improved performance when using threaded animation and mesh generation, enabled by default. Load balancing can be disabled via a new Spine preferences parameter `Threading Defaults - Load Balancing` setting a build define accordingly. 
     Additional configuration parameters `SkeletonUpdateSystem.UpdateChunksPerThread` and `LateUpdateChunksPerThread` are available to fine-tune the chunk count for load balancing. A minimum of 8 chunks is recommended with load balancing enabled. Higher values add higher overhead with potentially detrimental effect on performance.
+  - Spine UI Toolkit UPM package now supports rendering back-face triangles. Enable `Flip Back Faces` to automatically fix back-face geometry in an additional pass (defaults to enabled). Disable the setting to save additional processing overhead.
+  - Spine UI Toolkit UPM package now supports PMA atlas textures. At the `SpineVisualElement` expand `Blend Mode Materials` and hit `Detect Materials` to automatically assign the proper PMA or straight alpha material at `Normal Material`. Unity minimum version increased to 6000.3 which added  support for UI Toolkit materials.
+  - Spine UI Toolkit UPM package now supports all Spine blend modes via blend mode materials and multiple materials per skeleton. Enable `Multiple Materials` (enabled by default), expand `Blend Mode Materials` and hit `Detect Materials` to automatically assign the correct PMA or straight alpha blend mode materials.
 
 - **Deprecated**
 
