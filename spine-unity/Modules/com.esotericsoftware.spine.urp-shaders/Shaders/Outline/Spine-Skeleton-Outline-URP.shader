@@ -1,4 +1,4 @@
-Shader "Universal Render Pipeline/Spine/Skeleton" {
+Shader "Universal Render Pipeline/Spine/Outline/Skeleton" {
 	Properties {
 		_Cutoff("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex("Main Texture", 2D) = "black" {}
@@ -39,117 +39,45 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 		}
 
 		Pass {
-			Name "Forward"
-			Tags{"LightMode" = "UniversalForward"}
-
-			ZWrite[_ZWrite]
-			Cull Off
 			Blend One OneMinusSrcAlpha
-
-			HLSLPROGRAM
-			// Required to compile gles 2.0 with standard srp library
-			#pragma prefer_hlslcc gles
-			#pragma exclude_renderers d3d11_9x
-
-			// -------------------------------------
-			// Unity defined keywords
-			#pragma multi_compile_fog
-
-			//--------------------------------------
-			// GPU Instancing
-			#pragma multi_compile_instancing
-
-			//--------------------------------------
-			// Spine related keywords
-			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
-			#pragma shader_feature _TINT_BLACK_ON
-			#pragma shader_feature _ZWRITE
-			#pragma vertex vert
-			#pragma fragment frag
-
-			#undef LIGHTMAP_ON
-
-			#define USE_URP
-			#define fixed4 half4
-			#define fixed3 half3
-			#define fixed half
-			#include "Include/Spine-Input-URP.hlsl"
-			#include "Include/Spine-Skeleton-ForwardPass-URP.hlsl"
-			ENDHLSL
-	 	}
-
-		Pass
-		{
-			Name "ShadowCaster"
-			Tags{"LightMode" = "ShadowCaster"}
-
-			ZWrite On
-			ColorMask 0
-			ZTest LEqual
+			ZWrite Off
 			Cull Off
 
+			Name "Outline"
+			Tags { "LightMode" = "SRPDefaultUnlit" "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
 			HLSLPROGRAM
 			// Required to compile gles 2.0 with standard srp library
 			#pragma prefer_hlslcc gles
 			#pragma exclude_renderers d3d11_9x
-			#pragma target 2.0
-
-			// -------------------------------------
-			// Material Keywords
-			#pragma shader_feature _ALPHATEST_ON
 
 			//--------------------------------------
 			// GPU Instancing
 			#pragma multi_compile_instancing
-			#pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
-			#pragma vertex ShadowPassVertexSkeletonLit
-			#pragma fragment ShadowPassFragmentSkeletonLit
+			#pragma vertex vertOutline
+			#pragma fragment fragOutline
+			#pragma shader_feature _ _USE8NEIGHBOURHOOD_ON
+			#pragma shader_feature _ _USE_SCREENSPACE_OUTLINE_WIDTH
+			#pragma shader_feature _ _OUTLINE_FILL_INSIDE
+
+			#pragma fragmentoption ARB_precision_hint_fastest
+			#pragma multi_compile_local _ PIXELSNAP_ON
 
 			#define USE_URP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-			#include "Include/Spine-Input-URP.hlsl"
-			#include "Include/Spine-SkeletonLit-ShadowCasterPass-URP.hlsl"
-
+			#define NO_CUTOFF_PARAM
+			#include "../Include/Spine-Input-Outline-URP.hlsl"
+			#include "../Include/Spine-Outline-Pass-URP.hlsl"
 			ENDHLSL
 		}
 
-		Pass
-		{
-			Name "DepthOnly"
-			Tags{"LightMode" = "DepthOnly"}
+		UsePass "Universal Render Pipeline/Spine/Skeleton/FORWARD"
 
-			ZWrite On
-			ColorMask R
-			Cull Off
+		UsePass "Universal Render Pipeline/Spine/Skeleton/SHADOWCASTER"
 
-			HLSLPROGRAM
-			// Required to compile gles 2.0 with standard srp library
-			#pragma prefer_hlslcc gles
-			#pragma exclude_renderers d3d11_9x
-
-			#pragma vertex DepthOnlyVertex
-			#pragma fragment DepthOnlyFragment
-
-			// -------------------------------------
-			// Material Keywords
-			#pragma shader_feature _ALPHATEST_ON
-			#pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-
-			//--------------------------------------
-			// GPU Instancing
-			#pragma multi_compile_instancing
-
-			#define USE_URP
-			#define fixed4 half4
-			#define fixed3 half3
-			#define fixed half
-			#include "Include/Spine-Input-URP.hlsl"
-			#include "Include/Spine-DepthOnlyPass-URP.hlsl"
-			ENDHLSL
-		}
+		UsePass "Universal Render Pipeline/Spine/Skeleton/DEPTHONLY"
 	}
 
 	FallBack "Universal Render Pipeline/Unlit"

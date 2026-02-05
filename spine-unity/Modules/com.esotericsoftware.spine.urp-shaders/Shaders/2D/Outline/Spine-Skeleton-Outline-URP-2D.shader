@@ -1,4 +1,4 @@
-Shader "Universal Render Pipeline/2D/Spine/Skeleton" {
+Shader "Universal Render Pipeline/2D/Spine/Outline/Skeleton" {
 	Properties {
 		_Cutoff("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex("Main Texture", 2D) = "black" {}
@@ -38,43 +38,41 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton" {
 		}
 
 		Pass {
-			Name "Universal2D"
-			Tags { "LightMode" = "Universal2D" }
-
-			ZWrite Off
 			Cull Off
+			ZWrite Off
 			Blend One OneMinusSrcAlpha
 
+			Name "Outline"
+			Tags { "LightMode" = "SRPDefaultUnlit" "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
 			HLSLPROGRAM
 			// Required to compile gles 2.0 with standard srp library
 			#pragma prefer_hlslcc gles
 			#pragma exclude_renderers d3d11_9x
 
-			// -------------------------------------
-			// Unity defined keywords
-			#pragma multi_compile_fog
-
 			//--------------------------------------
 			// GPU Instancing
 			#pragma multi_compile_instancing
 
-			//--------------------------------------
-			// Spine related keywords
-			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
-			#pragma shader_feature _TINT_BLACK_ON
-			#pragma vertex vert
-			#pragma fragment frag
+			#pragma vertex vertOutline
+			#pragma fragment fragOutline
+			#pragma shader_feature _ _USE8NEIGHBOURHOOD_ON
+			#pragma shader_feature _ _USE_SCREENSPACE_OUTLINE_WIDTH
+			#pragma shader_feature _ _OUTLINE_FILL_INSIDE
 
-			#undef LIGHTMAP_ON
+			#pragma fragmentoption ARB_precision_hint_fastest
+			#pragma multi_compile_local _ PIXELSNAP_ON
 
 			#define USE_URP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-			#include "../Include/Spine-Input-URP.hlsl"
-			#include "../Include/Spine-Skeleton-ForwardPass-URP.hlsl"
+			#define NO_CUTOFF_PARAM
+			#include "../../Include/Spine-Input-Outline-URP.hlsl"
+			#include "../../Include/Spine-Outline-Pass-URP.hlsl"
 			ENDHLSL
 		}
+
+		UsePass "Universal Render Pipeline/2D/Spine/Skeleton/UNIVERSAL2D"
 	}
 
 	FallBack "Universal Render Pipeline/2D/Sprite-Unlit-Default"

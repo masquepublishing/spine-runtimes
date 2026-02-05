@@ -1,13 +1,14 @@
-Shader "Universal Render Pipeline/2D/Spine/Skeleton" {
+Shader "Universal Render Pipeline/2D/Spine/Outline/Skeleton Lit" {
 	Properties {
-		_Cutoff("Shadow alpha cutoff", Range(0,1)) = 0.1
-		[NoScaleOffset] _MainTex("Main Texture", 2D) = "black" {}
+		[NoScaleOffset] _MainTex ("Main Texture", 2D) = "black" {}
+		[NoScaleOffset] _MaskTex("Mask", 2D) = "white" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[MaterialToggle(_LIGHT_AFFECTS_ADDITIVE)] _LightAffectsAdditive("Light Affects Additive", Float) = 0
 		[MaterialToggle(_TINT_BLACK_ON)]  _TintBlack("Tint Black", Float) = 0
 		_Color("    Light Color", Color) = (1,1,1,1)
 		_Black("    Dark Color", Color) = (0,0,0,0)
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
-		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
+		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 8 // Set to Always as default
 
 		// Outline properties are drawn via custom editor.
 		[HideInInspector] _OutlineWidth("Outline Width", Range(0,8)) = 3.0
@@ -22,14 +23,16 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton" {
 		[HideInInspector] _OutlineMipLevel("Outline Mip Level", Range(0,3)) = 0
 	}
 
+	HLSLINCLUDE
+	#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+	ENDHLSL
+
 	SubShader {
-		// Universal Pipeline tag is required. If Universal render pipeline is not set in the graphics settings
+		// UniversalPipeline tag is required. If Universal render pipeline is not set in the graphics settings
 		// this Subshader will fail.
-		Tags { "RenderPipeline" = "UniversalPipeline" "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
-		LOD 100
+		Tags {"Queue" = "Transparent" "RenderType" = "Transparent" "RenderPipeline" = "UniversalPipeline" "IgnoreProjector" = "True" }
 		Cull Off
 		ZWrite Off
-		Blend One OneMinusSrcAlpha
 
 		Stencil {
 			Ref[_StencilRef]
@@ -38,45 +41,46 @@ Shader "Universal Render Pipeline/2D/Spine/Skeleton" {
 		}
 
 		Pass {
-			Name "Universal2D"
-			Tags { "LightMode" = "Universal2D" }
-
 			ZWrite Off
 			Cull Off
 			Blend One OneMinusSrcAlpha
 
+			Name "Outline"
+			Tags { "LightMode" = "SRPDefaultUnlit" "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
 			HLSLPROGRAM
 			// Required to compile gles 2.0 with standard srp library
 			#pragma prefer_hlslcc gles
 			#pragma exclude_renderers d3d11_9x
 
-			// -------------------------------------
-			// Unity defined keywords
-			#pragma multi_compile_fog
-
 			//--------------------------------------
 			// GPU Instancing
 			#pragma multi_compile_instancing
 
-			//--------------------------------------
-			// Spine related keywords
-			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
-			#pragma shader_feature _TINT_BLACK_ON
-			#pragma vertex vert
-			#pragma fragment frag
+			#pragma vertex vertOutline
+			#pragma fragment fragOutline
+			#pragma shader_feature _ _USE8NEIGHBOURHOOD_ON
+			#pragma shader_feature _ _USE_SCREENSPACE_OUTLINE_WIDTH
+			#pragma shader_feature _ _OUTLINE_FILL_INSIDE
 
-			#undef LIGHTMAP_ON
+			#pragma fragmentoption ARB_precision_hint_fastest
+			#pragma multi_compile_local _ PIXELSNAP_ON
 
 			#define USE_URP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-			#include "../Include/Spine-Input-URP.hlsl"
-			#include "../Include/Spine-Skeleton-ForwardPass-URP.hlsl"
+			#define NO_CUTOFF_PARAM
+			#include "../../Include/Spine-Input-Outline-URP.hlsl"
+			#include "../../Include/Spine-Outline-Pass-URP.hlsl"
 			ENDHLSL
 		}
-	}
 
-	FallBack "Universal Render Pipeline/2D/Sprite-Unlit-Default"
+		UsePass "Universal Render Pipeline/2D/Spine/Skeleton Lit/UNIVERSAL2D"
+
+		UsePass "Universal Render Pipeline/2D/Spine/Skeleton Lit/NORMALS"
+
+		UsePass "Universal Render Pipeline/2D/Spine/Skeleton Lit/UNLIT"
+	}
+	FallBack "Universal Render Pipeline/2D/Spine/Skeleton"
 	CustomEditor "SpineShaderWithOutlineGUI"
 }

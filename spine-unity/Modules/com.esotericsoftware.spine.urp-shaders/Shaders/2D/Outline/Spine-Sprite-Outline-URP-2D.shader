@@ -1,4 +1,4 @@
-Shader "Universal Render Pipeline/2D/Spine/Sprite"
+Shader "Universal Render Pipeline/2D/Spine/Outline/Sprite"
 {
 	Properties
 	{
@@ -72,124 +72,46 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 			Pass Keep
 		}
 
-		Pass
-		{
-			Name "Universal2D"
-			Tags { "LightMode" = "Universal2D" }
-			Blend[_SrcBlend][_DstBlend]
-			ZWrite[_ZWrite]
-			Cull[_Cull]
+		Blend One OneMinusSrcAlpha
+		ZWrite[_ZWrite]
+		Cull[_Cull]
 
+		Pass {
+			Name "Outline"
+			Tags { "LightMode" = "SRPDefaultUnlit" "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
 			HLSLPROGRAM
 			// Required to compile gles 2.0 with standard srp library
 			#pragma prefer_hlslcc gles
 			#pragma exclude_renderers d3d11_9x
-			#if UNITY_VERSION < 60030000 // before  Unity 6000.3
-				#pragma multi_compile USE_SHAPE_LIGHT_TYPE_0 __
-				#pragma multi_compile USE_SHAPE_LIGHT_TYPE_1 __
-				#pragma multi_compile USE_SHAPE_LIGHT_TYPE_2 __
-				#pragma multi_compile USE_SHAPE_LIGHT_TYPE_3 __
-			#endif
 
-			// -------------------------------------
-			// Material Keywords
-			#pragma shader_feature _ _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON _ALPHAPREMULTIPLY_VERTEX_ONLY _ADDITIVEBLEND _ADDITIVEBLEND_SOFT _MULTIPLYBLEND _MULTIPLYBLEND_X2
-			#pragma shader_feature _ _FIXED_NORMALS_VIEWSPACE _FIXED_NORMALS_VIEWSPACE_BACKFACE _FIXED_NORMALS_MODELSPACE  _FIXED_NORMALS_MODELSPACE_BACKFACE
-			#pragma shader_feature _NORMALMAP
-			#pragma shader_feature _ALPHA_CLIP
-			#pragma shader_feature _EMISSION
-			#pragma shader_feature _COLOR_ADJUST
-			#pragma shader_feature _RIM_LIGHTING
-			#pragma shader_feature _TEXTURE_BLEND
-			#pragma shader_feature _LIGHT_AFFECTS_ADDITIVE
-			#pragma shader_feature _TINT_BLACK_ON
+			//--------------------------------------
+			// GPU Instancing
+			#pragma multi_compile_instancing
+
+			#pragma vertex vertOutline
+			#pragma fragment fragOutline
+			#pragma shader_feature _ _USE8NEIGHBOURHOOD_ON
+			#pragma shader_feature _ _USE_SCREENSPACE_OUTLINE_WIDTH
+			#pragma shader_feature _ _OUTLINE_FILL_INSIDE
 
 			#pragma fragmentoption ARB_precision_hint_fastest
 			#pragma multi_compile_local _ PIXELSNAP_ON
 
-			//--------------------------------------
-			// GPU Instancing
-			#pragma multi_compile_instancing
-
-			//--------------------------------------
-			// Spine related keywords
-			#pragma vertex CombinedShapeLightVertex
-			#pragma fragment CombinedShapeLightFragment
-
 			#define USE_URP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-
-			#if UNITY_VERSION < 60030000 // before Unity 6000.3
-				#include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/LightingUtility.hlsl"
-			#else
-				#include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/Core2D.hlsl"
-				#include_with_pragmas "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/ShapeLightShared.hlsl"
-			#endif
-
-			#define SPRITE_SHADER_2D
-			#include "../Include/Spine-Input-Sprite-URP.hlsl"
-			#include "Include/Spine-Sprite-StandardPass-URP-2D.hlsl"
+			#define NO_CUTOFF_PARAM
+			#include "../../Include/Spine-Input-Outline-URP.hlsl"
+			#include "../../Include/Spine-Outline-Pass-URP.hlsl"
 			ENDHLSL
 		}
 
-		Pass
-		{
-			Name "Normals"
-			Tags { "LightMode" = "NormalsRendering"}
+		UsePass "Universal Render Pipeline/2D/Spine/Sprite/UNIVERSAL2D"
 
-			Blend SrcAlpha OneMinusSrcAlpha
-			Cull[_Cull]
-			ZWrite[_ZWrite]
+		UsePass "Universal Render Pipeline/2D/Spine/Sprite/NORMALS"
 
-			HLSLPROGRAM
-			#pragma prefer_hlslcc gles
-			#pragma vertex NormalsRenderingVertex
-			#pragma fragment NormalsRenderingFragment
-
-			// -------------------------------------
-			// Material Keywords
-			#pragma shader_feature _ _FIXED_NORMALS_VIEWSPACE _FIXED_NORMALS_VIEWSPACE_BACKFACE _FIXED_NORMALS_MODELSPACE  _FIXED_NORMALS_MODELSPACE_BACKFACE
-			#pragma shader_feature _NORMALMAP
-			#pragma shader_feature _ALPHA_CLIP
-
-			#pragma multi_compile_local _ PIXELSNAP_ON
-
-			//--------------------------------------
-			// GPU Instancing
-			#pragma multi_compile_instancing
-
-			#define USE_URP
-			#define fixed4 half4
-			#define fixed3 half3
-			#define fixed half
-			#define SPRITE_SHADER_2D
-			#include "../Include/Spine-Input-Sprite-URP.hlsl"
-			#include "Include/Spine-Sprite-NormalsPass-URP-2D.hlsl"
-
-			ENDHLSL
-		}
-
-		Pass
-		{
-			Name "Unlit"
-			Tags { "LightMode" = "UniversalForward" "Queue" = "Transparent" "RenderType" = "Transparent"}
-
-			ZWrite Off
-			Cull Off
-			Blend One OneMinusSrcAlpha
-
-			HLSLPROGRAM
-			#pragma shader_feature _ _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON _ALPHAPREMULTIPLY_VERTEX_ONLY _ADDITIVEBLEND _ADDITIVEBLEND_SOFT _MULTIPLYBLEND _MULTIPLYBLEND_X2
-
-			#pragma prefer_hlslcc gles
-			#pragma vertex UnlitVertex
-			#pragma fragment UnlitFragment
-
-			#include "Include/Spine-SkeletonLit-UnlitPass-URP-2D.hlsl"
-			ENDHLSL
-		}
+		UsePass "Universal Render Pipeline/2D/Spine/Sprite/UNLIT"
 	}
 
 	FallBack "Universal Render Pipeline/2D/Spine/Skeleton Lit"
