@@ -369,6 +369,7 @@
   - Spine UI Toolkit UPM package now supports rendering back-face triangles. Enable `Flip Back Faces` to automatically fix back-face geometry in an additional pass (defaults to enabled). Disable the setting to save additional processing overhead.
   - Spine UI Toolkit UPM package now supports PMA atlas textures. At the `SpineVisualElement` expand `Blend Mode Materials` and hit `Detect Materials` to automatically assign the proper PMA or straight alpha material at `Normal Material`. Unity minimum version increased to 6000.3 which added  support for UI Toolkit materials.
   - Spine UI Toolkit UPM package now supports all Spine blend modes via blend mode materials and multiple materials per skeleton. Enable `Multiple Materials` (enabled by default), expand `Blend Mode Materials` and hit `Detect Materials` to automatically assign the correct PMA or straight alpha blend mode materials.
+  - Every Spine URP shader now has an `Outline` option to switch to the respective Outline shader variant. Uses multi-pass support of newer URP versions. Requires spine-unity core package version 4.3.44 or newer due to required modifications in custom Sprite Shader GUI.
 
 - **Deprecated**
 
