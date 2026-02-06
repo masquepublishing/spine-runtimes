@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { Animation } from "./Animation"
+import type { Animation } from "./Animation.js"
 import type { BoneData } from "./BoneData.js";
-import type { ConstraintData } from "./ConstraintData";
+import type { ConstraintData } from "./ConstraintData.js";
 import type { EventData } from "./EventData.js";
 import type { Skin } from "./Skin.js";
 import type { SlotData } from "./SlotData.js";
