@@ -507,7 +507,7 @@ MonoBehaviour:
   multiplyMaterial: {fileID: 0}
   screenMaterial: {fileID: 0}
   layoutScaleMode: 0
-  referenceSize: {x: 683.7319, y: 689.6365}
+  referenceSize: {x: 683.73193, y: 874.59644}
   pivotOffset: {x: 0, y: 0}
   referenceScale: 1
   layoutScale: 1
@@ -795,103 +795,6 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
---- !u!1 &523939414
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 523939415}
-  - component: {fileID: 523939418}
-  - component: {fileID: 523939417}
-  - component: {fileID: 523939416}
-  m_Layer: 0
-  m_Name: Outline
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &523939415
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 523939414}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.01}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1539523635}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &523939416
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 523939414}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbb58643468d3dc479e20aff7c8c611e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  referenceRenderer: {fileID: 1539523633}
-  replacementMaterials:
-  - originalMaterial: {fileID: 2100000, guid: d0bb1df72b79cec4e966733b038217e0, type: 2}
-    replacementMaterial: {fileID: 2100000, guid: c556bf10e5e5267429938469800c7c31,
-      type: 2}
---- !u!33 &523939417
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 523939414}
-  m_Mesh: {fileID: 0}
---- !u!23 &523939418
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 523939414}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: c556bf10e5e5267429938469800c7c31, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
 --- !u!1 &570701010
 GameObject:
   m_ObjectHideFlags: 0
@@ -1175,7 +1078,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 10
+    m_FontSize: 12
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -1186,14 +1089,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "In URP you can draw the Outline as a separate GameObject.\nTo add an outline
-    to your SkeletenRenderer:\n1) Add a child GameObject and move it a bit back.\n2)
-    Add a `RenderExistingMesh` component, found in latest `Spine Examples`\n3) Copy
-    the original material, add  _Outline to its name and set the shader to `Universal
-    Render Pipeline/Spine/Outline/Skeleton-OutlineOnly`.\n4) Assign this _Outline
-    material at the `RenderExistingMesh` under Replacement Materials.\n\nAlternatively
-    you can use the new 'Outline' property to switch to a two-pass shader. See the
-    example scene\n 'Outline Shaders URP OutlinePass'."
+  m_Text: Spine URP Shaders now all provide an optional Outline variant, which you
+    can switch to via the 'Outline' property at the Material, just as the Built-In
+    Render Pipeline Shaders.
 --- !u!222 &832862687
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1626,6 +1524,7 @@ GameObject:
   - component: {fileID: 1489880318}
   - component: {fileID: 1489880319}
   - component: {fileID: 1489880320}
+  - component: {fileID: 1489880321}
   m_Layer: 0
   m_Name: Spine GameObject (raptor-pro)
   m_TagString: Untagged
@@ -1689,7 +1588,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4e6ba50fbf623e34cb9aba576e61625d, type: 2}
+  - {fileID: 2100000, guid: 614172e5bb1f5bd40b5b1e30f8554d63, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1728,8 +1627,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -6.02, y: -1.82, z: 0}
   m_LocalScale: {x: 0.47223, y: 0.47223, z: 0.47223}
-  m_Children:
-  - {fileID: 1780468725}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1776,8 +1674,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1780468724}
-          m_MethodName: SetActive
+        - m_Target: {fileID: 1489880321}
+          m_MethodName: set_enabled
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -1802,8 +1700,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1780468724}
-          m_MethodName: SetActive
+        - m_Target: {fileID: 1489880321}
+          m_MethodName: set_enabled
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -1870,6 +1768,27 @@ MonoBehaviour:
   tintBlackDeprecated: 0
   addNormalsDeprecated: 0
   calculateTangentsDeprecated: 0
+--- !u!114 &1489880321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1489880313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26947ae098a8447408d80c0c86e35b48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skeletonRenderer: {fileID: 1489880320}
+  customSlotMaterials: []
+  customMaterialOverrides:
+  - overrideDisabled: 0
+    originalMaterial: {fileID: 2100000, guid: 4e6ba50fbf623e34cb9aba576e61625d, type: 2}
+    replacementMaterial: {fileID: 2100000, guid: 614172e5bb1f5bd40b5b1e30f8554d63,
+      type: 2}
+  previousSkeletonRenderer: {fileID: 0}
+  wasUpgradedTo43: 1
 --- !u!1 &1539523631
 GameObject:
   m_ObjectHideFlags: 0
@@ -1885,6 +1804,7 @@ GameObject:
   - component: {fileID: 1539523636}
   - component: {fileID: 1539523637}
   - component: {fileID: 1539523638}
+  - component: {fileID: 1539523639}
   m_Layer: 0
   m_Name: Spine GameObject (stretchyman)
   m_TagString: Untagged
@@ -1987,8 +1907,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.23, y: -2.16, z: 0.52}
   m_LocalScale: {x: 0.57548, y: 0.57548, z: 0.57548}
-  m_Children:
-  - {fileID: 523939415}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2035,8 +1954,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 523939414}
-          m_MethodName: SetActive
+        - m_Target: {fileID: 1539523639}
+          m_MethodName: set_enabled
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -2061,8 +1980,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 523939414}
-          m_MethodName: SetActive
+        - m_Target: {fileID: 1539523639}
+          m_MethodName: set_enabled
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -2129,6 +2048,27 @@ MonoBehaviour:
   tintBlackDeprecated: 0
   addNormalsDeprecated: 0
   calculateTangentsDeprecated: 0
+--- !u!114 &1539523639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1539523631}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26947ae098a8447408d80c0c86e35b48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skeletonRenderer: {fileID: 1539523638}
+  customSlotMaterials: []
+  customMaterialOverrides:
+  - overrideDisabled: 0
+    originalMaterial: {fileID: 2100000, guid: d0bb1df72b79cec4e966733b038217e0, type: 2}
+    replacementMaterial: {fileID: 2100000, guid: 28e8f6e0aa2b8c842b6a50e5843f2536,
+      type: 2}
+  previousSkeletonRenderer: {fileID: 0}
+  wasUpgradedTo43: 1
 --- !u!1 &1628022514
 GameObject:
   m_ObjectHideFlags: 0
@@ -2275,103 +2215,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1758924601}
   m_CullTransparentMesh: 0
---- !u!1 &1780468724
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1780468725}
-  - component: {fileID: 1780468728}
-  - component: {fileID: 1780468727}
-  - component: {fileID: 1780468726}
-  m_Layer: 0
-  m_Name: Outline
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1780468725
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1780468724}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.01}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1489880317}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1780468726
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1780468724}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbb58643468d3dc479e20aff7c8c611e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  referenceRenderer: {fileID: 1489880315}
-  replacementMaterials:
-  - originalMaterial: {fileID: 2100000, guid: 4e6ba50fbf623e34cb9aba576e61625d, type: 2}
-    replacementMaterial: {fileID: 2100000, guid: 48fccf41ebe7c7e4e80e2698562616c8,
-      type: 2}
---- !u!33 &1780468727
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1780468724}
-  m_Mesh: {fileID: 0}
---- !u!23 &1780468728
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1780468724}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 48fccf41ebe7c7e4e80e2698562616c8, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
 --- !u!1 &1847925713
 GameObject:
   m_ObjectHideFlags: 0
