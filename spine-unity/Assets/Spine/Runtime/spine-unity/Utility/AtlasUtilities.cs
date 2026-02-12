@@ -372,7 +372,7 @@ namespace Spine.Unity.AttachmentTools {
 			};
 		}
 
-		protected struct BlendModeAtlasPages {
+		private struct BlendModeAtlasPages {
 			public AtlasPage normalPage;
 			public AtlasPage additivePage;
 			public AtlasPage multiplyPage;
