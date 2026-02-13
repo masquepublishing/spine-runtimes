@@ -55,9 +55,7 @@ namespace Spine.Unity.Examples {
 		public bool repack = true;
 		public BoundingBoxFollower bbFollower;
 
-		[Header("Do not assign")]
-		public Texture2D runtimeAtlas;
-		public Material runtimeMaterial;
+		AtlasUtilities.RepackAttachmentsOutput repackingOutput;
 		#endregion
 
 		Skin customSkin;
@@ -73,6 +71,11 @@ namespace Spine.Unity.Examples {
 		IEnumerator Start () {
 			yield return new WaitForSeconds(1f); // Delay for one second before applying. For testing.
 			Apply();
+		}
+
+		void OnDestroy () {
+			// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed
+			repackingOutput.DestroyGeneratedAssets();
 		}
 
 		void Apply () {
@@ -124,12 +127,14 @@ namespace Spine.Unity.Examples {
 				repackedSkin.AddSkin(skeleton.Data.DefaultSkin); // Include the "default" skin. (everything outside of skin placeholders)
 				repackedSkin.AddSkin(customSkin); // Include your new custom skin.
 
-				// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed
-				if (runtimeMaterial)
-					Destroy(runtimeMaterial);
-				if (runtimeAtlas)
-					Destroy(runtimeAtlas);
-				repackedSkin = repackedSkin.GetRepackedSkin("repacked skin", sourceMaterial, out runtimeMaterial, out runtimeAtlas); // Pack all the items in the skin.
+				// Note: materials and textures returned by previous GetRepackedSkin() calls behave like 'new Texture2D()'
+				// and need to be destroyed.
+				repackingOutput.DestroyGeneratedAssets();
+				AtlasUtilities.RepackAttachmentsSettings settings = AtlasUtilities.RepackAttachmentsSettings.Default;
+				settings.UseSourceMaterialsFrom(skeletonAnimation.SkeletonDataAsset);
+				settings.maxAtlasSize = 1024;
+				repackedSkin = repackedSkin.GetRepackedSkin("repacked skin", settings, ref repackingOutput); // Pack all the items in the skin.
+
 				skeleton.SetSkin(repackedSkin); // Assign the repacked skin to your Skeleton.
 				if (bbFollower != null) bbFollower.Initialize(true);
 			} else {

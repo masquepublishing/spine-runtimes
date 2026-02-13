@@ -65,9 +65,8 @@ namespace Spine.Unity.Examples {
 		Skin characterSkin;
 
 		// for repacking the skin to a new atlas texture
-		public Material runtimeMaterial;
-		public Texture2D runtimeAtlas;
-
+		AtlasUtilities.RepackAttachmentsOutput repackingOutput;
+		
 		void Awake () {
 			skeletonAnimation = this.GetComponent<SkeletonAnimation>();
 		}
@@ -75,6 +74,11 @@ namespace Spine.Unity.Examples {
 		void Start () {
 			UpdateCharacterSkin();
 			UpdateCombinedSkin();
+		}
+
+		void OnDestroy () {
+			// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed
+			repackingOutput.DestroyGeneratedAssets();
 		}
 
 		public void NextHairSkin () {
@@ -136,12 +140,14 @@ namespace Spine.Unity.Examples {
 		public void OptimizeSkin () {
 			// Create a repacked skin.
 			Skin previousSkin = skeletonAnimation.Skeleton.Skin;
-			// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed
-			if (runtimeMaterial)
-				Destroy(runtimeMaterial);
-			if (runtimeAtlas)
-				Destroy(runtimeAtlas);
-			Skin repackedSkin = previousSkin.GetRepackedSkin("Repacked skin", skeletonAnimation.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial, out runtimeMaterial, out runtimeAtlas);
+			
+			// Note: materials and textures returned by previous GetRepackedSkin() calls behave like 'new Texture2D()'
+			// and need to be destroyed.
+			repackingOutput.DestroyGeneratedAssets();
+			AtlasUtilities.RepackAttachmentsSettings settings = AtlasUtilities.RepackAttachmentsSettings.Default;
+			settings.UseSourceMaterialsFrom(skeletonAnimation.SkeletonDataAsset);
+			settings.maxAtlasSize = 1024;
+			Skin repackedSkin = previousSkin.GetRepackedSkin("repacked skin", settings, ref repackingOutput);
 			previousSkin.Clear();
 
 			// Use the repacked skin.

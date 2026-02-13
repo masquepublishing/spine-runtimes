@@ -31,11 +31,9 @@
 #define CONFIGURABLE_ENTER_PLAY_MODE
 #endif
 
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
 
 namespace Spine.Unity.AttachmentTools {
 
@@ -266,6 +264,27 @@ namespace Spine.Unity.AttachmentTools {
 			/// as main texture.
 			/// Materials and textures returned behave like <c>new Texture2D()</c> and need to be destroyed.</summary>
 			public Material outputScreenMaterial;
+
+			/// <summary>
+			/// Destroys any assigned previously generated assets. If you decide to store
+			/// <see cref="RepackAttachmentsOutput"/> in a MonoBehaviour for re-use, call this method before each
+			/// <see cref="GetRepackedSkin"/> or <see cref="GetRepackedAttachments"/> call, and also once in OnDestroy.
+			/// </summary>
+			public void DestroyGeneratedAssets () {
+				if (outputMaterial) { UnityEngine.Object.Destroy(outputMaterial); outputMaterial = null; }
+				if (outputTexture) { UnityEngine.Object.Destroy(outputTexture); outputTexture = null; }
+				if (additionalOutputTextures != null) {
+					for (int i = 0; i < additionalOutputTextures.Length; ++i) {
+						if (additionalOutputTextures[i]) {
+							UnityEngine.Object.Destroy(additionalOutputTextures[i]);
+							additionalOutputTextures[i] = null;
+						}
+					}
+				}
+				if (outputAdditiveMaterial) { UnityEngine.Object.Destroy(outputAdditiveMaterial); outputAdditiveMaterial = null; }
+				if (outputMultiplyMaterial) { UnityEngine.Object.Destroy(outputMultiplyMaterial); outputMultiplyMaterial = null; }
+				if (outputScreenMaterial) { UnityEngine.Object.Destroy(outputScreenMaterial); outputScreenMaterial = null; }
+			}
 		}
 
 		/// <summary>
@@ -351,25 +370,63 @@ namespace Spine.Unity.AttachmentTools {
 			public bool[] additionalTextureIsLinear;
 
 			/// <summary>Default settings providing reasonable parameters, modify according to your needs.</summary>
-			public static RepackAttachmentsSettings Default = new RepackAttachmentsSettings {
-				materialPropertySource = null,
-				additiveMaterialSource = null,
-				multiplyMaterialSource = null,
-				screenMaterialSource = null,
+			public static RepackAttachmentsSettings Default = new RepackAttachmentsSettings(true);
 
-				newAssetName = "Repacked Attachments",
+			/// <summary>Hidden pseudo-default ctor, use <see cref="Default"/> instead.</summary>
+			private RepackAttachmentsSettings (bool _) {
+				newAssetName = DefaultTextureName;
 
-				maxAtlasSize = 1024,
-				padding = 2,
-				textureFormat = SpineTextureFormat,
-				mipmaps = UseMipMaps,
-				clearCache = false,
+				maxAtlasSize = 1024;
+				padding = 2;
+				textureFormat = SpineTextureFormat;
+				mipmaps = UseMipMaps;
+				clearCache = false;
+				useOriginalNonrenderables = true;
 
-				useOriginalNonrenderables = true,
-				additionalTexturePropertyIDsToCopy = null,
-				additionalTextureFormats = null,
-				additionalTextureIsLinear = null
-			};
+				shader = null;
+				materialPropertySource = null;
+				additiveMaterialSource = null;
+				multiplyMaterialSource = null;
+				screenMaterialSource = null;
+
+				additionalTexturePropertyIDsToCopy = null;
+				additionalTextureFormats = null;
+				additionalTextureIsLinear = null;
+			}
+
+			/// <summary>
+			/// Default settings providing reasonable parameters, with source materials assigned according to the
+			/// provided <paramref name="skeletonDataAsset"/>. Modify according to your needs.
+			/// </summary>
+			/// <param name="skeletonDataAsset">Reference <see cref="SkeletonDataAsset"/> used to provide source
+			/// materials for all blend modes.</param>
+			public RepackAttachmentsSettings (SkeletonDataAsset skeletonDataAsset)
+				: this(true) {
+				UseSourceMaterialsFrom(skeletonDataAsset);
+			}
+
+			/// <summary>
+			/// Assigns source materials from the provided <paramref name="skeletonDataAsset"/> for all blend modes
+			/// including normal blend mode.
+			/// </summary>
+			public void UseSourceMaterialsFrom (SkeletonDataAsset skeletonDataAsset) {
+				materialPropertySource = skeletonDataAsset.atlasAssets[0].PrimaryMaterial;
+				UseBlendModeMaterialsFrom(skeletonDataAsset);
+			}
+
+			/// <summary>
+			/// Assigns source materials from the provided <paramref name="skeletonDataAsset"/> for
+			/// additive, multiply and screen blend modes.
+			/// </summary>
+			public void UseBlendModeMaterialsFrom (SkeletonDataAsset skeletonDataAsset) {
+				BlendModeMaterials materials = skeletonDataAsset.blendModeMaterials;
+				if (materials.additiveMaterials.Count > 0)
+					additiveMaterialSource = materials.additiveMaterials[0].material;
+				if (materials.multiplyMaterials.Count > 0)
+					multiplyMaterialSource = materials.multiplyMaterials[0].material;
+				if (materials.screenMaterials.Count > 0)
+					screenMaterialSource = materials.screenMaterials[0].material;
+			}
 		}
 
 		private struct BlendModeAtlasPages {
