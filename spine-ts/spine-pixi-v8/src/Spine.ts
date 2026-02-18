@@ -785,7 +785,7 @@ export class Spine extends ViewContainer {
 		container.visible = this.skeleton.drawOrder.includes(slot) && followAttachmentValue;
 
 		if (container.visible) {
-			let applied = slot.bone.applied;
+			const applied = slot.bone.applied;
 
 			const matrix = container.localTransform;
 			matrix.a = applied.a;
