@@ -33,6 +33,10 @@
 #define HINGE_JOINT_NEW_BEHAVIOUR
 #endif
 
+#if UNITY_6000_0_OR_NEWER
+#define USE_RIGIDBODY_BODY_TYPE
+#endif
+
 using Spine;
 using System.Collections.Generic;
 using UnityEditor;
@@ -338,7 +342,11 @@ namespace Spine.Unity.Editor {
 			rootFollowerKinematic.transform.parent = normalChainParentObject.transform;
 			Rigidbody2D followerRigidbody = rootFollowerKinematic.AddComponent<Rigidbody2D>();
 			followerRigidbody.mass = mass;
+#if USE_RIGIDBODY_BODY_TYPE
+			followerRigidbody.bodyType = RigidbodyType2D.Kinematic;
+#else
 			followerRigidbody.isKinematic = true;
+#endif
 			rootFollowerKinematic.AddComponent<FollowLocationRigidbody2D>().reference = kinematicParentUtilityBone.transform;
 			rootFollowerKinematic.transform.position = kinematicParentUtilityBone.transform.position;
 			rootFollowerKinematic.transform.rotation = kinematicParentUtilityBone.transform.rotation;

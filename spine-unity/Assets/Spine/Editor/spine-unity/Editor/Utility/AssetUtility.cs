@@ -63,6 +63,10 @@
 #define HAS_CULL_TRANSPARENT_MESH
 #endif
 
+#if UNITY_6000_3_OR_NEWER
+#define USES_ENTITY_ID
+#endif
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -605,7 +609,11 @@ namespace Spine.Unity.Editor {
 									skeletonDataAtlasAssets[i].Equals(null) &&
 									skeletonDataAtlasAssets[i].GetInstanceID() != 0
 								) {
+#if USES_ENTITY_ID
+									skeletonDataAtlasAssets[i] = EditorUtility.EntityIdToObject(skeletonDataAtlasAssets[i].GetEntityId()) as AtlasAssetBase;
+#else
 									skeletonDataAtlasAssets[i] = EditorUtility.InstanceIDToObject(skeletonDataAtlasAssets[i].GetInstanceID()) as AtlasAssetBase;
+#endif
 								}
 							}
 						}

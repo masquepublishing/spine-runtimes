@@ -31,6 +31,10 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
+#if UNITY_2023_1_OR_NEWER
+#define USE_COLLIDER_COMPOSITE_OPERATION
+#endif
+
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -136,7 +140,12 @@ namespace Spine.Unity.Editor {
 						foreach (PolygonCollider2D col in follower.colliderTable.Values) {
 							col.isTrigger = isTrigger.boolValue;
 							col.usedByEffector = usedByEffector.boolValue;
+#if USE_COLLIDER_COMPOSITE_OPERATION
+							col.compositeOperation = usedByComposite.boolValue ?
+								Collider2D.CompositeOperation.Merge : Collider2D.CompositeOperation.None;
+#else
 							col.usedByComposite = usedByComposite.boolValue;
+#endif
 						}
 				}
 			}

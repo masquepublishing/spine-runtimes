@@ -27,8 +27,21 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_6000_3_OR_NEWER
+#define GET_ASSET_PATH_USES_ENTITY_ID
+#endif
+
+//#if UNITY_2022_2_OR_NEWER
+// note: defined by spine-unity-editor.asmdef file when package is actually found
+//#define TEXTUREIMPORTER_SPRITESHEET_OBSOLETE
+//#endif
+
 //#define BAKE_ALL_BUTTON
 //#define REGION_BAKING_MESH
+
+#if TEXTUREIMPORTER_SPRITESHEET_OBSOLETE
+using UnityEditor.U2D.Sprites;
+#endif
 
 using Spine;
 using System;
@@ -39,6 +52,11 @@ using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
+#if TEXTUREIMPORTER_SPRITESHEET_OBSOLETE
+	using SpriteDataType = SpriteRect;
+#else
+	using SpriteDataType = SpriteMetaData;
+#endif
 
 	[CustomEditor(typeof(SpineAtlasAsset)), CanEditMultipleObjects]
 	public class SpineAtlasAssetInspector : UnityEditor.Editor {
@@ -142,12 +160,16 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.PropertyField(textureLoadingMode);
 				EditorGUILayout.PropertyField(onDemandTextureLoader);
 			}
-			
+
 			EditorGUILayout.Space();
 			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpinePreferences.DEFAULT_MIPMAPBIAS, tooltip: "This may help textures with mipmaps be less blurry when used for 2D sprites."))) {
 				foreach (Material m in atlasAsset.materials) {
 					Texture texture = m.mainTexture;
+#if GET_ASSET_PATH_USES_ENTITY_ID
+					string texturePath = AssetDatabase.GetAssetPath(texture.GetEntityId());
+#else
 					string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());
+#endif
 					TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 					importer.mipMapBias = SpinePreferences.DEFAULT_MIPMAPBIAS;
 					EditorUtility.SetDirty(texture);
@@ -324,11 +346,26 @@ namespace Spine.Unity.Editor {
 		}
 
 		static public void UpdateSpriteSlices (Texture texture, Atlas atlas) {
+#if GET_ASSET_PATH_USES_ENTITY_ID
+			string texturePath = AssetDatabase.GetAssetPath(texture.GetEntityId());
+#else
 			string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());
+#endif
 			TextureImporter t = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 			t.spriteImportMode = SpriteImportMode.Multiple;
+#if TEXTUREIMPORTER_SPRITESHEET_OBSOLETE
+			SpriteDataProviderFactories factory = new SpriteDataProviderFactories();
+			factory.Init();
+			ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(t);
+			dataProvider.InitSpriteEditorDataProvider();
+
+			// Read existing sprite rects
+			SpriteRect[] spriteRects = dataProvider.GetSpriteRects();
+			List<SpriteRect> sprites = new List<SpriteRect>(spriteRects);
+#else
 			SpriteMetaData[] spriteSheet = t.spritesheet;
 			List<SpriteMetaData> sprites = new List<SpriteMetaData>(spriteSheet);
+#endif
 
 			List<AtlasRegion> regions = SpineAtlasAssetInspector.GetRegions(atlas);
 			int updatedCount = 0;
@@ -366,12 +403,12 @@ namespace Spine.Unity.Editor {
 					spriteRect.y = r.page.height - spriteRect.height - r.y;
 
 					if (spriteNameMatchExists) {
-						SpriteMetaData s = sprites[spriteIndex];
+						SpriteDataType s = sprites[spriteIndex];
 						s.rect = spriteRect;
 						sprites[spriteIndex] = s;
 						updatedCount++;
 					} else {
-						sprites.Add(new SpriteMetaData {
+						sprites.Add(new SpriteDataType {
 							name = r.name,
 							pivot = new Vector2(0.5f, 0.5f),
 							rect = spriteRect
@@ -381,8 +418,12 @@ namespace Spine.Unity.Editor {
 				}
 
 			}
-
+#if TEXTUREIMPORTER_SPRITESHEET_OBSOLETE
+			dataProvider.SetSpriteRects(spriteRects);
+			dataProvider.Apply();
+#else
 			t.spritesheet = sprites.ToArray();
+#endif
 			EditorUtility.SetDirty(t);
 			AssetDatabase.ImportAsset(texturePath, ImportAssetOptions.ForceUpdate);
 			EditorGUIUtility.PingObject(texture);

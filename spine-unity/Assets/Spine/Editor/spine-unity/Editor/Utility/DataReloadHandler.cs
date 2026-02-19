@@ -35,6 +35,10 @@
 #define NEWPLAYMODECALLBACKS
 #endif
 
+#if UNITY_2022_2_OR_NEWER
+#define USE_FIND_OBJECTS_BY_TYPE
+#endif
+
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -68,7 +72,11 @@ namespace Spine.Unity.Editor {
 
 				HashSet<SkeletonDataAsset> skeletonDataAssetsToReload = new HashSet<SkeletonDataAsset>();
 
+#if USE_FIND_OBJECTS_BY_TYPE
+				SkeletonRenderer[] activeSkeletonRenderers = GameObject.FindObjectsByType<SkeletonRenderer>(FindObjectsSortMode.None);
+#else
 				SkeletonRenderer[] activeSkeletonRenderers = GameObject.FindObjectsOfType<SkeletonRenderer>();
+#endif
 				foreach (SkeletonRenderer sr in activeSkeletonRenderers) {
 					SkeletonDataAsset skeletonDataAsset = sr.skeletonDataAsset;
 					if (skeletonDataAsset != null) skeletonDataAssetsToReload.Add(skeletonDataAsset);
@@ -79,7 +87,11 @@ namespace Spine.Unity.Editor {
 				// by the instance of the ScriptableObject being destroyed but still assigned.
 				// Here we save the skeletonGraphic.skeletonDataAsset asset path in order
 				// to restore it later.
+#if USE_FIND_OBJECTS_BY_TYPE
+				SkeletonGraphic[] activeSkeletonGraphics = GameObject.FindObjectsByType<SkeletonGraphic>(FindObjectsSortMode.None);
+#else
 				SkeletonGraphic[] activeSkeletonGraphics = GameObject.FindObjectsOfType<SkeletonGraphic>();
+#endif
 				foreach (SkeletonGraphic skeletonGraphic in activeSkeletonGraphics) {
 					SkeletonDataAsset skeletonDataAsset = skeletonGraphic.skeletonDataAsset;
 					if (skeletonDataAsset != null) {
@@ -106,12 +118,20 @@ namespace Spine.Unity.Editor {
 				if (EditorApplication.isCompiling) return;
 				if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
+#if USE_FIND_OBJECTS_BY_TYPE
+				SkeletonRenderer[] activeSkeletonRenderers = GameObject.FindObjectsByType<SkeletonRenderer>(FindObjectsSortMode.None);
+#else
 				SkeletonRenderer[] activeSkeletonRenderers = GameObject.FindObjectsOfType<SkeletonRenderer>();
+#endif
 				foreach (SkeletonRenderer renderer in activeSkeletonRenderers) {
 					if (renderer.isActiveAndEnabled && renderer.skeletonDataAsset == skeletonDataAsset) renderer.Initialize(true);
 				}
 
+#if USE_FIND_OBJECTS_BY_TYPE
+				SkeletonGraphic[] activeSkeletonGraphics = GameObject.FindObjectsByType<SkeletonGraphic>(FindObjectsSortMode.None);
+#else
 				SkeletonGraphic[] activeSkeletonGraphics = GameObject.FindObjectsOfType<SkeletonGraphic>();
+#endif
 				foreach (SkeletonGraphic graphic in activeSkeletonGraphics) {
 					if (graphic.isActiveAndEnabled && graphic.skeletonDataAsset == skeletonDataAsset)
 						graphic.Initialize(true);

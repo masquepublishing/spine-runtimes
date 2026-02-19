@@ -2,12 +2,20 @@
     "name": "spine-unity-editor",
     "references": [
         "spine-csharp",
-        "spine-unity"
+        "spine-unity",
+        "Unity.2D.Sprite.Editor"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
-    "allowUnsafeCode": false
+    "allowUnsafeCode": false,
+    "versionDefines": [
+        {
+            "name": "com.unity.2d.sprite",
+            "expression": "1.0.0",
+            "define": "TEXTUREIMPORTER_SPRITESHEET_OBSOLETE"
+        }
+    ]
 }
