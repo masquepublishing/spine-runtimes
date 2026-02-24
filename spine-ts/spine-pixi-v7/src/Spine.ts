@@ -309,6 +309,7 @@ export class Spine extends Container {
 	}
 	/** Sets the ticker to use when {@link autoUpdate} is `true`. If `autoUpdate` is already `true`, the update callback will be moved from the old ticker to the new one. */
 	public set ticker (value: Ticker) {
+		value = value ?? Ticker.shared;
 		if (this._ticker === value) return;
 
 		if (this._autoUpdate) {
@@ -405,6 +406,7 @@ export class Spine extends Container {
 	/** Destroy Spine game object elements, then call the {@link Container.destroy} with the given options */
 	public override destroy (options?: boolean | IDestroyOptions | undefined): void {
 		if (this.autoUpdate) this.autoUpdate = false;
+		(this._ticker as unknown) = null;
 		for (const [, mesh] of this.meshesCache) {
 			mesh?.destroy();
 		}

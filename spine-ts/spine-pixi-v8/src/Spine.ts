@@ -386,6 +386,7 @@ export class Spine extends ViewContainer {
 	}
 	/** Sets the ticker to use when {@link autoUpdate} is `true`. If `autoUpdate` is already `true`, the update callback will be moved from the old ticker to the new one. */
 	public set ticker (value: Ticker) {
+		value = value ?? Ticker.shared;
 		if (this._ticker === value) return;
 
 		if (this._autoUpdate) {
@@ -1044,6 +1045,7 @@ export class Spine extends ViewContainer {
 		super.destroy(options);
 
 		this._ticker.remove(this.internalUpdate, this);
+		(this._ticker as unknown) = null;
 		this.state.clearListeners();
 		this.debug = undefined;
 		(this.skeleton as unknown) = null;
