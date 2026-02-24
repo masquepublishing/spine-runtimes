@@ -95,6 +95,9 @@ export interface SpineFromOptions {
 
 	/** Set {@link AtlasAttachmentLoader.allowMissingRegions} property on the AtlasAttachmentLoader. */
 	allowMissingRegions?: boolean;
+
+	/** The ticker to use when {@link autoUpdate} is `true`. Defaults to {@link Ticker.shared}. */
+	ticker?: Ticker,
 };
 
 const vectorAux = new Vector2();
@@ -247,6 +250,9 @@ export interface SpineOptions extends ContainerOptions {
 
 	/**  See {@link SpineFromOptions.boundsProvider}. */
 	boundsProvider?: SpineBoundsProvider,
+
+	/** See {@link SpineFromOptions.ticker}. */
+	ticker?: Ticker,
 }
 
 /**
@@ -358,19 +364,36 @@ export class Spine extends ViewContainer {
 	}
 
 	private _autoUpdate = false;
+	private _ticker: Ticker = Ticker.shared;
 
 	public get autoUpdate (): boolean {
 		return this._autoUpdate;
 	}
-	/** When `true`, the Spine AnimationState and the Skeleton will be automatically updated using the {@link Ticker.shared} instance. */
+	/** When `true`, the Spine AnimationState and the Skeleton will be automatically updated using the {@link ticker}. */
 	public set autoUpdate (value: boolean) {
 		if (value && !this._autoUpdate) {
-			Ticker.shared.add(this.internalUpdate, this);
+			this._ticker.add(this.internalUpdate, this);
 		} else if (!value && this._autoUpdate) {
-			Ticker.shared.remove(this.internalUpdate, this);
+			this._ticker.remove(this.internalUpdate, this);
 		}
 
 		this._autoUpdate = value;
+	}
+
+	/** The ticker to use when {@link autoUpdate} is `true`. Defaults to {@link Ticker.shared}. */
+	public get ticker (): Ticker {
+		return this._ticker;
+	}
+	/** Sets the ticker to use when {@link autoUpdate} is `true`. If `autoUpdate` is already `true`, the update callback will be moved from the old ticker to the new one. */
+	public set ticker (value: Ticker) {
+		if (this._ticker === value) return;
+
+		if (this._autoUpdate) {
+			this._ticker.remove(this.internalUpdate, this);
+			value.add(this.internalUpdate, this);
+		}
+
+		this._ticker = value;
 	}
 
 	private _boundsProvider?: SpineBoundsProvider;
@@ -397,9 +420,10 @@ export class Spine extends ViewContainer {
 
 		this.allowChildren = true;
 
-		const { autoUpdate, boundsProvider, darkTint, skeletonData } = options;
+		const { autoUpdate, boundsProvider, darkTint, skeletonData, ticker } = options;
 		this.skeleton = new Skeleton(skeletonData);
 		this.state = new AnimationState(new AnimationStateData(skeletonData));
+		if (ticker) this._ticker = ticker;
 		this.autoUpdate = autoUpdate ?? true;
 		this._boundsProvider = boundsProvider;
 
@@ -419,9 +443,7 @@ export class Spine extends ViewContainer {
 	}
 
 	protected internalUpdate (ticker?: Ticker, deltaSeconds?: number): void {
-		// Because reasons, pixi uses deltaFrames at 60fps.
-		// We ignore the default deltaFrames and use the deltaSeconds from pixi ticker.
-		this._updateAndApplyState(deltaSeconds ?? Ticker.shared.deltaMS / 1000);
+		this._updateAndApplyState(deltaSeconds ?? this._ticker.deltaMS / 1000);
 	}
 
 	override get bounds () {
@@ -1021,7 +1043,7 @@ export class Spine extends ViewContainer {
 	public override destroy (options: DestroyOptions = false) {
 		super.destroy(options);
 
-		Ticker.shared.remove(this.internalUpdate, this);
+		this._ticker.remove(this.internalUpdate, this);
 		this.state.clearListeners();
 		this.debug = undefined;
 		(this.skeleton as unknown) = null;
@@ -1066,7 +1088,7 @@ export class Spine extends ViewContainer {
 	 * @param options - Options to configure the Spine game object. See {@link SpineFromOptions}
 	 * @returns {SpineOptions} The configuration ready to be passed to the Spine constructor
 	 */
-	static createOptions ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions = false }: SpineFromOptions): SpineOptions {
+	static createOptions ({ skeleton, atlas, scale = 1, darkTint, autoUpdate = true, boundsProvider, allowMissingRegions = false, ticker }: SpineFromOptions): SpineOptions {
 		const cacheKey = `${skeleton}-${atlas}-${scale}`;
 
 		if (Cache.has(cacheKey)) {
@@ -1075,6 +1097,7 @@ export class Spine extends ViewContainer {
 				darkTint,
 				autoUpdate,
 				boundsProvider,
+				ticker,
 			};
 		}
 
@@ -1097,6 +1120,7 @@ export class Spine extends ViewContainer {
 			darkTint,
 			autoUpdate,
 			boundsProvider,
+			ticker,
 		};
 	}
 
