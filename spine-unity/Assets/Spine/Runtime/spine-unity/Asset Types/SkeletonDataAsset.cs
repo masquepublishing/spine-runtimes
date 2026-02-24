@@ -226,7 +226,8 @@ namespace Spine.Unity {
 					loadedSkeletonData = SkeletonDataAsset.ReadSkeletonData(skeletonJSON.text, attachmentLoader, skeletonDataScale);
 			} catch (Exception ex) {
 				if (!quiet)
-					Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, skeletonJSON);
+					Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" +
+						ex.Message + "\n" + ex.InnerException + "\n" + ex.StackTrace, skeletonJSON);
 			}
 
 #if UNITY_EDITOR
