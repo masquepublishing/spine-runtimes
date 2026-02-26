@@ -204,8 +204,8 @@ namespace Spine.Unity {
 				UpdateLocal(skeletonGraphic);
 				UpdateWorld(skeletonGraphic);
 				UpdateComplete(skeletonGraphic);
- 			}
- 		}
+			}
+		}
 
 		[HideInInspector] public SkeletonRenderer skeletonRenderer;
 		[HideInInspector] public SkeletonGraphic skeletonGraphic;
@@ -362,16 +362,21 @@ namespace Spine.Unity {
 			if (skeleton == null) return;
 
 			if (boneRoot != null) {
-				List<object> constraintTargets = new List<object>();
+				List<Bone> constrainedBones = new List<Bone>();
 				ExposedList<IConstraint> constraints = skeleton.Constraints;
 				for (int i = 0, n = constraints.Count; i < n; i++) {
 					IConstraint constraint = constraints.Items[i];
+					ExposedList<BonePose> bones = null;
 					if (constraint is IkConstraint)
-						constraintTargets.Add(((IkConstraint)constraint).Bones);
+						bones = ((IkConstraint)constraint).Bones;
 					else if (constraint is TransformConstraint)
-						constraintTargets.Add(((TransformConstraint)constraint).Bones);
+						bones = ((TransformConstraint)constraint).Bones;
 					else if (constraint is PathConstraint)
-						constraintTargets.Add(((PathConstraint)constraint).Bones);
+						bones = ((PathConstraint)constraint).Bones;
+					if (bones != null) {
+						for (int j = 0, m = bones.Count; j < m; j++)
+							constrainedBones.Add(bones.Items[j].bone);
+					}
 				}
 
 				List<SkeletonUtilityBone> boneComponents = this.boneComponents;
@@ -382,7 +387,7 @@ namespace Spine.Unity {
 						if (b.bone == null) continue;
 					}
 					hasOverrideBones |= (b.mode == SkeletonUtilityBone.Mode.Override);
-					hasConstraintTargetBones |= constraintTargets.Contains(b.bone);
+					hasConstraintTargetBones |= constrainedBones.Contains(b.bone);
 				}
 
 				needToReprocessBones = false;
