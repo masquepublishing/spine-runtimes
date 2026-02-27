@@ -52,7 +52,7 @@ cpus=2
 if [ "$OSTYPE" == "msys" ]; then
 	os="windows"
 	cpus=$NUMBER_OF_PROCESSORS
-	target="$target"
+	target="$target d3d12=no"
 	godot_exe="godot.windows.editor$dev_extension.x86_64$mono_extension.exe"
 	godot_exe_host=$godot_exe
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -74,9 +74,6 @@ fi
 echo "CPUS: $cpus"
 
 pushd ../godot
-if [ "$os" == "windows" ]; then
-	python misc/scripts/install_d3d12_sdk_windows.py
-fi
 if [ "$os" == "macos" ] && [ $dev == "false" ]; then
 	scons $target $mono_module arch=x86_64 compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus
 	scons $target $mono_module arch=arm64 compiledb=yes custom_modules="../spine_godot" opengl3=yes --jobs=$cpus
