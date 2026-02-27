@@ -117,15 +117,23 @@ elif [ "$platform" = "ios" ]; then
 	strip -S -x bin/libgodot.ios.template_release.simulator.a
 
 	pushd bin
-	cp -r ../misc/dist/ios_xcode .
-	cp libgodot.ios.template_release.arm64.a ios_xcode/libgodot.ios.release.xcframework/ios-arm64/libgodot.a
-	cp libgodot.ios.template_release.simulator.a ios_xcode/libgodot.ios.release.xcframework/ios-arm64_x86_64-simulator/libgodot.a
-	cp libgodot.ios.template_debug.arm64.a ios_xcode/libgodot.ios.debug.xcframework/ios-arm64/libgodot.a
-	cp libgodot.ios.template_debug.simulator.a ios_xcode/libgodot.ios.debug.xcframework/ios-arm64_x86_64-simulator/libgodot.a
-	cp -r ~/VulkanSDK/1.4.328.1/macOS/lib/MoltenVK.xcframework ios_xcode/
-  	rm -rf ios_xcode/MoltenVK.xcframework/{macos,tvos}*
+	if [ -d ../misc/dist/ios_xcode ]; then
+		ios_tpl_dir="ios_xcode"
+	elif [ -d ../misc/dist/apple_embedded_xcode ]; then
+		ios_tpl_dir="apple_embedded_xcode"
+	else
+		echo "ERROR: Could not find ios_xcode or apple_embedded_xcode in misc/dist/"
+		exit 1
+	fi
+	cp -r ../misc/dist/$ios_tpl_dir .
+	cp libgodot.ios.template_release.arm64.a $ios_tpl_dir/libgodot.ios.release.xcframework/ios-arm64/libgodot.a
+	cp libgodot.ios.template_release.simulator.a $ios_tpl_dir/libgodot.ios.release.xcframework/ios-arm64_x86_64-simulator/libgodot.a
+	cp libgodot.ios.template_debug.arm64.a $ios_tpl_dir/libgodot.ios.debug.xcframework/ios-arm64/libgodot.a
+	cp libgodot.ios.template_debug.simulator.a $ios_tpl_dir/libgodot.ios.debug.xcframework/ios-arm64_x86_64-simulator/libgodot.a
+	cp -r ~/VulkanSDK/1.4.328.1/macOS/lib/MoltenVK.xcframework $ios_tpl_dir/
+	rm -rf $ios_tpl_dir/MoltenVK.xcframework/{macos,tvos}*
 	rm -rf ios.zip
-	pushd ios_xcode
+	pushd $ios_tpl_dir
 	zip -q -9 -r ../ios.zip *
 	popd
 	popd
