@@ -64,6 +64,7 @@ pushd ../godot
 if [ "$platform" = "windows" ]; then
 	# --- Windows ---
 	#generates windows_64_debug.exe and windows_64_release.exe
+	python misc/scripts/install_d3d12_sdk_windows.py
 	scons platform=windows tools=no target=template_release custom_modules="../spine_godot" $mono_module --jobs=$cpus
 	scons platform=windows tools=no target=template_debug custom_modules="../spine_godot" $mono_module --jobs=$cpus
 	cp bin/godot.windows.template_release.x86_64$mono_extension.exe bin/windows_release_x86_64.exe
