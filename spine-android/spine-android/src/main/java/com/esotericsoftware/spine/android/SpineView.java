@@ -358,11 +358,19 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	 * {@link SpineView#loadFromDrawable(AndroidSkeletonDrawable)} or
 	 * {@link SpineView#setSkeletonDrawable(AndroidSkeletonDrawable)}. */
 	public void loadFrom (AndroidSkeletonDrawableLoader loader) {
+		if (controller == null) {
+			throw new IllegalStateException(
+				"SpineController is not set. When using SpineView from XML, call setController(...) before loadFromAsset/loadFromFile/loadFromHttp/loadFromDrawable.");
+		}
 		Handler mainHandler = new Handler(Looper.getMainLooper());
 		Thread backgroundThread = new Thread( () -> {
 			try {
 				final AndroidSkeletonDrawable skeletonDrawable = loader.load();
 				mainHandler.post( () -> {
+					if (controller == null) {
+						throw new IllegalStateException(
+							"SpineController became null before initialization. Ensure setController(...) is called and not cleared until loading completes.");
+					}
 					setSkeletonDrawable(skeletonDrawable);
 				});
 			} catch (Exception e) {
@@ -375,6 +383,10 @@ public class SpineView extends View implements Choreographer.FrameCallback {
 	/** Set the skeleton drawable. Must be called from the main thread. */
 	@MainThread
 	public final void setSkeletonDrawable (@NonNull AndroidSkeletonDrawable skeletonDrawable) {
+		if (controller == null) {
+			throw new IllegalStateException(
+				"SpineController is not set. When using SpineView from XML, call setController(...) before setSkeletonDrawable/loadFromAsset/loadFromFile/loadFromHttp/loadFromDrawable.");
+		}
 		computedBounds = boundsProvider.computeBounds(skeletonDrawable);
 		updateCanvasTransform();
 
