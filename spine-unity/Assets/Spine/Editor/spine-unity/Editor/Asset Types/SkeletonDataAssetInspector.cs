@@ -251,7 +251,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		void CreateAnimationReferenceAssets () {
-			const string AssetFolderName = "ReferenceAssets";
+			const string AssetFolderName = SpineEditorUtilities.ReferenceAssetsFolderName;
 			string parentFolder = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(targetSkeletonDataAsset));
 			string dataPath = parentFolder + "/" + AssetFolderName;
 			if (!AssetDatabase.IsValidFolder(dataPath)) {

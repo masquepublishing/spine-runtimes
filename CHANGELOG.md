@@ -371,7 +371,8 @@
   - Spine UI Toolkit UPM package now supports all Spine blend modes via blend mode materials and multiple materials per skeleton. Enable `Multiple Materials` (enabled by default), expand `Blend Mode Materials` and hit `Detect Materials` to automatically assign the correct PMA or straight alpha blend mode materials.
   - Every Spine URP shader now has an `Outline` option to switch to the respective Outline shader variant. Uses multi-pass support of newer URP versions. Requires spine-unity core package version 4.3.44 or newer due to required modifications in custom Sprite Shader GUI.
   - Added new variants of `GetRepackedSkin` and `GetRepackedAttachments` supporting blend modes. These new variants take a packing configuration input struct `RepackAttachmentsSettings` which provides optional `additiveMaterialSource`, `multiplyMaterialSource` and `screenMaterialSource` properties, enabling blend mode repacking when any is non-null. Create your `RepackAttachmentsSettings` from default settings via `RepackAttachmentsSettings.Default` and then customize settings as needed. Blend mode materials can be set at once using `UseSourceMaterialsFrom(SkeletonDataAsset)` or `UseBlendModeMaterialsFrom(SkeletonDataAsset)`. Uses new `RepackAttachmentsOutput` struct providing `DestroyGeneratedAssets` to easily destroy any previously generated assets.
-  - Updated example scenes to demonstrate new `GetRepackedSkin` variant usage. 
+  - Updated example scenes to demonstrate new `GetRepackedSkin` variant usage.
+  - AnimationReferenceAsset: Added animation selector drop-down popup next to object assignment field for easy initial assignment and animation switching. Shows red warning color if the assigned AnimationReferenceAsset's SkeletonDataAsset does not match the one at the GameObjects `SkeletonAnimation` component. A mismatch may be intentional for a special split SkeletonDataAsset setup.
 
 - **Deprecated**
 

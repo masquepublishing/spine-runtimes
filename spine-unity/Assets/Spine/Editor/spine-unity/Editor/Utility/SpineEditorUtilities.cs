@@ -78,7 +78,7 @@ namespace Spine.Unity.Editor {
 	// Analysis disable once ConvertToStaticType
 	[InitializeOnLoad]
 	public partial class SpineEditorUtilities : AssetPostprocessor {
-
+		public const string ReferenceAssetsFolderName = "ReferenceAssets";
 		public static string editorPath = "";
 		public static string editorGUIPath = "";
 		public static bool initialized;

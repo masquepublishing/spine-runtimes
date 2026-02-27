@@ -42,6 +42,20 @@ namespace Spine.Unity {
 
 		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
 
+		public string AnimationName {
+			get {
+				return animationName;
+			}
+			set {
+				if (animationName == value)
+					return;
+				animationName = value;
+#if AUTOINIT_SPINEREFERENCE
+				Initialize();
+#endif
+			}
+		}
+
 		public Animation Animation {
 			get {
 #if AUTOINIT_SPINEREFERENCE
