@@ -371,9 +371,9 @@ public class SkeletonBinary extends SkeletonLoader {
 					data.slot = slots[input.readInt(true)];
 					int flags = input.read();
 					data.skinRequired = (flags & 1) != 0;
-					data.positionMode = PositionMode.values[(flags >> 1) & 2];
-					data.spacingMode = SpacingMode.values[(flags >> 2) & 3];
-					data.rotateMode = RotateMode.values[(flags >> 4) & 3];
+					data.positionMode = PositionMode.values[(flags >> 1) & 0b1];
+					data.spacingMode = SpacingMode.values[(flags >> 2) & 0b11];
+					data.rotateMode = RotateMode.values[(flags >> 4) & 0b11];
 					if ((flags & 128) != 0) data.offsetRotation = input.readFloat();
 					PathConstraintPose setup = data.setup;
 					setup.position = input.readFloat();
