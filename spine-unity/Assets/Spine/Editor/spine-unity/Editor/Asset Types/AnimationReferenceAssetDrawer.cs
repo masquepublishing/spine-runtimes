@@ -171,18 +171,38 @@ namespace Spine.Unity.Editor {
 
 			string skeletonDataAssetPath = AssetDatabase.GetAssetPath(targetSkeletonDataAsset);
 			string parentFolder = Path.GetDirectoryName(skeletonDataAssetPath);
+
+			// Search AnimationReferenceAssetContainer sub-assets
+			string skeletonDataAssetName = Path.GetFileNameWithoutExtension(skeletonDataAssetPath);
+			string baseName = skeletonDataAssetName.Replace(AssetUtility.SkeletonDataSuffix, "");
+			string containerPath = string.Format("{0}/{1}{2}.asset", parentFolder, baseName,
+				SpineEditorUtilities.AnimationReferenceContainerSuffix);
+			AnimationReferenceAsset foundAsset = FindAnimationReferenceInSubAssets(containerPath, targetSkeletonDataAsset, targetAnimationName);
+			if (foundAsset != null) return foundAsset;
+
+			// Search standalone files in same asset directory
 			string dataPath = parentFolder + "/" + ReferenceAssetsFolderName;
 			string safeName = AssetUtility.GetPathSafeName(targetAnimationName);
 			string assetPath = string.Format("{0}/{1}.asset", dataPath, safeName);
-
 			AnimationReferenceAsset existingAsset = AssetDatabase.LoadAssetAtPath<AnimationReferenceAsset>(assetPath);
 			if (existingAsset != null) return existingAsset;
 
-			// Search the project for matching AnimationReferenceAsset
+			// Global fallback: search the project for matching AnimationReferenceAsset including sub-assets
 			string[] guids = AssetDatabase.FindAssets("t:AnimationReferenceAsset");
 			foreach (string guid in guids) {
 				string path = AssetDatabase.GUIDToAssetPath(guid);
-				AnimationReferenceAsset asset = AssetDatabase.LoadAssetAtPath<AnimationReferenceAsset>(path);
+				foundAsset = FindAnimationReferenceInSubAssets(path, targetSkeletonDataAsset, targetAnimationName);
+				if (foundAsset != null) return foundAsset;
+			}
+			return null;
+		}
+
+		static AnimationReferenceAsset FindAnimationReferenceInSubAssets (string assetPath,
+			SkeletonDataAsset targetSkeletonDataAsset, string targetAnimationName) {
+
+			UnityEngine.Object[] allAssets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
+			foreach (UnityEngine.Object obj in allAssets) {
+				AnimationReferenceAsset asset = obj as AnimationReferenceAsset;
 				if (asset == null) continue;
 				if (asset.SkeletonDataAsset == targetSkeletonDataAsset && asset.AnimationName == targetAnimationName)
 					return asset;

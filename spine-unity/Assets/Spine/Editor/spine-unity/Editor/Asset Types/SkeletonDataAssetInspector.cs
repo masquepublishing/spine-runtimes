@@ -220,10 +220,31 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.LabelField("Preview", EditorStyles.boldLabel);
 				DrawAnimationList();
 				if (targetSkeletonData.Animations.Count > 0) {
-					const string AnimationReferenceButtonText = "Create Animation Reference Assets";
-					const string AnimationReferenceTooltipText = "AnimationReferenceAsset acts as Unity asset for a reference to a Spine.Animation. This can be used in inspectors.\n\nIt serializes a reference to a SkeletonData asset and an animationName.\n\nAt runtime, a reference to its Spine.Animation is loaded and cached into the object to be used as needed. This skips the need to find and cache animation references in individual MonoBehaviours.";
-					if (GUILayout.Button(SpineInspectorUtility.TempContent(AnimationReferenceButtonText, Icons.animationRoot, AnimationReferenceTooltipText), GUILayout.Width(250), GUILayout.Height(26))) {
-						CreateAnimationReferenceAssets();
+					const string AnimationReferenceTooltipText =
+						"AnimationReferenceAsset acts as Unity asset for a reference to a Spine.Animation. This can " +
+						"be used in inspectors." +
+						"\n\n" +
+						"It serializes a reference to a SkeletonData asset and an animationName." +
+						"\n\n" +
+						"At runtime, a reference to its Spine.Animation is loaded and cached into the object to be " +
+						"used as needed. This skips the need to find and cache animation references in individual " +
+						"MonoBehaviours.";
+					EditorGUILayout.Space();
+					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Create Animation Reference Assets",
+						Icons.animationRoot, AnimationReferenceTooltipText));
+					using (new GUILayout.HorizontalScope()) {
+						if (GUILayout.Button(SpineInspectorUtility.TempContent("Create Individual",
+							EditorGUIUtility.IconContent("Folder Icon").image as Texture2D,
+							"Legacy method, no longer recommended. Creates individual .asset files in a " +
+							"ReferenceAssets subfolder."), GUILayout.Height(20), GUILayout.MaxWidth(130))) {
+							CreateAnimationReferenceAssets();
+						}
+						if (GUILayout.Button(SpineInspectorUtility.TempContent("Create Nested",
+							EditorGUIUtility.IconContent("AnimatorController Icon").image as Texture2D,
+							"Recommended. Creates AnimationReferenceAssets as sub-assets nested under a single " +
+							"container asset."), GUILayout.Height(20), GUILayout.MaxWidth(130))) {
+							CreateAnimationReferenceAssetsNested();
+						}
 					}
 				}
 				EditorGUILayout.Space();
@@ -258,15 +279,13 @@ namespace Spine.Unity.Editor {
 				AssetDatabase.CreateFolder(parentFolder, AssetFolderName);
 			}
 
-			FieldInfo nameField = typeof(AnimationReferenceAsset).GetField("animationName", BindingFlags.NonPublic | BindingFlags.Instance);
-			FieldInfo skeletonDataAssetField = typeof(AnimationReferenceAsset).GetField("skeletonDataAsset", BindingFlags.NonPublic | BindingFlags.Instance);
 			foreach (Animation animation in targetSkeletonData.Animations) {
 				string assetPath = string.Format("{0}/{1}.asset", dataPath, AssetUtility.GetPathSafeName(animation.Name));
 				AnimationReferenceAsset existingAsset = AssetDatabase.LoadAssetAtPath<AnimationReferenceAsset>(assetPath);
 				if (existingAsset == null) {
 					AnimationReferenceAsset newAsset = ScriptableObject.CreateInstance<AnimationReferenceAsset>();
-					skeletonDataAssetField.SetValue(newAsset, targetSkeletonDataAsset);
-					nameField.SetValue(newAsset, animation.Name);
+					newAsset.SkeletonDataAsset = targetSkeletonDataAsset;
+					newAsset.AnimationName = animation.Name;
 					AssetDatabase.CreateAsset(newAsset, assetPath);
 				}
 			}
@@ -276,6 +295,50 @@ namespace Spine.Unity.Editor {
 				Selection.activeObject = folderObject;
 				EditorGUIUtility.PingObject(folderObject);
 			}
+		}
+
+		void CreateAnimationReferenceAssetsNested () {
+			string skeletonDataAssetPath = AssetDatabase.GetAssetPath(targetSkeletonDataAsset);
+			string parentFolder = System.IO.Path.GetDirectoryName(skeletonDataAssetPath);
+			string skeletonDataAssetName = System.IO.Path.GetFileNameWithoutExtension(skeletonDataAssetPath);
+			string baseName = skeletonDataAssetName.Replace(AssetUtility.SkeletonDataSuffix, "");
+			string containerPath = string.Format("{0}/{1}{2}.asset", parentFolder, baseName,
+				SpineEditorUtilities.AnimationReferenceContainerSuffix);
+
+			AnimationReferenceAssetContainer container = AssetDatabase.LoadAssetAtPath<AnimationReferenceAssetContainer>(containerPath);
+			if (container == null) {
+				container = ScriptableObject.CreateInstance<AnimationReferenceAssetContainer>();
+				container.SkeletonDataAsset = targetSkeletonDataAsset;
+				AssetDatabase.CreateAsset(container, containerPath);
+			} else {
+				container.SkeletonDataAsset = targetSkeletonDataAsset;
+				EditorUtility.SetDirty(container);
+			}
+
+			// Collect existing sub-assets to avoid duplicates
+			UnityEngine.Object[] existingSubAssets = AssetDatabase.LoadAllAssetsAtPath(containerPath);
+			HashSet<string> existingAnimationNames = new HashSet<string>();
+			foreach (UnityEngine.Object subAsset in existingSubAssets) {
+				AnimationReferenceAsset existingRef = subAsset as AnimationReferenceAsset;
+				if (existingRef != null)
+					existingAnimationNames.Add(existingRef.AnimationName);
+			}
+
+			foreach (Animation animation in targetSkeletonData.Animations) {
+				if (existingAnimationNames.Contains(animation.Name))
+					continue;
+
+				AnimationReferenceAsset newAsset = ScriptableObject.CreateInstance<AnimationReferenceAsset>();
+				newAsset.name = AssetUtility.GetPathSafeName(animation.Name);
+				newAsset.SkeletonDataAsset = targetSkeletonDataAsset;
+				newAsset.AnimationName = animation.Name;
+				AssetDatabase.AddObjectToAsset(newAsset, container);
+			}
+
+			AssetDatabase.SaveAssets();
+			AssetDatabase.ImportAsset(containerPath);
+			Selection.activeObject = container;
+			EditorGUIUtility.PingObject(container);
 		}
 
 		void OnInspectorGUIMulti () {

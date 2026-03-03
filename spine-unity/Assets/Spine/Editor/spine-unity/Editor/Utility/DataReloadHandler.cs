@@ -152,9 +152,11 @@ namespace Spine.Unity.Editor {
 				string[] guids = UnityEditor.AssetDatabase.FindAssets("t:AnimationReferenceAsset");
 				foreach (string guid in guids) {
 					string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-					if (!string.IsNullOrEmpty(path)) {
-						AnimationReferenceAsset referenceAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<AnimationReferenceAsset>(path);
-						if (referenceAsset.SkeletonDataAsset == skeletonDataAsset)
+					if (string.IsNullOrEmpty(path)) continue;
+					UnityEngine.Object[] allAssets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(path);
+					foreach (UnityEngine.Object obj in allAssets) {
+						AnimationReferenceAsset referenceAsset = obj as AnimationReferenceAsset;
+						if (referenceAsset != null && referenceAsset.SkeletonDataAsset == skeletonDataAsset)
 							func(referenceAsset);
 					}
 				}

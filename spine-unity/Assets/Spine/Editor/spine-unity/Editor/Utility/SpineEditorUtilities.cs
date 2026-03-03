@@ -79,6 +79,7 @@ namespace Spine.Unity.Editor {
 	[InitializeOnLoad]
 	public partial class SpineEditorUtilities : AssetPostprocessor {
 		public const string ReferenceAssetsFolderName = "ReferenceAssets";
+		public const string AnimationReferenceContainerSuffix = "_AnimationReferences";
 		public static string editorPath = "";
 		public static string editorGUIPath = "";
 		public static bool initialized;

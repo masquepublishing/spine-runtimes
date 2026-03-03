@@ -27,63 +27,14 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define AUTOINIT_SPINEREFERENCE
-
 using UnityEngine;
 
 namespace Spine.Unity {
-	[CreateAssetMenu(menuName = "Spine/Animation Reference Asset", order = 100)]
-	public class AnimationReferenceAsset : ScriptableObject, IHasSkeletonDataAsset {
-		const bool QuietSkeletonData = true;
-
+	public class AnimationReferenceAssetContainer : ScriptableObject {
 		[SerializeField] protected SkeletonDataAsset skeletonDataAsset;
-		[SerializeField, SpineAnimation] protected string animationName;
-		private Animation animation;
-
 		public SkeletonDataAsset SkeletonDataAsset {
 			get { return skeletonDataAsset; }
 			set { skeletonDataAsset = value; }
-		}
-
-		public string AnimationName {
-			get {
-				return animationName;
-			}
-			set {
-				if (animationName == value)
-					return;
-				animationName = value;
-#if AUTOINIT_SPINEREFERENCE
-				Initialize();
-#endif
-			}
-		}
-
-		public Animation Animation {
-			get {
-#if AUTOINIT_SPINEREFERENCE
-				if (animation == null)
-					Initialize();
-#endif
-				return animation;
-			}
-		}
-
-		/// <summary>Clears the cached animation corresponding to a loaded SkeletonData object.
-		/// Use this to force a reload for the next time Animation is called.</summary>
-		public void Clear () {
-			animation = null;
-		}
-
-		public void Initialize () {
-			if (skeletonDataAsset == null) return;
-			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(AnimationReferenceAsset.QuietSkeletonData);
-			this.animation = skeletonData != null ? skeletonData.FindAnimation(animationName) : null;
-			if (this.animation == null) Debug.LogWarningFormat("Animation '{0}' not found in SkeletonData : {1}.", animationName, skeletonDataAsset.name);
-		}
-
-		public static implicit operator Animation (AnimationReferenceAsset asset) {
-			return asset.Animation;
 		}
 	}
 }
