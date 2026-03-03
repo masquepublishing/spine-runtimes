@@ -38,8 +38,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DataInput;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.SerializationException;
 
@@ -730,20 +728,21 @@ public class SkeletonBinary extends SkeletonLoader {
 			vertices.vertices = readFloatArray(input, vertices.length, scale);
 			return vertices;
 		}
-		var weights = new FloatArray(vertices.length * 3 * 3);
-		var bonesArray = new IntArray(vertices.length * 3);
-		for (int i = 0; i < vertexCount; i++) {
+		int n = input.readInt(true);
+		var bones = new int[n];
+		var weights = new float[(n - vertexCount) * 3];
+		for (int b = 0, w = 0; b < n;) {
 			int boneCount = input.readInt(true);
-			bonesArray.add(boneCount);
-			for (int ii = 0; ii < boneCount; ii++) {
-				bonesArray.add(input.readInt(true));
-				weights.add(input.readFloat() * scale);
-				weights.add(input.readFloat() * scale);
-				weights.add(input.readFloat());
+			bones[b++] = boneCount;
+			for (int ii = 0; ii < boneCount; ii++, w += 3) {
+				bones[b++] = input.readInt(true);
+				weights[w] = input.readFloat() * scale;
+				weights[w + 1] = input.readFloat() * scale;
+				weights[w + 2] = input.readFloat();
 			}
 		}
-		vertices.vertices = weights.toArray();
-		vertices.bones = bonesArray.toArray();
+		vertices.vertices = weights;
+		vertices.bones = bones;
 		return vertices;
 	}
 
