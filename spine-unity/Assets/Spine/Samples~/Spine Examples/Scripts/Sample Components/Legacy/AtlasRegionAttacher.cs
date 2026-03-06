@@ -71,7 +71,9 @@ namespace Spine.Unity.Examples {
 				if (region == null) {
 					slotPose.Attachment = null;
 				} else if (inheritProperties && originalAttachment != null) {
-					slotPose.Attachment = originalAttachment.GetRemappedClone(region, true, true, scale);
+					Attachment newAttachment = originalAttachment.Copy();
+					newAttachment.SetRegion(region, true, scale);
+					slotPose.Attachment = newAttachment;
 				} else {
 					RegionAttachment newRegionAttachment = region.ToRegionAttachment(region.name, scale);
 					slotPose.Attachment = newRegionAttachment;

@@ -349,6 +349,10 @@
   - When enabling `Threaded Animation` at `SkeletonAnimation` components, `SkeletonAnimation.AnimationState` callbacks and `TrackEntry` callbacks are not automatically called on the main thread. There are additional main thread callbacks provided to subscribe to instead, like `MainThreadComplete` for `Complete` and the like - see *Additions* below. Please note that this requires a change of user code to subscribe to these main thread delegate variants instead.
   - `SkeletonRenderer`: `maskInteraction` → `MaskInteraction`.
   - Removed rather useless old menu entries `GameObject - Spine - SkeletonRenderer` and the like which are spawning e.g. a GameObject with an empty `SkeletonRenderer` component without `SkeletonDataAsset` assigned and thus also not initialized properly.
+  - Removed `attachment.GetRemappedClone()` extension methods. Replace `attachment.GetRemappedClone(parameters)` with `attachment.Copy(); attachment.SetRegion(parameters)`. Removed `AttachmentCloneExtensions` class, `SetRegion` methods are now in `AttachmentRegionExtensions`.
+  - Renamed `ToAtlasRegionPMAClone` to `ToAtlasRegionWithNewPMATexture`.
+  - Renamed `ToRegionAttachmentPMAClone` to `ToRegionAttachmentWithNewPMATexture`.
+  
 - **Changes of default values**
   - Changed default atlas texture workflow from PMA to straight alpha textures. This move was done because straight alpha textures are compatible with both Gamma and Linear color space, with the latter being the default for quite some time now in Unity. Note that `PMA Vertex Color` is unaffected and shall be enabled as usual to allow for single-pass additive rendering.
 

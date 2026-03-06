@@ -97,15 +97,17 @@ namespace Spine.Unity.Examples {
 			int visorSlotIndex = skeleton.Data.FindSlot(visorSlot).Index; // You can access GetAttachment and SetAttachment via string, but caching the slotIndex is faster.
 			Attachment templateAttachment = templateSkin.GetAttachment(visorSlotIndex, visorKey); // STEP 1.1
 
-			// Note: Each call to `GetRemappedClone()` with parameter `premultiplyAlpha` set to `true` creates
+			// Note: Each call to `SetRegion()` with parameter `premultiplyAlpha` set to `true` creates
 			// a cached Texture copy which can be cleared by calling AtlasUtilities.ClearCache() as done in the method below.
-			Attachment newAttachment = templateAttachment.GetRemappedClone(visorSprite, sourceMaterial, pivotShiftsMeshUVCoords: false); // STEP 1.2 - 1.3
+			Attachment newAttachment = templateAttachment.Copy(); // STEP 1.2
+			newAttachment.SetRegion(visorSprite, sourceMaterial, pivotShiftsMeshUVCoords: false); // STEP 1.3
 			customSkin.SetAttachment(visorSlotIndex, visorKey, newAttachment); // STEP 1.4
 
 			// And now for the gun.
 			int gunSlotIndex = skeleton.Data.FindSlot(gunSlot).Index;
 			Attachment templateGun = templateSkin.GetAttachment(gunSlotIndex, gunKey); // STEP 1.1
-			Attachment newGun = templateGun.GetRemappedClone(gunSprite, sourceMaterial, pivotShiftsMeshUVCoords: false); // STEP 1.2 - 1.3
+			Attachment newGun = templateGun.Copy(); // STEP 1.2
+			newGun.SetRegion(gunSprite, sourceMaterial, pivotShiftsMeshUVCoords: false); // STEP 1.3
 			if (newGun != null) customSkin.SetAttachment(gunSlotIndex, gunKey, newGun); // STEP 1.4
 
 			// customSkin.RemoveAttachment(gunSlotIndex, gunKey); // To remove an item.
@@ -144,7 +146,7 @@ namespace Spine.Unity.Examples {
 			skeleton.SetupPoseSlots(); // Use the pose from setup pose.
 			skeletonAnimation.Update(0); // Use the pose in the currently active animation.
 
-			// `GetRepackedSkin()` and each call to `GetRemappedClone()` with parameter `premultiplyAlpha` set to `true`
+			// `GetRepackedSkin()` and each call to `SetRegion()` with parameter `premultiplyAlpha` set to `true`
 			// cache necessarily created Texture copies which can be cleared by calling AtlasUtilities.ClearCache().
 			// You can optionally clear the textures cache after multiple repack operations.
 			// Just be aware that while this cleanup frees up memory, it is also a costly operation

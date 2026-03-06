@@ -99,13 +99,13 @@ namespace Spine.Unity.AttachmentTools {
 
 		/// <summary>
 		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate of the Sprite's texture data.</summary>
-		public static AtlasRegion ToAtlasRegionPMAClone (this Texture2D t, Material materialPropertySource, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
-			return t.ToAtlasRegionPMAClone(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
+		public static AtlasRegion ToAtlasRegionWithNewPMATexture (this Texture2D t, Material materialPropertySource, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+			return t.ToAtlasRegionWithNewPMATexture(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
 		}
 
 		/// <summary>
 		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate of the Sprite's texture data.</summary>
-		public static AtlasRegion ToAtlasRegionPMAClone (this Texture2D t, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
+		public static AtlasRegion ToAtlasRegionWithNewPMATexture (this Texture2D t, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
 			Material material = new Material(shader);
 			if (materialPropertySource != null) {
 				material.CopyPropertiesFromMaterial(materialPropertySource);
@@ -159,13 +159,13 @@ namespace Spine.Unity.AttachmentTools {
 			return region;
 		}
 
-		public static AtlasRegion ToAtlasRegionPMAClone (this Sprite s, Material materialPropertySource, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
-			return s.ToAtlasRegionPMAClone(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
+		public static AtlasRegion ToAtlasRegionWithNewPMATexture (this Sprite s, Material materialPropertySource, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+			return s.ToAtlasRegionWithNewPMATexture(materialPropertySource.shader, textureFormat, mipmaps, materialPropertySource);
 		}
 
 		/// <summary>
 		/// Creates a Spine.AtlasRegion that uses a premultiplied alpha duplicate of the Sprite's texture data.</summary>
-		public static AtlasRegion ToAtlasRegionPMAClone (this Sprite s, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
+		public static AtlasRegion ToAtlasRegionWithNewPMATexture (this Sprite s, Shader shader, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, Material materialPropertySource = null) {
 			Material material = new Material(shader);
 			if (materialPropertySource != null) {
 				material.CopyPropertiesFromMaterial(materialPropertySource);
@@ -962,14 +962,15 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Frees up textures cached by repacking and remapping operations.
 		///
-		/// Calling <see cref="AttachmentCloneExtensions.GetRemappedClone"/> with parameter <c>premultiplyAlpha=true</c>,
+		/// Calling <see cref="AttachmentRegionExtensions.SetRegion(Attachment, Sprite, Material, bool, bool, bool, bool, TextureFormat, bool)"/>
+		/// with parameter <c>premultiplyAlpha=true</c>,
 		/// <see cref="GetRepackedAttachments"/> or <see cref="GetRepackedSkin"/> will cache textures for later re-use,
 		///	which might steadily increase the texture memory footprint when used excessively.
 		///	You can clear this Texture cache by calling <see cref="AtlasUtilities.ClearCache()"/>.
 		/// You may also want to call <c>Resources.UnloadUnusedAssets()</c> after that. Be aware that while this cleanup
 		/// frees up memory, it is also a costly operation and will likely cause a spike in the framerate.
 		/// Thus it is recommended to perform costly repacking and cleanup operations after e.g. a character customization
-		/// screen has been exited, and if required additionally after a certain number of <c>GetRemappedClone()</c> calls.
+		/// screen has been exited, and if required additionally after a certain number of <c>SetRegion()</c> calls.
 		/// </summary>
 		public static void ClearCache () {
 			foreach (Texture2D t in CachedRegionTexturesList) {
