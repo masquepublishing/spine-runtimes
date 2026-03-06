@@ -229,22 +229,15 @@ namespace Spine.Unity.Editor {
 						"At runtime, a reference to its Spine.Animation is loaded and cached into the object to be " +
 						"used as needed. This skips the need to find and cache animation references in individual " +
 						"MonoBehaviours.";
-					EditorGUILayout.Space();
-					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Create Animation Reference Assets",
-						Icons.animationRoot, AnimationReferenceTooltipText));
-					using (new GUILayout.HorizontalScope()) {
-						if (GUILayout.Button(SpineInspectorUtility.TempContent("Create Individual",
-							EditorGUIUtility.IconContent("Folder Icon").image as Texture2D,
-							"Legacy method, no longer recommended. Creates individual .asset files in a " +
-							"ReferenceAssets subfolder."), GUILayout.Height(20), GUILayout.MaxWidth(130))) {
-							CreateAnimationReferenceAssets();
-						}
-						if (GUILayout.Button(SpineInspectorUtility.TempContent("Create Nested",
-							EditorGUIUtility.IconContent("AnimatorController Icon").image as Texture2D,
-							"Recommended. Creates AnimationReferenceAssets as sub-assets nested under a single " +
-							"container asset."), GUILayout.Height(20), GUILayout.MaxWidth(130))) {
-							CreateAnimationReferenceAssetsNested();
-						}
+					if (GUILayout.Button(SpineInspectorUtility.TempContent("Create Animation Reference Assets",
+						Icons.animationRoot, AnimationReferenceTooltipText), GUILayout.Width(250), GUILayout.Height(26))) {
+						// Add SPINE_INDIVIDUAL_ANIMATION_REFERENCE_ASSETS to your project's Scripting Define Symbols
+						// to create individual .asset files in a ReferenceAssets subfolder instead of nested sub-assets.
+#if SPINE_INDIVIDUAL_ANIMATION_REFERENCE_ASSETS
+						CreateAnimationReferenceAssets();
+#else
+						CreateAnimationReferenceAssetsNested();
+#endif
 					}
 				}
 				EditorGUILayout.Space();
