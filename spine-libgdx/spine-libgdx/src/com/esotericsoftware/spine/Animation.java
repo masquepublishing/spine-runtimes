@@ -1995,8 +1995,7 @@ public class Animation {
 			}
 			}
 
-			switch (blend) {
-			case setup -> {
+			if (blend == setup) {
 				IkConstraintPose setup = constraint.data.setup;
 				pose.mix = setup.mix + (mix - setup.mix) * alpha;
 				pose.softness = setup.softness + (softness - setup.softness) * alpha;
@@ -2006,17 +2005,10 @@ public class Animation {
 					pose.stretch = setup.stretch;
 					return;
 				}
-			}
-			case first, replace -> {
+			} else {
 				pose.mix += (mix - pose.mix) * alpha;
 				pose.softness += (softness - pose.softness) * alpha;
 				if (direction == out) return;
-			}
-			case add -> {
-				pose.mix += mix * alpha;
-				pose.softness += softness * alpha;
-				if (direction == out) return;
-			}
 			}
 			pose.bendDirection = (int)frames[i + BEND_DIRECTION];
 			pose.compress = frames[i + COMPRESS] != 0;
@@ -2201,7 +2193,8 @@ public class Animation {
 			var constraint = (PathConstraint)skeleton.constraints.items[constraintIndex];
 			if (constraint.active) {
 				PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.spacing = getAbsoluteValue(time, alpha, blend, pose.spacing, constraint.data.setup.spacing);
+				pose.spacing = getAbsoluteValue(time, alpha, blend == add ? replace : blend, pose.spacing,
+					constraint.data.setup.spacing);
 			}
 		}
 	}
@@ -2288,29 +2281,23 @@ public class Animation {
 			}
 			}
 
-			switch (blend) {
-			case setup -> {
+			if (blend == setup) {
 				PathConstraintPose setup = constraint.data.setup;
 				pose.mixRotate = setup.mixRotate + (rotate - setup.mixRotate) * alpha;
 				pose.mixX = setup.mixX + (x - setup.mixX) * alpha;
 				pose.mixY = setup.mixY + (y - setup.mixY) * alpha;
-			}
-			case first, replace -> {
+			} else {
 				pose.mixRotate += (rotate - pose.mixRotate) * alpha;
 				pose.mixX += (x - pose.mixX) * alpha;
 				pose.mixY += (y - pose.mixY) * alpha;
-			}
-			case add -> {
-				pose.mixRotate += rotate * alpha;
-				pose.mixX += x * alpha;
-				pose.mixY += y * alpha;
-			}
 			}
 		}
 	}
 
 	/** The base class for most {@link PhysicsConstraint} timelines. */
 	static abstract public class PhysicsConstraintTimeline extends ConstraintTimeline1 {
+		boolean additive;
+
 		/** @param constraintIndex -1 for all physics constraints in the skeleton. */
 		public PhysicsConstraintTimeline (int frameCount, int bezierCount, int constraintIndex, Property property) {
 			super(frameCount, bezierCount, constraintIndex, property);
@@ -2319,6 +2306,7 @@ public class Animation {
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction, boolean appliedPose) {
 
+			if (blend == add && !additive) blend = replace;
 			if (constraintIndex == -1) {
 				float value = time >= frames[0] ? getCurveValue(time) : 0;
 				PhysicsConstraint[] constraints = skeleton.physics.items;
@@ -2425,6 +2413,7 @@ public class Animation {
 	static public class PhysicsConstraintWindTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintWindTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintWind);
+			additive = true;
 		}
 
 		protected float get (PhysicsConstraintPose pose) {
@@ -2444,6 +2433,7 @@ public class Animation {
 	static public class PhysicsConstraintGravityTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintGravityTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintGravity);
+			additive = true;
 		}
 
 		protected float get (PhysicsConstraintPose pose) {
