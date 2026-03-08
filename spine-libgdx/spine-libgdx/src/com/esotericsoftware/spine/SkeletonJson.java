@@ -492,7 +492,7 @@ public class SkeletonJson extends SkeletonLoader {
 				if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
 				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh);
 				linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
-				if (linkedMesh.mesh.getRegion() != null) linkedMesh.mesh.updateRegion();
+				linkedMesh.mesh.updateSequence();
 			}
 			linkedMeshes.clear();
 
@@ -580,12 +580,11 @@ public class SkeletonJson extends SkeletonLoader {
 			region.setRotation(map.getFloat("rotation", 0));
 			region.setWidth(map.getFloat("width") * scale);
 			region.setHeight(map.getFloat("height") * scale);
-			region.setSequence(sequence);
 
 			String color = map.getString("color", null);
 			if (color != null) Color.valueOf(color, region.getColor());
 
-			if (region.getRegion() != null) region.updateRegion();
+			region.updateSequence();
 			yield region;
 		}
 		case boundingbox -> {
@@ -609,7 +608,6 @@ public class SkeletonJson extends SkeletonLoader {
 
 			mesh.setWidth(map.getFloat("width", 0) * scale);
 			mesh.setHeight(map.getFloat("height", 0) * scale);
-			mesh.setSequence(sequence);
 
 			String parent = map.getString("parent", null);
 			if (parent != null) {
@@ -622,10 +620,11 @@ public class SkeletonJson extends SkeletonLoader {
 			readVertices(map, mesh, uvs.length);
 			mesh.setTriangles(map.require("triangles").asShortArray());
 			mesh.setRegionUVs(uvs);
-			if (mesh.getRegion() != null) mesh.updateRegion();
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() << 1);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asShortArray());
+
+			mesh.updateSequence();
 			yield mesh;
 		}
 		case path -> {
@@ -680,8 +679,8 @@ public class SkeletonJson extends SkeletonLoader {
 	}
 
 	private Sequence readSequence (@Null JsonValue map) {
-		if (map == null) return null;
-		var sequence = new Sequence(map.getInt("count"));
+		if (map == null) return new Sequence(1, false);
+		var sequence = new Sequence(map.getInt("count"), true);
 		sequence.setStart(map.getInt("start", 1));
 		sequence.setDigits(map.getInt("digits", 0));
 		sequence.setSetupIndex(map.getInt("setup", 0));

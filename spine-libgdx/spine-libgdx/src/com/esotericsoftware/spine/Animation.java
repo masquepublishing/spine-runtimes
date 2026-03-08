@@ -43,7 +43,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 
 import com.esotericsoftware.spine.BoneData.Inherit;
 import com.esotericsoftware.spine.attachments.Attachment;
-import com.esotericsoftware.spine.attachments.HasTextureRegion;
+import com.esotericsoftware.spine.attachments.HasSequence;
 import com.esotericsoftware.spine.attachments.Sequence;
 import com.esotericsoftware.spine.attachments.Sequence.SequenceMode;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
@@ -1700,13 +1700,12 @@ public class Animation {
 		static private final int MODE = 1, DELAY = 2;
 
 		final int slotIndex;
-		final HasTextureRegion attachment;
+		final HasSequence attachment;
 
 		public SequenceTimeline (int frameCount, int slotIndex, Attachment attachment) {
-			super(frameCount,
-				Property.sequence.ordinal() + "|" + slotIndex + "|" + ((HasTextureRegion)attachment).getSequence().getId());
+			super(frameCount, Property.sequence.ordinal() + "|" + slotIndex + "|" + ((HasSequence)attachment).getSequence().getId());
 			this.slotIndex = slotIndex;
-			this.attachment = (HasTextureRegion)attachment;
+			this.attachment = (HasSequence)attachment;
 		}
 
 		public int getFrameEntries () {
@@ -1743,8 +1742,6 @@ public class Animation {
 				if (!(slotAttachment instanceof VertexAttachment vertexAttachment)
 					|| vertexAttachment.getTimelineAttachment() != attachment) return;
 			}
-			Sequence sequence = ((HasTextureRegion)slotAttachment).getSequence();
-			if (sequence == null) return;
 
 			if (direction == out) {
 				if (blend == setup) pose.setSequenceIndex(-1);
@@ -1762,7 +1759,7 @@ public class Animation {
 			int modeAndIndex = (int)frames[i + MODE];
 			float delay = frames[i + DELAY];
 
-			int index = modeAndIndex >> 4, count = sequence.getRegions().length;
+			int index = modeAndIndex >> 4, count = (((HasSequence)slotAttachment).getSequence()).getRegions().length;
 			SequenceMode mode = SequenceMode.values[modeAndIndex & 0xf];
 			if (mode != SequenceMode.hold) {
 				index += (time - before) / delay + 0.0001f;

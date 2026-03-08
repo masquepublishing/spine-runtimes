@@ -36,7 +36,6 @@ import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.Pool;
 
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
@@ -53,11 +52,11 @@ import com.esotericsoftware.spine.attachments.Sequence;
 /** Unit tests to ensure {@link AnimationState} is working as expected. */
 public class AnimationStateTests {
 	final SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
-		public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
+		public RegionAttachment newRegionAttachment (Skin skin, String name, String path, Sequence sequence) {
 			return null;
 		}
 
-		public MeshAttachment newMeshAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
+		public MeshAttachment newMeshAttachment (Skin skin, String name, String path, Sequence sequence) {
 			return null;
 		}
 

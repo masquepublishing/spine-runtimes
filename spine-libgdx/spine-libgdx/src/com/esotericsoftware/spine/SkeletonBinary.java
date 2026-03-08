@@ -475,7 +475,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
 				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh);
 				linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
-				if (linkedMesh.mesh.getRegion() == null) linkedMesh.mesh.updateRegion();
+				linkedMesh.mesh.updateSequence();
 			}
 			linkedMeshes.clear();
 
@@ -561,7 +561,7 @@ public class SkeletonBinary extends SkeletonLoader {
 		case region -> {
 			String path = (flags & 16) != 0 ? input.readStringRef() : null;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence sequence = (flags & 64) != 0 ? readSequence(input) : null;
+			Sequence sequence = readSequence(input, (flags & 64) != 0);
 			float rotation = (flags & 128) != 0 ? input.readFloat() : 0;
 			float x = input.readFloat();
 			float y = input.readFloat();
@@ -582,8 +582,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			region.setWidth(width * scale);
 			region.setHeight(height * scale);
 			Color.rgba8888ToColor(region.getColor(), color);
-			region.setSequence(sequence);
-			if (region.getRegion() != null) region.updateRegion();
+			region.updateSequence();
 			yield region;
 		}
 		case boundingbox -> {
@@ -601,7 +600,7 @@ public class SkeletonBinary extends SkeletonLoader {
 		case mesh -> {
 			String path = (flags & 16) != 0 ? input.readStringRef() : name;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence sequence = (flags & 64) != 0 ? readSequence(input) : null;
+			Sequence sequence = readSequence(input, (flags & 64) != 0);
 			int hullLength = input.readInt(true);
 			Vertices vertices = readVertices(input, (flags & 128) != 0);
 			float[] uvs = readFloatArray(input, vertices.length, 1);
@@ -619,25 +618,24 @@ public class SkeletonBinary extends SkeletonLoader {
 			if (mesh == null) yield null;
 			mesh.setPath(path);
 			Color.rgba8888ToColor(mesh.getColor(), color);
+			mesh.setHullLength(hullLength << 1);
 			mesh.setBones(vertices.bones);
 			mesh.setVertices(vertices.vertices);
 			mesh.setWorldVerticesLength(vertices.length);
-			mesh.setTriangles(triangles);
 			mesh.setRegionUVs(uvs);
-			if (mesh.getRegion() != null) mesh.updateRegion();
-			mesh.setHullLength(hullLength << 1);
-			mesh.setSequence(sequence);
+			mesh.setTriangles(triangles);
 			if (nonessential) {
 				mesh.setEdges(edges);
 				mesh.setWidth(width * scale);
 				mesh.setHeight(height * scale);
 			}
+			mesh.updateSequence();
 			yield mesh;
 		}
 		case linkedmesh -> {
 			String path = (flags & 16) != 0 ? input.readStringRef() : name;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence sequence = (flags & 64) != 0 ? readSequence(input) : null;
+			Sequence sequence = readSequence(input, (flags & 64) != 0);
 			boolean inheritTimelines = (flags & 128) != 0;
 			int skinIndex = input.readInt(true);
 			String parent = input.readStringRef();
@@ -651,7 +649,6 @@ public class SkeletonBinary extends SkeletonLoader {
 			if (mesh == null) yield null;
 			mesh.setPath(path);
 			Color.rgba8888ToColor(mesh.getColor(), color);
-			mesh.setSequence(sequence);
 			if (nonessential) {
 				mesh.setWidth(width * scale);
 				mesh.setHeight(height * scale);
@@ -711,8 +708,9 @@ public class SkeletonBinary extends SkeletonLoader {
 		};
 	}
 
-	private Sequence readSequence (SkeletonInput input) throws IOException {
-		var sequence = new Sequence(input.readInt(true));
+	private Sequence readSequence (SkeletonInput input, boolean hasPathSuffix) throws IOException {
+		if (!hasPathSuffix) return new Sequence(1, false);
+		var sequence = new Sequence(input.readInt(true), true);
 		sequence.setStart(input.readInt(true));
 		sequence.setDigits(input.readInt(true));
 		sequence.setSetupIndex(input.readInt(true));

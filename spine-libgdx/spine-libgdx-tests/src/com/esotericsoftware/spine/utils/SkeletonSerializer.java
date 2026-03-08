@@ -2479,10 +2479,12 @@ public class SkeletonSerializer {
 		json.writeValue("MeshAttachment");
 
 		json.writeName("region");
-		if (obj.getRegion() == null) {
+		Sequence sequence = obj.getSequence();
+		TextureRegion region = sequence.getRegion(sequence.getSetupIndex());
+		if (region == null) {
 			json.writeNull();
 		} else {
-			writeTextureRegion(obj.getRegion());
+			writeTextureRegion(region);
 		}
 
 		json.writeName("triangles");
@@ -2501,8 +2503,10 @@ public class SkeletonSerializer {
 
 		json.writeName("uVs");
 		json.writeArrayStart();
-		for (float item : obj.getUVs()) {
-			json.writeValue(item);
+		float[] uvs = sequence.getUVs(sequence.getSetupIndex());
+		if (uvs != null) {
+			for (float item : uvs)
+				json.writeValue(item);
 		}
 		json.writeArrayEnd();
 
@@ -2954,24 +2958,32 @@ public class SkeletonSerializer {
 		json.writeName("type");
 		json.writeValue("RegionAttachment");
 
+		Sequence sequence = obj.getSequence();
+		int setupIndex = sequence.getSetupIndex();
+		TextureRegion region = sequence.getRegion(setupIndex);
+
 		json.writeName("region");
-		if (obj.getRegion() == null) {
+		if (region == null) {
 			json.writeNull();
 		} else {
-			writeTextureRegion(obj.getRegion());
+			writeTextureRegion(region);
 		}
 
 		json.writeName("offset");
 		json.writeArrayStart();
-		for (float item : obj.getOffset()) {
-			json.writeValue(item);
+		float[] offset = sequence.getOffsets(setupIndex);
+		if (offset != null) {
+			for (float item : offset)
+				json.writeValue(item);
 		}
 		json.writeArrayEnd();
 
 		json.writeName("uVs");
 		json.writeArrayStart();
-		for (float item : obj.getUVs()) {
-			json.writeValue(item);
+		float[] uvs = sequence.getUVs(setupIndex);
+		if (uvs != null) {
+			for (float item : uvs)
+				json.writeValue(item);
 		}
 		json.writeArrayEnd();
 
@@ -3003,11 +3015,7 @@ public class SkeletonSerializer {
 		json.writeValue(obj.getPath());
 
 		json.writeName("sequence");
-		if (obj.getSequence() == null) {
-			json.writeNull();
-		} else {
-			writeSequence(obj.getSequence());
-		}
+		writeSequence(obj.getSequence());
 
 		json.writeName("name");
 		json.writeValue(obj.getName());
