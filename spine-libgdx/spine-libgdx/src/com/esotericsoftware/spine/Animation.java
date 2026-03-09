@@ -987,8 +987,8 @@ public class Animation {
 		}
 
 		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
-			float[] frames = this.frames;
 			Color color = pose.color;
+			float[] frames = this.frames;
 			if (time < frames[0]) {
 				Color setup = slot.data.setup.color;
 				switch (blend) {
@@ -1031,8 +1031,12 @@ public class Animation {
 			if (alpha == 1)
 				color.set(r, g, b, a);
 			else {
-				if (blend == setup) color.set(slot.data.setup.color);
-				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+				if (blend == setup) {
+					Color setup = slot.data.setup.color;
+					color.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
+						setup.a + (a - setup.a) * alpha);
+				} else
+					color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			}
 		}
 	}
@@ -1062,8 +1066,9 @@ public class Animation {
 		}
 
 		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
-			float[] frames = this.frames;
 			Color color = pose.color;
+			float r, g, b;
+			float[] frames = this.frames;
 			if (time < frames[0]) {
 				Color setup = slot.data.setup.color;
 				switch (blend) {
@@ -1071,56 +1076,58 @@ public class Animation {
 					color.r = setup.r;
 					color.g = setup.g;
 					color.b = setup.b;
+					return;
 				}
 				case first -> {
-					color.r += (setup.r - color.r) * alpha;
-					color.g += (setup.g - color.g) * alpha;
-					color.b += (setup.b - color.b) * alpha;
+					r = color.r + (setup.r - color.r) * alpha;
+					g = color.g + (setup.g - color.g) * alpha;
+					b = color.b + (setup.b - color.b) * alpha;
+				}
+				default -> {
+					return;
 				}
 				}
-				return;
-			}
-
-			float r, g, b;
-			int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
-			switch (curveType) {
-			case LINEAR -> {
-				float before = frames[i];
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				float t = (time - before) / (frames[i + ENTRIES] - before);
-				r += (frames[i + ENTRIES + R] - r) * t;
-				g += (frames[i + ENTRIES + G] - g) * t;
-				b += (frames[i + ENTRIES + B] - b) * t;
-			}
-			case STEPPED -> {
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-			}
-			default -> {
-				r = getBezierValue(time, i, R, curveType - BEZIER);
-				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-			}
-			}
-
-			if (alpha == 1) {
-				color.r = r;
-				color.g = g;
-				color.b = b;
 			} else {
-				if (blend == setup) {
-					Color setup = slot.data.setup.color;
-					color.r = setup.r;
-					color.g = setup.g;
-					color.b = setup.b;
+				int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
+				switch (curveType) {
+				case LINEAR -> {
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
 				}
-				color.r += (r - color.r) * alpha;
-				color.g += (g - color.g) * alpha;
-				color.b += (b - color.b) * alpha;
+				case STEPPED -> {
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+				}
+				default -> {
+					r = getBezierValue(time, i, R, curveType - BEZIER);
+					g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				}
+				}
+
+				if (alpha != 1) {
+					if (blend == setup) {
+						Color setup = slot.data.setup.color;
+						r = setup.r + (r - setup.r) * alpha;
+						g = setup.g + (g - setup.g) * alpha;
+						b = setup.b + (b - setup.b) * alpha;
+					} else {
+						r = color.r + (r - color.r) * alpha;
+						g = color.g + (g - color.g) * alpha;
+						b = color.b + (b - color.b) * alpha;
+					}
+				}
 			}
+			color.r = r < 0 ? 0 : (r > 1 ? 1 : r);
+			color.g = g < 0 ? 0 : (g > 1 ? 1 : g);
+			color.b = b < 0 ? 0 : (b > 1 ? 1 : b);
 		}
 	}
 
@@ -1144,23 +1151,31 @@ public class Animation {
 			if (!slot.bone.active) return;
 
 			Color color = (appliedPose ? slot.applied : slot.pose).color;
+			float a;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				Color setup = slot.data.setup.color;
 				switch (blend) {
-				case setup -> color.a = setup.a;
-				case first -> color.a += (setup.a - color.a) * alpha;
+				case setup -> {
+					color.a = setup.a;
+					return;
 				}
-				return;
+				case first -> a = color.a + (setup.a - color.a) * alpha;
+				default -> {
+					return;
+				}
+				}
+			} else {
+				a = getCurveValue(time);
+				if (alpha != 1) {
+					if (blend == setup) {
+						Color setup = slot.data.setup.color;
+						a = setup.a + (a - setup.a) * alpha;
+					} else
+						a = color.a + (a - color.a) * alpha;
+				}
 			}
-
-			float a = getCurveValue(time);
-			if (alpha == 1)
-				color.a = a;
-			else {
-				if (blend == setup) color.a = slot.data.setup.color.a;
-				color.a += (a - color.a) * alpha;
-			}
+			color.a = a < 0 ? 0 : (a > 1 ? 1 : a);
 		}
 	}
 
