@@ -2198,8 +2198,7 @@ namespace Spine {
 				break;
 			}
 
-			switch (blend) {
-			case MixBlend.Setup: {
+			if (blend == MixBlend.Setup) {
 				IkConstraintPose setup = constraint.data.setup;
 				pose.mix = setup.mix + (mix - setup.mix) * alpha;
 				pose.softness = setup.softness + (softness - setup.softness) * alpha;
@@ -2209,21 +2208,10 @@ namespace Spine {
 					pose.stretch = setup.stretch;
 					return;
 				}
-				break;
-			}
-			case MixBlend.First:
-			case MixBlend.Replace: {
+			} else {
 				pose.mix += (mix - pose.mix) * alpha;
 				pose.softness += (softness - pose.softness) * alpha;
 				if (direction == MixDirection.Out) return;
-				break;
-			}
-			case MixBlend.Add: {
-				pose.mix += mix * alpha;
-				pose.softness += softness * alpha;
-				if (direction == MixDirection.Out) return;
-				break;
-			}
 			}
 			pose.bendDirection = (int)frames[i + BEND_DIRECTION];
 			pose.compress = frames[i + COMPRESS] != 0;
@@ -2429,7 +2417,8 @@ namespace Spine {
 			var constraint = (PathConstraint)skeleton.constraints.Items[constraintIndex];
 			if (constraint.active) {
 				PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.spacing = GetAbsoluteValue(time, alpha, blend, pose.spacing, constraint.data.setup.spacing);
+				pose.spacing = GetAbsoluteValue(time, alpha, blend == MixBlend.Add ? MixBlend.Replace : blend, pose.spacing,
+					constraint.data.setup.spacing);
 			}
 		}
 	}
@@ -2518,33 +2507,22 @@ namespace Spine {
 				break;
 			}
 
-			switch (blend) {
-			case MixBlend.Setup: {
+			if (blend == MixBlend.Setup) {
 				PathConstraintPose setup = constraint.data.setup;
 				pose.mixRotate = setup.mixRotate + (rotate - setup.mixRotate) * alpha;
 				pose.mixX = setup.mixX + (x - setup.mixX) * alpha;
 				pose.mixY = setup.mixY + (y - setup.mixY) * alpha;
-				break;
-			}
-			case MixBlend.First:
-			case MixBlend.Replace: {
+			} else {
 				pose.mixRotate += (rotate - pose.mixRotate) * alpha;
 				pose.mixX += (x - pose.mixX) * alpha;
 				pose.mixY += (y - pose.mixY) * alpha;
-				break;
-			}
-			case MixBlend.Add: {
-				pose.mixRotate += rotate * alpha;
-				pose.mixX += x * alpha;
-				pose.mixY += y * alpha;
-				break;
-			}
 			}
 		}
 	}
 
 	/// <summary>The base class for most <see cref="PhysicsConstraint"/> timelines.</summary>
 	public abstract class PhysicsConstraintTimeline : ConstraintTimeline1 {
+		internal bool additive;
 
 		/// <param name="constraintIndex">-1 for all physics constraints in the skeleton.</param>
 		public PhysicsConstraintTimeline (int frameCount, int bezierCount, int constraintIndex, Property property)
@@ -2555,6 +2533,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixBlend blend,
 			MixDirection direction, bool appliedPose) {
 
+			if (blend == MixBlend.Add && !additive) blend = MixBlend.Replace;
 			if (constraintIndex == -1) {
 				float value = time >= frames[0] ? GetCurveValue(time) : 0;
 				PhysicsConstraint[] constraints = skeleton.physics.Items;
@@ -2661,6 +2640,7 @@ namespace Spine {
 	public class PhysicsConstraintWindTimeline : PhysicsConstraintTimeline {
 		public PhysicsConstraintWindTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.PhysicsConstraintWind) {
+			additive = true;
 		}
 
 		override protected float Get (PhysicsConstraintPose pose) {
@@ -2680,6 +2660,7 @@ namespace Spine {
 	public class PhysicsConstraintGravityTimeline : PhysicsConstraintTimeline {
 		public PhysicsConstraintGravityTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.PhysicsConstraintGravity) {
+			additive = true;
 		}
 
 		override protected float Get (PhysicsConstraintPose pose) {
