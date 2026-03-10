@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "OP5RC3PVz5E",
-	"spine": "4.3.39-beta",
+	"spine": "4.3.40-beta",
 	"x": -221.22133,
 	"y": -8.550505,
 	"width": 371.0865,
@@ -341,7 +341,7 @@
 					"closed": true,
 					"lengths": [ 559.9323, 1219.4568 ],
 					"vertexCount": 6,
-					"vertices": [ 169.43, -419.28, 139.24, -43.51, 111.84, 297.59, -220.3, -362.22, -282.74, -117.7, -400, 341.5 ],
+					"vertices": [ 169.43, -419.28, 139.24, -43.51, 111.84, 297.59, -220.3, -362.22, -282.74, -117.7, -400.0, 341.5 ],
 					"color": "ffffffff"
 				}
 			},
@@ -412,8 +412,8 @@
 					"vertices": [ 108.05, 119.48, 217.1, 58.6, 171.34, -23.37, 28.15, -76.42, -62.51, -25.81, 12.13, 107.89 ],
 					"hull": 6,
 					"edges": [ 6, 8, 2, 4, 6, 4, 8, 10, 2, 0, 10, 0 ],
-					"width": 210,
-					"height": 203
+					"width": 210.0,
+					"height": 203.0
 				}
 			}
 		}
@@ -421,9 +421,9 @@
 ],
 "events": {
 	"footstep": {},
-	"headAttach": { "int": 3, "float": 4 },
-	"headBehind": { "int": 5, "float": 6, "string": "setup" },
-	"headPop": { "int": 1, "float": 2 }
+	"headAttach": { "int": 3, "float": 4.0 },
+	"headBehind": { "int": 5, "float": 6.0, "string": "setup" },
+	"headPop": { "int": 1, "float": 2.0 }
 },
 "animations": {
 	"death": {

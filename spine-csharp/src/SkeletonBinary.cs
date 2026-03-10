@@ -351,9 +351,9 @@ namespace Spine {
 						data.slot = slots[input.ReadInt(true)];
 						int flags = input.Read();
 						data.skinRequired = (flags & 1) != 0;
-						data.positionMode = (PositionMode)Enum.GetValues(typeof(PositionMode)).GetValue((flags >> 1) & 2);
-						data.spacingMode = (SpacingMode)Enum.GetValues(typeof(SpacingMode)).GetValue((flags >> 2) & 3);
-						data.rotateMode = (RotateMode)Enum.GetValues(typeof(RotateMode)).GetValue((flags >> 4) & 3);
+						data.positionMode = (PositionMode)Enum.GetValues(typeof(PositionMode)).GetValue((flags >> 1) & 0x1); // 0b1
+						data.spacingMode = (SpacingMode)Enum.GetValues(typeof(SpacingMode)).GetValue((flags >> 2) & 0x3); // 0b11
+						data.rotateMode = (RotateMode)Enum.GetValues(typeof(RotateMode)).GetValue((flags >> 4) & 0x3); // 0b11
 						if ((flags & 128) != 0) data.offsetRotation = input.ReadFloat();
 						PathConstraintPose setup = data.setup;
 						setup.position = input.ReadFloat();
@@ -711,21 +711,22 @@ namespace Spine {
 				vertices.vertices = ReadFloatArray(input, vertices.length, scale);
 				return vertices;
 			}
-			var weights = new ExposedList<float>(vertices.length * 3 * 3);
-			var bonesArray = new ExposedList<int>(vertices.length * 3);
-			for (int i = 0; i < vertexCount; i++) {
+			int n = input.ReadInt(true);
+			var bones = new int[n];
+			var weights = new float[(n - vertexCount) * 3];
+			for (int b = 0, w = 0; b < n;) {
 				int boneCount = input.ReadInt(true);
-				bonesArray.Add(boneCount);
-				for (int ii = 0; ii < boneCount; ii++) {
-					bonesArray.Add(input.ReadInt(true));
-					weights.Add(input.ReadFloat() * scale);
-					weights.Add(input.ReadFloat() * scale);
-					weights.Add(input.ReadFloat());
+				bones[b++] = boneCount;
+				for (int ii = 0; ii < boneCount; ii++, w += 3) {
+					bones[b++] = input.ReadInt(true);
+					weights[w] = input.ReadFloat() * scale;
+					weights[w + 1] = input.ReadFloat() * scale;
+					weights[w + 2] = input.ReadFloat();
 				}
 			}
 
-			vertices.vertices = weights.ToArray();
-			vertices.bones = bonesArray.ToArray();
+			vertices.vertices = weights;
+			vertices.bones = bones;
 			return vertices;
 		}
 

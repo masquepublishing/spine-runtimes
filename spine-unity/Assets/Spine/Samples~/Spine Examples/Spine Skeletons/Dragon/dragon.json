@@ -1,9 +1,9 @@
 {
 "skeleton": {
-	"hash": "CGbEcaKTYiQ",
-	"spine": "4.3.39-beta",
-	"x": -366.31195,
-	"y": -327.81042,
+	"hash": "ET1S7UZQVks",
+	"spine": "4.3.40-beta",
+	"x": -366.31192,
+	"y": -327.81046,
 	"width": 660.3925,
 	"height": 643,
 	"images": "./images/",
@@ -324,8 +324,7 @@
 	{ "name": "right-front-toe3", "bone": "right-front-toe3", "attachment": "front-toe-b" },
 	{ "name": "chin", "bone": "chin", "attachment": "chin" },
 	{ "name": "right-wing", "bone": "right-wing", "attachment": "right-wing" },
-	{ "name": "head", "bone": "head", "attachment": "head" },
-	{ "name": "thiagobrayner", "bone": "root", "attachment": "thiagobrayner" }
+	{ "name": "head", "bone": "head", "attachment": "head" }
 ],
 "skins": [
 	{
@@ -442,9 +441,6 @@
 			},
 			"tail6": {
 				"tail06": { "x": 28.022919, "y": -16.830769, "rotation": -175.44641, "width": 95, "height": 68 }
-			},
-			"thiagobrayner": {
-				"thiagobrayner": { "y": -95, "width": 350, "height": 31 }
 			}
 		}
 	}
