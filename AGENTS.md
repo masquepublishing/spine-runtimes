@@ -28,6 +28,7 @@ Use lowercase prefixes exactly as listed below.
 - `[ios]` -> `spine-ios`
 - `[libgdx]` -> `spine-libgdx`
 - `[monogame]` -> `spine-monogame`
+- `[runtimes]` -> all runtimes (use for repo-wide changes like example re-exports)
 - `[sdl]` -> `spine-sdl`
 - `[sfml]` -> `spine-sfml`
 - `[ts]` -> `spine-ts`
@@ -38,4 +39,5 @@ Use lowercase prefixes exactly as listed below.
 ### Prefix selection rules
 - If one runtime is changed, use one prefix.
 - If multiple runtimes are changed, include multiple prefixes.
+- If all runtimes are changed, use `[runtimes]`.
 - If shared files at repo root are changed, include the runtime prefix(es) impacted by that change.
