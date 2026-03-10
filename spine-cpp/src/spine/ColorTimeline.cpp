@@ -136,6 +136,7 @@ void RGBTimeline::setFrame(int frame, float time, float r, float g, float b) {
 
 void RGBTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, MixBlend blend) {
 	Color &color = pose._color;
+	float r, g, b;
 	if (time < _frames[0]) {
 		Color &setup = slot._data._setup._color;
 		switch (blend) {
@@ -145,59 +146,58 @@ void RGBTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, Mi
 				color.b = setup.b;
 				return;
 			case MixBlend_First:
-				color.r += (setup.r - color.r) * alpha;
-				color.g += (setup.g - color.g) * alpha;
-				color.b += (setup.b - color.b) * alpha;
-				return;
+				r = color.r + (setup.r - color.r) * alpha;
+				g = color.g + (setup.g - color.g) * alpha;
+				b = color.b + (setup.b - color.b) * alpha;
+				break;
 			default:
 				return;
 		}
-	}
-
-	float r, g, b;
-	int i = Animation::search(_frames, time, ENTRIES);
-	int curveType = (int) _curves[i >> 2];
-	switch (curveType) {
-		case LINEAR: {
-			float before = _frames[i];
-			r = _frames[i + R];
-			g = _frames[i + G];
-			b = _frames[i + B];
-			float t = (time - before) / (_frames[i + ENTRIES] - before);
-			r += (_frames[i + ENTRIES + R] - r) * t;
-			g += (_frames[i + ENTRIES + G] - g) * t;
-			b += (_frames[i + ENTRIES + B] - b) * t;
-			break;
-		}
-		case STEPPED: {
-			r = _frames[i + R];
-			g = _frames[i + G];
-			b = _frames[i + B];
-			break;
-		}
-		default: {
-			r = getBezierValue(time, i, R, curveType - BEZIER);
-			g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-			b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-			break;
-		}
-	}
-
-	if (alpha == 1) {
-		color.r = r;
-		color.g = g;
-		color.b = b;
 	} else {
-		if (blend == MixBlend_Setup) {
-			Color &setup = slot._data._setup._color;
-			color.r = setup.r;
-			color.g = setup.g;
-			color.b = setup.b;
+		int i = Animation::search(_frames, time, ENTRIES);
+		int curveType = (int) _curves[i >> 2];
+		switch (curveType) {
+			case LINEAR: {
+				float before = _frames[i];
+				r = _frames[i + R];
+				g = _frames[i + G];
+				b = _frames[i + B];
+				float t = (time - before) / (_frames[i + ENTRIES] - before);
+				r += (_frames[i + ENTRIES + R] - r) * t;
+				g += (_frames[i + ENTRIES + G] - g) * t;
+				b += (_frames[i + ENTRIES + B] - b) * t;
+				break;
+			}
+			case STEPPED: {
+				r = _frames[i + R];
+				g = _frames[i + G];
+				b = _frames[i + B];
+				break;
+			}
+			default: {
+				r = getBezierValue(time, i, R, curveType - BEZIER);
+				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				break;
+			}
 		}
-		color.r += (r - color.r) * alpha;
-		color.g += (g - color.g) * alpha;
-		color.b += (b - color.b) * alpha;
+
+		if (alpha != 1) {
+			if (blend == MixBlend_Setup) {
+				Color &setup = slot._data._setup._color;
+				r = setup.r + (r - setup.r) * alpha;
+				g = setup.g + (g - setup.g) * alpha;
+				b = setup.b + (b - setup.b) * alpha;
+			} else {
+				r = color.r + (r - color.r) * alpha;
+				g = color.g + (g - color.g) * alpha;
+				b = color.b + (b - color.b) * alpha;
+			}
+		}
 	}
+	color.r = r < 0 ? 0 : (r > 1 ? 1 : r);
+	color.g = g < 0 ? 0 : (g > 1 ? 1 : g);
+	color.b = b < 0 ? 0 : (b > 1 ? 1 : b);
 }
 
 RTTI_IMPL(AlphaTimeline, SlotCurveTimeline)
@@ -229,6 +229,7 @@ void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<
 	if (!slot->_bone._active) return;
 
 	Color &color = (appliedPose ? *slot->_applied : slot->_pose)._color;
+	float a;
 	if (time < _frames[0]) {
 		Color &setup = slot->_data._setup._color;
 		switch (blend) {
@@ -236,20 +237,22 @@ void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<
 				color.a = setup.a;
 				return;
 			case MixBlend_First:
-				color.a += (setup.a - color.a) * alpha;
-				return;
+				a = color.a + (setup.a - color.a) * alpha;
+				break;
 			default:
 				return;
 		}
+	} else {
+		a = getCurveValue(time);
+		if (alpha != 1) {
+			if (blend == MixBlend_Setup) {
+				Color &setup = slot->_data._setup._color;
+				a = setup.a + (a - setup.a) * alpha;
+			} else
+				a = color.a + (a - color.a) * alpha;
+		}
 	}
-
-	float a = getCurveValue(time);
-	if (alpha == 1)
-		color.a = a;
-	else {
-		if (blend == MixBlend_Setup) color.a = slot->_data._setup._color.a;
-		color.a += (a - color.a) * alpha;
-	}
+	color.a = a < 0 ? 0 : (a > 1 ? 1 : a);
 }
 
 RTTI_IMPL(RGBA2Timeline, SlotCurveTimeline)
