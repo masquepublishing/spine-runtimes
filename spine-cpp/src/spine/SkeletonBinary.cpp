@@ -340,7 +340,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					data->_slot = slots[input.readInt(true)];
 					int flags = input.read();
 					data->_skinRequired = (flags & 1) != 0;
-					data->_positionMode = (PositionMode) ((flags >> 1) & 2);
+					data->_positionMode = (PositionMode) ((flags >> 1) & 1);
 					data->_spacingMode = (SpacingMode) ((flags >> 2) & 3);
 					data->_rotateMode = (RotateMode) ((flags >> 4) & 3);
 					if ((flags & 128) != 0) data->_offsetRotation = input.readFloat();
@@ -757,16 +757,17 @@ int SkeletonBinary::readVertices(DataInput &input, Array<float> &vertices, Array
 		readFloatArray(input, verticesLength, scale, vertices.setSize(verticesLength, 0));
 		return verticesLength;
 	}
-	vertices.ensureCapacity(verticesLength * 3 * 3);
-	bones.ensureCapacity(verticesLength * 3);
-	for (int i = 0; i < vertexCount; ++i) {
+	int n = input.readInt(true);
+	bones.setSize(n, 0);
+	vertices.setSize((n - vertexCount) * 3, 0);
+	for (int b = 0, w = 0; b < n;) {
 		int boneCount = input.readInt(true);
-		bones.add(boneCount);
-		for (int ii = 0; ii < boneCount; ++ii) {
-			bones.add(input.readInt(true));
-			vertices.add(input.readFloat() * scale);
-			vertices.add(input.readFloat() * scale);
-			vertices.add(input.readFloat());
+		bones[b++] = boneCount;
+		for (int ii = 0; ii < boneCount; ++ii, w += 3) {
+			bones[b++] = input.readInt(true);
+			vertices[w] = input.readFloat() * scale;
+			vertices[w + 1] = input.readFloat() * scale;
+			vertices[w + 2] = input.readFloat();
 		}
 	}
 	return verticesLength;
