@@ -638,7 +638,7 @@ namespace Spine {
 				ReadVertices(map, mesh, uvs.Length);
 				mesh.triangles = GetIntArray(map, "triangles");
 				mesh.regionUVs = uvs;
-				
+
 				if (map.ContainsKey("hull")) mesh.HullLength = GetInt(map, "hull", 0) << 1;
 				if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
 				mesh.UpdateSequence();
