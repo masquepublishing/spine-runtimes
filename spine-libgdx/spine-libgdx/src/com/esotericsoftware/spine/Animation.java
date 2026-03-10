@@ -1731,6 +1731,9 @@ public class Animation {
 			return slotIndex;
 		}
 
+		/** The attachment for which the {@link SlotPose#getSequenceIndex()} will be set.
+		 * <p>
+		 * See {@link VertexAttachment#getTimelineAttachment()}. */
 		public Attachment getAttachment () {
 			return (Attachment)attachment;
 		}
@@ -1753,10 +1756,7 @@ public class Animation {
 			SlotPose pose = appliedPose ? slot.applied : slot.pose;
 
 			Attachment slotAttachment = pose.attachment;
-			if (slotAttachment != attachment) {
-				if (!(slotAttachment instanceof VertexAttachment vertexAttachment)
-					|| vertexAttachment.getTimelineAttachment() != attachment) return;
-			}
+			if (!(slotAttachment instanceof HasSequence hasSequence) || slotAttachment.getTimelineAttachment() != attachment) return;
 
 			if (direction == out) {
 				if (blend == setup) pose.setSequenceIndex(-1);
@@ -1774,7 +1774,7 @@ public class Animation {
 			int modeAndIndex = (int)frames[i + MODE];
 			float delay = frames[i + DELAY];
 
-			int index = modeAndIndex >> 4, count = (((HasSequence)slotAttachment).getSequence()).getRegions().length;
+			int index = modeAndIndex >> 4, count = hasSequence.getSequence().getRegions().length;
 			SequenceMode mode = SequenceMode.values[modeAndIndex & 0xf];
 			if (mode != SequenceMode.hold) {
 				index += (time - before) / delay + 0.0001f;
