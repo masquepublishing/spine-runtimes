@@ -520,8 +520,10 @@ namespace Spine.Unity.Editor {
 			bone.AppliedPose.UpdateWorldTransform(skeleton);
 
 			float[] floatVerts = new float[8];
-			attachment.ComputeWorldVertices(slot, floatVerts, 0);
-			Vector2[] uvs = ExtractUV(attachment.UVs);
+			Sequence sequence = attachment.Sequence;
+			int sequenceIndex = 0;
+			attachment.ComputeWorldVertices(slot, sequence.GetOffsets(sequenceIndex), floatVerts, 0);
+			Vector2[] uvs = ExtractUV(sequence.GetUVs(sequenceIndex));
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			//unrotate verts now that they're centered
@@ -559,7 +561,10 @@ namespace Spine.Unity.Editor {
 
 			float[] floatVerts = new float[attachment.WorldVerticesLength];
 			attachment.ComputeWorldVertices(skeleton, slot, floatVerts);
-			Vector2[] uvs = ExtractUV(attachment.UVs);
+
+			Sequence sequence = attachment.Sequence;
+			int sequenceIndex = 0;
+			Vector2[] uvs = ExtractUV(sequence.GetUVs(sequenceIndex));
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			int[] triangles = attachment.Triangles;
@@ -624,7 +629,10 @@ namespace Spine.Unity.Editor {
 
 			float[] floatVerts = new float[attachment.WorldVerticesLength];
 			attachment.ComputeWorldVertices(skeleton, skeleton.Slots.Items[slotIndex], floatVerts);
-			Vector2[] uvs = ExtractUV(attachment.UVs);
+
+			Sequence sequence = attachment.Sequence;
+			int sequenceIndex = 0;
+			Vector2[] uvs = ExtractUV(sequence.GetUVs(sequenceIndex));
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			int[] triangles = attachment.Triangles;

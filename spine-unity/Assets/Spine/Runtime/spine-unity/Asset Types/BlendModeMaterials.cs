@@ -88,7 +88,7 @@ namespace Spine.Unity {
 					skin.GetAttachments(slotIndex, skinEntries);
 
 				foreach (Skin.SkinEntry entry in skinEntries) {
-					if (entry.Attachment is IHasTextureRegion) {
+					if (entry.Attachment is IHasSequence) {
 						requiresBlendModeMaterials = true;
 						return true;
 					}
@@ -165,22 +165,15 @@ namespace Spine.Unity {
 					skin.GetAttachments(slotIndex, skinEntries);
 
 				foreach (Skin.SkinEntry entry in skinEntries) {
-					IHasTextureRegion renderableAttachment = entry.Attachment as IHasTextureRegion;
+					IHasSequence renderableAttachment = entry.Attachment as IHasSequence;
 					if (renderableAttachment != null) {
-						AtlasRegion originalRegion = (AtlasRegion)renderableAttachment.Region;
-						if (originalRegion != null) {
-							anyCreationFailed |= createForRegionFunc(
-								ref replacementMaterials, ref anyReplacementMaterialsChanged,
-								originalRegion, materialTemplate, materialSuffix, skeletonDataAsset);
-						} else {
-							Sequence sequence = renderableAttachment.Sequence;
-							if (sequence != null && sequence.Regions != null) {
-								for (int i = 0, count = sequence.Regions.Length; i < count; ++i) {
-									originalRegion = (AtlasRegion)sequence.Regions[i];
-									anyCreationFailed |= createForRegionFunc(
-										ref replacementMaterials, ref anyReplacementMaterialsChanged,
-										originalRegion, materialTemplate, materialSuffix, skeletonDataAsset);
-								}
+						Sequence sequence = renderableAttachment.Sequence;
+						if (sequence != null && sequence.Regions != null) {
+							for (int i = 0, count = sequence.Regions.Length; i < count; ++i) {
+								AtlasRegion originalRegion = (AtlasRegion)sequence.Regions[i];
+								anyCreationFailed |= createForRegionFunc(
+									ref replacementMaterials, ref anyReplacementMaterialsChanged,
+									originalRegion, materialTemplate, materialSuffix, skeletonDataAsset);
 							}
 						}
 					}
@@ -268,20 +261,12 @@ namespace Spine.Unity {
 					skin.GetAttachments(slotIndex, skinEntries);
 
 				foreach (Skin.SkinEntry entry in skinEntries) {
-					IHasTextureRegion renderableAttachment = entry.Attachment as IHasTextureRegion;
+					IHasSequence renderableAttachment = entry.Attachment as IHasSequence;
 					if (renderableAttachment != null) {
-						if (renderableAttachment.Sequence != null) {
-							TextureRegion[] regions = renderableAttachment.Sequence.Regions;
-							for (int i = 0; i < regions.Length; ++i) {
-								regions[i] = CloneAtlasRegionWithMaterial(
-									(AtlasRegion)regions[i], replacementMaterials);
-							}
-							if (regions.Length > 0) {
-								renderableAttachment.Region = regions[0];
-							}
-						} else if (renderableAttachment.Region != null) {
-							renderableAttachment.Region = CloneAtlasRegionWithMaterial(
-							(AtlasRegion)renderableAttachment.Region, replacementMaterials);
+						TextureRegion[] regions = renderableAttachment.Sequence.Regions;
+						for (int i = 0; i < regions.Length; ++i) {
+							regions[i] = CloneAtlasRegionWithMaterial(
+								(AtlasRegion)regions[i], replacementMaterials);
 						}
 					}
 				}

@@ -498,7 +498,8 @@ namespace Spine.Unity.AttachmentTools {
 			}
 			originalRegions.Clear();
 
-			if (!object.ReferenceEquals(sourceAttachments, outputAttachments)) {
+			bool isInPlaceOperation = object.ReferenceEquals(sourceAttachments, outputAttachments);
+			if (!isInPlaceOperation) {
 				outputAttachments.Clear();
 				outputAttachments.AddRange(sourceAttachments);
 			}
@@ -507,40 +508,22 @@ namespace Spine.Unity.AttachmentTools {
 			for (int attachmentIndex = 0, n = sourceAttachments.Count; attachmentIndex < n; attachmentIndex++) {
 				Attachment originalAttachment = sourceAttachments[attachmentIndex];
 
-				if (originalAttachment is IHasTextureRegion) {
-					MeshAttachment originalMeshAttachment = originalAttachment as MeshAttachment;
-					IHasTextureRegion originalTextureAttachment = (IHasTextureRegion)originalAttachment;
-
-					Attachment newAttachment = (originalTextureAttachment.Sequence != null) ? originalAttachment :
-						(originalMeshAttachment != null) ? originalMeshAttachment.NewLinkedMesh() :
-						originalAttachment.Copy();
-					IHasTextureRegion newTextureAttachment = (IHasTextureRegion)newAttachment;
-					AtlasRegion region = newTextureAttachment.Region as AtlasRegion;
-					if (region == null && originalTextureAttachment.Sequence != null)
-						region = (AtlasRegion)originalTextureAttachment.Sequence.Regions[0];
-
+				if (originalAttachment is IHasSequence) {
+					IHasSequence originalTextureAttachment = (IHasSequence)originalAttachment;
+					Attachment newAttachment = originalAttachment.Copy();
+					AtlasRegion firstRegion = (AtlasRegion)originalTextureAttachment.Sequence.Regions[0];
 					int existingIndex;
-					if (existingRegions.TryGetValue(region, out existingIndex)) {
+					if (existingRegions.TryGetValue(firstRegion, out existingIndex)) {
 						regionIndices.Add(existingIndex);
 					} else {
-						existingRegions.Add(region, newRegionIndex);
+						existingRegions.Add(firstRegion, newRegionIndex);
 						Sequence originalSequence = originalTextureAttachment.Sequence;
-						if (originalSequence != null) {
-							newTextureAttachment.Sequence = new Sequence(originalSequence);
-							for (int i = 0, regionCount = originalSequence.Regions.Length; i < regionCount; ++i) {
-								AtlasRegion sequenceRegion = (AtlasRegion)originalSequence.Regions[i];
-								AddRegionTexturesToPack(numTextureParamsToRepack, sequenceRegion,
-									settings.textureFormat, settings.mipmaps, settings.additionalTextureFormats,
-									settings.additionalTexturePropertyIDsToCopy, settings.additionalTextureIsLinear);
-								originalRegions.Add(sequenceRegion);
-								regionIndices.Add(newRegionIndex);
-								newRegionIndex++;
-							}
-						} else {
-							AddRegionTexturesToPack(numTextureParamsToRepack, region,
+						for (int i = 0, regionCount = originalSequence.Regions.Length; i < regionCount; ++i) {
+							AtlasRegion sequenceRegion = (AtlasRegion)originalSequence.Regions[i];
+							AddRegionTexturesToPack(numTextureParamsToRepack, sequenceRegion,
 								settings.textureFormat, settings.mipmaps, settings.additionalTextureFormats,
 								settings.additionalTexturePropertyIDsToCopy, settings.additionalTextureIsLinear);
-							originalRegions.Add(region);
+							originalRegions.Add(sequenceRegion);
 							regionIndices.Add(newRegionIndex);
 							newRegionIndex++;
 						}
@@ -616,32 +599,24 @@ namespace Spine.Unity.AttachmentTools {
 
 			// Map the cloned attachments to the repacked atlas.
 			for (int attachmentIndex = 0, repackedIndex = 0, n = outputAttachments.Count;
-				attachmentIndex < n;
-				++attachmentIndex, ++repackedIndex) {
+				attachmentIndex < n; ++attachmentIndex, ++repackedIndex) {
 
 				Attachment attachment = outputAttachments[attachmentIndex];
-				IHasTextureRegion textureAttachment = attachment as IHasTextureRegion;
+				IHasSequence textureAttachment = attachment as IHasSequence;
 				if (textureAttachment != null) {
-					if (textureAttachment.Sequence != null) {
-						TextureRegion[] regions = textureAttachment.Sequence.Regions;
-						for (int r = 0, regionCount = regions.Length; r < regionCount; ++r) {
-							TextureRegion originalRegion = regions[r];
-							TextureRegion repackedRegion = repackedRegions[regionIndices[repackedIndex++]];
+					TextureRegion[] regions = textureAttachment.Sequence.Regions;
+					for (int r = 0, regionCount = regions.Length; r < regionCount; ++r) {
+						TextureRegion originalRegion = regions[r];
+						TextureRegion repackedRegion = repackedRegions[regionIndices[repackedIndex++]];
+						if (enableBlendModes) {
 							AssignBlendMode(ref repackedRegion, originalRegion, normalShader, ref blendModePages,
 								additiveMaterialSource, multiplyMaterialSource, screenMaterialSource);
-							regions[r] = repackedRegion;
 						}
-						textureAttachment.Region = regions[0];
-						--repackedIndex;
-					} else {
-						TextureRegion originalRegion = textureAttachment.Region;
-						TextureRegion repackedRegion = repackedRegions[regionIndices[repackedIndex]];
-						if (enableBlendModes)
-							AssignBlendMode(ref repackedRegion, originalRegion, normalShader, ref blendModePages,
-								additiveMaterialSource, multiplyMaterialSource, screenMaterialSource);
-						textureAttachment.Region = repackedRegion;
+						regions[r] = repackedRegion;
 					}
-					textureAttachment.UpdateRegion();
+					--repackedIndex;
+					
+					textureAttachment.UpdateSequence();
 				}
 			}
 
@@ -1075,7 +1050,7 @@ namespace Spine.Unity.AttachmentTools {
 		}
 
 		static bool IsRenderable (Attachment a) {
-			return a is IHasTextureRegion;
+			return a is IHasSequence;
 		}
 
 		/// <summary>

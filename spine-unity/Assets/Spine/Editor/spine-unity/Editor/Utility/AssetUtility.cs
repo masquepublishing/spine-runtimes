@@ -300,24 +300,14 @@ namespace Spine.Unity.Editor {
 			}
 
 			public RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence) {
-				RegionAttachment regionAttachment = new RegionAttachment(name);
-				if (sequence != null)
-					LoadSequence(path, sequence);
-				else {
-					requirementList.Add(path);
-					AssignDummyRegion(regionAttachment);
-				}
+				RegionAttachment regionAttachment = new RegionAttachment(name, sequence);
+				LoadSequence(path, sequence);
 				return regionAttachment;
 			}
 
 			public MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence) {
-				MeshAttachment meshAttachment = new MeshAttachment(name);
-				if (sequence != null)
-					LoadSequence(path, sequence);
-				else {
-					requirementList.Add(path);
-					AssignDummyRegion(meshAttachment);
-				}
+				MeshAttachment meshAttachment = new MeshAttachment(name, sequence);
+				LoadSequence(path, sequence);
 				return meshAttachment;
 			}
 
@@ -343,10 +333,6 @@ namespace Spine.Unity.Editor {
 					string path = sequence.GetPath(basePath, i);
 					requirementList.Add(path);
 				}
-			}
-
-			private static void AssignDummyRegion (IHasTextureRegion attachment) {
-				attachment.Region = new AtlasRegion();
 			}
 		}
 		#endregion

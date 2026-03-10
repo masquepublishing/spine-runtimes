@@ -134,31 +134,13 @@ namespace Spine.Unity.TK2D {
 		}
 
 		public RegionAttachment NewRegionAttachment (Skin skin, String name, String path, Sequence sequence) {
-			RegionAttachment attachment = new RegionAttachment(name);
-			if (sequence != null)
-				LoadSequence(name, path, sequence);
-			else {
-				AtlasRegion region = ProcessSpriteDefinition(path);
-				if (region == null)
-					throw new ArgumentException(string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
-				attachment.Region = region;
-				attachment.Path = path;
-			}
-			return attachment;
+			LoadSequence(name, path, sequence);
+			return new RegionAttachment(name, sequence);
 		}
 
 		public MeshAttachment NewMeshAttachment (Skin skin, String name, String path, Sequence sequence) {
-			MeshAttachment attachment = new MeshAttachment(name);
-			if (sequence != null)
-				LoadSequence(name, path, sequence);
-			else {
-				AtlasRegion region = ProcessSpriteDefinition(path);
-				if (region == null)
-					throw new ArgumentException(string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
-				attachment.Region = region;
-				attachment.Path = path;
-			}
-			return attachment;
+			LoadSequence(name, path, sequence);
+			return new MeshAttachment(name, sequence);
 		}
 
 		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, String name) {

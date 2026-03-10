@@ -36,25 +36,12 @@ namespace Spine {
 	using Color32F = UnityEngine.Color;
 #endif
 
-	public interface IHasTextureRegion {
-		/// <summary>The name used to find the <see cref="Region"/></summary>
+	public interface IHasSequence {
 		string Path { get; set; }
-		/// <summary>
-		/// Sets the region used to draw the attachment. After setting the region or if the region's properties are changed,
-		/// <see cref="UpdateRegion()"/> must be called.
-		/// </summary>
-		TextureRegion Region { get; set; }
-
-		/// <summary>
-		/// Updates any values the attachment calculates using the <see cref="Region"/>. Must be called after setting the
-		/// <see cref="Region"/> or if the region's properties are changed.
-		/// </summary>
-		void UpdateRegion ();
-
 		Color32F GetColor ();
 		void SetColor (Color32F color);
 		void SetColor (float r, float g, float b, float a);
-
-		Sequence Sequence { get; set; }
+		Sequence Sequence { get; }
+		void UpdateSequence ();
 	}
 }

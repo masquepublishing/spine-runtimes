@@ -254,15 +254,17 @@ namespace Spine.Unity {
 
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
-					if (regionAttachment.Sequence != null) regionAttachment.Sequence.Apply(slot.AppliedPose, regionAttachment);
-					rendererObject = regionAttachment.Region;
+					Sequence sequence = regionAttachment.Sequence;
+					int sequenceIndex = sequence.ResolveIndex(slot.AppliedPose);
+					rendererObject = sequence.GetRegion(sequenceIndex);
 					attachmentVertexCount = 4;
 					attachmentTriangleCount = 6;
 				} else {
 					MeshAttachment meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
-						if (meshAttachment.Sequence != null) meshAttachment.Sequence.Apply(slot.AppliedPose, meshAttachment);
-						rendererObject = meshAttachment.Region;
+						Sequence sequence = meshAttachment.Sequence;
+						int sequenceIndex = sequence.ResolveIndex(slot.AppliedPose);
+						rendererObject = sequence.GetRegion(sequenceIndex);
 						attachmentVertexCount = meshAttachment.WorldVerticesLength >> 1;
 						attachmentTriangleCount = meshAttachment.Triangles.Length;
 					} else {
@@ -323,10 +325,11 @@ namespace Spine.Unity {
 #endif
 					) continue;
 				Attachment attachment = slot.AppliedPose.Attachment;
-				IHasTextureRegion rendererAttachment = attachment as IHasTextureRegion;
+				IHasSequence rendererAttachment = attachment as IHasSequence;
 				if (rendererAttachment != null) {
-					if (rendererAttachment.Sequence != null) rendererAttachment.Sequence.Apply(slot.AppliedPose, rendererAttachment);
-					AtlasRegion atlasRegion = (AtlasRegion)rendererAttachment.Region;
+					Sequence sequence = rendererAttachment.Sequence;
+					int sequenceIndex = sequence.ResolveIndex(slot.AppliedPose);
+					AtlasRegion atlasRegion = (AtlasRegion)sequence.GetRegion(sequenceIndex);
 					Material material = (Material)atlasRegion.page.rendererObject;
 					if (lastRendererMaterial != material) {
 						if (lastRendererMaterial != null)
@@ -399,8 +402,9 @@ namespace Spine.Unity {
 
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
-					if (regionAttachment.Sequence != null) regionAttachment.Sequence.Apply(slot.AppliedPose, regionAttachment);
-					region = regionAttachment.Region;
+					Sequence sequence = regionAttachment.Sequence;
+					int sequenceIndex = sequence.ResolveIndex(slot.AppliedPose);
+					region = sequence.GetRegion(sequenceIndex);
 #if SPINE_TRIANGLECHECK
 					attachmentVertexCount = 4;
 					attachmentTriangleCount = 6;
@@ -408,8 +412,9 @@ namespace Spine.Unity {
 				} else {
 					MeshAttachment meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
-						if (meshAttachment.Sequence != null) meshAttachment.Sequence.Apply(slot.AppliedPose, meshAttachment);
-						region = meshAttachment.Region;
+						Sequence sequence = meshAttachment.Sequence;
+						int sequenceIndex = sequence.ResolveIndex(slot.AppliedPose);
+						region = sequence.GetRegion(sequenceIndex);
 #if SPINE_TRIANGLECHECK
 						attachmentVertexCount = meshAttachment.WorldVerticesLength >> 1;
 						attachmentTriangleCount = meshAttachment.Triangles.Length;
@@ -620,8 +625,10 @@ namespace Spine.Unity {
 				// Identify and prepare values.
 				RegionAttachment region = attachment as RegionAttachment;
 				if (region != null) {
-					region.ComputeWorldVertices(slot, workingVerts, 0);
-					uvs = region.UVs;
+					Sequence sequence = region.Sequence;
+					int sequenceIndex = sequence.ResolveIndex(slotPose);
+					region.ComputeWorldVertices(slot, sequence.GetOffsets(sequenceIndex), workingVerts, 0);
+					uvs = sequence.GetUVs(sequenceIndex);
 					attachmentTriangleIndices = regionTriangles;
 					regionC = region.GetColor();
 					attachmentVertexCount = 4;
@@ -634,8 +641,10 @@ namespace Spine.Unity {
 							workingVerts = new float[meshVerticesLength];
 							this.tempVerts = workingVerts;
 						}
-						mesh.ComputeWorldVertices(skeleton, slot, 0, meshVerticesLength, workingVerts, 0); //meshAttachment.ComputeWorldVertices(slot, tempVerts);
-						uvs = mesh.UVs;
+						Sequence sequence = mesh.Sequence;
+						int sequenceIndex = sequence.ResolveIndex(slotPose);
+						mesh.ComputeWorldVertices(skeleton, slot, 0, meshVerticesLength, workingVerts, 0);
+						uvs = sequence.GetUVs(sequenceIndex);
 						attachmentTriangleIndices = mesh.Triangles;
 						regionC = mesh.GetColor();
 						attachmentVertexCount = meshVerticesLength >> 1; // meshVertexCount / 2;
@@ -942,7 +951,10 @@ namespace Spine.Unity {
 
 					RegionAttachment regionAttachment = attachment as RegionAttachment;
 					if (regionAttachment != null) {
-						regionAttachment.ComputeWorldVertices(slot, tempVerts, 0);
+						Sequence sequence = regionAttachment.Sequence;
+						int sequenceIndex = sequence.ResolveIndex(slotPose);
+						regionAttachment.ComputeWorldVertices(slot, sequence.GetOffsets(sequenceIndex), tempVerts, 0);
+
 						Color regionC = regionAttachment.GetColor();
 						Color combinedC = skeletonC * slotC * regionC;
 
@@ -978,7 +990,7 @@ namespace Spine.Unity {
 
 						cbi[vertexIndex] = color; cbi[vertexIndex + 1] = color; cbi[vertexIndex + 2] = color; cbi[vertexIndex + 3] = color;
 
-						float[] regionUVs = regionAttachment.UVs;
+						float[] regionUVs = sequence.GetUVs(sequenceIndex);
 						ubi[vertexIndex] = new Vector2(regionUVs[RegionAttachment.BLX], regionUVs[RegionAttachment.BLY]);
 						ubi[vertexIndex + 1] = new Vector2(regionUVs[RegionAttachment.BRX], regionUVs[RegionAttachment.BRY]);
 						ubi[vertexIndex + 2] = new Vector2(regionUVs[RegionAttachment.ULX], regionUVs[RegionAttachment.ULY]);
@@ -1032,7 +1044,9 @@ namespace Spine.Unity {
 								color.b = (byte)(combinedC.b * 255);
 							}
 
-							float[] attachmentUVs = meshAttachment.UVs;
+							Sequence sequence = meshAttachment.Sequence;
+							int sequenceIndex = sequence.ResolveIndex(slotPose);
+							float[] attachmentUVs = sequence.GetUVs(sequenceIndex);
 
 							// Potential first attachment bounds initialization. See conditions in RegionAttachment logic.
 							if (vertexIndex == 0) {

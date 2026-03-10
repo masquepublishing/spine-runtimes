@@ -331,6 +331,7 @@
   - Attachment `ComputeWorldVertices()` methods now take an additional `skeleton` parameter
   - Renamed timeline constraint index methods to use unified `ConstraintIndex` property
   - Reorganized timeline class hierarchy with new base classes
+  - Removed `AtlasAttachmentLoader` method `AtlasRegion FindRegion(string name)` from public interface. Added `protected AtlasRegion FindRegion(string name, string path)` instead which may be overridden instead when deriving your own subclass.
 
 ### Unity
 

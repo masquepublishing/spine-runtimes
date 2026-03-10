@@ -461,7 +461,7 @@ namespace Spine {
 					if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
 					linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh;
 					linkedMesh.mesh.ParentMesh = (MeshAttachment)parent;
-					if (linkedMesh.mesh.Region != null) linkedMesh.mesh.UpdateRegion();
+					linkedMesh.mesh.UpdateSequence();
 				}
 				linkedMeshes.Clear();
 
@@ -546,7 +546,7 @@ namespace Spine {
 			case AttachmentType.Region: {
 				string path = (flags & 16) != 0 ? input.ReadStringRef() : null;
 				uint color = (flags & 32) != 0 ? (uint)input.ReadInt() : 0xffffffff;
-				Sequence sequence = (flags & 64) != 0 ? ReadSequence(input) : null;
+				Sequence sequence = ReadSequence(input, (flags & 64) != 0);
 				float rotation = (flags & 128) != 0 ? input.ReadFloat() : 0;
 				float x = input.ReadFloat();
 				float y = input.ReadFloat();
@@ -567,8 +567,7 @@ namespace Spine {
 				region.width = width * scale;
 				region.height = height * scale;
 				region.SetColor(color.RGBA8888ToColor());
-				region.sequence = sequence;
-				if (region.Region != null) region.UpdateRegion();
+				region.UpdateSequence();
 				return region;
 			}
 			case AttachmentType.Boundingbox: {
@@ -586,7 +585,7 @@ namespace Spine {
 			case AttachmentType.Mesh: {
 				string path = (flags & 16) != 0 ? input.ReadStringRef() : name;
 				uint color = (flags & 32) != 0 ? (uint)input.ReadInt() : 0xffffffff;
-				Sequence sequence = (flags & 64) != 0 ? ReadSequence(input) : null;
+				Sequence sequence = ReadSequence(input, (flags & 64) != 0);
 				int hullLength = input.ReadInt(true);
 				Vertices vertices = ReadVertices(input, (flags & 128) != 0);
 				float[] uvs = ReadFloatArray(input, vertices.length, 1);
@@ -604,25 +603,24 @@ namespace Spine {
 				if (mesh == null) return null;
 				mesh.Path = path;
 				mesh.SetColor(color.RGBA8888ToColor());
+				mesh.HullLength = hullLength << 1;
 				mesh.bones = vertices.bones;
 				mesh.vertices = vertices.vertices;
 				mesh.WorldVerticesLength = vertices.length;
-				mesh.triangles = triangles;
 				mesh.regionUVs = uvs;
-				if (mesh.Region != null) mesh.UpdateRegion();
-				mesh.HullLength = hullLength << 1;
-				mesh.Sequence = sequence;
+				mesh.triangles = triangles;
 				if (nonessential) {
 					mesh.Edges = edges;
 					mesh.Width = width * scale;
 					mesh.Height = height * scale;
 				}
+				mesh.UpdateSequence();
 				return mesh;
 			}
 			case AttachmentType.Linkedmesh: {
 				string path = (flags & 16) != 0 ? input.ReadStringRef() : name;
 				uint color = (flags & 32) != 0 ? (uint)input.ReadInt() : 0xffffffff;
-				Sequence sequence = (flags & 64) != 0 ? ReadSequence(input) : null;
+				Sequence sequence = ReadSequence(input, (flags & 64) != 0);
 				bool inheritTimelines = (flags & 128) != 0;
 				int skinIndex = input.ReadInt(true);
 				string parent = input.ReadStringRef();
@@ -636,7 +634,6 @@ namespace Spine {
 				if (mesh == null) return null;
 				mesh.Path = path;
 				mesh.SetColor(color.RGBA8888ToColor());
-				mesh.Sequence = sequence;
 				if (nonessential) {
 					mesh.Width = width * scale;
 					mesh.Height = height * scale;
@@ -696,8 +693,9 @@ namespace Spine {
 			return null;
 		}
 
-		private Sequence ReadSequence (SkeletonInput input) {
-			var sequence = new Sequence(input.ReadInt(true));
+		private Sequence ReadSequence (SkeletonInput input, bool hasPathSuffix) {
+			if (!hasPathSuffix) return new Sequence(1, false);
+			var sequence = new Sequence(input.ReadInt(true), true);
 			sequence.Start = input.ReadInt(true);
 			sequence.Digits = input.ReadInt(true);
 			sequence.SetupIndex = input.ReadInt(true);

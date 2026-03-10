@@ -494,7 +494,7 @@ namespace Spine {
 					if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
 					linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh;
 					linkedMesh.mesh.ParentMesh = (MeshAttachment)parent;
-					if (linkedMesh.mesh.Region != null) linkedMesh.mesh.UpdateRegion();
+					linkedMesh.mesh.UpdateSequence();
 				}
 				linkedMeshes.Clear();
 
@@ -596,14 +596,13 @@ namespace Spine {
 				region.rotation = GetFloat(map, "rotation", 0);
 				region.width = GetFloat(map, "width") * scale;
 				region.height = GetFloat(map, "height") * scale;
-				region.sequence = sequence;
 
 				if (map.ContainsKey("color")) {
 					string color = (string)map["color"];
 					region.SetColor(ToColor32(color, 8));
 				}
 
-				if (region.Region != null) region.UpdateRegion();
+				region.UpdateSequence();
 				return region;
 			}
 			case AttachmentType.Boundingbox:
@@ -628,7 +627,6 @@ namespace Spine {
 
 				mesh.Width = GetFloat(map, "width", 0) * scale;
 				mesh.Height = GetFloat(map, "height", 0) * scale;
-				mesh.Sequence = sequence;
 
 				string parent = GetString(map, "parent", null);
 				if (parent != null) {
@@ -640,10 +638,10 @@ namespace Spine {
 				ReadVertices(map, mesh, uvs.Length);
 				mesh.triangles = GetIntArray(map, "triangles");
 				mesh.regionUVs = uvs;
-				if (mesh.Region != null) mesh.UpdateRegion();
-
+				
 				if (map.ContainsKey("hull")) mesh.HullLength = GetInt(map, "hull", 0) << 1;
 				if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
+				mesh.UpdateSequence();
 				return mesh;
 			}
 			case AttachmentType.Path: {
@@ -693,8 +691,8 @@ namespace Spine {
 
 		public static Sequence ReadSequence (object sequenceJson) {
 			Dictionary<string, object> map = sequenceJson as Dictionary<string, Object>;
-			if (map == null) return null;
-			var sequence = new Sequence(GetInt(map, "count"));
+			if (map == null) return new Sequence(1, false);
+			var sequence = new Sequence(GetInt(map, "count"), true);
 			sequence.start = GetInt(map, "start", 1);
 			sequence.digits = GetInt(map, "digits", 0);
 			sequence.setupIndex = GetInt(map, "setup", 0);

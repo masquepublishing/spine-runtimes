@@ -74,9 +74,10 @@ namespace Spine.Unity.AttachmentTools {
 			if (region == null) throw new System.ArgumentNullException("region");
 
 			// (AtlasAttachmentLoader.cs)
-			RegionAttachment attachment = new RegionAttachment(attachmentName);
+			Sequence sequence = new Sequence(1, false);
+			sequence.Regions[0] = region;
+			RegionAttachment attachment = new RegionAttachment(attachmentName, sequence);
 
-			attachment.Region = region;
 			attachment.Path = region.name;
 			attachment.ScaleX = 1;
 			attachment.ScaleY = 1;
@@ -84,15 +85,11 @@ namespace Spine.Unity.AttachmentTools {
 			attachment.SetColor(Color.white);
 
 			// pass OriginalWidth and OriginalHeight because UpdateOffset uses it in its calculation.
-			TextureRegion textreRegion = attachment.Region;
-			AtlasRegion atlasRegion = textreRegion as AtlasRegion;
-			float originalWidth = atlasRegion != null ? atlasRegion.originalWidth : textreRegion.width;
-			float originalHeight = atlasRegion != null ? atlasRegion.originalHeight : textreRegion.height;
-			attachment.Width = originalWidth * scale;
-			attachment.Height = originalHeight * scale;
+			attachment.Width = region.originalWidth * scale;
+			attachment.Height = region.originalHeight * scale;
 
 			attachment.SetColor(Color.white);
-			attachment.UpdateRegion();
+			attachment.UpdateSequence();
 			return attachment;
 		}
 
@@ -166,8 +163,10 @@ namespace Spine.Unity.AttachmentTools {
 			float scale = 1f / sprite.pixelsPerUnit;
 			if (useOriginalRegionScale) {
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
-				if (regionAttachment != null)
-					scale = regionAttachment.Width / regionAttachment.Region.OriginalWidth;
+				if (regionAttachment != null) {
+					var firstRegion = regionAttachment.Sequence.GetRegion(0);
+					scale = regionAttachment.Width / firstRegion.OriginalWidth;
+				}
 			}
 			attachment.SetRegion(atlasRegion, useOriginalRegionSize, scale);
 		}
@@ -181,17 +180,18 @@ namespace Spine.Unity.AttachmentTools {
 		public static void SetRegion (this Attachment attachment, AtlasRegion atlasRegion, bool useOriginalRegionSize = false, float scale = 0.01f) {
 			RegionAttachment regionAttachment = attachment as RegionAttachment;
 			if (regionAttachment != null) {
-				regionAttachment.Region = atlasRegion;
+
+				regionAttachment.Sequence.Regions[0] = atlasRegion;
 				if (!useOriginalRegionSize) {
 					regionAttachment.Width = atlasRegion.width * scale;
 					regionAttachment.Height = atlasRegion.height * scale;
 				}
-				regionAttachment.UpdateRegion();
+				regionAttachment.UpdateSequence();
 			} else {
 				MeshAttachment meshAttachment = attachment as MeshAttachment;
 				if (meshAttachment != null) {
-					meshAttachment.Region = atlasRegion;
-					meshAttachment.UpdateRegion();
+					meshAttachment.Sequence.Regions[0] = atlasRegion;
+					meshAttachment.UpdateSequence();
 				}
 			}
 		}

@@ -1881,12 +1881,12 @@ namespace Spine {
 		private const int MODE = 1, DELAY = 2;
 
 		readonly int slotIndex;
-		readonly IHasTextureRegion attachment;
+		readonly IHasSequence attachment;
 
 		public SequenceTimeline (int frameCount, int slotIndex, Attachment attachment)
-			: base(frameCount, (int)Property.Sequence + "|" + slotIndex + "|" + ((IHasTextureRegion)attachment).Sequence.Id) {
+			: base(frameCount, (int)Property.Sequence + "|" + slotIndex + "|" + ((IHasSequence)attachment).Sequence.Id) {
 			this.slotIndex = slotIndex;
-			this.attachment = (IHasTextureRegion)attachment;
+			this.attachment = (IHasSequence)attachment;
 		}
 
 		public override int FrameEntries {
@@ -1927,8 +1927,6 @@ namespace Spine {
 				if ((vertexAttachment == null)
 					|| vertexAttachment.TimelineAttachment != attachment) return;
 			}
-			Sequence sequence = ((IHasTextureRegion)slotAttachment).Sequence;
-			if (sequence == null) return;
 
 			if (direction == MixDirection.Out) {
 				if (blend == MixBlend.Setup) pose.SequenceIndex = -1;
@@ -1946,7 +1944,7 @@ namespace Spine {
 			int modeAndIndex = (int)frames[i + MODE];
 			float delay = frames[i + DELAY];
 
-			int index = modeAndIndex >> 4, count = sequence.Regions.Length;
+			int index = modeAndIndex >> 4, count = (((IHasSequence)slotAttachment).Sequence).Regions.Length;
 			SequenceMode mode = (SequenceMode)(modeAndIndex & 0xf);
 			if (mode != SequenceMode.Hold) {
 				index += (int)((time - before) / delay + 0.0001f);

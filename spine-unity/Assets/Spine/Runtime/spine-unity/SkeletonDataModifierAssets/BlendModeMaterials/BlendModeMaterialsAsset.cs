@@ -77,10 +77,12 @@ namespace Spine.Unity {
 					if (templateMaterial == null) continue;
 
 					foreach (Skin.SkinEntry entry in entryBuffer) {
-						IHasTextureRegion renderableAttachment = entry.Attachment as IHasTextureRegion;
-						if (renderableAttachment != null) {
-							renderableAttachment.Region = materialCache.CloneAtlasRegionWithMaterial(
-								(AtlasRegion)renderableAttachment.Region, templateMaterial);
+						IHasSequence renderableAttachment = entry.Attachment as IHasSequence;
+						if (renderableAttachment == null) continue;
+						TextureRegion[] regions = renderableAttachment.Sequence.Regions;
+						for (int i = 0; i < regions.Length; ++i) {
+							regions[i] = materialCache.CloneAtlasRegionWithMaterial(
+								(AtlasRegion)regions[i], templateMaterial);
 						}
 					}
 				}
