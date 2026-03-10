@@ -41,3 +41,19 @@ Use lowercase prefixes exactly as listed below.
 - If multiple runtimes are changed, include multiple prefixes.
 - If all runtimes are changed, use `[runtimes]`.
 - If shared files at repo root are changed, include the runtime prefix(es) impacted by that change.
+
+## spine-cpp / spine-libgdx test infrastructure
+
+The spine-cpp headless test (`spine-cpp/tests/test.sh`) validates that spine-cpp produces the same parsed skeleton data as spine-libgdx. Both runtimes have a `SkeletonSerializer` that serializes loaded skeleton data to JSON for comparison.
+
+Files:
+- `spine-cpp/tests/HeadlessTest.cpp` - C++ test that loads skeleton and serializes to JSON
+- `spine-cpp/tests/SkeletonSerializer.h` - C++ JSON serializer for skeleton data
+- `spine-libgdx/spine-libgdx-tests/src/com/esotericsoftware/spine/HeadlessTest.java` - Java equivalent
+- `spine-libgdx/spine-libgdx-tests/src/com/esotericsoftware/spine/utils/SkeletonSerializer.java` - Java equivalent
+
+When tests disagree:
+1. Check if the skeleton was loaded from JSON or binary. Run both to isolate which parser differs.
+2. Compare the SkeletonSerializer implementations. They must output identical JSON structure.
+3. Check for unported changes in spine-libgdx (SkeletonBinary.java, SkeletonJson.java) and port them to spine-cpp.
+4. Update `spine-cpp/tests/test.sh` expected output if the serializer format changed intentionally.
