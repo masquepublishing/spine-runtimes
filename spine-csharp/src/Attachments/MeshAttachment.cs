@@ -56,8 +56,7 @@ namespace Spine {
 
 		/// <summary>The UV pair for each vertex, normalized within the texture region.</summary>
 		public float[] RegionUVs { get { return regionUVs; } set { regionUVs = value; } }
-		/// <summary>The UV pair for each vertex, normalized within the entire texture.
-		/// <seealso cref="MeshAttachment.UpdateRegion"/></summary>
+		/// <summary>Triplets of vertex indices which describe the mesh's triangulation.</summary>
 		public int[] Triangles { get { return triangles; } set { triangles = value; } }
 
 		public Color32F GetColor () {
@@ -74,6 +73,10 @@ namespace Spine {
 
 		public string Path { get { return path; } set { path = value; } }
 		public Sequence Sequence { get { return sequence; } }
+		Attachment IHasSequence.TimelineAttachment {
+			get { return timelineAttachment; }
+			set { timelineAttachment = (VertexAttachment)value; }
+		}
 
 		public MeshAttachment ParentMesh {
 			get { return parentMesh; }

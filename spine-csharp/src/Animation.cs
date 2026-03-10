@@ -1923,9 +1923,9 @@ namespace Spine {
 
 			Attachment slotAttachment = pose.attachment;
 			if (slotAttachment != attachment) {
-				VertexAttachment vertexAttachment = slotAttachment as VertexAttachment;
-				if ((vertexAttachment == null)
-					|| vertexAttachment.TimelineAttachment != attachment) return;
+				IHasSequence sequenceAttachment = slotAttachment as IHasSequence;
+				if ((sequenceAttachment == null)
+					|| sequenceAttachment.TimelineAttachment != attachment) return;
 			}
 
 			if (direction == MixDirection.Out) {

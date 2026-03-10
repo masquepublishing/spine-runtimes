@@ -46,6 +46,7 @@ namespace Spine {
 		public const int BRX = 6, BRY = 7;
 
 		internal readonly Sequence sequence;
+		internal Attachment timelineAttachment;
 		internal float x, y, rotation, scaleX = 1, scaleY = 1, width, height;
 		// Color is a struct, set to protected to prevent
 		// Color color = slot.color; color.a = 0.5;
@@ -75,11 +76,13 @@ namespace Spine {
 
 		public string Path { get; set; }
 		public Sequence Sequence { get { return sequence; } }
+		public Attachment TimelineAttachment { get { return timelineAttachment; } set { timelineAttachment = value; } }
 
 		public RegionAttachment (string name, Sequence sequence)
 			: base(name) {
 			if (sequence == null) throw new ArgumentException("sequence cannot be null.", "sequence");
 			this.sequence = sequence;
+			timelineAttachment = this;
 		}
 
 		/// <summary>Copy constructor.</summary>
@@ -95,6 +98,7 @@ namespace Spine {
 			height = other.height;
 			color = other.color;
 			sequence = new Sequence(other.sequence);
+			timelineAttachment = other.timelineAttachment;
 		}
 
 		/// <summary><para>
