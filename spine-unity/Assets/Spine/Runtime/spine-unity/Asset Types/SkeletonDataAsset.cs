@@ -66,12 +66,7 @@ namespace Spine.Unity {
 		#region Inspector
 		public AtlasAssetBase[] atlasAssets = new AtlasAssetBase[0];
 
-#if SPINE_TK2D
-		public tk2dSpriteCollectionData spriteCollection;
-		public float scale = 1f;
-#else
 		public float scale = 0.01f;
-#endif
 		public TextAsset skeletonJSON;
 
 		public bool isUpgradingBlendModeMaterials = false;
@@ -173,17 +168,10 @@ namespace Spine.Unity {
 			//				Clear();
 			//				return null;
 			//			}
-			//			#if !SPINE_TK2D
 			//			if (atlasAssets.Length == 0) {
 			//				Clear();
 			//				return null;
 			//			}
-			//			#else
-			//			if (atlasAssets.Length == 0 && spriteCollection == null) {
-			//				Clear();
-			//				return null;
-			//			}
-			//			#endif
 
 			if (skeletonData != null)
 				return skeletonData;
@@ -192,23 +180,8 @@ namespace Spine.Unity {
 			float skeletonDataScale;
 			Atlas[] atlasArray = this.GetAtlasArray();
 
-#if !SPINE_TK2D
 			attachmentLoader = (atlasArray.Length == 0) ? (AttachmentLoader)new RegionlessAttachmentLoader() : (AttachmentLoader)new AtlasAttachmentLoader(atlasArray);
 			skeletonDataScale = scale;
-#else
-			if (spriteCollection != null) {
-				attachmentLoader = new Spine.Unity.TK2D.SpriteCollectionAttachmentLoader(spriteCollection);
-				skeletonDataScale = (1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale);
-			} else {
-				if (atlasArray.Length == 0) {
-					Reset();
-					if (!quiet) Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
-					return null;
-				}
-				attachmentLoader = new AtlasAttachmentLoader(atlasArray);
-				skeletonDataScale = scale;
-			}
-#endif
 
 			bool hasBinaryExtension = skeletonJSON.name.ToLower().Contains(".skel");
 			SkeletonData loadedSkeletonData = null;

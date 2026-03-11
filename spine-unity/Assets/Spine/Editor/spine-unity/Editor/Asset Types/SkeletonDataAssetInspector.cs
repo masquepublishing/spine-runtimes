@@ -56,9 +56,6 @@ namespace Spine.Unity.Editor {
 		SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix;
 		SerializedProperty skeletonDataModifiers;
 		SerializedProperty blendModeMaterials;
-#if SPINE_TK2D
-		SerializedProperty spriteCollection;
-#endif
 
 #if SPINE_SKELETON_MECANIM
 		static bool isMecanimExpanded = false;
@@ -121,13 +118,8 @@ namespace Spine.Unity.Editor {
 			controller = serializedObject.FindProperty("controller");
 #endif
 
-#if SPINE_TK2D
-			if (newAtlasAssets) atlasAssets.isExpanded = false;
-			spriteCollection = serializedObject.FindProperty("spriteCollection");
-#else
 			// Analysis disable once ConvertIfToOrExpression
 			if (newAtlasAssets) atlasAssets.isExpanded = true;
-#endif
 
 			// This handles the case where the managed editor assembly is unloaded before recompilation when code changes.
 			AppDomain.CurrentDomain.DomainUnload -= OnDomainUnload;
@@ -247,15 +239,11 @@ namespace Spine.Unity.Editor {
 				DrawUnityTools();
 
 			} else {
-#if !SPINE_TK2D
 				// Draw Reimport Button
 				using (new EditorGUI.DisabledGroupScope(skeletonJSON.objectReferenceValue == null)) {
 					if (GUILayout.Button(SpineInspectorUtility.TempContent("Attempt Reimport", Icons.warning)))
 						DoReimport();
 				}
-#else
-				EditorGUILayout.HelpBox("Couldn't load SkeletonData.", MessageType.Error);
-#endif
 
 				DrawWarningList();
 			}
@@ -350,15 +338,7 @@ namespace Spine.Unity.Editor {
 			// Texture source field.
 			using (new SpineInspectorUtility.BoxScope()) {
 				EditorGUILayout.LabelField("Atlas", EditorStyles.boldLabel);
-#if !SPINE_TK2D
 				EditorGUILayout.PropertyField(atlasAssets, true);
-#else
-				using (new EditorGUI.DisabledGroupScope(spriteCollection.objectReferenceValue != null)) {
-					EditorGUILayout.PropertyField(atlasAssets, true);
-				}
-				EditorGUILayout.LabelField("spine-tk2d", EditorStyles.boldLabel);
-				EditorGUILayout.PropertyField(spriteCollection, true);
-#endif
 			}
 
 			// Mix settings.
@@ -430,15 +410,7 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.LabelField("Atlas", EditorStyles.boldLabel);
 
 			using (var changeCheck = new EditorGUI.ChangeCheckScope()) {
-#if !SPINE_TK2D
 				EditorGUILayout.PropertyField(atlasAssets, true);
-#else
-				using (new EditorGUI.DisabledGroupScope(spriteCollection.objectReferenceValue != null)) {
-					EditorGUILayout.PropertyField(atlasAssets, true);
-				}
-				EditorGUILayout.LabelField("spine-tk2d", EditorStyles.boldLabel);
-				EditorGUILayout.PropertyField(spriteCollection, true);
-#endif
 				if (atlasAssets.arraySize == 0)
 					EditorGUILayout.HelpBox("AtlasAssets array is empty. Skeleton's attachments will load without being mapped to images.", MessageType.Info);
 
@@ -703,14 +675,8 @@ namespace Spine.Unity.Editor {
 					else
 						warnings.Add("Skeleton data file is not a valid Spine JSON or binary file.");
 				} else {
-#if SPINE_TK2D
-					bool searchForSpineAtlasAssets = (compatibilityProblemInfo == null);
-					bool isSpriteCollectionNull = spriteCollection.objectReferenceValue == null;
-					if (!isSpriteCollectionNull) searchForSpineAtlasAssets = false;
-#else
 					// Analysis disable once ConvertToConstant.Local
 					bool searchForSpineAtlasAssets = (compatibilityProblemInfo == null);
-#endif
 
 					if (searchForSpineAtlasAssets) {
 						bool detectedNullAtlasEntry = false;
@@ -744,10 +710,6 @@ namespace Spine.Unity.Editor {
 									}
 								}
 
-#if SPINE_TK2D
-								if (missingPaths.Count > 0)
-									warnings.Add("Missing regions. SkeletonData asset requires tk2DSpriteCollectionData or Spine AtlasAssets.");
-#endif
 							}
 
 							if (missingPaths != null) {

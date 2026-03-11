@@ -57,34 +57,6 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Spine.Unity.Editor {
-	public partial class SpineEditorUtilities {
-		public static class SpineTK2DEditorUtility {
-			const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
-
-			internal static bool IsTK2DInstalled () {
-				return (Shader.Find("tk2d/SolidVertexColor") != null ||
-					Shader.Find("tk2d/AdditiveVertexColor") != null);
-			}
-
-			internal static bool IsTK2DAllowed {
-				get {
-					return false; // replace with "return true;" to allow TK2D support
-				}
-			}
-
-			internal static void EnableTK2D () {
-				if (!IsTK2DAllowed)
-					return;
-				SpineBuildEnvUtility.DisableSpineAsmdefFiles();
-				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TK2D_DEFINE);
-			}
-
-			internal static void DisableTK2D () {
-				SpineBuildEnvUtility.EnableSpineAsmdefFiles();
-				SpineBuildEnvUtility.DisableBuildDefine(SPINE_TK2D_DEFINE);
-			}
-		}
-	}
 
 	public static class SpineBuildEnvUtility {
 		public const string SPINE_ALLOW_UNSAFE_CODE = "SPINE_ALLOW_UNSAFE";

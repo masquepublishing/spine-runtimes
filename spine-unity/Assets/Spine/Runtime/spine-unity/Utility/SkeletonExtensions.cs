@@ -237,11 +237,7 @@ namespace Spine.Unity {
 			if (rendererObject == null)
 				return null;
 
-#if SPINE_TK2D
-			return (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
-#else
 			return (Material)((AtlasRegion)rendererObject).page.rendererObject;
-#endif
 		}
 
 		/// <summary>Fills a Vector2 buffer with local vertices.</summary>

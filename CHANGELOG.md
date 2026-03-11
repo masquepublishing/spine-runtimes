@@ -353,6 +353,7 @@
   - Removed `attachment.GetRemappedClone()` extension methods. Replace `attachment.GetRemappedClone(parameters)` with `attachment.Copy(); attachment.SetRegion(parameters)`. Removed `AttachmentCloneExtensions` class, `SetRegion` methods are now in `AttachmentRegionExtensions`.
   - Renamed `ToAtlasRegionPMAClone` to `ToAtlasRegionWithNewPMATexture`.
   - Renamed `ToRegionAttachmentPMAClone` to `ToRegionAttachmentWithNewPMATexture`.
+  - Removed support for long abandoned thirdparty asset "2D Toolkit" (TK2D) by Unikron Software.
   
 - **Changes of default values**
   - Changed default atlas texture workflow from PMA to straight alpha textures. This move was done because straight alpha textures are compatible with both Gamma and Linear color space, with the latter being the default for quite some time now in Unity. Note that `PMA Vertex Color` is unaffected and shall be enabled as usual to allow for single-pass additive rendering.

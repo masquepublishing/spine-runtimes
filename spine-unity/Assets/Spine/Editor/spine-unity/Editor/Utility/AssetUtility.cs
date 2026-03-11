@@ -434,9 +434,6 @@ namespace Spine.Unity.Editor {
 
 				string dir = Path.GetDirectoryName(skeletonPath).Replace('\\', '/');
 
-#if SPINE_TK2D
-				IngestSpineProject(loadedAsset, null);
-#else
 				string skeletonName = Path.GetFileNameWithoutExtension(skeletonPath);
 				List<string> requiredPaths = GetRequiredAtlasRegions(skeletonPath);
 
@@ -470,7 +467,6 @@ namespace Spine.Unity.Editor {
 
 				if (abortSkeletonImport)
 					break;
-#endif
 			}
 
 			if (atlasPaths.Count > 0 || imagePaths.Count > 0 || skeletonPaths.Count > 0) {
@@ -1123,32 +1119,6 @@ namespace Spine.Unity.Editor {
 		internal static SkeletonDataAsset IngestSpineProject (TextAsset spineJson, params AtlasAssetBase[] atlasAssets) {
 			string filePath = GetSkeletonDataAssetFilePath(spineJson);
 
-#if SPINE_TK2D
-			if (spineJson != null) {
-				SkeletonDataAsset skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(filePath, typeof(SkeletonDataAsset));
-				if (skeletonDataAsset == null) {
-					skeletonDataAsset = SkeletonDataAsset.CreateInstance<SkeletonDataAsset>();
-					skeletonDataAsset.skeletonJSON = spineJson;
-					skeletonDataAsset.fromAnimation = new string[0];
-					skeletonDataAsset.toAnimation = new string[0];
-					skeletonDataAsset.duration = new float[0];
-					skeletonDataAsset.defaultMix = SpineEditorUtilities.Preferences.defaultMix;
-					skeletonDataAsset.scale = SpineEditorUtilities.Preferences.defaultScale;
-
-					AssetDatabase.CreateAsset(skeletonDataAsset, filePath);
-					AssetDatabase.SaveAssets();
-				} else {
-					SpineEditorUtilities.ClearSkeletonDataAsset(targetSkeletonDataAsset);
-					skeletonDataAsset.GetSkeletonData(true);
-				}
-
-				return skeletonDataAsset;
-			} else {
-				EditorUtility.DisplayDialog("Error!", "Tried to ingest null Spine data.", "OK");
-				return null;
-			}
-
-#else
 			if (spineJson != null && atlasAssets != null) {
 				SkeletonDataAsset skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(filePath, typeof(SkeletonDataAsset));
 				if (skeletonDataAsset == null) {
@@ -1175,7 +1145,6 @@ namespace Spine.Unity.Editor {
 				EditorUtility.DisplayDialog("Error!", "Must specify both Spine JSON and AtlasAsset array", "OK");
 				return null;
 			}
-#endif
 		}
 		#endregion
 

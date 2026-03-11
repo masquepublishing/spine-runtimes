@@ -282,13 +282,8 @@ namespace Spine.Unity {
 				totalRawVertexCount += attachmentVertexCount;
 			}
 
-#if !SPINE_TK2D
 			if (material == null && rendererObject != null)
 				current.material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
-#else
-			if (material == null && rendererObject != null)
-				current.material = (rendererObject is Material) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
-#endif
 
 			instructionOutput.hasActiveClipping = skeletonHasClipping;
 			instructionOutput.rawVertexCount = totalRawVertexCount;
@@ -309,9 +304,6 @@ namespace Spine.Unity {
 
 		public static bool RequiresMultipleSubmeshesByDrawOrder (Skeleton skeleton) {
 
-#if SPINE_TK2D
-			return false;
-#endif
 			ExposedList<Slot> drawOrder = skeleton.DrawOrder;
 			int drawOrderCount = drawOrder.Count;
 			Slot[] drawOrderItems = drawOrder.Items;
@@ -366,9 +358,7 @@ namespace Spine.Unity {
 				preActiveClippingSlotSource = -1
 			};
 
-#if !SPINE_TK2D
 			bool isCustomSlotMaterialsPopulated = customSlotMaterials != null && customSlotMaterials.Count > 0;
-#endif
 
 			int separatorCount = separatorSlots == null ? 0 : separatorSlots.Count;
 			bool hasSeparators = separatorCount > 0;
@@ -467,7 +457,6 @@ namespace Spine.Unity {
 #endif
 					}
 				} else {
-#if !SPINE_TK2D
 					Material material;
 					if (isCustomSlotMaterialsPopulated) {
 						if (!customSlotMaterials.TryGetValue(slot, out material))
@@ -475,10 +464,6 @@ namespace Spine.Unity {
 					} else {
 						material = (Material)((AtlasRegion)region).page.rendererObject;
 					}
-#else
-					// An AtlasRegion in plain spine-unity, spine-TK2D hooks into TK2D's system. eventual source of Material object.
-					Material material = (region is Material) ? (Material)region : (Material)((AtlasRegion)region).page.rendererObject;
-#endif
 
 #if !SPINE_TRIANGLECHECK
 					if (current.forceSeparate || !System.Object.ReferenceEquals(current.material, material)) { // Material changed. Add the previous submesh.
