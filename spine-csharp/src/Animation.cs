@@ -1052,8 +1052,8 @@ namespace Spine {
 		}
 
 		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
-			float[] frames = this.frames;
 			Color32F color = pose.GetColor();
+			float[] frames = this.frames;
 			if (time < frames[0]) {
 				Color32F setup = slot.data.setup.GetColor();
 				switch (blend) {
@@ -1103,12 +1103,15 @@ namespace Spine {
 			if (alpha == 1) {
 				color = new Color32F(r, g, b, a);
 			} else {
-				if (blend == MixBlend.Setup) color = slot.data.setup.GetColor();
-				color += new Color32F((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+				if (blend == MixBlend.Setup) {
+					Color32F setup = slot.data.setup.GetColor();
+					color = new Color32F(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
+						setup.a + (a - setup.a) * alpha);
+				} else
+					color += new Color32F((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			}
 			color.Clamp();
 			pose.SetColor(color); // see above
-
 		}
 	}
 
@@ -1137,8 +1140,9 @@ namespace Spine {
 		}
 
 		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
-			float[] frames = this.frames;
 			Color32F color = pose.GetColor();
+			float r, g, b;
+			float[] frames = this.frames;
 			if (time < frames[0]) {
 				Color32F setup = slot.data.setup.GetColor();
 				switch (blend) {
@@ -1147,61 +1151,57 @@ namespace Spine {
 					color.g = setup.g;
 					color.b = setup.b;
 					pose.SetColor(color); // required due to Color being a struct
+					goto default; // Fall through.
+				default:
 					return;
 				case MixBlend.First:
-					color.r += (setup.r - color.r) * alpha;
-					color.g += (setup.g - color.g) * alpha;
-					color.b += (setup.b - color.b) * alpha;
-					color.Clamp();
-					pose.SetColor(color); // see above
-					return;
+					r = color.r + (setup.r - color.r) * alpha;
+					g = color.g + (setup.g - color.g) * alpha;
+					b = color.b + (setup.b - color.b) * alpha;
+					break;
 				}
-				return;
-			}
-
-			float r, g, b;
-			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
-			switch (curveType) {
-			case LINEAR:
-				float before = frames[i];
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				float t = (time - before) / (frames[i + ENTRIES] - before);
-				r += (frames[i + ENTRIES + R] - r) * t;
-				g += (frames[i + ENTRIES + G] - g) * t;
-				b += (frames[i + ENTRIES + B] - b) * t;
-				break;
-			case STEPPED:
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				break;
-			default:
-				r = GetBezierValue(time, i, R, curveType - BEZIER);
-				g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-				b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-				break;
-			}
-
-			if (alpha == 1) {
-				color.r = r;
-				color.g = g;
-				color.b = b;
-				color.Clamp();
-				pose.SetColor(color); // see above
 			} else {
-				if (blend == MixBlend.Setup) {
-					Color32F setup = slot.data.setup.GetColor();
-					color.r = setup.r;
-					color.g = setup.g;
-					color.b = setup.b;
+				int i = Search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
+				switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					break;
+				case STEPPED:
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					break;
+				default:
+					r = GetBezierValue(time, i, R, curveType - BEZIER);
+					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+					break;
 				}
-				color.r += (r - color.r) * alpha;
-				color.g += (g - color.g) * alpha;
-				color.b += (b - color.b) * alpha;
+
+				if (alpha != 1) {
+					if (blend == MixBlend.Setup) {
+						Color32F setup = slot.data.setup.GetColor();
+						r = setup.r + (r - setup.r) * alpha;
+						g = setup.g + (g - setup.g) * alpha;
+						b = setup.b + (b - setup.b) * alpha;
+					} else {
+						r = color.r + (r - color.r) * alpha;
+						g = color.g + (g - color.g) * alpha;
+						b = color.b + (b - color.b) * alpha;
+					}
+				}
 			}
-			color.Clamp();
+			color.r = r;
+			color.g = g;
+			color.b = b;
+			color.ClampRGB();
 			pose.SetColor(color); // see above
 		}
 	}
@@ -1229,7 +1229,7 @@ namespace Spine {
 
 			SlotPose pose = (appliedPose ? slot.applied : slot.pose);
 			Color32F color = pose.GetColor();
-
+			float a;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				Color32F setup = slot.data.setup.GetColor();
@@ -1237,24 +1237,24 @@ namespace Spine {
 				case MixBlend.Setup:
 					color.a = setup.a;
 					pose.SetColor(color); // required due to Color being a struct
+					goto default; // Fall through.
+				default:
 					return;
 				case MixBlend.First:
-					color.a += (setup.a - color.a) * alpha;
-					color.a = MathUtils.Clamp01(color.a);
-					pose.SetColor(color); // see above
+					a = color.a + (setup.a - color.a) * alpha;
 					break;
 				}
-				return;
+			} else {
+				a = GetCurveValue(time);
+				if (alpha != 1) {
+					if (blend == MixBlend.Setup) {
+						Color32F setup = slot.data.setup.GetColor();
+						a = setup.a + (a - setup.a) * alpha;
+					} else
+						a = color.a + (a - color.a) * alpha;
+				}
 			}
-
-			float a = GetCurveValue(time);
-			if (alpha == 1)
-				color.a = a;
-			else {
-				if (blend == MixBlend.Setup) color.a = slot.data.setup.GetColor().a;
-				color.a += (a - color.a) * alpha;
-			}
-			color.a = MathUtils.Clamp01(color.a);
+			color.a = MathUtils.Clamp01(a);
 			pose.SetColor(color); // see above
 		}
 	}
@@ -1293,112 +1293,106 @@ namespace Spine {
 		}
 
 		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
-			float[] frames = this.frames;
 			Color32F light = pose.GetColor();
-			Color32F? dark = pose.GetDarkColor();
+			Color32F? darkOptional = pose.GetDarkColor();
+			float r2, g2, b2;
+			float[] frames = this.frames;
 			if (time < frames[0]) {
 				SlotPose setup = slot.data.setup;
 				Color32F setupLight = setup.GetColor();
-				Color32F? setupDark = setup.GetDarkColor();
+				Color32F? setupDarkOptional = setup.GetDarkColor();
 				switch (blend) {
 				case MixBlend.Setup:
 					pose.SetColor(setupLight); // required due to Color being a struct
-					pose.SetDarkColor(setupDark);
+					pose.SetDarkColor(setupDarkOptional);
+					goto default; // Fall through.
+				default:
 					return;
 				case MixBlend.First:
 					light += new Color32F((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
 						(setupLight.a - light.a) * alpha);
 					light.Clamp();
-
-					Color32F darkValue = dark.Value;
-					Color32F setupDarkValue = setupDark.Value;
-					darkValue.r += (setupDarkValue.r - darkValue.r) * alpha;
-					darkValue.g += (setupDarkValue.g - darkValue.g) * alpha;
-					darkValue.b += (setupDarkValue.b - darkValue.b) * alpha;
-					darkValue.Clamp();
-
 					pose.SetColor(light); // required due to Color being a struct
-					pose.SetDarkColor(darkValue);
-					return;
+
+					Color32F dark = darkOptional.Value;
+					Color32F setupDark = setupDarkOptional.Value;
+					r2 = dark.r + (setupDark.r - dark.r) * alpha;
+					g2 = dark.g + (setupDark.g - dark.g) * alpha;
+					b2 = dark.b + (setupDark.b - dark.b) * alpha;
+					break;
 				}
-				return;
-			}
-
-			float r, g, b, a, r2, g2, b2;
-			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i >> 3];
-			switch (curveType) {
-			case LINEAR:
-				float before = frames[i];
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				a = frames[i + A];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-				float t = (time - before) / (frames[i + ENTRIES] - before);
-				r += (frames[i + ENTRIES + R] - r) * t;
-				g += (frames[i + ENTRIES + G] - g) * t;
-				b += (frames[i + ENTRIES + B] - b) * t;
-				a += (frames[i + ENTRIES + A] - a) * t;
-				r2 += (frames[i + ENTRIES + R2] - r2) * t;
-				g2 += (frames[i + ENTRIES + G2] - g2) * t;
-				b2 += (frames[i + ENTRIES + B2] - b2) * t;
-				break;
-			case STEPPED:
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				a = frames[i + A];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-				break;
-			default:
-				r = GetBezierValue(time, i, R, curveType - BEZIER);
-				g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-				b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-				a = GetBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
-				r2 = GetBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
-				g2 = GetBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
-				b2 = GetBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
-				break;
-			}
-
-			if (alpha == 1) {
-				light = new Color32F(r, g, b, a);
-				light.Clamp();
-
-				Color32F darkValue = dark.Value;
-				darkValue.r = r2;
-				darkValue.g = g2;
-				darkValue.b = b2;
-				darkValue.Clamp();
-
-				pose.SetColor(light); // required due to Color being a struct
-				pose.SetDarkColor(darkValue);
 			} else {
-				Color32F darkValue = dark.Value;
-				if (blend == MixBlend.Setup) {
-					SlotPose setup = slot.data.setup;
-					light = setup.GetColor();
-					Color32F? setupDark = setup.GetDarkColor();
-					Color32F setupDarkValue = setupDark.Value;
-					darkValue.r = setupDarkValue.r;
-					darkValue.g = setupDarkValue.g;
-					darkValue.b = setupDarkValue.b;
+				float r, g, b, a;
+				int i = Search(frames, time, ENTRIES), curveType = (int)curves[i >> 3];
+				switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					a = frames[i + A];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					a += (frames[i + ENTRIES + A] - a) * t;
+					r2 += (frames[i + ENTRIES + R2] - r2) * t;
+					g2 += (frames[i + ENTRIES + G2] - g2) * t;
+					b2 += (frames[i + ENTRIES + B2] - b2) * t;
+					break;
+				case STEPPED:
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					a = frames[i + A];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					break;
+				default:
+					r = GetBezierValue(time, i, R, curveType - BEZIER);
+					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+					a = GetBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
+					r2 = GetBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
+					g2 = GetBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
+					b2 = GetBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
+					break;
 				}
-				light += new Color32F((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
-				light.Clamp();
 
-				darkValue.r += (r2 - darkValue.r) * alpha;
-				darkValue.g += (g2 - darkValue.g) * alpha;
-				darkValue.b += (b2 - darkValue.b) * alpha;
-				darkValue.Clamp();
+				if (alpha == 1) {
+					light = new Color32F(r, g, b, a);
+					light.Clamp();
+					pose.SetColor(light); // required due to Color being a struct
+				} else if (blend == MixBlend.Setup) {
+					SlotPose setupPose = slot.data.setup;
+					Color32F setup = setupPose.GetColor();
+					light = new Color32F(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
+						setup.a + (a - setup.a) * alpha);
+					light.Clamp();
+					pose.SetColor(light); // see above
 
-				pose.SetColor(light); // see above
-				pose.SetDarkColor(darkValue);
+					Color32F? setupDark = setupPose.GetDarkColor();
+					setup = setupDark.Value;
+					r2 = setup.r + (r2 - setup.r) * alpha;
+					g2 = setup.g + (g2 - setup.g) * alpha;
+					b2 = setup.b + (b2 - setup.b) * alpha;
+				} else {
+					light += new Color32F((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+					light.Clamp();
+					pose.SetColor(light); // see above
+					Color32F dark = darkOptional.Value;
+					r2 = dark.r + (r2 - dark.r) * alpha;
+					g2 = dark.g + (g2 - dark.g) * alpha;
+					b2 = dark.b + (b2 - dark.b) * alpha;
+				}
 			}
+			Color32F darkValue = new Color32F(r2, g2, b2);
+			darkValue.ClampRGB();
+			pose.SetDarkColor(darkValue);
 		}
 	}
 
@@ -1434,127 +1428,110 @@ namespace Spine {
 		}
 
 		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
-			float[] frames = this.frames;
 			Color32F light = pose.GetColor();
-			Color32F? dark = pose.GetDarkColor();
+			Color32F? darkOptional = pose.GetDarkColor();
+			float r, g, b, r2, g2, b2;
+			float[] frames = this.frames;
 			if (time < frames[0]) {
 				SlotPose setup = slot.data.setup;
 				Color32F setupLight = setup.GetColor();
-				Color32F? setupDark = setup.GetDarkColor();
-				Color32F darkValue = dark.Value;
-				Color32F setupDarkValue = setupDark.Value;
+				Color32F? setupDarkOptional = setup.GetDarkColor();
+				Color32F dark = darkOptional.Value;
+				Color32F setupDark = setupDarkOptional.Value;
 
 				switch (blend) {
 				case MixBlend.Setup:
 					light.r = setupLight.r;
 					light.g = setupLight.g;
 					light.b = setupLight.b;
-
-					darkValue.r = setupDarkValue.r;
-					darkValue.g = setupDarkValue.g;
-					darkValue.b = setupDarkValue.b;
+					dark.r = setupDark.r;
+					dark.g = setupDark.g;
+					dark.b = setupDark.b;
 
 					pose.SetColor(light); // required due to Color being a struct
-					pose.SetDarkColor(darkValue);
+					pose.SetDarkColor(dark);
+					goto default; // Fall through.
+				default:
 					return;
 				case MixBlend.First:
-					light.r += (setupLight.r - light.r) * alpha;
-					light.g += (setupLight.g - light.g) * alpha;
-					light.b += (setupLight.b - light.b) * alpha;
-					light.Clamp();
-
-					darkValue.r += (setupDarkValue.r - darkValue.r) * alpha;
-					darkValue.g += (setupDarkValue.g - darkValue.g) * alpha;
-					darkValue.b += (setupDarkValue.b - darkValue.b) * alpha;
-					darkValue.Clamp();
-
-					pose.SetColor(light); // see above
-					pose.SetDarkColor(darkValue);
-					return;
+					r = light.r + (setupLight.r - light.r) * alpha;
+					g = light.g + (setupLight.g - light.g) * alpha;
+					b = light.b + (setupLight.b - light.b) * alpha;
+					r2 = dark.r + (setupDark.r - dark.r) * alpha;
+					g2 = dark.g + (setupDark.g - dark.g) * alpha;
+					b2 = dark.b + (setupDark.b - dark.b) * alpha;
+					break;
 				}
-				return;
-			}
-
-			float r, g, b, r2, g2, b2;
-			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
-			switch (curveType) {
-			case LINEAR:
-				float before = frames[i];
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-				float t = (time - before) / (frames[i + ENTRIES] - before);
-				r += (frames[i + ENTRIES + R] - r) * t;
-				g += (frames[i + ENTRIES + G] - g) * t;
-				b += (frames[i + ENTRIES + B] - b) * t;
-				r2 += (frames[i + ENTRIES + R2] - r2) * t;
-				g2 += (frames[i + ENTRIES + G2] - g2) * t;
-				b2 += (frames[i + ENTRIES + B2] - b2) * t;
-				break;
-			case STEPPED:
-				r = frames[i + R];
-				g = frames[i + G];
-				b = frames[i + B];
-				r2 = frames[i + R2];
-				g2 = frames[i + G2];
-				b2 = frames[i + B2];
-				break;
-			default:
-				r = GetBezierValue(time, i, R, curveType - BEZIER);
-				g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-				b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-				r2 = GetBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
-				g2 = GetBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
-				b2 = GetBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
-				break;
-			}
-
-			if (alpha == 1) {
-				light.r = r;
-				light.g = g;
-				light.b = b;
-				light.Clamp();
-
-				Color32F darkValue = dark.Value;
-				darkValue.r = r2;
-				darkValue.g = g2;
-				darkValue.b = b2;
-				darkValue.Clamp();
-
-				pose.SetColor(light); // required due to Color being a struct
-				pose.SetDarkColor(darkValue);
 			} else {
-				Color32F darkValue = dark.Value;
-				if (blend == MixBlend.Setup) {
-
-					SlotPose setup = slot.data.setup;
-					Color32F setupLight = setup.GetColor();
-					Color32F? setupDark = setup.GetDarkColor();
-					Color32F setupDarkValue = setupDark.Value;
-
-					light.r = setupLight.r;
-					light.g = setupLight.g;
-					light.b = setupLight.b;
-					darkValue.r = setupDarkValue.r;
-					darkValue.g = setupDarkValue.g;
-					darkValue.b = setupDarkValue.b;
+				int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+				switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					r2 += (frames[i + ENTRIES + R2] - r2) * t;
+					g2 += (frames[i + ENTRIES + G2] - g2) * t;
+					b2 += (frames[i + ENTRIES + B2] - b2) * t;
+					break;
+				case STEPPED:
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					break;
+				default:
+					r = GetBezierValue(time, i, R, curveType - BEZIER);
+					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+					r2 = GetBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
+					g2 = GetBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
+					b2 = GetBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
+					break;
 				}
 
-				light.r += (r - light.r) * alpha;
-				light.g += (g - light.g) * alpha;
-				light.b += (b - light.b) * alpha;
-				light.Clamp();
-				darkValue.r += (r2 - darkValue.r) * alpha;
-				darkValue.g += (g2 - darkValue.g) * alpha;
-				darkValue.b += (b2 - darkValue.b) * alpha;
-				darkValue.Clamp();
+				if (alpha != 1) {
+					Color32F dark = darkOptional.Value;
+					if (blend == MixBlend.Setup) {
+						SlotPose setupPose = slot.data.setup;
+						Color32F setup = setupPose.GetColor();
+						r = setup.r + (r - setup.r) * alpha;
+						g = setup.g + (g - setup.g) * alpha;
+						b = setup.b + (b - setup.b) * alpha;
 
-				pose.SetColor(light); // see above
-				pose.SetDarkColor(darkValue);
+						Color32F? setupDarkOptional = setupPose.GetDarkColor();
+						setup = setupDarkOptional.Value;
+						r2 = setup.r + (r2 - setup.r) * alpha;
+						g2 = setup.g + (g2 - setup.g) * alpha;
+						b2 = setup.b + (b2 - setup.b) * alpha;
+					} else {
+						r = light.r + (r - light.r) * alpha;
+						g = light.g + (g - light.g) * alpha;
+						b = light.b + (b - light.b) * alpha;
+						r2 = dark.r + (r2 - dark.r) * alpha;
+						g2 = dark.g + (g2 - dark.g) * alpha;
+						b2 = dark.b + (b2 - dark.b) * alpha;
+					}
+				}
 			}
+			light.r = r;
+			light.g = g;
+			light.b = b;
+			light.ClampRGB();
+			Color32F darkValue = new Color32F(r2, g2, b2);
+			darkValue.ClampRGB();
+
+			pose.SetColor(light); // see above
+			pose.SetDarkColor(darkValue);
 		}
 	}
 

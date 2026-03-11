@@ -72,6 +72,13 @@ namespace Spine {
 			return color;
 		}
 
+		public static Color32F ClampRGB (this Color32F color) {
+			color.r = MathUtils.Clamp(color.r, 0, 1);
+			color.g = MathUtils.Clamp(color.g, 0, 1);
+			color.b = MathUtils.Clamp(color.b, 0, 1);
+			return color;
+		}
+
 		public static Color32F RGBA8888ToColor (this uint rgba8888) {
 			float r = ((rgba8888 & 0xff000000) >> 24) / 255f;
 			float g = ((rgba8888 & 0x00ff0000) >> 16) / 255f;
