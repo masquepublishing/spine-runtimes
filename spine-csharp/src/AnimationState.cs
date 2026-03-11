@@ -263,7 +263,7 @@ namespace Spine {
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelines[ii];
 						if (timeline is AttachmentTimeline)
-							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
+							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, false, attachments);
 						else {
 							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection.In,
 								false);
@@ -285,7 +285,7 @@ namespace Spine {
 							ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation,
 												ii << 1, firstFrame);
 						else if (timeline is AttachmentTimeline)
-							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, attachments);
+							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, false, attachments);
 						else
 							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.In, false);
 					}
@@ -396,7 +396,6 @@ namespace Spine {
 				from.totalAlpha = 0;
 				for (int i = 0; i < timelineCount; i++) {
 					Timeline timeline = timelines[i];
-					MixDirection direction = MixDirection.Out;
 					MixBlend timelineBlend;
 					float alpha;
 					switch (timelineMode[i]) {
@@ -429,9 +428,10 @@ namespace Spine {
 						ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1,
 							firstFrame);
 					} else if (timeline is AttachmentTimeline) {
-						ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, timelineBlend,
+						ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, timelineBlend, true,
 							attachments && alpha >= from.alphaAttachmentThreshold);
 					} else {
+						MixDirection direction = MixDirection.Out;
 						if (drawOrder && timeline is DrawOrderTimeline && timelineBlend == MixBlend.Setup)
 							direction = MixDirection.In;
 						timeline.Apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction, false);
@@ -490,14 +490,16 @@ namespace Spine {
 		/// <param name="attachments">False when: 1) the attachment timeline is mixing out, 2) mix &lt; attachmentThreshold, and 3) the timeline
 		/// is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
 		/// timelines see any deform.</param>
-		private void ApplyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, MixBlend blend,
+		private void ApplyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, MixBlend blend, bool mixOut,
 			bool attachments) {
 
 			Slot slot = skeleton.slots.Items[timeline.SlotIndex];
 			if (!slot.bone.active) return;
 
 			float[] frames = timeline.frames;
-			if (time < frames[0]) { // Time is before first frame.
+			if (mixOut) {
+				if (blend == MixBlend.Setup) SetAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+			} else if (time < frames[0]) { // Time is before first frame.
 				if (blend == MixBlend.Setup || blend == MixBlend.First)
 					SetAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 			} else
@@ -1180,6 +1182,7 @@ namespace Spine {
 		/// Typically track 0 is used to completely pose the skeleton, then alpha is used on higher tracks. It doesn't make sense to
 		/// use alpha on track 0 if the skeleton pose is from the last frame render.</para>
 		/// </summary>
+		/// <seealso cref="AlphaAttachmentThreshold"/>
 		public float Alpha { get { return alpha; } set { alpha = value; } }
 
 		public float InterruptAlpha { get { return interruptAlpha; } }
