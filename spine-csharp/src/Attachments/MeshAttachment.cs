@@ -73,11 +73,7 @@ namespace Spine {
 
 		public string Path { get { return path; } set { path = value; } }
 		public Sequence Sequence { get { return sequence; } }
-		Attachment IHasSequence.TimelineAttachment {
-			get { return timelineAttachment; }
-			set { timelineAttachment = (VertexAttachment)value; }
-		}
-
+		
 		public MeshAttachment ParentMesh {
 			get { return parentMesh; }
 			set {

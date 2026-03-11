@@ -42,9 +42,6 @@ namespace Spine {
 		void SetColor (Color32F color);
 		void SetColor (float r, float g, float b, float a);
 		Sequence Sequence { get; }
-		/// <summary>Timelines for the timeline attachment are also applied to this attachment.
-		/// May be null if no attachment-specific timelines should be applied.</summary>
-		Attachment TimelineAttachment { get; set; }
 		void UpdateSequence ();
 	}
 }

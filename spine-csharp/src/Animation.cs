@@ -1898,6 +1898,9 @@ namespace Spine {
 				return slotIndex;
 			}
 		}
+
+		/// <summary>The attachment for which the <see cref="SlotPose.SequenceIndex"/> will be set.</summary>
+		/// <seealso cref="Attachment.TimelineAttachment"/>.
 		public Attachment Attachment {
 			get {
 				return (Attachment)attachment;
@@ -1922,11 +1925,8 @@ namespace Spine {
 			SlotPose pose = appliedPose ? slot.applied : slot.pose;
 
 			Attachment slotAttachment = pose.attachment;
-			if (slotAttachment != attachment) {
-				IHasSequence sequenceAttachment = slotAttachment as IHasSequence;
-				if ((sequenceAttachment == null)
-					|| sequenceAttachment.TimelineAttachment != attachment) return;
-			}
+			IHasSequence hasSequence = slotAttachment as IHasSequence;
+			if ((hasSequence == null) || slotAttachment.TimelineAttachment != attachment) return;
 
 			if (direction == MixDirection.Out) {
 				if (blend == MixBlend.Setup) pose.SequenceIndex = -1;
@@ -1944,7 +1944,7 @@ namespace Spine {
 			int modeAndIndex = (int)frames[i + MODE];
 			float delay = frames[i + DELAY];
 
-			int index = modeAndIndex >> 4, count = (((IHasSequence)slotAttachment).Sequence).Regions.Length;
+			int index = modeAndIndex >> 4, count = hasSequence.Sequence.Regions.Length;
 			SequenceMode mode = (SequenceMode)(modeAndIndex & 0xf);
 			if (mode != SequenceMode.Hold) {
 				index += (int)((time - before) / delay + 0.0001f);
