@@ -2537,11 +2537,7 @@ public class SkeletonSerializer {
 		json.writeValue(obj.getHeight());
 
 		json.writeName("sequence");
-		if (obj.getSequence() == null) {
-			json.writeNull();
-		} else {
-			writeSequence(obj.getSequence());
-		}
+		writeSequence(obj.getSequence());
 
 		json.writeName("parentMesh");
 		if (obj.getParentMesh() == null) {

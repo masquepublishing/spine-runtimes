@@ -144,7 +144,7 @@ public class Sequence {
 		this.setupIndex = index;
 	}
 
-	public boolean getPathSuffix () {
+	public boolean hasPathSuffix () {
 		return pathSuffix;
 	}
 
