@@ -46,7 +46,7 @@ namespace Spine {
 		public int[] Bones { get { return bones; } set { bones = value; } }
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }
-		
+
 		public VertexAttachment (string name)
 			: base(name) {
 

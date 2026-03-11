@@ -73,7 +73,7 @@ namespace Spine {
 
 		public string Path { get { return path; } set { path = value; } }
 		public Sequence Sequence { get { return sequence; } }
-		
+
 		public MeshAttachment ParentMesh {
 			get { return parentMesh; }
 			set {

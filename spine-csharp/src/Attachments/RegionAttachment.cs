@@ -75,7 +75,7 @@ namespace Spine {
 
 		public string Path { get; set; }
 		public Sequence Sequence { get { return sequence; } }
-		
+
 		public RegionAttachment (string name, Sequence sequence)
 			: base(name) {
 			if (sequence == null) throw new ArgumentException("sequence cannot be null.", "sequence");
