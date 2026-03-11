@@ -50,7 +50,7 @@ namespace Spine {
 		/// <summary>The index of the region to show for the setup pose.</summary>
 		public int SetupIndex { get { return setupIndex; } set { setupIndex = value; } }
 		public TextureRegion[] Regions { get { return regions; } }
-		public bool PathSuffix { get { return pathSuffix; } }
+		public bool HasPathSuffix { get { return pathSuffix; } }
 		/// <summary>Returns a unique ID for this attachment.</summary>
 		public int Id { get { return id; } }
 
