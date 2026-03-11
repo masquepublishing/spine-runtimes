@@ -225,9 +225,12 @@ namespace Spine.Unity {
 				} else
 					loadedSkeletonData = SkeletonDataAsset.ReadSkeletonData(skeletonJSON.text, attachmentLoader, skeletonDataScale);
 			} catch (Exception ex) {
-				if (!quiet)
-					Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" +
-						ex.Message + "\n" + ex.InnerException + "\n" + ex.StackTrace, skeletonJSON);
+				if (!quiet) {
+					string formatString = hasBinaryExtension ? ".skel" : "JSON";
+					string innerExceptionLine = ex.InnerException != null ? ex.InnerException + "\n" : "";
+					Debug.LogError(string.Format("Error reading skeleton {0} file for SkeletonData asset: {1}\n{2}\n{3}{4}",
+						formatString, name, ex.Message, innerExceptionLine, ex.StackTrace), skeletonJSON);
+				}
 			}
 
 #if UNITY_EDITOR
