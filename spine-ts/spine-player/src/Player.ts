@@ -893,7 +893,7 @@ export class SpinePlayer implements Disposable {
 				renderer.camera.position.y = viewport.y + viewport.height / 2;
 
 				// Resize the canvas.
-				renderer.resize(this.currentViewport.clip ? ResizeMode.FitClip : ResizeMode.Fit, viewport.width, viewport.height);
+				renderer.resize(this.currentViewport.clip ? ResizeMode.FitClip : ResizeMode.Expand, viewport.width, viewport.height);
 
 				// Clear the screen.
 				const gl = this.context!.gl;
