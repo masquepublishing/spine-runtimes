@@ -7,11 +7,13 @@
   - Added `spine_slider_timeline` and `spine_slider_mix_timeline` for animating sliders
   - Added new pose system with `spine_bone_local`, `spine_bone_pose`, and related types
   - Added `spine_pose`, `spine_posed`, and `spine_posed_active` base types
+  - Regenerated the C API for the sequence attachment refactor in spine-cpp. `spine_region_attachment` and `spine_mesh_attachment` now mirror the new non-null `Sequence` model exposed by the C++ runtime.
 
 - **Breaking changes**
   - **IMPORTANT**: The C runtime has been completely rewritten as an auto-generated wrapper around the C++ runtime. This is a major breaking change. Users must update their code to use the new API. See https://esotericsoftware.com/spine-c
   - All types, functions, and headers have been restructured
   - The new runtime provides full feature parity with C++ through automatic code generation, has nullability annotations and documentation, and supports lightweight RTTI, allowing language specific wrappers to be built around it that expose the full type hierarchy idiomatically. See spine-ios and spine-flutter for examples.
+  - Sequence attachments now follow the spine-cpp sequence refactor. Region and mesh attachments no longer use the old mutable region/UV update path.
   - Renamed setup pose functions:
     - `spSkeleton_setToSetupPose()` → `spine_skeleton_setup_pose()`
     - `spSkeleton_setBonesToSetupPose()` → `spine_skeleton_setup_pose_bones()`
@@ -44,10 +46,19 @@
   - Added CMakePresets.json for modern CMake configuration
   - Added physics example (physics.cpp)
   - Added IK following example (ik-following.cpp)
+  - Added dragon sequence examples for binary and JSON loading in both C++ and C:
+    - `dragon.cpp`
+    - `dragon-json.cpp`
+    - `dragon-c.cpp`
+    - `dragon-json-c.cpp`
+  - Added C mirrors for the physics and IK following examples:
+    - `physics-c.cpp`
+    - `ik-following-c.cpp`
 
 - **Restructuring**
   - Renamed main-cpp-lite.cpp to main-c.cpp
   - Simplified build system with build.sh script
+  - Fixed the GLFW CMake data copy step to copy shared example assets once, avoiding parallel `copy_directory` races under ninja
 
 - **Breaking changes**
   - Updated to use new C runtime API
@@ -64,6 +75,9 @@
   - Added template method `SkeletonData::findConstraint<T>()` for type-safe constraint queries
   - Added `SkeletonRenderer` class with `RenderCommand` for batched rendering
   - Added `HasRendererObject` interface for attachments with renderer-specific data
+  - Ported the latest parser fixes from spine-libgdx, including the 4.3 path constraint flag fix and the weighted mesh binary vertex allocation/count fix.
+  - Ported the latest additive timeline updates and alpha/RGB timeline flicker fixes from spine-libgdx.
+  - Ported the sequence attachment refactor from spine-libgdx. `Sequence` now precomputes per-frame regions, UVs, and region offsets, and `RegionAttachment` / `MeshAttachment` now mirror the libgdx implementation.
 
 - **Breaking changes**
   - Headers reorganized from `spine-cpp/spine-cpp/include/spine/` to `spine-cpp/include/spine/`
@@ -71,6 +85,7 @@
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
   - Changed timeline class hierarchy with new base classes `BoneTimeline`, `SlotCurveTimeline`, and `ConstraintTimeline`
+  - Sequence attachments now use the new non-null `Sequence` model. `RegionAttachment` and `MeshAttachment` were refactored to match spine-libgdx and no longer use the old lazy mutable region update path.
   - Renamed setup pose methods:
     ||||
     |-----|-|-----|
