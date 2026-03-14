@@ -48,8 +48,9 @@ import Foundation
             backgroundColor: UIColor,
             scaleFactor: CGFloat = 1
         ) throws -> CGImage? {
+            let controller = SpineController(disposeDrawableOnDeInit: false)  // Doesn't own the drawable
             let spineView = SpineUIView(
-                controller: SpineController(disposeDrawableOnDeInit: false),  // Doesn't own the drawable
+                controller: controller,
                 boundsProvider: boundsProvider,
                 backgroundColor: backgroundColor
             )
@@ -58,6 +59,12 @@ import Foundation
             spineView.enableSetNeedsDisplay = false
             spineView.framebufferOnly = false
             spineView.contentScaleFactor = scaleFactor
+
+            defer {
+                controller.drawable = nil
+                spineView.delegate = nil
+                spineView.renderer = nil
+            }
 
             try spineView.load(drawable: self)
             spineView.renderer?.waitUntilCompleted = true
