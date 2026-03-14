@@ -185,7 +185,9 @@ namespace spine {
 
 	public:
 		explicit PhysicsConstraintWindTimeline(size_t frameCount, size_t bezierCount, int physicsConstraintIndex)
-			: PhysicsConstraintTimeline(frameCount, bezierCount, physicsConstraintIndex, Property_PhysicsConstraintWind) { _additive = true; };
+			: PhysicsConstraintTimeline(frameCount, bezierCount, physicsConstraintIndex, Property_PhysicsConstraintWind) {
+			_additive = true;
+		};
 
 	protected:
 		float get(PhysicsConstraintPose &pose) override {
@@ -211,7 +213,9 @@ namespace spine {
 
 	public:
 		explicit PhysicsConstraintGravityTimeline(size_t frameCount, size_t bezierCount, int physicsConstraintIndex)
-			: PhysicsConstraintTimeline(frameCount, bezierCount, physicsConstraintIndex, Property_PhysicsConstraintGravity) { _additive = true; };
+			: PhysicsConstraintTimeline(frameCount, bezierCount, physicsConstraintIndex, Property_PhysicsConstraintGravity) {
+			_additive = true;
+		};
 
 	protected:
 		float get(PhysicsConstraintPose &pose) override {

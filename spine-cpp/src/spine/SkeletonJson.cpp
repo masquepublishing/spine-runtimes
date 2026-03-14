@@ -561,7 +561,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		if (parent == NULL) SKELETON_JSON_ERROR(root, "Parent mesh not found: ", linkedMesh->_parent.buffer());
 		linkedMesh->_mesh->_timelineAttachment = linkedMesh->_inheritTimelines ? static_cast<VertexAttachment *>(parent) : linkedMesh->_mesh;
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
-		if (linkedMesh->_mesh->_region != NULL) linkedMesh->_mesh->updateRegion();
+		linkedMesh->_mesh->updateSequence();
 	}
 	ArrayUtils::deleteElements(_linkedMeshes);
 	_linkedMeshes.clear();
@@ -639,12 +639,11 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 			region->setRotation(Json::getFloat(map, "rotation", 0));
 			region->setWidth(Json::getFloat(map, "width", 0) * scale);
 			region->setHeight(Json::getFloat(map, "height", 0) * scale);
-			region->setSequence(sequence);
 
 			const char *color = Json::getString(map, "color", NULL);
 			if (color) Color::valueOf(color, region->getColor());
 
-			if (region->_region != NULL) region->updateRegion();
+			region->updateSequence();
 			return region;
 		}
 		case AttachmentType_Boundingbox: {
@@ -669,7 +668,6 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 
 			mesh->setWidth(Json::getFloat(map, "width", 0) * scale);
 			mesh->setHeight(Json::getFloat(map, "height", 0) * scale);
-			mesh->setSequence(sequence);
 
 			const char *parent = Json::getString(map, "parent", NULL);
 			if (parent) {
@@ -686,12 +684,13 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 			if (!Json::asUnsignedShortArray(Json::getItem(map, "triangles"), triangles)) return NULL;
 			mesh->_triangles.clearAndAddAll(triangles);
 			mesh->_regionUVs.clearAndAddAll(uvs);
-			if (mesh->_region != NULL) mesh->updateRegion();
 
 			if (Json::getInt(map, "hull", 0)) mesh->setHullLength(Json::getInt(map, "hull", 0) << 1);
 			Array<unsigned short> edges;
 			Json::asUnsignedShortArray(Json::getItem(map, "edges"), edges);
 			if (edges.size() > 0) mesh->_edges.clearAndAddAll(edges);
+
+			mesh->updateSequence();
 			return mesh;
 		}
 		case AttachmentType_Path: {
@@ -744,8 +743,8 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 }
 
 Sequence *SkeletonJson::readSequence(Json *item) {
-	if (item == NULL) return NULL;
-	Sequence *sequence = new Sequence(Json::getInt(item, "count", 0));
+	if (item == NULL) return new (__FILE__, __LINE__) Sequence(1, false);
+	Sequence *sequence = new (__FILE__, __LINE__) Sequence(Json::getInt(item, "count", 0), true);
 	sequence->_start = Json::getInt(item, "start", 1);
 	sequence->_digits = Json::getInt(item, "digits", 0);
 	sequence->_setupIndex = Json::getInt(item, "setup", 0);

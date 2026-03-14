@@ -243,7 +243,7 @@ namespace spine {
 		Attachment *readAttachment(DataInput &input, Skin &skin, int slotIndex, const String &attachmentName, SkeletonData &skeletonData,
 								   bool nonessential);
 
-		Sequence *readSequence(DataInput &input);
+		Sequence *readSequence(DataInput &input, bool hasPathSuffix);
 
 		int readVertices(DataInput &input, Array<float> &vertices, Array<int> &bones, bool weighted);
 

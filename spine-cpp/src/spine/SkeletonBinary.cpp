@@ -476,7 +476,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 			}
 			linkedMesh->_mesh->_timelineAttachment = linkedMesh->_inheritTimelines ? static_cast<VertexAttachment *>(parent) : linkedMesh->_mesh;
 			linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
-			if (linkedMesh->_mesh->getSequence() == NULL) linkedMesh->_mesh->updateRegion();
+			linkedMesh->_mesh->updateSequence();
 		}
 		ArrayUtils::deleteElements(_linkedMeshes);
 		_linkedMeshes.clear();
@@ -582,7 +582,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 		case AttachmentType_Region: {
 			String path = (flags & 16) != 0 ? input.readStringRef() : name;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence *sequence = (flags & 64) != 0 ? readSequence(input) : nullptr;
+			Sequence *sequence = readSequence(input, (flags & 64) != 0);
 			float rotation = (flags & 128) != 0 ? input.readFloat() : 0;
 			float x = input.readFloat();
 			float y = input.readFloat();
@@ -602,8 +602,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			region->setWidth(width * scale);
 			region->setHeight(height * scale);
 			Color::rgba8888ToColor(region->getColor(), color);
-			region->setSequence(sequence);
-			if (sequence == NULL) region->updateRegion();
+			region->updateSequence();
 			return region;
 		}
 		case AttachmentType_Boundingbox: {
@@ -623,7 +622,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 		case AttachmentType_Mesh: {
 			String path = (flags & 16) != 0 ? input.readStringRef() : name;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence *sequence = (flags & 64) != 0 ? readSequence(input) : nullptr;
+			Sequence *sequence = readSequence(input, (flags & 64) != 0);
 			int hullLength = input.readInt(true);
 			Array<float> vertices;
 			Array<int> bones;
@@ -645,25 +644,24 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			if (!mesh) return NULL;
 			mesh->setPath(path);
 			Color::rgba8888ToColor(mesh->getColor(), color);
+			mesh->setHullLength(hullLength << 1);
 			mesh->setBones(bones);
 			mesh->setVertices(vertices);
 			mesh->setWorldVerticesLength(verticesLength);
-			mesh->setTriangles(triangles);
 			mesh->setRegionUVs(uvs);
-			if (sequence == NULL) mesh->updateRegion();
-			mesh->setHullLength(hullLength << 1);
-			mesh->setSequence(sequence);
+			mesh->setTriangles(triangles);
 			if (nonessential) {
 				mesh->setEdges(edges);
 				mesh->setWidth(width * scale);
 				mesh->setHeight(height * scale);
 			}
+			mesh->updateSequence();
 			return mesh;
 		}
 		case AttachmentType_Linkedmesh: {
 			String path = (flags & 16) != 0 ? input.readStringRef() : name;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
-			Sequence *sequence = (flags & 64) != 0 ? readSequence(input) : nullptr;
+			Sequence *sequence = readSequence(input, (flags & 64) != 0);
 			bool inheritTimelines = (flags & 128) != 0;
 			int skinIndex = input.readInt(true);
 			String parent = input.readStringRef();
@@ -677,7 +675,6 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			if (!mesh) return NULL;
 			mesh->setPath(path);
 			Color::rgba8888ToColor(mesh->getColor(), color);
-			mesh->setSequence(sequence);
 			if (nonessential) {
 				mesh->setWidth(width * scale);
 				mesh->setHeight(height * scale);
@@ -741,8 +738,9 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 	return NULL;
 }
 
-Sequence *SkeletonBinary::readSequence(DataInput &input) {
-	Sequence *sequence = new (__FILE__, __LINE__) Sequence(input.readInt(true));
+Sequence *SkeletonBinary::readSequence(DataInput &input, bool hasPathSuffix) {
+	if (!hasPathSuffix) return new (__FILE__, __LINE__) Sequence(1, false);
+	Sequence *sequence = new (__FILE__, __LINE__) Sequence(input.readInt(true), true);
 	sequence->setStart(input.readInt(true));
 	sequence->setDigits(input.readInt(true));
 	sequence->setSetupIndex(input.readInt(true));
