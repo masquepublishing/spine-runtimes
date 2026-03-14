@@ -100,7 +100,7 @@ namespace spine {
 			_setupIndex = setupIndex;
 		}
 
-		bool getPathSuffix() {
+		bool hasPathSuffix() {
 			return _pathSuffix;
 		}
 

@@ -559,7 +559,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		if (skin == NULL) SKELETON_JSON_ERROR(root, "Skin not found: ", linkedMesh->_skin.buffer());
 		Attachment *parent = skin->getAttachment(linkedMesh->_slotIndex, linkedMesh->_parent);
 		if (parent == NULL) SKELETON_JSON_ERROR(root, "Parent mesh not found: ", linkedMesh->_parent.buffer());
-		linkedMesh->_mesh->_timelineAttachment = linkedMesh->_inheritTimelines ? static_cast<VertexAttachment *>(parent) : linkedMesh->_mesh;
+		linkedMesh->_mesh->setTimelineAttachment(linkedMesh->_inheritTimelines ? static_cast<VertexAttachment *>(parent) : linkedMesh->_mesh);
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
 		linkedMesh->_mesh->updateSequence();
 	}

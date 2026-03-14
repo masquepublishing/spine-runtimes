@@ -156,7 +156,7 @@ Attachment &MeshAttachment::copy() {
 
 MeshAttachment &MeshAttachment::newLinkedMesh() {
 	MeshAttachment *copy = new (__FILE__, __LINE__) MeshAttachment(getName(), new (__FILE__, __LINE__) Sequence(*_sequence));
-	copy->_timelineAttachment = _timelineAttachment;
+	copy->setTimelineAttachment(getTimelineAttachment());
 	copy->_path = _path;
 	copy->_color.set(_color);
 	copy->setParentMesh(_parentMesh != NULL ? _parentMesh : this);

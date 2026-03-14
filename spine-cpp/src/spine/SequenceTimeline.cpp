@@ -83,9 +83,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Arr
 
 	Attachment *slotAttachment = pose.getAttachment();
 	if (slotAttachment != (Attachment *) _attachment) {
-		if (slotAttachment == NULL || !slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti) ||
-			((VertexAttachment *) slotAttachment)->getTimelineAttachment() != (Attachment *) _attachment)
-			return;
+		if (slotAttachment == NULL || slotAttachment->getTimelineAttachment() != (Attachment *) _attachment) return;
 	}
 	Sequence *sequence = NULL;
 	if (((Attachment *) _attachment)->getRTTI().instanceOf(RegionAttachment::rtti)) sequence = &((RegionAttachment *) _attachment)->getSequence();

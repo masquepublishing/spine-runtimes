@@ -2605,7 +2605,7 @@ namespace spine {
 			_json.writeValue(obj->getHeight());
 
 			_json.writeName("sequence");
-			if (!obj->getSequence().getPathSuffix()) {
+			if (!obj->getSequence().hasPathSuffix()) {
 				_json.writeNull();
 			} else {
 				writeSequence(&obj->getSequence());
@@ -3128,7 +3128,7 @@ namespace spine {
 			_json.writeValue(obj->getPath());
 
 			_json.writeName("sequence");
-			if (!obj->getSequence().getPathSuffix()) {
+			if (!obj->getSequence().hasPathSuffix()) {
 				_json.writeNull();
 			} else {
 				writeSequence(&obj->getSequence());

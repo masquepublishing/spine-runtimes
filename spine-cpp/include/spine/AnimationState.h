@@ -579,7 +579,7 @@ namespace spine {
 		/// @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
 		/// is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
 		/// timelines see any deform.
-		void applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float animationTime, MixBlend pose,
+		void applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float animationTime, MixBlend pose, bool out,
 									 bool attachments);
 
 		/// Returns true when all mixing from entries are complete.

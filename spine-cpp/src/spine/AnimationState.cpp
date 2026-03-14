@@ -569,7 +569,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 			for (size_t ii = 0; ii < timelineCount; ++ii) {
 				Timeline *timeline = timelines[ii];
 				if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
-					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, blend, attachments);
+					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, blend, false, attachments);
 				else
 					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection_In, false);
 			}
@@ -591,7 +591,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, applyTime, alpha, timelineBlend, timelinesRotation,
 										ii << 1, firstFrame);
 				else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
-					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, blend, attachments);
+					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, blend, false, attachments);
 				else
 					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection_In, false);
 			}
@@ -798,13 +798,15 @@ Animation *AnimationState::getEmptyAnimation() {
 	return &ret;
 }
 
-void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float time, MixBlend blend,
+void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float time, MixBlend blend, bool out,
 											 bool attachments) {
 	Slot *slot = skeleton.getSlots()[attachmentTimeline->getSlotIndex()];
 	if (!slot->getBone().isActive()) return;
 
 	Array<float> &frames = attachmentTimeline->getFrames();
-	if (time < frames[0]) {
+	if (out) {
+		if (blend == MixBlend_Setup) setAttachment(skeleton, *slot, slot->getData().getAttachmentName(), attachments);
+	} else if (time < frames[0]) {
 		if (blend == MixBlend_Setup || blend == MixBlend_First) setAttachment(skeleton, *slot, slot->getData().getAttachmentName(), attachments);
 	} else {
 		setAttachment(skeleton, *slot, attachmentTimeline->getAttachmentNames()[Animation::search(frames, time)], attachments);
@@ -986,7 +988,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			if (!shortestRotation && (timeline->getRTTI().isExactly(RotateTimeline::rtti))) {
 				applyRotateTimeline((RotateTimeline *) timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
 			} else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
-				applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, timelineBlend,
+				applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, timelineBlend, true,
 										attachments && alpha >= from->_alphaAttachmentThreshold);
 			} else {
 				if (drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) && timelineBlend == MixBlend_Setup)
