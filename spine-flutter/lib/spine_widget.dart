@@ -438,15 +438,12 @@ class SpineWidget extends StatefulWidget {
 class _SpineWidgetState extends State<SpineWidget> {
   late Bounds _computedBounds;
   SkeletonDrawableFlutter? _drawable;
+  int _loadGeneration = 0;
 
   @override
   void initState() {
     super.initState();
-    if (widget._assetType == _AssetType.drawable) {
-      loadDrawable(widget._drawable!);
-    } else {
-      loadFromAsset(widget._bundle, widget._atlasFile!, widget._skeletonFile!, widget._assetType);
-    }
+    _loadCurrentDrawable();
   }
 
   @override
@@ -469,14 +466,27 @@ class _SpineWidgetState extends State<SpineWidget> {
     }
 
     if (hasChanged) {
-      widget._controller._drawable?.dispose();
-      _drawable = null;
-      if (widget._assetType == _AssetType.drawable) {
-        loadDrawable(widget._drawable!);
-      } else {
-        loadFromAsset(widget._bundle, widget._atlasFile!, widget._skeletonFile!, widget._assetType);
-      }
+      _disposeDrawable(oldWidget._controller);
+      _loadCurrentDrawable();
     }
+  }
+
+  void _loadCurrentDrawable() {
+    final loadGeneration = ++_loadGeneration;
+    if (widget._assetType == _AssetType.drawable) {
+      loadDrawable(widget._drawable!);
+    } else {
+      loadFromAsset(widget._bundle, widget._atlasFile!, widget._skeletonFile!, widget._assetType, loadGeneration);
+    }
+  }
+
+  void _disposeDrawable(SpineWidgetController controller) {
+    final drawable = _drawable;
+    if (drawable == null) return;
+
+    if (controller._drawable == drawable) controller._drawable = null;
+    drawable.dispose();
+    _drawable = null;
   }
 
   void loadDrawable(SkeletonDrawableFlutter drawable) {
@@ -486,23 +496,37 @@ class _SpineWidgetState extends State<SpineWidget> {
     setState(() {});
   }
 
-  void loadFromAsset(AssetBundle? bundle, String atlasFile, String skeletonFile, _AssetType assetType) async {
+  void loadFromAsset(
+    AssetBundle? bundle,
+    String atlasFile,
+    String skeletonFile,
+    _AssetType assetType,
+    int loadGeneration,
+  ) async {
+    late final SkeletonDrawableFlutter drawable;
     switch (assetType) {
       case _AssetType.asset:
-        loadDrawable(await SkeletonDrawableFlutter.fromAsset(atlasFile, skeletonFile, bundle: bundle));
+        drawable = await SkeletonDrawableFlutter.fromAsset(atlasFile, skeletonFile, bundle: bundle);
         break;
       case _AssetType.file:
-        loadDrawable(await SkeletonDrawableFlutter.fromFile(atlasFile, skeletonFile));
+        drawable = await SkeletonDrawableFlutter.fromFile(atlasFile, skeletonFile);
         break;
       case _AssetType.http:
-        loadDrawable(await SkeletonDrawableFlutter.fromHttp(atlasFile, skeletonFile));
+        drawable = await SkeletonDrawableFlutter.fromHttp(atlasFile, skeletonFile);
         break;
       case _AssetType.memory:
-        loadDrawable(await SkeletonDrawableFlutter.fromMemory(atlasFile, skeletonFile, widget._loadFile!));
+        drawable = await SkeletonDrawableFlutter.fromMemory(atlasFile, skeletonFile, widget._loadFile!);
         break;
       case _AssetType.drawable:
         throw Exception("Drawable can not be loaded via loadFromAsset().");
     }
+
+    if (!mounted || loadGeneration != _loadGeneration) {
+      drawable.dispose();
+      return;
+    }
+
+    loadDrawable(drawable);
   }
 
   @override
@@ -523,8 +547,9 @@ class _SpineWidgetState extends State<SpineWidget> {
 
   @override
   void dispose() {
+    _loadGeneration++;
+    _disposeDrawable(widget._controller);
     super.dispose();
-    widget._controller._drawable?.dispose();
   }
 }
 
