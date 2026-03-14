@@ -80,9 +80,9 @@ void spine_sequence_set_setup_index(spine_sequence self, int setupIndex) {
 	_self->setSetupIndex(setupIndex);
 }
 
-bool spine_sequence_get_path_suffix(spine_sequence self) {
+bool spine_sequence_has_path_suffix(spine_sequence self) {
 	Sequence *_self = (Sequence *) self;
-	return _self->getPathSuffix();
+	return _self->hasPathSuffix();
 }
 
 const char *spine_sequence_get_path(spine_sequence self, const char *basePath, int index) {

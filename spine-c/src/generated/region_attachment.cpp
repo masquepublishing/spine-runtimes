@@ -144,6 +144,16 @@ const char *spine_region_attachment_get_name(spine_region_attachment self) {
 	return _self->getName().buffer();
 }
 
+/*@null*/ spine_attachment spine_region_attachment_get_timeline_attachment(spine_region_attachment self) {
+	RegionAttachment *_self = (RegionAttachment *) self;
+	return (spine_attachment) _self->getTimelineAttachment();
+}
+
+void spine_region_attachment_set_timeline_attachment(spine_region_attachment self, /*@null*/ spine_attachment attachment) {
+	RegionAttachment *_self = (RegionAttachment *) self;
+	_self->setTimelineAttachment((Attachment *) attachment);
+}
+
 int spine_region_attachment_get_ref_count(spine_region_attachment self) {
 	RegionAttachment *_self = (RegionAttachment *) self;
 	return _self->getRefCount();

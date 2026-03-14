@@ -60,6 +60,8 @@ SPINE_C_API spine_attachment spine_region_attachment_copy(spine_region_attachmen
 SPINE_C_API void spine_region_attachment_compute_u_vs(/*@null*/ spine_texture_region region, float x, float y, float scaleX, float scaleY,
 													  float rotation, float width, float height, spine_array_float offset, spine_array_float uvs);
 SPINE_C_API const char *spine_region_attachment_get_name(spine_region_attachment self);
+SPINE_C_API /*@null*/ spine_attachment spine_region_attachment_get_timeline_attachment(spine_region_attachment self);
+SPINE_C_API void spine_region_attachment_set_timeline_attachment(spine_region_attachment self, /*@null*/ spine_attachment attachment);
 SPINE_C_API int spine_region_attachment_get_ref_count(spine_region_attachment self);
 SPINE_C_API void spine_region_attachment_reference(spine_region_attachment self);
 SPINE_C_API void spine_region_attachment_dereference(spine_region_attachment self);

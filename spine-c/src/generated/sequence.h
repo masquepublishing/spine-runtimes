@@ -41,7 +41,7 @@ SPINE_C_API void spine_sequence_set_digits(spine_sequence self, int digits);
  */
 SPINE_C_API int spine_sequence_get_setup_index(spine_sequence self);
 SPINE_C_API void spine_sequence_set_setup_index(spine_sequence self, int setupIndex);
-SPINE_C_API bool spine_sequence_get_path_suffix(spine_sequence self);
+SPINE_C_API bool spine_sequence_has_path_suffix(spine_sequence self);
 SPINE_C_API const char *spine_sequence_get_path(spine_sequence self, const char *basePath, int index);
 /**
  * Returns a unique ID for this attachment.
