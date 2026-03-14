@@ -95,14 +95,19 @@ int main() {
 	GLFWwindow *window = init_glfw();
 	if (!window) return -1;
 
+	spine_enable_debug_extension(true);
+
 	// We use a y-down coordinate system, see renderer_set_viewport_size()
 	Bone::setYDown(true);
+
+	{
 
 	// Load the atlas and the skeleton data
 	int atlas_length = 0;
 	uint8_t *atlas_bytes = read_file("data/spineboy-pma.atlas", &atlas_length);
 	spine_atlas_result result = spine_atlas_load_callback((const char *) atlas_bytes, "data/", load_texture, unload_texture);
 	spine_atlas atlas = spine_atlas_result_get_atlas(result);
+	spine_atlas_result_dispose(result);
 
 	int skeleton_length = 0;
 	// uint8_t *skeleton_bytes = read_file("data/spineboy-pro.skel", &skeleton_length);
@@ -110,6 +115,7 @@ int main() {
 	uint8_t *skeleton_bytes = read_file("data/spineboy-pro.json", &skeleton_length);
 	spine_skeleton_data_result result2 = spine_skeleton_data_load_json(atlas, (const char *) skeleton_bytes, "data/");
 	spine_skeleton_data skeleton_data = spine_skeleton_data_result_get_data(result2);
+	spine_skeleton_data_result_dispose(result2);
 
 	// Create a skeleton from the data, set the skeleton's position to the bottom center of
 	// the screen and scale it to make it smaller.
@@ -163,10 +169,16 @@ int main() {
 
 	// Dispose everything
 	renderer_dispose(renderer);
-	// delete skeletonData;
-	delete atlas;
+	spine_skeleton_drawable_dispose(drawable);
+	spine_skeleton_data_dispose(skeleton_data);
+	spine_atlas_dispose(atlas);
+	free(atlas_bytes);
+	free(skeleton_bytes);
 
 	// Kill the window and GLFW
+	}
+
+	spine_report_leaks();
 	glfwTerminate();
 	return 0;
 }

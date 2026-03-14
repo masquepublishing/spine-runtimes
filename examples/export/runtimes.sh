@@ -300,6 +300,10 @@ cp -f ../celestial-circus/export/celestial-circus-pro.json "$ROOT/spine-glfw/dat
 cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-glfw/data/"
 cp -f ../celestial-circus/export/celestial-circus-pma.atlas "$ROOT/spine-glfw/data/"
 cp -f ../celestial-circus/export/celestial-circus-pma.png "$ROOT/spine-glfw/data/"
+cp -f ../dragon/export/dragon-ess.json "$ROOT/spine-glfw/data/"
+cp -f ../dragon/export/dragon-ess.skel "$ROOT/spine-glfw/data/"
+cp -f ../dragon/export/dragon-pma.atlas "$ROOT/spine-glfw/data/"
+cp -f ../dragon/export/dragon-pma*.png "$ROOT/spine-glfw/data/"
 
 echo "spine-sfml"
 rm -f "$ROOT/spine-sfml/data/"*

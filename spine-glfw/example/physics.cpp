@@ -97,8 +97,12 @@ int main() {
 	GLFWwindow *window = init_glfw();
 	if (!window) return -1;
 
+	spine_enable_debug_extension(true);
+
 	// We use a y-down coordinate system, see renderer_set_viewport_size()
 	Bone::setYDown(true);
+
+	{
 
 	// Load the atlas and the skeleton data
 	GlTextureLoader textureLoader;
@@ -170,6 +174,9 @@ int main() {
 	delete atlas;
 
 	// Kill the window and GLFW
+	}
+
+	spine_report_leaks();
 	glfwTerminate();
 	return 0;
 }
