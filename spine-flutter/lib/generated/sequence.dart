@@ -119,8 +119,8 @@ class Sequence {
     SpineBindings.bindings.spine_sequence_set_setup_index(_ptr, value);
   }
 
-  bool get pathSuffix {
-    final result = SpineBindings.bindings.spine_sequence_get_path_suffix(_ptr);
+  bool get hasPathSuffix {
+    final result = SpineBindings.bindings.spine_sequence_has_path_suffix(_ptr);
     return result;
   }
 
