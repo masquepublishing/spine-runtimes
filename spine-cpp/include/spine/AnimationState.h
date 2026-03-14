@@ -308,7 +308,11 @@ namespace spine {
 
 		float getTrackComplete();
 
+#ifdef SPINE_USE_STD_FUNCTION
+		void setListener(AnimationStateListener listener);
+#else
 		void setListener(AnimationStateListener listener, void *userData = NULL);
+#endif
 
 		void setListener(AnimationStateListenerObject *listener);
 
@@ -353,7 +357,9 @@ namespace spine {
 		Array<TrackEntry *> _timelineHoldMix;
 		Array<float> _timelinesRotation;
 		AnimationStateListener _listener;
+#ifndef SPINE_USE_STD_FUNCTION
 		void *_listenerUserData;
+#endif
 		AnimationStateListenerObject *_listenerObject;
 		AnimationState *_state;
 
@@ -523,7 +529,11 @@ namespace spine {
 		void setTimeScale(float inValue);
 
 		/// Adds a listener to receive events for all track entries.
+#ifdef SPINE_USE_STD_FUNCTION
+		void setListener(AnimationStateListener listener);
+#else
 		void setListener(AnimationStateListener listener, void *userData = NULL);
+#endif
 
 		/// Adds a listener to receive events for all track entries.
 		void setListener(AnimationStateListenerObject *listener);
@@ -559,7 +569,9 @@ namespace spine {
 		bool _animationsChanged;
 
 		AnimationStateListener _listener;
+#ifndef SPINE_USE_STD_FUNCTION
 		void *_listenerUserData;
+#endif
 		AnimationStateListenerObject *_listenerObject;
 
 		int _unkeyedState;
