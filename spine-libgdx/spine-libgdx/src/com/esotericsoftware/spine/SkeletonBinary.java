@@ -32,6 +32,7 @@ package com.esotericsoftware.spine;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -47,6 +48,7 @@ import com.esotericsoftware.spine.Animation.BoneTimeline2;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline1;
 import com.esotericsoftware.spine.Animation.DeformTimeline;
+import com.esotericsoftware.spine.Animation.DrawOrderFolderTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
@@ -1160,34 +1162,26 @@ public class SkeletonBinary extends SkeletonLoader {
 		}
 
 		// Draw order timeline.
+		int slotCount = skeletonData.slots.size;
 		int drawOrderCount = input.readInt(true);
 		if (drawOrderCount > 0) {
 			var timeline = new DrawOrderTimeline(drawOrderCount);
-			int slotCount = skeletonData.slots.size;
-			for (int i = 0; i < drawOrderCount; i++) {
-				float time = input.readFloat();
-				int offsetCount = input.readInt(true);
-				var drawOrder = new int[slotCount];
-				for (int ii = slotCount - 1; ii >= 0; ii--)
-					drawOrder[ii] = -1;
-				var unchanged = new int[slotCount - offsetCount];
-				int originalIndex = 0, unchangedIndex = 0;
-				for (int ii = 0; ii < offsetCount; ii++) {
-					int slotIndex = input.readInt(true);
-					// Collect unchanged items.
-					while (originalIndex != slotIndex)
-						unchanged[unchangedIndex++] = originalIndex++;
-					// Set changed items.
-					drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
-				}
-				// Collect remaining unchanged items.
-				while (originalIndex < slotCount)
-					unchanged[unchangedIndex++] = originalIndex++;
-				// Fill in unchanged items.
-				for (int ii = slotCount - 1; ii >= 0; ii--)
-					if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
-				timeline.setFrame(i, time, drawOrder);
-			}
+			for (int i = 0; i < drawOrderCount; i++)
+				timeline.setFrame(i, input.readFloat(), readDrawOrder(input, slotCount));
+			timelines.add(timeline);
+		}
+
+		// Draw order folder timelines.
+		int folderCount = input.readInt(true);
+		for (int i = 0; i < folderCount; i++) {
+			int folderSlotCount = input.readInt(true);
+			var folderSlots = new int[folderSlotCount];
+			for (int ii = 0; ii < folderSlotCount; ii++)
+				folderSlots[ii] = input.readInt(true);
+			int keyCount = input.readInt(true);
+			var timeline = new DrawOrderFolderTimeline(keyCount, folderSlots, slotCount);
+			for (int ii = 0; ii < keyCount; ii++)
+				timeline.setFrame(ii, input.readFloat(), readDrawOrder(input, folderSlotCount));
 			timelines.add(timeline);
 		}
 
@@ -1255,6 +1249,30 @@ public class SkeletonBinary extends SkeletonLoader {
 			value2 = nvalue2;
 		}
 		timelines.add(timeline);
+	}
+
+	private @Null int[] readDrawOrder (SkeletonInput input, int slotCount) throws IOException {
+		int changeCount = input.readInt(true);
+		if (changeCount == 0) return null;
+		var drawOrder = new int[slotCount];
+		Arrays.fill(drawOrder, -1);
+		var unchanged = new int[slotCount - changeCount];
+		int originalIndex = 0, unchangedIndex = 0;
+		for (int i = 0; i < changeCount; i++) {
+			int slotIndex = input.readInt(true);
+			// Collect unchanged items.
+			while (originalIndex != slotIndex)
+				unchanged[unchangedIndex++] = originalIndex++;
+			// Set changed items.
+			drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
+		}
+		// Collect remaining unchanged items.
+		while (originalIndex < slotCount)
+			unchanged[unchangedIndex++] = originalIndex++;
+		// Fill in unchanged items.
+		for (int i = slotCount - 1; i >= 0; i--)
+			if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+		return drawOrder;
 	}
 
 	void setBezier (SkeletonInput input, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,

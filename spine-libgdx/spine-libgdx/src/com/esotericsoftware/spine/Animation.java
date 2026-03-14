@@ -1880,8 +1880,7 @@ public class Animation {
 		/** Sets the time and draw order for the specified frame.
 		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds.
-		 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the slot in the new draw order. May be null to use
-		 *           setup pose draw order. */
+		 * @param drawOrder Ordered {@link Skeleton#slots} indices, or null to use setup pose order. */
 		public void setFrame (int frame, float time, @Null int[] drawOrder) {
 			frames[frame] = time;
 			drawOrders[frame] = drawOrder;
@@ -1909,6 +1908,87 @@ public class Animation {
 				Slot[] drawOrder = skeleton.drawOrder.items;
 				for (int i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+			}
+		}
+	}
+
+	/** Changes a subset of a skeleton's {@link Skeleton#getDrawOrder()}. */
+	static public class DrawOrderFolderTimeline extends Timeline {
+		private final int[] slots;
+		private final boolean[] inFolder;
+		private final int[][] drawOrders;
+
+		/** @param slots {@link Skeleton#getSlots()} indices controlled by this timeline, in setup order.
+		 * @param slotCount The maximum number of slots in the skeleton. */
+		public DrawOrderFolderTimeline (int frameCount, int[] slots, int slotCount) {
+			super(frameCount, DrawOrderTimeline.propertyIds);
+			this.slots = slots;
+			drawOrders = new int[frameCount][];
+			inFolder = new boolean[slotCount];
+			for (int i : slots)
+				inFolder[i] = true;
+		}
+
+		public int getFrameCount () {
+			return frames.length;
+		}
+
+		/** The {@link Skeleton#getSlots()} indices that this timeline affects, in setup order. */
+		public int[] getSlots () {
+			return slots;
+		}
+
+		/** The draw order for each frame. See {@link #setFrame(int, float, int[])}. */
+		public int[][] getDrawOrders () {
+			return drawOrders;
+		}
+
+		/** Sets the time and draw order for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds.
+		 * @param drawOrder Ordered {@link #getSlots()} indices, or null to use setup pose order. */
+		public void setFrame (int frame, float time, @Null int[] drawOrder) {
+			frames[frame] = time;
+			drawOrders[frame] = drawOrder;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction, boolean appliedPose) {
+
+			if (direction == out) {
+				if (blend == setup) setup(skeleton);
+			} else if (time < frames[0]) {
+				if (blend == setup || blend == first) setup(skeleton);
+			} else {
+				int[] order = drawOrders[search(frames, time)];
+				if (order == null)
+					setup(skeleton);
+				else
+					apply(skeleton, order);
+			}
+		}
+
+		private void setup (Skeleton skeleton) {
+			boolean[] inFolder = this.inFolder;
+			Slot[] drawOrder = skeleton.drawOrder.items, allSlots = skeleton.slots.items;
+			int[] slots = this.slots;
+			for (int i = 0, found = 0, done = slots.length;; i++) {
+				if (inFolder[drawOrder[i].data.index]) {
+					drawOrder[i] = allSlots[slots[found]];
+					if (++found == done) break;
+				}
+			}
+		}
+
+		private void apply (Skeleton skeleton, int[] order) {
+			boolean[] inFolder = this.inFolder;
+			Slot[] drawOrder = skeleton.drawOrder.items, allSlots = skeleton.slots.items;
+			int[] slots = this.slots;
+			for (int i = 0, found = 0, done = slots.length;; i++) {
+				if (inFolder[drawOrder[i].data.index]) {
+					drawOrder[i] = allSlots[slots[order[found]]];
+					if (++found == done) break;
+				}
 			}
 		}
 	}
