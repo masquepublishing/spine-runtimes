@@ -73,67 +73,68 @@ int main() {
 
 	{
 
-	int atlas_length = 0;
-	uint8_t *atlas_bytes = read_file("data/spineboy-pma.atlas", &atlas_length);
-	spine_atlas_result atlas_result = spine_atlas_load_callback((const char *) atlas_bytes, "data/", load_texture, unload_texture);
-	spine_atlas atlas = spine_atlas_result_get_atlas(atlas_result);
-	spine_atlas_result_dispose(atlas_result);
+		int atlas_length = 0;
+		uint8_t *atlas_bytes = read_file("data/spineboy-pma.atlas", &atlas_length);
+		spine_atlas_result atlas_result = spine_atlas_load_callback((const char *) atlas_bytes, "data/", load_texture, unload_texture);
+		spine_atlas atlas = spine_atlas_result_get_atlas(atlas_result);
+		spine_atlas_result_dispose(atlas_result);
 
-	int skeleton_length = 0;
-	uint8_t *skeleton_bytes = read_file("data/spineboy-pro.skel", &skeleton_length);
-	spine_skeleton_data_result skeleton_result = spine_skeleton_data_load_binary(atlas, skeleton_bytes, skeleton_length, "data/spineboy-pro.skel");
-	spine_skeleton_data skeleton_data = spine_skeleton_data_result_get_data(skeleton_result);
-	spine_skeleton_data_result_dispose(skeleton_result);
+		int skeleton_length = 0;
+		uint8_t *skeleton_bytes = read_file("data/spineboy-pro.skel", &skeleton_length);
+		spine_skeleton_data_result skeleton_result = spine_skeleton_data_load_binary(atlas, skeleton_bytes, skeleton_length,
+																					 "data/spineboy-pro.skel");
+		spine_skeleton_data skeleton_data = spine_skeleton_data_result_get_data(skeleton_result);
+		spine_skeleton_data_result_dispose(skeleton_result);
 
-	spine_skeleton_drawable drawable = spine_skeleton_drawable_create(skeleton_data);
-	spine_skeleton skeleton = spine_skeleton_drawable_get_skeleton(drawable);
-	spine_skeleton_set_scale(skeleton, 0.5f, 0.5f);
-	spine_skeleton_setup_pose(skeleton);
-	spine_skeleton_set_position(skeleton, 200.0f, height / 2.0f + 150.0f);
+		spine_skeleton_drawable drawable = spine_skeleton_drawable_create(skeleton_data);
+		spine_skeleton skeleton = spine_skeleton_drawable_get_skeleton(drawable);
+		spine_skeleton_set_scale(skeleton, 0.5f, 0.5f);
+		spine_skeleton_setup_pose(skeleton);
+		spine_skeleton_set_position(skeleton, 200.0f, height / 2.0f + 150.0f);
 
-	spine_animation_state animation_state = spine_skeleton_drawable_get_animation_state(drawable);
-	spine_animation_state_set_animation_1(animation_state, 0, "walk", true);
-	spine_animation_state_set_animation_1(animation_state, 1, "aim", true);
+		spine_animation_state animation_state = spine_skeleton_drawable_get_animation_state(drawable);
+		spine_animation_state_set_animation_1(animation_state, 0, "walk", true);
+		spine_animation_state_set_animation_1(animation_state, 1, "aim", true);
 
-	renderer_t *renderer = renderer_create();
-	renderer_set_viewport_size(renderer, width, height);
+		renderer_t *renderer = renderer_create();
+		renderer_set_viewport_size(renderer, width, height);
 
-	double lastTime = glfwGetTime();
-	while (!glfwWindowShouldClose(window)) {
-		double currTime = glfwGetTime();
-		float delta = (float) (currTime - lastTime);
-		lastTime = currTime;
+		double lastTime = glfwGetTime();
+		while (!glfwWindowShouldClose(window)) {
+			double currTime = glfwGetTime();
+			float delta = (float) (currTime - lastTime);
+			lastTime = currTime;
 
-		spine_animation_state_update(animation_state, delta);
-		spine_animation_state_apply(animation_state, skeleton);
-		spine_skeleton_update(skeleton, delta);
+			spine_animation_state_update(animation_state, delta);
+			spine_animation_state_apply(animation_state, skeleton);
+			spine_skeleton_update(skeleton, delta);
 
-		spine_bone crosshair_bone = spine_skeleton_find_bone(skeleton, "crosshair");
-		if (crosshair_bone != nullptr) {
-			spine_bone parent = spine_bone_get_parent(crosshair_bone);
-			if (parent != nullptr) {
-				float localX = 0, localY = 0;
-				spine_bone_pose parent_pose = spine_bone_get_applied_pose(parent);
-				spine_bone_pose_world_to_local(parent_pose, (float) mouseX, (float) mouseY, &localX, &localY);
-				spine_bone_pose crosshair_pose = spine_bone_get_applied_pose(crosshair_bone);
-				spine_bone_pose_set_x(crosshair_pose, localX);
-				spine_bone_pose_set_y(crosshair_pose, localY);
+			spine_bone crosshair_bone = spine_skeleton_find_bone(skeleton, "crosshair");
+			if (crosshair_bone != nullptr) {
+				spine_bone parent = spine_bone_get_parent(crosshair_bone);
+				if (parent != nullptr) {
+					float localX = 0, localY = 0;
+					spine_bone_pose parent_pose = spine_bone_get_applied_pose(parent);
+					spine_bone_pose_world_to_local(parent_pose, (float) mouseX, (float) mouseY, &localX, &localY);
+					spine_bone_pose crosshair_pose = spine_bone_get_applied_pose(crosshair_bone);
+					spine_bone_pose_set_x(crosshair_pose, localX);
+					spine_bone_pose_set_y(crosshair_pose, localY);
+				}
 			}
+
+			spine_skeleton_update_world_transform(skeleton, SPINE_PHYSICS_UPDATE);
+			gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+			renderer_draw_c(renderer, skeleton, true);
+			glfwSwapBuffers(window);
+			glfwPollEvents();
 		}
 
-		spine_skeleton_update_world_transform(skeleton, SPINE_PHYSICS_UPDATE);
-		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
-		renderer_draw_c(renderer, skeleton, true);
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-
-	renderer_dispose(renderer);
-	spine_skeleton_drawable_dispose(drawable);
-	spine_skeleton_data_dispose(skeleton_data);
-	spine_atlas_dispose(atlas);
-	free(atlas_bytes);
-	free(skeleton_bytes);
+		renderer_dispose(renderer);
+		spine_skeleton_drawable_dispose(drawable);
+		spine_skeleton_data_dispose(skeleton_data);
+		spine_atlas_dispose(atlas);
+		free(atlas_bytes);
+		free(skeleton_bytes);
 	}
 
 	spine_report_leaks();

@@ -65,53 +65,53 @@ int main() {
 
 	{
 
-	int atlas_length = 0;
-	uint8_t *atlas_bytes = read_file("data/dragon-pma.atlas", &atlas_length);
-	spine_atlas_result atlas_result = spine_atlas_load_callback((const char *) atlas_bytes, "data/", load_texture, unload_texture);
-	spine_atlas atlas = spine_atlas_result_get_atlas(atlas_result);
-	spine_atlas_result_dispose(atlas_result);
+		int atlas_length = 0;
+		uint8_t *atlas_bytes = read_file("data/dragon-pma.atlas", &atlas_length);
+		spine_atlas_result atlas_result = spine_atlas_load_callback((const char *) atlas_bytes, "data/", load_texture, unload_texture);
+		spine_atlas atlas = spine_atlas_result_get_atlas(atlas_result);
+		spine_atlas_result_dispose(atlas_result);
 
-	int skeleton_length = 0;
-	uint8_t *skeleton_bytes = read_file("data/dragon-ess.json", &skeleton_length);
-	spine_skeleton_data_result skeleton_result = spine_skeleton_data_load_json(atlas, (const char *) skeleton_bytes, "data/dragon-ess.json");
-	spine_skeleton_data skeleton_data = spine_skeleton_data_result_get_data(skeleton_result);
-	spine_skeleton_data_result_dispose(skeleton_result);
+		int skeleton_length = 0;
+		uint8_t *skeleton_bytes = read_file("data/dragon-ess.json", &skeleton_length);
+		spine_skeleton_data_result skeleton_result = spine_skeleton_data_load_json(atlas, (const char *) skeleton_bytes, "data/dragon-ess.json");
+		spine_skeleton_data skeleton_data = spine_skeleton_data_result_get_data(skeleton_result);
+		spine_skeleton_data_result_dispose(skeleton_result);
 
-	spine_skeleton_drawable drawable = spine_skeleton_drawable_create(skeleton_data);
-	spine_skeleton skeleton = spine_skeleton_drawable_get_skeleton(drawable);
-	spine_skeleton_set_position(skeleton, width / 2.0f, height / 2.0f);
-	spine_skeleton_set_scale(skeleton, 0.5f, 0.5f);
-	spine_skeleton_setup_pose(skeleton);
+		spine_skeleton_drawable drawable = spine_skeleton_drawable_create(skeleton_data);
+		spine_skeleton skeleton = spine_skeleton_drawable_get_skeleton(drawable);
+		spine_skeleton_set_position(skeleton, width / 2.0f, height / 2.0f);
+		spine_skeleton_set_scale(skeleton, 0.5f, 0.5f);
+		spine_skeleton_setup_pose(skeleton);
 
-	spine_animation_state animation_state = spine_skeleton_drawable_get_animation_state(drawable);
-	spine_animation_state_set_animation_1(animation_state, 0, "flying", true);
+		spine_animation_state animation_state = spine_skeleton_drawable_get_animation_state(drawable);
+		spine_animation_state_set_animation_1(animation_state, 0, "flying", true);
 
-	renderer_t *renderer = renderer_create();
-	renderer_set_viewport_size(renderer, width, height);
+		renderer_t *renderer = renderer_create();
+		renderer_set_viewport_size(renderer, width, height);
 
-	double lastTime = glfwGetTime();
-	while (!glfwWindowShouldClose(window)) {
-		double currTime = glfwGetTime();
-		float delta = (float) (currTime - lastTime);
-		lastTime = currTime;
+		double lastTime = glfwGetTime();
+		while (!glfwWindowShouldClose(window)) {
+			double currTime = glfwGetTime();
+			float delta = (float) (currTime - lastTime);
+			lastTime = currTime;
 
-		spine_animation_state_update(animation_state, delta);
-		spine_animation_state_apply(animation_state, skeleton);
-		spine_skeleton_update(skeleton, delta);
-		spine_skeleton_update_world_transform(skeleton, SPINE_PHYSICS_UPDATE);
+			spine_animation_state_update(animation_state, delta);
+			spine_animation_state_apply(animation_state, skeleton);
+			spine_skeleton_update(skeleton, delta);
+			spine_skeleton_update_world_transform(skeleton, SPINE_PHYSICS_UPDATE);
 
-		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
-		renderer_draw_c(renderer, skeleton, true);
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
+			gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+			renderer_draw_c(renderer, skeleton, true);
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
 
-	renderer_dispose(renderer);
-	spine_skeleton_drawable_dispose(drawable);
-	spine_skeleton_data_dispose(skeleton_data);
-	spine_atlas_dispose(atlas);
-	free(atlas_bytes);
-	free(skeleton_bytes);
+		renderer_dispose(renderer);
+		spine_skeleton_drawable_dispose(drawable);
+		spine_skeleton_data_dispose(skeleton_data);
+		spine_atlas_dispose(atlas);
+		free(atlas_bytes);
+		free(skeleton_bytes);
 	}
 
 	spine_report_leaks();

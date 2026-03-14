@@ -104,76 +104,76 @@ int main() {
 
 	{
 
-	// Load the atlas and the skeleton data
-	GlTextureLoader textureLoader;
-	Atlas *atlas = new Atlas("data/celestial-circus-pma.atlas", &textureLoader);
-	SkeletonBinary binary(*atlas);
-	binary.setScale(0.2f);
-	SkeletonData *skeletonData = binary.readSkeletonDataFile("data/celestial-circus-pro.skel");
+		// Load the atlas and the skeleton data
+		GlTextureLoader textureLoader;
+		Atlas *atlas = new Atlas("data/celestial-circus-pma.atlas", &textureLoader);
+		SkeletonBinary binary(*atlas);
+		binary.setScale(0.2f);
+		SkeletonData *skeletonData = binary.readSkeletonDataFile("data/celestial-circus-pro.skel");
 
-	// Create a skeleton from the data
-	Skeleton skeleton(*skeletonData);
-	skeleton.setupPose();
-	skeleton.update(0);
-	skeleton.updateWorldTransform(Physics_Update);
+		// Create a skeleton from the data
+		Skeleton skeleton(*skeletonData);
+		skeleton.setupPose();
+		skeleton.update(0);
+		skeleton.updateWorldTransform(Physics_Update);
 
-	// Center the skeleton on screen
-	skeleton.setPosition(width / 2, height / 2 + 150);
+		// Center the skeleton on screen
+		skeleton.setPosition(width / 2, height / 2 + 150);
 
-	// Set the global skeleton pointer for mouse dragging
-	dragSkeleton = &skeleton;
+		// Set the global skeleton pointer for mouse dragging
+		dragSkeleton = &skeleton;
 
-	// Create an AnimationState to drive animations on the skeleton
-	AnimationStateData animationStateData(*skeletonData);
-	AnimationState animationState(animationStateData);
+		// Create an AnimationState to drive animations on the skeleton
+		AnimationStateData animationStateData(*skeletonData);
+		AnimationState animationState(animationStateData);
 
-	// Set the "eyeblink-long" animation like in the web example
-	animationState.setAnimation(0, "eyeblink-long", true);
-	animationState.setAnimation(1, "wind-idle", true);
+		// Set the "eyeblink-long" animation like in the web example
+		animationState.setAnimation(0, "eyeblink-long", true);
+		animationState.setAnimation(1, "wind-idle", true);
 
-	// Create the renderer and set the viewport size to match the window size. This sets up a
-	// pixel perfect orthogonal projection for 2D rendering.
-	renderer_t *renderer = renderer_create();
-	renderer_set_viewport_size(renderer, width, height);
+		// Create the renderer and set the viewport size to match the window size. This sets up a
+		// pixel perfect orthogonal projection for 2D rendering.
+		renderer_t *renderer = renderer_create();
+		renderer_set_viewport_size(renderer, width, height);
 
-	// Rendering loop
-	double lastTime = glfwGetTime();
-	while (!glfwWindowShouldClose(window)) {
-		// Calculate the delta time in seconds
-		double currTime = glfwGetTime();
-		float delta = currTime - lastTime;
-		lastTime = currTime;
+		// Rendering loop
+		double lastTime = glfwGetTime();
+		while (!glfwWindowShouldClose(window)) {
+			// Calculate the delta time in seconds
+			double currTime = glfwGetTime();
+			float delta = currTime - lastTime;
+			lastTime = currTime;
 
-		// Update and apply the animation state to the skeleton
-		animationState.update(delta);
-		animationState.apply(skeleton);
+			// Update and apply the animation state to the skeleton
+			animationState.update(delta);
+			animationState.apply(skeleton);
 
-		// Update the skeleton time (used for physics)
-		skeleton.update(delta);
+			// Update the skeleton time (used for physics)
+			skeleton.update(delta);
 
-		// Calculate the new pose
-		skeleton.updateWorldTransform(spine::Physics_Update);
+			// Calculate the new pose
+			skeleton.updateWorldTransform(spine::Physics_Update);
 
-		// Clear the screen
-		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+			// Clear the screen
+			gl::glClear(gl::GL_COLOR_BUFFER_BIT);
 
-		// Render the skeleton in its current pose
-		renderer_draw(renderer, &skeleton, true);
+			// Render the skeleton in its current pose
+			renderer_draw(renderer, &skeleton, true);
 
-		// Present the rendering results and poll for events
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
+			// Present the rendering results and poll for events
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
 
-	// Clear the drag skeleton pointer
-	dragSkeleton = nullptr;
+		// Clear the drag skeleton pointer
+		dragSkeleton = nullptr;
 
-	// Dispose everything
-	renderer_dispose(renderer);
-	delete skeletonData;
-	delete atlas;
+		// Dispose everything
+		renderer_dispose(renderer);
+		delete skeletonData;
+		delete atlas;
 
-	// Kill the window and GLFW
+		// Kill the window and GLFW
 	}
 
 	spine_report_leaks();

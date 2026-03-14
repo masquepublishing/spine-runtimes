@@ -67,50 +67,50 @@ int main() {
 
 	{
 
-	GlTextureLoader textureLoader;
-	Atlas *atlas = new Atlas("data/dragon-pma.atlas", &textureLoader);
+		GlTextureLoader textureLoader;
+		Atlas *atlas = new Atlas("data/dragon-pma.atlas", &textureLoader);
 
-	SkeletonJson json(*atlas);
-	SkeletonData *skeletonData = json.readSkeletonDataFile("data/dragon-ess.json");
-	if (!skeletonData) {
-		std::cerr << "Failed to load dragon: " << json.getError().buffer() << std::endl;
-		return -1;
-	}
+		SkeletonJson json(*atlas);
+		SkeletonData *skeletonData = json.readSkeletonDataFile("data/dragon-ess.json");
+		if (!skeletonData) {
+			std::cerr << "Failed to load dragon: " << json.getError().buffer() << std::endl;
+			return -1;
+		}
 
-	Skeleton skeleton(*skeletonData);
-	skeleton.setPosition(width / 2, height / 2);
-	skeleton.setScaleX(0.5f);
-	skeleton.setScaleY(0.5f);
-	skeleton.setupPose();
+		Skeleton skeleton(*skeletonData);
+		skeleton.setPosition(width / 2, height / 2);
+		skeleton.setScaleX(0.5f);
+		skeleton.setScaleY(0.5f);
+		skeleton.setupPose();
 
-	AnimationStateData animationStateData(*skeletonData);
-	AnimationState animationState(animationStateData);
-	animationState.setAnimation(0, "flying", true);
+		AnimationStateData animationStateData(*skeletonData);
+		AnimationState animationState(animationStateData);
+		animationState.setAnimation(0, "flying", true);
 
-	renderer_t *renderer = renderer_create();
-	renderer_set_viewport_size(renderer, width, height);
+		renderer_t *renderer = renderer_create();
+		renderer_set_viewport_size(renderer, width, height);
 
-	double lastTime = glfwGetTime();
-	while (!glfwWindowShouldClose(window)) {
-		double currTime = glfwGetTime();
-		float delta = currTime - lastTime;
-		lastTime = currTime;
+		double lastTime = glfwGetTime();
+		while (!glfwWindowShouldClose(window)) {
+			double currTime = glfwGetTime();
+			float delta = currTime - lastTime;
+			lastTime = currTime;
 
-		animationState.update(delta);
-		animationState.apply(skeleton);
-		skeleton.update(delta);
-		skeleton.updateWorldTransform(spine::Physics_Update);
+			animationState.update(delta);
+			animationState.apply(skeleton);
+			skeleton.update(delta);
+			skeleton.updateWorldTransform(spine::Physics_Update);
 
-		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
-		renderer_draw(renderer, &skeleton, true);
+			gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+			renderer_draw(renderer, &skeleton, true);
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
 
-	renderer_dispose(renderer);
-	delete skeletonData;
-	delete atlas;
+		renderer_dispose(renderer);
+		delete skeletonData;
+		delete atlas;
 	}
 
 	spine_report_leaks();

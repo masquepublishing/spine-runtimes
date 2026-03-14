@@ -82,8 +82,7 @@ int main() {
 		skeleton.setupPose();
 		skeleton.updateWorldTransform(spine::Physics_None);
 
-		std::cout << "Loaded mix-and-match successfully. Bones=" << skeletonData->getBones().size()
-				  << ", slots=" << skeletonData->getSlots().size()
+		std::cout << "Loaded mix-and-match successfully. Bones=" << skeletonData->getBones().size() << ", slots=" << skeletonData->getSlots().size()
 				  << ", skins=" << skeletonData->getSkins().size() << std::endl;
 
 		delete skeletonData;

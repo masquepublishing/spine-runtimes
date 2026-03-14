@@ -140,7 +140,8 @@ public class SkeletonRenderer {
 				}
 
 				command.vertices.setSize(command.vertices.size + verticesLength);
-				region.computeWorldVertices(slot, sequence.getOffsets(sequenceIndex), command.vertices.items, vertexStart, vertexSize);
+				region.computeWorldVertices(slot, sequence.getOffsets(sequenceIndex), command.vertices.items, vertexStart,
+					vertexSize);
 				uvs = sequence.getUVs(sequenceIndex);
 				indices = quadTriangles;
 				color = region.getColor();

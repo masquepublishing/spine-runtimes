@@ -82,93 +82,93 @@ int main() {
 
 	{
 
-	// Load the atlas and the skeleton data
-	GlTextureLoader textureLoader;
-	Atlas *atlas = new Atlas("data/spineboy-pma.atlas", &textureLoader);
-	SkeletonBinary binary(*atlas);
-	SkeletonData *skeletonData = binary.readSkeletonDataFile("data/spineboy-pro.skel");
+		// Load the atlas and the skeleton data
+		GlTextureLoader textureLoader;
+		Atlas *atlas = new Atlas("data/spineboy-pma.atlas", &textureLoader);
+		SkeletonBinary binary(*atlas);
+		SkeletonData *skeletonData = binary.readSkeletonDataFile("data/spineboy-pro.skel");
 
-	// Create a skeleton from the data
-	Skeleton skeleton(*skeletonData);
-	skeleton.setScaleX(0.5);
-	skeleton.setScaleY(0.5);
-	skeleton.setupPose();
+		// Create a skeleton from the data
+		Skeleton skeleton(*skeletonData);
+		skeleton.setScaleX(0.5);
+		skeleton.setScaleY(0.5);
+		skeleton.setupPose();
 
-	// Position the skeleton on the left side like in the Flutter example
-	skeleton.setPosition(200, height / 2 + 150);
+		// Position the skeleton on the left side like in the Flutter example
+		skeleton.setPosition(200, height / 2 + 150);
 
-	// Set the global skeleton pointer for IK
-	ikSkeleton = &skeleton;
+		// Set the global skeleton pointer for IK
+		ikSkeleton = &skeleton;
 
-	// Create an AnimationState to drive animations on the skeleton
-	AnimationStateData animationStateData(*skeletonData);
-	AnimationState animationState(animationStateData);
+		// Create an AnimationState to drive animations on the skeleton
+		AnimationStateData animationStateData(*skeletonData);
+		AnimationState animationState(animationStateData);
 
-	// Set the walk animation on track 0 and aim animation on track 1
-	animationState.setAnimation(0, "walk", true);
-	animationState.setAnimation(1, "aim", true);
+		// Set the walk animation on track 0 and aim animation on track 1
+		animationState.setAnimation(0, "walk", true);
+		animationState.setAnimation(1, "aim", true);
 
-	// Create the renderer and set the viewport size to match the window size
-	renderer_t *renderer = renderer_create();
-	renderer_set_viewport_size(renderer, width, height);
+		// Create the renderer and set the viewport size to match the window size
+		renderer_t *renderer = renderer_create();
+		renderer_set_viewport_size(renderer, width, height);
 
-	// Rendering loop
-	double lastTime = glfwGetTime();
-	while (!glfwWindowShouldClose(window)) {
-		// Calculate the delta time in seconds
-		double currTime = glfwGetTime();
-		float delta = currTime - lastTime;
-		lastTime = currTime;
+		// Rendering loop
+		double lastTime = glfwGetTime();
+		while (!glfwWindowShouldClose(window)) {
+			// Calculate the delta time in seconds
+			double currTime = glfwGetTime();
+			float delta = currTime - lastTime;
+			lastTime = currTime;
 
-		// Update and apply the animation state to the skeleton
-		animationState.update(delta);
-		animationState.apply(skeleton);
+			// Update and apply the animation state to the skeleton
+			animationState.update(delta);
+			animationState.apply(skeleton);
 
-		// Update the skeleton time (used for physics)
-		skeleton.update(delta);
+			// Update the skeleton time (used for physics)
+			skeleton.update(delta);
 
-		// Update the crosshair bone position based on mouse position
-		Bone *crosshairBone = skeleton.findBone("crosshair");
-		if (crosshairBone != nullptr) {
-			Bone *parent = crosshairBone->getParent();
-			if (parent != nullptr) {
-				// Convert mouse position to world coordinates
-				float worldX = mouseX;
-				float worldY = mouseY;
+			// Update the crosshair bone position based on mouse position
+			Bone *crosshairBone = skeleton.findBone("crosshair");
+			if (crosshairBone != nullptr) {
+				Bone *parent = crosshairBone->getParent();
+				if (parent != nullptr) {
+					// Convert mouse position to world coordinates
+					float worldX = mouseX;
+					float worldY = mouseY;
 
-				// Convert world position to parent's local space
-				float localX, localY;
-				parent->getAppliedPose().worldToLocal(worldX, worldY, localX, localY);
+					// Convert world position to parent's local space
+					float localX, localY;
+					parent->getAppliedPose().worldToLocal(worldX, worldY, localX, localY);
 
-				// Set the crosshair bone position in its applied pose
-				crosshairBone->getAppliedPose().setX(localX);
-				crosshairBone->getAppliedPose().setY(localY);
+					// Set the crosshair bone position in its applied pose
+					crosshairBone->getAppliedPose().setX(localX);
+					crosshairBone->getAppliedPose().setY(localY);
+				}
 			}
+
+			// Calculate the new pose
+			skeleton.updateWorldTransform(spine::Physics_Update);
+
+			// Clear the screen
+			gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+
+			// Render the skeleton in its current pose
+			renderer_draw(renderer, &skeleton, true);
+
+			// Present the rendering results and poll for events
+			glfwSwapBuffers(window);
+			glfwPollEvents();
 		}
 
-		// Calculate the new pose
-		skeleton.updateWorldTransform(spine::Physics_Update);
+		// Clear the IK skeleton pointer
+		ikSkeleton = nullptr;
 
-		// Clear the screen
-		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+		// Dispose everything
+		renderer_dispose(renderer);
+		delete skeletonData;
+		delete atlas;
 
-		// Render the skeleton in its current pose
-		renderer_draw(renderer, &skeleton, true);
-
-		// Present the rendering results and poll for events
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-
-	// Clear the IK skeleton pointer
-	ikSkeleton = nullptr;
-
-	// Dispose everything
-	renderer_dispose(renderer);
-	delete skeletonData;
-	delete atlas;
-
-	// Kill the window and GLFW
+		// Kill the window and GLFW
 	}
 
 	spine_report_leaks();
