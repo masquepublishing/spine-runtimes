@@ -198,7 +198,7 @@ export class AnimationState {
 					Utils.webkit602BugfixHelper(alpha, blend);
 					const timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline)
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, attachments);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, false, attachments);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection.in, false);
 				}
@@ -215,7 +215,7 @@ export class AnimationState {
 					if (!shortestRotation && timeline instanceof RotateTimeline) {
 						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, current.timelinesRotation, ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline) {
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, attachments);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, false, attachments);
 					} else {
 						// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
 						Utils.webkit602BugfixHelper(alpha, blend);
@@ -286,7 +286,6 @@ export class AnimationState {
 			from.totalAlpha = 0;
 			for (let i = 0; i < timelineCount; i++) {
 				const timeline = timelines[i];
-				let direction = MixDirection.out;
 				let timelineBlend: MixBlend;
 				let alpha = 0;
 				switch (timelineMode[i]) {
@@ -319,8 +318,9 @@ export class AnimationState {
 				if (!shortestRotation && timeline instanceof RotateTimeline)
 					this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, from.timelinesRotation, i << 1, firstFrame);
 				else if (timeline instanceof AttachmentTimeline)
-					this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, attachments && alpha >= from.alphaAttachmentThreshold);
+					this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, true, attachments && alpha >= from.alphaAttachmentThreshold);
 				else {
+					let direction = MixDirection.out;
 					// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
 					Utils.webkit602BugfixHelper(alpha, blend);
 					if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend === MixBlend.setup)
@@ -338,11 +338,13 @@ export class AnimationState {
 		return mix;
 	}
 
-	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, blend: MixBlend, attachments: boolean) {
+	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, blend: MixBlend, out: boolean, attachments: boolean) {
 		const slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active) return;
 
-		if (time < timeline.frames[0]) { // Time is before first frame.
+		if (out) {
+			if (blend === MixBlend.setup) this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+		} else if (time < timeline.frames[0]) { // Time is before first frame.
 			if (blend === MixBlend.setup || blend === MixBlend.first)
 				this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 		} else
@@ -965,7 +967,8 @@ export class TrackEntry {
 	 * to 1, which overwrites the skeleton's current pose with this animation.
 	 *
 	 * Typically track 0 is used to completely pose the skeleton, then alpha is used on higher tracks. It doesn't make sense to
-	 * use alpha on track 0 if the skeleton pose is from the last frame render. */
+	 * use alpha on track 0 if the skeleton pose is from the last frame render.
+	 * @see alphaAttachmentThreshold */
 	alpha: number = 0;
 
 	/** Seconds from 0 to the {@link #getMixDuration()} when mixing from the previous animation to this animation. May be

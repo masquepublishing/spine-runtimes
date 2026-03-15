@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type BlendMode, ClippingAttachment, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, SkeletonClipping, type TextureRegion, Utils, Vector2 } from "@esotericsoftware/spine-core";
+import { type BlendMode, ClippingAttachment, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, SkeletonClipping, Utils, Vector2 } from "@esotericsoftware/spine-core";
 import type { GLTexture } from "./GLTexture.js";
 import type { PolygonBatcher } from "./PolygonBatcher.js";
 import type { ManagedWebGLRenderingContext } from "./WebGL.js";
@@ -102,10 +102,14 @@ export class SkeletonRenderer {
 				renderable.vertices = this.vertices;
 				renderable.numVertices = 4;
 				renderable.numFloats = vertexSize << 2;
-				attachment.computeWorldVertices(slot, renderable.vertices, 0, vertexSize);
+
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+				attachment.computeWorldVertices(slot, attachment.getOffsets(pose), renderable.vertices, 0, vertexSize);
+
 				triangles = SkeletonRenderer.QUAD_TRIANGLES;
-				uvs = attachment.uvs;
-				texture = (attachment.region as TextureRegion).texture as GLTexture;
+				uvs = sequence.getUVs(sequenceIndex);
+				texture = sequence.regions[sequenceIndex]?.texture as GLTexture;
 				attachmentColor = attachment.color;
 			} else if (attachment instanceof MeshAttachment) {
 				renderable.vertices = this.vertices;
@@ -117,8 +121,12 @@ export class SkeletonRenderer {
 				}
 				attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, renderable.vertices, 0, vertexSize);
 				triangles = attachment.triangles;
-				texture = (attachment.region as TextureRegion).texture as GLTexture;
-				uvs = attachment.uvs;
+
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+
+				texture = sequence.regions[sequenceIndex]?.texture as GLTexture;
+				uvs = sequence.getUVs(sequenceIndex);
 				attachmentColor = attachment.color;
 			} else if (attachment instanceof ClippingAttachment) {
 				clipper.clipEnd(slot);

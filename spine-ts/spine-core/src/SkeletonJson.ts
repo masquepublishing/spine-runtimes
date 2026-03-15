@@ -30,7 +30,7 @@
 import { AlphaTimeline, Animation, AttachmentTimeline, type BoneTimeline2, type CurveTimeline, type CurveTimeline1, DeformTimeline, DrawOrderTimeline, EventTimeline, IkConstraintTimeline, InheritTimeline, PathConstraintMixTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintMixTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintWindTimeline, RGB2Timeline, RGBA2Timeline, RGBATimeline, RGBTimeline, RotateTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, SequenceTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, SliderMixTimeline, SliderTimeline, type Timeline, TransformConstraintTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline } from "./Animation.js";
 import type { Attachment, VertexAttachment } from "./attachments/Attachment.js";
 import type { AttachmentLoader } from "./attachments/AttachmentLoader.js";
-import type { HasTextureRegion } from "./attachments/HasTextureRegion.js";
+import type { HasSequence } from "./attachments/HasSequence.js";
 import type { MeshAttachment } from "./attachments/MeshAttachment.js";
 import { Sequence, SequenceMode } from "./attachments/Sequence.js";
 import { BoneData, Inherit } from "./BoneData.js";
@@ -440,7 +440,7 @@ export class SkeletonJson {
 			if (!parent) throw new Error(`Parent mesh not found: ${linkedMesh.parent}`);
 			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
 			linkedMesh.mesh.setParentMesh(<MeshAttachment>parent);
-			if (linkedMesh.mesh.region != null) linkedMesh.mesh.updateRegion();
+			linkedMesh.mesh.updateSequence();
 		}
 		this.linkedMeshes.length = 0;
 
@@ -528,12 +528,11 @@ export class SkeletonJson {
 				region.rotation = getValue(map, "rotation", 0);
 				region.width = map.width * scale;
 				region.height = map.height * scale;
-				region.sequence = sequence;
 
 				const color: string = getValue(map, "color", null);
 				if (color) region.color.setFromString(color);
 
-				if (region.region != null) region.updateRegion();
+				region.updateSequence();
 				return region;
 			}
 			case "boundingbox": {
@@ -557,7 +556,6 @@ export class SkeletonJson {
 
 				mesh.width = getValue(map, "width", 0) * scale;
 				mesh.height = getValue(map, "height", 0) * scale;
-				mesh.sequence = sequence;
 
 				const parent: string = getValue(map, "parent", null);
 				if (parent) {
@@ -569,10 +567,10 @@ export class SkeletonJson {
 				this.readVertices(map, mesh, uvs.length);
 				mesh.triangles = map.triangles;
 				mesh.regionUVs = uvs;
-				if (mesh.region != null) mesh.updateRegion();
 
 				mesh.edges = getValue(map, "edges", null);
 				mesh.hullLength = getValue(map, "hull", 0) * 2;
+				mesh.updateSequence();
 				return mesh;
 			}
 			case "path": {
@@ -623,8 +621,8 @@ export class SkeletonJson {
 	}
 
 	readSequence (map: object) {
-		if (map == null) return null;
-		const sequence = new Sequence(getValue(map, "count", 0));
+		if (map == null) return new Sequence(1, false);
+		const sequence = new Sequence(getValue(map, "count", 0), true);
 		sequence.start = getValue(map, "start", 1);
 		sequence.digits = getValue(map, "digits", 0);
 		sequence.setupIndex = getValue(map, "setup", 0);
@@ -1155,7 +1153,7 @@ export class SkeletonJson {
 								}
 								timelines.push(timeline);
 							} else if (timelineMapName === "sequence") {
-								const timeline = new SequenceTimeline(timelineMap.length, slotIndex, attachment as unknown as HasTextureRegion);
+								const timeline = new SequenceTimeline(timelineMap.length, slotIndex, attachment as unknown as HasSequence);
 								let lastDelay = 0;
 								for (let frame = 0; frame < timelineMap.length; frame++) {
 									const delay = getValue(keyMap, "delay", lastDelay);

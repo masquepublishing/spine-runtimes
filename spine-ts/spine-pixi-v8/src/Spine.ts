@@ -58,7 +58,6 @@ import {
 	Container,
 	type ContainerOptions,
 	type DestroyOptions,
-	fastCopy,
 	Graphics,
 	type PointData,
 	Texture,
@@ -66,6 +65,7 @@ import {
 	ViewContainer,
 } from 'pixi.js';
 import type { ISpineDebugRenderer } from './SpineDebugRenderer.js';
+import type { SpineTexture } from './SpineTexture.js';
 
 /**
  * Options to create a {@link Spine} using {@link Spine.from}.
@@ -662,8 +662,11 @@ export class Spine extends ViewContainer {
 				if (attachment instanceof MeshAttachment || attachment instanceof RegionAttachment) {
 					const cacheData = this._getCachedData(slot, attachment);
 
+					const sequence = attachment.sequence;
+					const sequenceIndex = sequence.resolveIndex(pose);
+
 					if (attachment instanceof RegionAttachment) {
-						attachment.computeWorldVertices(slot, cacheData.vertices, 0, 2);
+						attachment.computeWorldVertices(slot, attachment.getOffsets(pose), cacheData.vertices, 0, 2);
 					}
 					else {
 						attachment.computeWorldVertices(
@@ -677,13 +680,7 @@ export class Spine extends ViewContainer {
 						);
 					}
 
-					// sequences uvs are known only after computeWorldVertices is invoked
-					if (cacheData.uvs.length < attachment.uvs.length) {
-						cacheData.uvs = new Float32Array(attachment.uvs.length);
-					}
-
-					// need to copy because attachments uvs are shared among skeletons using the same atlas
-					fastCopy((attachment.uvs as Float32Array).buffer, cacheData.uvs.buffer);
+					cacheData.uvs = sequence.getUVs(sequenceIndex);
 
 					const skeletonColor = skeleton.color;
 					const slotColor = pose.color;
@@ -708,7 +705,7 @@ export class Spine extends ViewContainer {
 							cacheData.darkColor.setFromColor(pose.darkColor);
 						}
 
-						const texture = attachment.region?.texture.texture || Texture.EMPTY;
+						const texture = (sequence.regions[sequenceIndex]?.texture as SpineTexture)?.texture || Texture.EMPTY;
 
 						if (cacheData.texture !== texture) {
 							cacheData.texture = texture;
@@ -834,33 +831,35 @@ export class Spine extends ViewContainer {
 		if (attachment instanceof RegionAttachment) {
 			vertices = new Float32Array(8);
 
+			const sequence = attachment.sequence;
 			this.attachmentCacheData[slot.data.index][attachment.name] = {
 				id: `${slot.data.index}-${attachment.name}`,
 				vertices,
 				clipped: false,
 				indices: [0, 1, 2, 0, 2, 3],
-				uvs: new Float32Array(attachment.uvs.length),
+				uvs: new Float32Array(sequence.getUVs(0).length),
 				color: new Color(1, 1, 1, 1),
 				darkColor: new Color(0, 0, 0, 0),
 				darkTint: this.darkTint,
 				skipRender: false,
-				texture: attachment.region?.texture.texture,
+				texture: (sequence.regions[0]?.texture as SpineTexture)?.texture,
 			};
 		}
 		else {
 			vertices = new Float32Array(attachment.worldVerticesLength);
 
+			const sequence = attachment.sequence;
 			this.attachmentCacheData[slot.data.index][attachment.name] = {
 				id: `${slot.data.index}-${attachment.name}`,
 				vertices,
 				clipped: false,
 				indices: attachment.triangles,
-				uvs: new Float32Array(attachment.uvs.length),
+				uvs: new Float32Array(sequence.getUVs(0).length),
 				color: new Color(1, 1, 1, 1),
 				darkColor: new Color(0, 0, 0, 0),
 				darkTint: this.darkTint,
 				skipRender: false,
-				texture: attachment.region?.texture.texture,
+				texture: (sequence.regions[0]?.texture as SpineTexture)?.texture,
 			};
 		}
 

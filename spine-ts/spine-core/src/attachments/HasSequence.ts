@@ -27,24 +27,20 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { TextureRegion } from "../Texture.js"
 import type { Color } from "../Utils.js"
 import type { Sequence } from "./Sequence.js"
 
-export interface HasTextureRegion {
-	/** The name used to find the {@link #region()}. */
-	path: string;
+export function isHasSequence (obj: unknown): obj is HasSequence {
+	return !!obj && typeof obj === "object" && "sequence" in obj && "updateSequence" in obj;
+}
 
-	/** The region used to draw the attachment. After setting the region or if the region's properties are changed,
-	 * {@link #updateRegion()} must be called. */
-	region: TextureRegion | null;
+export interface HasSequence {
+	path?: string;
 
-	/** Updates any values the attachment calculates using the {@link #getRegion()}. Must be called after setting the
-	 * {@link #getRegion()} or if the region's properties are changed. */
-	updateRegion (): void;
-
-	/** The color to tint the attachment. */
 	color: Color;
 
-	sequence: Sequence | null;
+	/** Calls {@link Sequence#update(HasSequence)} on this attachment's sequence. */
+	updateSequence (): void;
+
+	sequence: Sequence;
 }

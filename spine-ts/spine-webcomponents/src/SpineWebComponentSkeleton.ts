@@ -1160,12 +1160,10 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 
 			// we could probably cache the vertices from rendering if interaction with this slot is enabled
 			if (attachment instanceof RegionAttachment) {
-				const regionAttachment = <RegionAttachment>attachment;
-				regionAttachment.computeWorldVertices(slot, vertices, 0, 2);
+				attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
 			} else if (attachment instanceof MeshAttachment) {
-				const mesh = <MeshAttachment>attachment;
-				mesh.computeWorldVertices(this.skeleton as Skeleton, slot, 0, mesh.worldVerticesLength, vertices, 0, 2);
-				hullLength = mesh.hullLength;
+				attachment.computeWorldVertices(this.skeleton as Skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
+				hullLength = attachment.hullLength;
 			}
 
 			// here we have only "move" and "drag" events

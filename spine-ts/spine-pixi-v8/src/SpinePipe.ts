@@ -216,8 +216,10 @@ export class SpinePipe implements RenderPipe<Spine> {
 
 				if (!cacheData.skipRender) {
 					const batchableSpineSlot = gpuSpine.slotBatches[cacheData.id];
-					// we didn't figure out why batchableSpineSlot might be undefined: https://github.com/EsotericSoftware/spine-runtimes/issues/2991
-					batchableSpineSlot?._batcher?.updateElement(batchableSpineSlot);
+					if (batchableSpineSlot) {
+						batchableSpineSlot.uvs = cacheData.uvs;
+						batchableSpineSlot._batcher?.updateElement(batchableSpineSlot);
+					}
 				}
 			}
 		}

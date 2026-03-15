@@ -568,7 +568,7 @@ export class Spine extends Container {
 		slotObject.visible = this.skeleton.drawOrder.includes(slot) && followAttachmentValue;
 
 		if (slotObject.visible) {
-			let applied = slot.bone.applied;
+			const applied = slot.bone.applied;
 
 			const matrix = slotObject.localTransform;
 			matrix.a = applied.a;
@@ -659,10 +659,14 @@ export class Spine extends Container {
 				const region = attachment;
 				attachmentColor = region.color;
 				numFloats = vertexSize * 4;
-				region.computeWorldVertices(slot, this.verticesCache, 0, vertexSize);
+
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+				attachment.computeWorldVertices(slot, attachment.getOffsets(pose), this.verticesCache, 0, vertexSize);
+
 				triangles = Spine.QUAD_TRIANGLES;
-				uvs = region.uvs;
-				texture = <SpineTexture>region.region?.texture;
+				uvs = sequence.getUVs(sequenceIndex);
+				texture = sequence.regions[sequenceIndex]?.texture as SpineTexture;
 			} else if (attachment instanceof MeshAttachment) {
 				const mesh = attachment;
 				attachmentColor = mesh.color;
@@ -672,8 +676,12 @@ export class Spine extends Container {
 				}
 				mesh.computeWorldVertices(skeleton, slot, 0, mesh.worldVerticesLength, this.verticesCache, 0, vertexSize);
 				triangles = mesh.triangles;
-				uvs = mesh.uvs;
-				texture = <SpineTexture>mesh.region?.texture;
+
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+
+				uvs = sequence.getUVs(sequenceIndex);
+				texture = sequence.regions[sequenceIndex]?.texture as SpineTexture;
 			} else if (attachment instanceof ClippingAttachment) {
 				Spine.clipper.clipStart(skeleton, slot, attachment);
 				pixiMaskSource = { slot, computed: false };
