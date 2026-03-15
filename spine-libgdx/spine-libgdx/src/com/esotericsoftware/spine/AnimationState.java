@@ -1369,8 +1369,8 @@ public class AnimationState {
 			drainDisabled = true;
 
 			SnapshotArray<AnimationStateListener> listenersArray = AnimationState.this.listeners;
-			Object[] objects = this.objects.items;
 			for (int i = 0; i < this.objects.size; i += 2) {
+				Object[] objects = this.objects.items;
 				var type = (EventType)objects[i];
 				var entry = (TrackEntry)objects[i + 1];
 				int nn = listenersArray.size;
