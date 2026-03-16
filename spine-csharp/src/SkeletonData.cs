@@ -147,6 +147,24 @@ namespace Spine {
 		}
 
 		// --- Animations
+		/// <summary>
+		/// <para>Collects animations used by <see cref="SliderData">slider constraints</see>.</para>
+		/// <para>Slider animations are designed to be applied by slider constraints rather than on their own. Applications that have a user
+		/// choose an animation may want to exclude them.
+		/// </para></summary>
+		public ExposedList<Animation> FindSliderAnimations (ExposedList<Animation> animations) {
+			IConstraintData[] constraints = this.constraints.Items;
+			for (int i = 0, n = this.constraints.Count; i < n; i++) {
+				SliderData data = constraints[i] as SliderData;
+				if (data != null && data.animation != null)
+					animations.Add(data.animation);
+			}
+			return animations;
+		}
+
+		/// <summary>
+		/// Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
+		/// call it multiple times.</summary>
 		/// <returns>May be null.</returns>
 		public Animation FindAnimation (string animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName", "animationName cannot be null.");
