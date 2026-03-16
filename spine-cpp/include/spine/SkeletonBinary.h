@@ -257,6 +257,8 @@ namespace spine {
 
 		void readTimeline(DataInput &input, Array<Timeline *> &timelines, BoneTimeline2 &timeline, float scale);
 
+		void readDrawOrder(DataInput &input, size_t slotCount, Array<int> &drawOrder);
+
 		void setBezier(DataInput &input, CurveTimeline &timeline, int bezier, int frame, int value, float time1, float time2, float value1,
 					   float value2, float scale);
 	};

@@ -47,6 +47,7 @@
 #include <spine/ColorTimeline.h>
 #include <spine/ArrayUtils.h>
 #include <spine/DeformTimeline.h>
+#include <spine/DrawOrderFolderTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 #include <spine/Event.h>
 #include <spine/EventData.h>
@@ -1304,33 +1305,33 @@ Animation *SkeletonBinary::readAnimation(DataInput &input, const String &name, S
 	}
 
 	// Draw order timeline.
+	size_t slotCount = skeletonData._slots.size();
 	size_t drawOrderCount = (size_t) input.readInt(true);
 	if (drawOrderCount > 0) {
 		DrawOrderTimeline *timeline = new (__FILE__, __LINE__) DrawOrderTimeline(drawOrderCount);
-		size_t slotCount = skeletonData._slots.size();
 		for (size_t i = 0; i < drawOrderCount; ++i) {
 			float time = input.readFloat();
-			size_t offsetCount = (size_t) input.readInt(true);
 			Array<int> drawOrder;
-			drawOrder.setSize(slotCount, 0);
-			for (int ii = (int) slotCount - 1; ii >= 0; --ii) drawOrder[ii] = -1;
-			Array<int> unchanged;
-			unchanged.setSize(slotCount - offsetCount, 0);
-			size_t originalIndex = 0, unchangedIndex = 0;
-			for (size_t ii = 0; ii < offsetCount; ++ii) {
-				size_t slotIndex = (size_t) input.readInt(true);
-				// Collect unchanged items.
-				while (originalIndex != slotIndex) unchanged[unchangedIndex++] = (int) originalIndex++;
-				// Set changed items.
-				size_t index = originalIndex;
-				drawOrder[index + (size_t) input.readInt(true)] = (int) originalIndex++;
-			}
-			// Collect remaining unchanged items.
-			while (originalIndex < slotCount) unchanged[unchangedIndex++] = (int) originalIndex++;
-			// Fill in unchanged items.
-			for (int ii = (int) slotCount - 1; ii >= 0; --ii)
-				if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
-			timeline->setFrame(i, time, &drawOrder);
+			readDrawOrder(input, slotCount, drawOrder);
+			timeline->setFrame(i, time, drawOrder.size() == 0 ? NULL : &drawOrder);
+		}
+		timelines.add(timeline);
+	}
+
+	// Draw order folder timelines.
+	size_t folderCount = (size_t) input.readInt(true);
+	for (size_t i = 0; i < folderCount; ++i) {
+		size_t folderSlotCount = (size_t) input.readInt(true);
+		Array<int> folderSlots;
+		folderSlots.setSize(folderSlotCount, 0);
+		for (size_t ii = 0; ii < folderSlotCount; ++ii) folderSlots[ii] = input.readInt(true);
+		size_t keyCount = (size_t) input.readInt(true);
+		DrawOrderFolderTimeline *timeline = new (__FILE__, __LINE__) DrawOrderFolderTimeline(keyCount, folderSlots, slotCount);
+		for (size_t ii = 0; ii < keyCount; ++ii) {
+			float time = input.readFloat();
+			Array<int> drawOrder;
+			readDrawOrder(input, folderSlotCount, drawOrder);
+			timeline->setFrame(ii, time, drawOrder.size() == 0 ? NULL : &drawOrder);
 		}
 		timelines.add(timeline);
 	}
@@ -1407,6 +1408,27 @@ void SkeletonBinary::readTimeline(DataInput &input, Array<Timeline *> &timelines
 		value2 = nvalue2;
 	}
 	timelines.add(&timeline);
+}
+
+void SkeletonBinary::readDrawOrder(DataInput &input, size_t slotCount, Array<int> &drawOrder) {
+	size_t changeCount = (size_t) input.readInt(true);
+	drawOrder.clear();
+	if (changeCount == 0) return;
+
+	drawOrder.setSize(slotCount, 0);
+	for (int i = (int) slotCount - 1; i >= 0; --i) drawOrder[i] = -1;
+	Array<int> unchanged;
+	unchanged.setSize(slotCount - changeCount, 0);
+	size_t originalIndex = 0, unchangedIndex = 0;
+	for (size_t i = 0; i < changeCount; ++i) {
+		size_t slotIndex = (size_t) input.readInt(true);
+		while (originalIndex != slotIndex) unchanged[unchangedIndex++] = (int) originalIndex++;
+		size_t index = originalIndex;
+		drawOrder[index + (size_t) input.readInt(true)] = (int) originalIndex++;
+	}
+	while (originalIndex < slotCount) unchanged[unchangedIndex++] = (int) originalIndex++;
+	for (int i = (int) slotCount - 1; i >= 0; --i)
+		if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 }
 
 void SkeletonBinary::setBezier(DataInput &input, CurveTimeline &timeline, int bezier, int frame, int value, float time1, float time2, float value1,

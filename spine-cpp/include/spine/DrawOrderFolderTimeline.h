@@ -27,72 +27,48 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_SliderData_h
-#define Spine_SliderData_h
+#ifndef Spine_DrawOrderFolderTimeline_h
+#define Spine_DrawOrderFolderTimeline_h
 
-#include <spine/ConstraintData.h>
-#include <spine/PosedData.h>
-#include <spine/SliderPose.h>
-#include <spine/SpineString.h>
+#include <spine/Timeline.h>
 
 namespace spine {
-	class Animation;
-	class BoneData;
-	class FromProperty;
-	class Slider;
-	class Skeleton;
-
-	/// Stores the setup pose for a Slider
-	class SP_API SliderData : public ConstraintDataGeneric<Slider, SliderPose> {
+	/// Changes a subset of a skeleton's Skeleton::getDrawOrder().
+	class SP_API DrawOrderFolderTimeline : public Timeline {
 		friend class SkeletonBinary;
-		friend class SkeletonData;
+
 		friend class SkeletonJson;
-		friend class Slider;
-		friend class SliderMixTimeline;
-		friend class SliderTimeline;
 
 		RTTI_DECL
 
 	public:
-		explicit SliderData(const String &name);
+		DrawOrderFolderTimeline(size_t frameCount, Array<int> &slots, size_t slotCount);
 
-		/// Creates a slider instance.
-		virtual Constraint &create(Skeleton &skeleton) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
+						   MixDirection direction, bool appliedPose) override;
 
-		Animation &getAnimation();
-		void setAnimation(Animation &animation);
+		size_t getFrameCount();
 
-		bool getAdditive();
-		void setAdditive(bool additive);
+		/// The Skeleton::getSlots() indices that this timeline affects, in setup order.
+		Array<int> &getSlots();
 
-		bool getLoop();
-		void setLoop(bool loop);
+		/// The draw order for each frame. See setFrame().
+		Array<Array<int>> &getDrawOrders();
 
-		BoneData *getBone();
-		void setBone(BoneData *bone);
-
-		FromProperty *getProperty();
-		void setProperty(FromProperty *property);
-
-		float getScale();
-		void setScale(float scale);
-
-		float getOffset();
-		void setOffset(float offset);
-
-		bool getLocal();
-		void setLocal(bool local);
+		/// Sets the time and draw order for the specified frame.
+		/// @param frame Between 0 and frameCount, inclusive.
+		/// @param time The frame time in seconds.
+		/// @param drawOrder Ordered getSlots() indices, or null to use setup pose order.
+		void setFrame(size_t frame, float time, Array<int> *drawOrder);
 
 	private:
-		Animation *_animation;
-		bool _additive;
-		bool _loop;
-		BoneData *_bone;
-		FromProperty *_property;
-		float _offset;
-		float _scale;
-		bool _local;
+		Array<int> _slots;
+		Array<bool> _inFolder;
+		Array<Array<int>> _drawOrders;
+
+		void setup(Skeleton &skeleton);
+		void apply(Skeleton &skeleton, Array<int> &drawOrder);
 	};
 }
 
-#endif /* Spine_SliderData_h */
+#endif /* Spine_DrawOrderFolderTimeline_h */

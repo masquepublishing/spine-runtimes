@@ -33,6 +33,7 @@
 #include <spine/AttachmentTimeline.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
+#include <spine/DrawOrderFolderTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 #include <spine/Event.h>
 #include <spine/EventTimeline.h>
@@ -444,7 +445,8 @@ void EventQueue::drain() {
 				break;
 			case EventType_Event:
 				if (!trackEntry->_listenerObject)
-					SP_INVOKE_ANIMATION_LISTENER(trackEntry->_listener, state, queueEntry._type, trackEntry, queueEntry._event, trackEntry->_listenerUserData);
+					SP_INVOKE_ANIMATION_LISTENER(trackEntry->_listener, state, queueEntry._type, trackEntry, queueEntry._event,
+												 trackEntry->_listenerUserData);
 				else
 					trackEntry->_listenerObject->callback(&state, queueEntry._type, trackEntry, queueEntry._event);
 				if (!state._listenerObject)
@@ -1203,7 +1205,8 @@ continue_outer:
 			timelineMode[i] = Subsequent;
 		} else {
 			if (to == NULL || timeline->getRTTI().isExactly(AttachmentTimeline::rtti) || timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) ||
-				timeline->getRTTI().isExactly(EventTimeline::rtti) || !to->_animation->hasTimeline(ids)) {
+				timeline->getRTTI().isExactly(DrawOrderFolderTimeline::rtti) || timeline->getRTTI().isExactly(EventTimeline::rtti) ||
+				!to->_animation->hasTimeline(ids)) {
 				timelineMode[i] = First;
 			} else {
 				for (TrackEntry *next = to->_mixingTo; next != NULL; next = next->_mixingTo) {
