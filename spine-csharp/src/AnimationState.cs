@@ -694,8 +694,12 @@ namespace Spine {
 			return SetAnimation(trackIndex, animation, loop);
 		}
 
-		/// <summary>Sets the current animation for a track, discarding any queued animations. If the formerly current track entry was never
-		/// applied to a skeleton, it is replaced (not mixed from).</summary>
+		/// <summary><para>
+		/// Sets the current animation for a track, discarding any queued animations.</para>
+		/// <para>
+		/// If the formerly current track entry is for the same animation and was never applied to a skeleton, it is replaced (not mixed
+		/// from).
+		/// </para></summary>
 		/// <param name="loop">If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
 		///          duration. In either case<see cref="TrackEntry.TrackEnd"/> determines when the track is cleared.</param>
 		/// <returns> A track entry to allow further customization of animation playback. References to the track entry must not be kept
@@ -705,7 +709,7 @@ namespace Spine {
 			bool interrupt = true;
 			TrackEntry current = ExpandToIndex(trackIndex);
 			if (current != null) {
-				if (current.nextTrackLast == -1) {
+				if (current.nextTrackLast == -1 && current.animation == animation) {
 					// Don't mix from an entry that was never applied.
 					tracks.Items[trackIndex] = current.mixingFrom;
 					queue.Interrupt(current);
