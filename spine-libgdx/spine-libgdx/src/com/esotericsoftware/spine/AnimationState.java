@@ -795,8 +795,12 @@ public class AnimationState {
 		ObjectSet<String> propertyIds = this.propertyIds;
 
 		if (to != null && to.holdPrevious) {
-			for (int i = 0; i < timelinesCount; i++)
-				timelineMode[i] = propertyIds.addAll(timelines[i].getPropertyIds()) ? HOLD_FIRST : HOLD_SUBSEQUENT;
+			for (int i = 0; i < timelinesCount; i++) {
+				boolean first = propertyIds.addAll(timelines[i].getPropertyIds());
+				if (first && timelines[i] instanceof DrawOrderFolderTimeline && propertyIds.contains(DrawOrderTimeline.propertyID))
+					first = false; // DrawOrderTimeline changed.
+				timelineMode[i] = first ? HOLD_FIRST : HOLD_SUBSEQUENT;
+			}
 			return;
 		}
 
@@ -806,6 +810,8 @@ public class AnimationState {
 			String[] ids = timeline.getPropertyIds();
 			if (!propertyIds.addAll(ids))
 				timelineMode[i] = SUBSEQUENT;
+			else if (timeline instanceof DrawOrderFolderTimeline && propertyIds.contains(DrawOrderTimeline.propertyID))
+				timelineMode[i] = SUBSEQUENT; // DrawOrderTimeline changed.
 			else if (to == null || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
 				|| timeline instanceof DrawOrderFolderTimeline || timeline instanceof EventTimeline
 				|| !to.animation.hasTimeline(ids)) {

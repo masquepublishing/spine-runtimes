@@ -1859,7 +1859,8 @@ public class Animation {
 
 	/** Changes a skeleton's {@link Skeleton#getDrawOrder()}. */
 	static public class DrawOrderTimeline extends Timeline {
-		static private final String[] propertyIds = {Integer.toString(Property.drawOrder.ordinal())};
+		static final String propertyID = Integer.toString(Property.drawOrder.ordinal());
+		static private final String[] propertyIds = {propertyID};
 
 		private final int[][] drawOrders;
 
@@ -1921,12 +1922,20 @@ public class Animation {
 		/** @param slots {@link Skeleton#getSlots()} indices controlled by this timeline, in setup order.
 		 * @param slotCount The maximum number of slots in the skeleton. */
 		public DrawOrderFolderTimeline (int frameCount, int[] slots, int slotCount) {
-			super(frameCount, DrawOrderTimeline.propertyIds);
+			super(frameCount, propertyIds(slots));
 			this.slots = slots;
 			drawOrders = new int[frameCount][];
 			inFolder = new boolean[slotCount];
 			for (int i : slots)
 				inFolder[i] = true;
+		}
+
+		static private String[] propertyIds (int[] slots) {
+			int n = slots.length;
+			String[] ids = new String[n];
+			for (int i = 0; i < n; i++)
+				ids[i] = "d" + slots[i];
+			return ids;
 		}
 
 		public int getFrameCount () {
