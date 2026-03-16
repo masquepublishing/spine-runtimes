@@ -6873,6 +6873,23 @@ class SpineDartBindings {
   late final _spine_skeleton_data_find_animation = _spine_skeleton_data_find_animationPtr
       .asFunction<spine_animation Function(spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
+  /// Collects animations used by slider constraints.
+  spine_array_animation spine_skeleton_data_find_slider_animations(
+    spine_skeleton_data self,
+    spine_array_animation animations,
+  ) {
+    return _spine_skeleton_data_find_slider_animations(
+      self,
+      animations,
+    );
+  }
+
+  late final _spine_skeleton_data_find_slider_animationsPtr =
+      _lookup<ffi.NativeFunction<spine_array_animation Function(spine_skeleton_data, spine_array_animation)>>(
+          'spine_skeleton_data_find_slider_animations');
+  late final _spine_skeleton_data_find_slider_animations = _spine_skeleton_data_find_slider_animationsPtr
+      .asFunction<spine_array_animation Function(spine_skeleton_data, spine_array_animation)>();
+
   /// The skeleton's name, which by default is the name of the skeleton data file
   /// when possible, or null when a name hasn't been set.
   ffi.Pointer<ffi.Char> spine_skeleton_data_get_name(
@@ -8469,6 +8486,20 @@ class SpineDartBindings {
           'spine_deform_timeline_cast_to_slot_timeline');
   late final _spine_deform_timeline_cast_to_slot_timeline =
       _spine_deform_timeline_cast_to_slot_timelinePtr.asFunction<spine_slot_timeline Function(spine_deform_timeline)>();
+
+  spine_timeline spine_draw_order_folder_timeline_cast_to_timeline(
+    spine_draw_order_folder_timeline obj,
+  ) {
+    return _spine_draw_order_folder_timeline_cast_to_timeline(
+      obj,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_cast_to_timelinePtr =
+      _lookup<ffi.NativeFunction<spine_timeline Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_cast_to_timeline');
+  late final _spine_draw_order_folder_timeline_cast_to_timeline = _spine_draw_order_folder_timeline_cast_to_timelinePtr
+      .asFunction<spine_timeline Function(spine_draw_order_folder_timeline)>();
 
   spine_timeline spine_draw_order_timeline_cast_to_timeline(
     spine_draw_order_timeline obj,
@@ -12519,6 +12550,20 @@ class SpineDartBindings {
           'spine_timeline_cast_to_deform_timeline');
   late final _spine_timeline_cast_to_deform_timeline =
       _spine_timeline_cast_to_deform_timelinePtr.asFunction<spine_deform_timeline Function(spine_timeline)>();
+
+  spine_draw_order_folder_timeline spine_timeline_cast_to_draw_order_folder_timeline(
+    spine_timeline obj,
+  ) {
+    return _spine_timeline_cast_to_draw_order_folder_timeline(
+      obj,
+    );
+  }
+
+  late final _spine_timeline_cast_to_draw_order_folder_timelinePtr =
+      _lookup<ffi.NativeFunction<spine_draw_order_folder_timeline Function(spine_timeline)>>(
+          'spine_timeline_cast_to_draw_order_folder_timeline');
+  late final _spine_timeline_cast_to_draw_order_folder_timeline = _spine_timeline_cast_to_draw_order_folder_timelinePtr
+      .asFunction<spine_draw_order_folder_timeline Function(spine_timeline)>();
 
   spine_draw_order_timeline spine_timeline_cast_to_draw_order_timeline(
     spine_timeline obj,
@@ -22383,6 +22428,205 @@ class SpineDartBindings {
   late final _spine_deform_timeline_rttiPtr =
       _lookup<ffi.NativeFunction<spine_rtti Function()>>('spine_deform_timeline_rtti');
   late final _spine_deform_timeline_rtti = _spine_deform_timeline_rttiPtr.asFunction<spine_rtti Function()>();
+
+  spine_draw_order_folder_timeline spine_draw_order_folder_timeline_create(
+    int frameCount,
+    spine_array_int slots,
+    int slotCount,
+  ) {
+    return _spine_draw_order_folder_timeline_create(
+      frameCount,
+      slots,
+      slotCount,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_createPtr =
+      _lookup<ffi.NativeFunction<spine_draw_order_folder_timeline Function(ffi.Size, spine_array_int, ffi.Size)>>(
+          'spine_draw_order_folder_timeline_create');
+  late final _spine_draw_order_folder_timeline_create = _spine_draw_order_folder_timeline_createPtr
+      .asFunction<spine_draw_order_folder_timeline Function(int, spine_array_int, int)>();
+
+  void spine_draw_order_folder_timeline_dispose(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_dispose(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_disposePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_dispose');
+  late final _spine_draw_order_folder_timeline_dispose =
+      _spine_draw_order_folder_timeline_disposePtr.asFunction<void Function(spine_draw_order_folder_timeline)>();
+
+  spine_rtti spine_draw_order_folder_timeline_get_rtti(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_rtti(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_rttiPtr =
+      _lookup<ffi.NativeFunction<spine_rtti Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_rtti');
+  late final _spine_draw_order_folder_timeline_get_rtti =
+      _spine_draw_order_folder_timeline_get_rttiPtr.asFunction<spine_rtti Function(spine_draw_order_folder_timeline)>();
+
+  void spine_draw_order_folder_timeline_apply(
+    spine_draw_order_folder_timeline self,
+    spine_skeleton skeleton,
+    double lastTime,
+    double time,
+    spine_array_event events,
+    double alpha,
+    int blend,
+    int direction,
+    bool appliedPose,
+  ) {
+    return _spine_draw_order_folder_timeline_apply(
+      self,
+      skeleton,
+      lastTime,
+      time,
+      events,
+      alpha,
+      blend,
+      direction,
+      appliedPose,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_applyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_draw_order_folder_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
+              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_draw_order_folder_timeline_apply');
+  late final _spine_draw_order_folder_timeline_apply = _spine_draw_order_folder_timeline_applyPtr.asFunction<
+      void Function(spine_draw_order_folder_timeline, spine_skeleton, double, double, spine_array_event, double, int,
+          int, bool)>();
+
+  int spine_draw_order_folder_timeline_get_frame_count(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_frame_count(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_frame_countPtr =
+      _lookup<ffi.NativeFunction<ffi.Size Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_frame_count');
+  late final _spine_draw_order_folder_timeline_get_frame_count =
+      _spine_draw_order_folder_timeline_get_frame_countPtr.asFunction<int Function(spine_draw_order_folder_timeline)>();
+
+  /// The Skeleton::getSlots() indices that this timeline affects, in setup order.
+  spine_array_int spine_draw_order_folder_timeline_get_slots(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_slots(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_slotsPtr =
+      _lookup<ffi.NativeFunction<spine_array_int Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_slots');
+  late final _spine_draw_order_folder_timeline_get_slots = _spine_draw_order_folder_timeline_get_slotsPtr
+      .asFunction<spine_array_int Function(spine_draw_order_folder_timeline)>();
+
+  /// Sets the time and draw order for the specified frame.
+  ///
+  /// @param frame Between 0 and frameCount, inclusive.
+  /// @param time The frame time in seconds.
+  /// @param drawOrder Ordered getSlots() indices, or null to use setup pose order.
+  void spine_draw_order_folder_timeline_set_frame(
+    spine_draw_order_folder_timeline self,
+    int frame,
+    double time,
+    spine_array_int drawOrder,
+  ) {
+    return _spine_draw_order_folder_timeline_set_frame(
+      self,
+      frame,
+      time,
+      drawOrder,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_set_framePtr = _lookup<
+          ffi
+          .NativeFunction<ffi.Void Function(spine_draw_order_folder_timeline, ffi.Size, ffi.Float, spine_array_int)>>(
+      'spine_draw_order_folder_timeline_set_frame');
+  late final _spine_draw_order_folder_timeline_set_frame = _spine_draw_order_folder_timeline_set_framePtr
+      .asFunction<void Function(spine_draw_order_folder_timeline, int, double, spine_array_int)>();
+
+  int spine_draw_order_folder_timeline_get_frame_entries(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_frame_entries(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_frame_entriesPtr =
+      _lookup<ffi.NativeFunction<ffi.Size Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_frame_entries');
+  late final _spine_draw_order_folder_timeline_get_frame_entries =
+      _spine_draw_order_folder_timeline_get_frame_entriesPtr
+          .asFunction<int Function(spine_draw_order_folder_timeline)>();
+
+  spine_array_float spine_draw_order_folder_timeline_get_frames(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_frames(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_framesPtr =
+      _lookup<ffi.NativeFunction<spine_array_float Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_frames');
+  late final _spine_draw_order_folder_timeline_get_frames = _spine_draw_order_folder_timeline_get_framesPtr
+      .asFunction<spine_array_float Function(spine_draw_order_folder_timeline)>();
+
+  double spine_draw_order_folder_timeline_get_duration(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_duration(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_durationPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_duration');
+  late final _spine_draw_order_folder_timeline_get_duration =
+      _spine_draw_order_folder_timeline_get_durationPtr.asFunction<double Function(spine_draw_order_folder_timeline)>();
+
+  spine_array_property_id spine_draw_order_folder_timeline_get_property_ids(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_property_ids(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_property_idsPtr =
+      _lookup<ffi.NativeFunction<spine_array_property_id Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_property_ids');
+  late final _spine_draw_order_folder_timeline_get_property_ids = _spine_draw_order_folder_timeline_get_property_idsPtr
+      .asFunction<spine_array_property_id Function(spine_draw_order_folder_timeline)>();
+
+  spine_rtti spine_draw_order_folder_timeline_rtti() {
+    return _spine_draw_order_folder_timeline_rtti();
+  }
+
+  late final _spine_draw_order_folder_timeline_rttiPtr =
+      _lookup<ffi.NativeFunction<spine_rtti Function()>>('spine_draw_order_folder_timeline_rtti');
+  late final _spine_draw_order_folder_timeline_rtti =
+      _spine_draw_order_folder_timeline_rttiPtr.asFunction<spine_rtti Function()>();
 
   spine_draw_order_timeline spine_draw_order_timeline_create(
     int frameCount,
@@ -49291,6 +49535,8 @@ final class spine_curve_timeline1_wrapper extends ffi.Opaque {}
 
 final class spine_deform_timeline_wrapper extends ffi.Opaque {}
 
+final class spine_draw_order_folder_timeline_wrapper extends ffi.Opaque {}
+
 final class spine_draw_order_timeline_wrapper extends ffi.Opaque {}
 
 final class spine_event_wrapper extends ffi.Opaque {}
@@ -49907,6 +50153,9 @@ typedef spine_constraint_timeline = ffi.Pointer<spine_constraint_timeline_wrappe
 /// Forward declarations for all non-enum types
 typedef spine_slot_curve_timeline = ffi.Pointer<spine_slot_curve_timeline_wrapper>;
 typedef spine_deform_timeline = ffi.Pointer<spine_deform_timeline_wrapper>;
+
+/// Forward declarations for all non-enum types
+typedef spine_draw_order_folder_timeline = ffi.Pointer<spine_draw_order_folder_timeline_wrapper>;
 
 /// Forward declarations for all non-enum types
 typedef spine_draw_order_timeline = ffi.Pointer<spine_draw_order_timeline_wrapper>;
