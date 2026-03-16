@@ -443,7 +443,8 @@ class Skeleton {
 					verticesLength = 8;
 					_tempVertices.resize(verticesLength);
 					vertices = _tempVertices;
-					cast(attachment, RegionAttachment).computeWorldVertices(slot, vertices, 0, 2);
+					var region:RegionAttachment = cast(attachment, RegionAttachment);
+					region.computeWorldVertices(slot, region.getOffsets(slot.applied), vertices, 0, 2);
 					triangles = Skeleton.quadTriangles;
 				} else if (Std.isOfType(attachment, MeshAttachment)) {
 					var mesh:MeshAttachment = cast(attachment, MeshAttachment);

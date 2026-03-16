@@ -33,15 +33,25 @@ import spine.Event;
 import spine.Skeleton;
 import spine.Slot;
 
-/** Changes a skeleton's Skeleton#drawOrder. */
-class DrawOrderTimeline extends Timeline {
-	/** The draw order for each frame. See setFrame(). */
-	public var drawOrders:Array<Array<Int>>;
+/** Changes a subset of a skeleton's spine.Skeleton.drawOrder. */
+class DrawOrderFolderTimeline extends Timeline {
+	private var slots:Array<Int>;
+	private var inFolder:Array<Bool>;
+	private var drawOrders:Array<Array<Int>>;
 
-	public function new(frameCount:Int) {
+	/** @param slots spine.Skeleton.slots indices controlled by this timeline, in setup order.
+	 * @param slotCount The maximum number of slots in the skeleton. */
+	public function new(frameCount:Int, slots:Array<Int>, slotCount:Int) {
 		super(frameCount, Property.drawOrder);
+		this.slots = slots;
 		drawOrders = new Array<Array<Int>>();
 		drawOrders.resize(frameCount);
+		inFolder = new Array<Bool>();
+		inFolder.resize(slotCount);
+		for (i in 0...slotCount)
+			inFolder[i] = false;
+		for (i in slots)
+			inFolder[i] = true;
 	}
 
 	public var frameCount(get, never):Int;
@@ -50,10 +60,20 @@ class DrawOrderTimeline extends Timeline {
 		return frames.length;
 	}
 
+	/** The spine.Skeleton.slots indices that this timeline affects, in setup order. */
+	public function getSlots():Array<Int> {
+		return slots;
+	}
+
+	/** The draw order for each frame. See setFrame(). */
+	public function getDrawOrders():Array<Array<Int>> {
+		return drawOrders;
+	}
+
 	/** Sets the time and draw order for the specified frame.
 	 * @param frame Between 0 and frameCount, inclusive.
 	 * @param time The frame time in seconds.
-	 * @param drawOrder Ordered spine.Skeleton.slots indices, or null to use setup pose order. */
+	 * @param drawOrder Ordered getSlots() indices, or null to use setup pose order. */
 	public function setFrame(frame:Int, time:Float, drawOrder:Array<Int>):Void {
 		frames[frame] = time;
 		drawOrders[frame] = drawOrder;
@@ -61,37 +81,46 @@ class DrawOrderTimeline extends Timeline {
 
 	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
 			appliedPose:Bool) {
-		var drawOrder:Array<Slot> = skeleton.drawOrder;
-		var slots:Array<Slot> = skeleton.slots;
-		var i:Int = 0, n:Int = slots.length;
-
 		if (direction == MixDirection.mixOut) {
-			if (blend == MixBlend.setup) {
-				for (i in 0...n) {
-					drawOrder[i] = slots[i];
-				}
-			}
-			return;
-		}
-
-		if (time < frames[0]) {
-			if (blend == MixBlend.setup || blend == MixBlend.first) {
-				for (i in 0...n) {
-					drawOrder[i] = slots[i];
-				}
-			}
-			return;
-		}
-
-		var drawOrderToSetupIndex:Array<Int> = drawOrders[Timeline.search1(frames, time)];
-		if (drawOrderToSetupIndex == null) {
-			for (i in 0...n) {
-				drawOrder[i] = slots[i];
-			}
+			if (blend == MixBlend.setup) setupApply(skeleton);
+		} else if (time < frames[0]) {
+			if (blend == MixBlend.setup || blend == MixBlend.first) setupApply(skeleton);
 		} else {
-			for (i in 0...n) {
-				drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+			var order = drawOrders[Timeline.search1(frames, time)];
+			if (order == null)
+				setupApply(skeleton);
+			else
+				orderApply(skeleton, order);
+		}
+	}
+
+	private function setupApply(skeleton:Skeleton):Void {
+		var drawOrder = skeleton.drawOrder;
+		var allSlots = skeleton.slots;
+		var found = 0, done = slots.length;
+		var i = 0;
+		while (true) {
+			if (inFolder[drawOrder[i].data.index]) {
+				drawOrder[i] = allSlots[slots[found]];
+				found++;
+				if (found == done) break;
 			}
+			i++;
+		}
+	}
+
+	private function orderApply(skeleton:Skeleton, order:Array<Int>):Void {
+		var drawOrder = skeleton.drawOrder;
+		var allSlots = skeleton.slots;
+		var found = 0, done = slots.length;
+		var i = 0;
+		while (true) {
+			if (inFolder[drawOrder[i].data.index]) {
+				drawOrder[i] = allSlots[slots[order[found]]];
+				found++;
+				if (found == done) break;
+			}
+			i++;
 		}
 	}
 }

@@ -29,20 +29,14 @@
 
 package spine;
 
-interface HasTextureRegion {
-	/** The name used to find the region. */
+interface HasSequence {
 	public var path:String;
-
-	/** Sets the region used to draw the attachment. After setting the region or if the region's properties are changed,
-	 * updateRegion() must be called. */
-	public var region:TextureRegion;
 
 	/** The color to tint the attachment. */
 	public var color:Color;
 
 	public var sequence:Sequence;
 
-	/** Updates any values the attachment calculates using the region. Must be called after setting the
-	 * region or if the region's properties are changed. */
-	public function updateRegion():Void;
+	/** Calls Sequence.update() on this attachment's sequence. */
+	public function updateSequence():Void;
 }
