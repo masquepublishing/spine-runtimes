@@ -1139,9 +1139,9 @@ export class EventQueue {
 		this.drainDisabled = true;
 
 		const listeners = this.animState.listeners;
-		const objects = this.objects;
 
-		for (let i = 0; i < objects.length; i += 2) {
+		for (let i = 0; i < this.objects.length; i += 2) {
+			const objects = this.objects;
 			const type = objects[i] as EventType;
 			const entry = objects[i + 1] as TrackEntry;
 			switch (type) {
