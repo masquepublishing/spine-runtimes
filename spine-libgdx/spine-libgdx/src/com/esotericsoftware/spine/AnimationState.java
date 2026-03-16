@@ -213,13 +213,13 @@ public class AnimationState {
 			if (current == null || current.delay > 0) continue;
 			applied = true;
 
-			// Track 0 animations aren't for layering, so do not show the previously applied animations before the first key.
+			// Track 0 animations aren't for layering, so never use current values before the first key.
 			MixBlend blend = i == 0 ? MixBlend.first : current.mixBlend;
 
 			// Apply mixing from entries first.
 			float alpha = current.alpha;
 			if (current.mixingFrom != null)
-				alpha *= applyMixingFrom(current, skeleton, blend);
+				alpha *= applyMixingFrom(current, skeleton);
 			else if (current.trackTime >= current.trackEnd && current.next == null) //
 				alpha = 0; // Set to setup pose the last time the entry will be applied.
 			boolean attachments = alpha >= current.alphaAttachmentThreshold;
@@ -252,7 +252,7 @@ public class AnimationState {
 
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = timelines[ii];
-					MixBlend timelineBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
+					MixBlend timelineBlend = timelineMode[ii] == SUBSEQUENT ? current.mixBlend : MixBlend.setup;
 					if (!shortestRotation && timeline instanceof RotateTimeline rotateTimeline) {
 						applyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, ii << 1,
 							firstFrame);
@@ -286,18 +286,16 @@ public class AnimationState {
 		return applied;
 	}
 
-	private float applyMixingFrom (TrackEntry to, Skeleton skeleton, MixBlend blend) {
+	private float applyMixingFrom (TrackEntry to, Skeleton skeleton) {
 		TrackEntry from = to.mixingFrom;
-		if (from.mixingFrom != null) applyMixingFrom(from, skeleton, blend);
+		if (from.mixingFrom != null) applyMixingFrom(from, skeleton);
 
 		float mix;
-		if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
+		if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
 			mix = 1;
-			if (blend == MixBlend.first) blend = MixBlend.setup; // Tracks >0 are transparent and can't reset to setup pose.
-		} else {
+		else {
 			mix = to.mixTime / to.mixDuration;
 			if (mix > 1) mix = 1;
-			if (blend != MixBlend.first) blend = from.mixBlend; // Track 0 ignores track mix blend.
 		}
 
 		boolean attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
@@ -312,6 +310,7 @@ public class AnimationState {
 			if (mix < from.eventThreshold) events = this.events;
 		}
 
+		MixBlend blend = from.mixBlend;
 		if (blend == MixBlend.add) {
 			for (int i = 0; i < timelineCount; i++)
 				timelines[i].apply(skeleton, animationLast, applyTime, events, alphaMix, blend, MixDirection.out, false);
@@ -1238,8 +1237,6 @@ public class AnimationState {
 		}
 
 		/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}.
-		 * <p>
-		 * Track entries on track 0 ignore this setting and always use {@link MixBlend#first}.
 		 * <p>
 		 * The <code>mixBlend</code> can be set for a new track entry only before {@link AnimationState#apply(Skeleton)} is next
 		 * called. */
