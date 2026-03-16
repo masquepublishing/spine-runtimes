@@ -1216,34 +1216,26 @@ namespace Spine {
 			}
 
 			// Draw order timeline.
+			int slotCount = skeletonData.slots.Count;
 			int drawOrderCount = input.ReadInt(true);
 			if (drawOrderCount > 0) {
 				var timeline = new DrawOrderTimeline(drawOrderCount);
-				int slotCount = skeletonData.slots.Count;
-				for (int i = 0; i < drawOrderCount; i++) {
-					float time = input.ReadFloat();
-					int offsetCount = input.ReadInt(true);
-					var drawOrder = new int[slotCount];
-					for (int ii = slotCount - 1; ii >= 0; ii--)
-						drawOrder[ii] = -1;
-					var unchanged = new int[slotCount - offsetCount];
-					int originalIndex = 0, unchangedIndex = 0;
-					for (int ii = 0; ii < offsetCount; ii++) {
-						int slotIndex = input.ReadInt(true);
-						// Collect unchanged items.
-						while (originalIndex != slotIndex)
-							unchanged[unchangedIndex++] = originalIndex++;
-						// Set changed items.
-						drawOrder[originalIndex + input.ReadInt(true)] = originalIndex++;
-					}
-					// Collect remaining unchanged items.
-					while (originalIndex < slotCount)
-						unchanged[unchangedIndex++] = originalIndex++;
-					// Fill in unchanged items.
-					for (int ii = slotCount - 1; ii >= 0; ii--)
-						if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
-					timeline.SetFrame(i, time, drawOrder);
-				}
+				for (int i = 0; i < drawOrderCount; i++)
+					timeline.SetFrame(i, input.ReadFloat(), ReadDrawOrder(input, slotCount));
+				timelines.Add(timeline);
+			}
+
+			// Draw order folder timelines.
+			int folderCount = input.ReadInt(true);
+			for (int i = 0; i < folderCount; i++) {
+				int folderSlotCount = input.ReadInt(true);
+				var folderSlots = new int[folderSlotCount];
+				for (int ii = 0; ii < folderSlotCount; ii++)
+					folderSlots[ii] = input.ReadInt(true);
+				int keyCount = input.ReadInt(true);
+				var timeline = new DrawOrderFolderTimeline(keyCount, folderSlots, slotCount);
+				for (int ii = 0; ii < keyCount; ii++)
+					timeline.SetFrame(ii, input.ReadFloat(), ReadDrawOrder(input, folderSlotCount));
 				timelines.Add(timeline);
 			}
 
@@ -1317,6 +1309,32 @@ namespace Spine {
 				value2 = nvalue2;
 			}
 			timelines.Add(timeline);
+		}
+
+		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>
+		private int[] ReadDrawOrder (SkeletonInput input, int slotCount) {
+			int changeCount = input.ReadInt(true);
+			if (changeCount == 0) return null;
+			var drawOrder = new int[slotCount];
+			for (int ii = slotCount - 1; ii >= 0; ii--)
+				drawOrder[ii] = -1;
+			var unchanged = new int[slotCount - changeCount];
+			int originalIndex = 0, unchangedIndex = 0;
+			for (int i = 0; i < changeCount; i++) {
+				int slotIndex = input.ReadInt(true);
+				// Collect unchanged items.
+				while (originalIndex != slotIndex)
+					unchanged[unchangedIndex++] = originalIndex++;
+				// Set changed items.
+				drawOrder[originalIndex + input.ReadInt(true)] = originalIndex++;
+			}
+			// Collect remaining unchanged items.
+			while (originalIndex < slotCount)
+				unchanged[unchangedIndex++] = originalIndex++;
+			// Fill in unchanged items.
+			for (int i = slotCount - 1; i >= 0; i--)
+				if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+			return drawOrder;
 		}
 
 		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>

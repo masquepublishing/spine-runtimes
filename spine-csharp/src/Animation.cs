@@ -2018,7 +2018,7 @@ namespace Spine {
 
 	/// <summary>Changes a skeleton's <see cref="Skeleton.DrawOrder"/>.</summary>
 	public class DrawOrderTimeline : Timeline {
-		static readonly string[] propertyIds = { ((int)Property.DrawOrder).ToString() };
+		internal static readonly string[] propertyIds = { ((int)Property.DrawOrder).ToString() };
 
 		readonly int[][] drawOrders;
 
@@ -2034,16 +2034,13 @@ namespace Spine {
 		/// <summary>The draw order for each frame. </summary>
 		/// <seealso cref="Timeline.SetFrame(int, float, int[])"/>.
 		public int[][] DrawOrders {
-			get {
-				return drawOrders;
-			}
+			get { return drawOrders; }
 		}
 
 		/// <summary>Sets the time and draw order for the specified frame.</summary>
 		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
-		/// <param name="drawOrder">For each slot in <see cref="Skeleton.Slots"/>, the index of the slot in the new draw order. May be null to use
-		///					 setup pose draw order.</param>
+		/// <param name="drawOrder">Ordered <see cref="Skeleton.Slots"/> indices, or null to use setup pose order.</param>
 		public void SetFrame (int frame, float time, int[] drawOrder) {
 			frames[frame] = time;
 			drawOrders[frame] = drawOrder;
@@ -2071,6 +2068,89 @@ namespace Spine {
 				Slot[] drawOrder = skeleton.drawOrder.Items;
 				for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
 					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+			}
+		}
+	}
+
+
+	/// <summary>Changes a subset of a skeleton's <see cref="Skeleton.DrawOrder"/>.</summary>
+	public class DrawOrderFolderTimeline : Timeline {
+		private readonly int[] slots;
+		private readonly bool[] inFolder;
+		private readonly int[][] drawOrders;
+
+		/// <param name="slots"><see cref="Skeleton.Slots"/> indices controlled by this timeline, in setup order.</param>
+		/// <param name="slotCount">The maximum number of slots in the skeleton.</param>
+		public DrawOrderFolderTimeline (int frameCount, int[] slots, int slotCount)
+			: base(frameCount, DrawOrderTimeline.propertyIds) {
+			this.slots = slots;
+			drawOrders = new int[frameCount][];
+			inFolder = new bool[slotCount];
+			foreach (int i in slots)
+				inFolder[i] = true;
+		}
+
+		override public int FrameCount {
+			get { return frames.Length; }
+		}
+
+		/// <summary>The <see cref="Skeleton.Slots"/> indices that this timeline affects, in setup order.</summary>
+		public int[] Slots {
+			get { return slots; }
+		}
+
+		/// <summary>The draw order for each frame. </summary>
+		/// <seealso cref="Timeline.SetFrame(int, float, int[])"/>.
+		public int[][] DrawOrders {
+			get { return drawOrders; }
+		}
+
+		/// <summary>Sets the time and draw order for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <c>frameCount</c>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		/// <param name="drawOrder">Ordered <see cref="Skeleton.Slots"/> indices, or null to use setup pose order.</param>
+		public void SetFrame (int frame, float time, int[] drawOrder) {
+			frames[frame] = time;
+			drawOrders[frame] = drawOrder;
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixBlend blend,
+			MixDirection direction, bool appliedPose) {
+
+			if (direction == MixDirection.Out) {
+				if (blend == MixBlend.Setup) setup(skeleton);
+			} else if (time < frames[0]) {
+				if (blend == MixBlend.Setup || blend == MixBlend.First) setup(skeleton);
+			} else {
+				int[] order = drawOrders[Search(frames, time)];
+				if (order == null)
+					setup(skeleton);
+				else
+					Apply(skeleton, order);
+			}
+		}
+
+		private void setup (Skeleton skeleton) {
+			bool[] inFolder = this.inFolder;
+			Slot[] drawOrder = skeleton.drawOrder.Items, allSlots = skeleton.slots.Items;
+			int[] slots = this.slots;
+			for (int i = 0, found = 0, done = slots.Length; ; i++) {
+				if (inFolder[drawOrder[i].data.index]) {
+					drawOrder[i] = allSlots[slots[found]];
+					if (++found == done) break;
+				}
+			}
+		}
+
+		private void Apply (Skeleton skeleton, int[] order) {
+			bool[] inFolder = this.inFolder;
+			Slot[] drawOrder = skeleton.drawOrder.Items, allSlots = skeleton.slots.Items;
+			int[] slots = this.slots;
+			for (int i = 0, found = 0, done = slots.Length; ; i++) {
+				if (inFolder[drawOrder[i].data.index]) {
+					drawOrder[i] = allSlots[slots[order[found]]];
+					if (++found == done) break;
+				}
 			}
 		}
 	}

@@ -919,7 +919,8 @@ namespace Spine {
 				if (!propertyIds.AddAll(ids))
 					timelineMode[i] = AnimationState.Subsequent;
 				else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
-						|| timeline is EventTimeline || !to.animation.HasTimeline(ids)) {
+						|| timeline is DrawOrderFolderTimeline || timeline is EventTimeline
+						|| !to.animation.HasTimeline(ids)) {
 					timelineMode[i] = AnimationState.First;
 				} else {
 					for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
