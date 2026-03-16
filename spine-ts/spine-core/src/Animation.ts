@@ -1792,7 +1792,7 @@ export class DrawOrderTimeline extends Timeline {
 	static propertyIds = [`${Property.drawOrder}`];
 
 	/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
-	drawOrders: Array<Array<number> | null>;
+	private readonly drawOrders: Array<Array<number> | null>;
 
 	constructor (frameCount: number) {
 		super(frameCount, ...DrawOrderTimeline.propertyIds);
@@ -1804,7 +1804,7 @@ export class DrawOrderTimeline extends Timeline {
 	}
 
 	/** Sets the time in seconds and the draw order for the specified key frame.
-	 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the new draw order. May be null to use setup pose
+	 * @param drawOrder Ordered {@link Skeleton#slots} indices, or null to use setup pose
 	 *           draw order. */
 	setFrame (frame: number, time: number, drawOrder: Array<number> | null) {
 		this.frames[frame] = time;
@@ -1833,6 +1833,85 @@ export class DrawOrderTimeline extends Timeline {
 			const slots: Array<Slot> = skeleton.slots;
 			for (let i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 				drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+		}
+	}
+}
+
+/** Changes a subset of a skeleton's {@link Skeleton#getDrawOrder()}. */
+export class DrawOrderFolderTimeline extends Timeline {
+	private readonly slots: number[];
+	private readonly inFolder: boolean[];
+	private readonly drawOrders: Array<Array<number> | null>;
+
+	/** @param slots {@link Skeleton#slots} indices controlled by this timeline, in setup order.
+	 * @param slotCount The maximum number of slots in the skeleton. */
+	constructor (frameCount: number, slots: number[], slotCount: number) {
+		super(frameCount, ...DrawOrderTimeline.propertyIds);
+		this.slots = slots;
+		this.drawOrders = new Array(frameCount);
+		this.inFolder = new Array(slotCount);
+		for (const i of slots)
+			this.inFolder[i] = true;
+	}
+
+	getFrameCount (): number {
+		return this.frames.length;
+	}
+
+	/** The {@link Skeleton#getSlots()} indices that this timeline affects, in setup order. */
+	getSlots (): number[] {
+		return this.slots;
+	}
+
+	/** The draw order for each frame. See {@link #setFrame(int, float, int[])}. */
+	getDrawOrders (): Array<Array<number> | null> {
+		return this.drawOrders;
+	}
+
+	/** Sets the time and draw order for the specified frame.
+	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param time The frame time in seconds.
+	 * @param drawOrder Ordered {@link #getSlots()} indices, or null to use setup pose order. */
+	setFrame (frame: number, time: number, drawOrder: Array<number> | null): void {
+		this.frames[frame] = time;
+		this.drawOrders[frame] = drawOrder;
+	}
+
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend,
+		direction: MixDirection, appliedPose: boolean): void {
+
+		if (direction === MixDirection.out) {
+			if (blend === MixBlend.setup) this.setup(skeleton);
+		} else if (time < this.frames[0]) {
+			if (blend === MixBlend.setup || blend === MixBlend.first) this.setup(skeleton);
+		} else {
+			const order = this.drawOrders[Timeline.search(this.frames, time)];
+			if (!order)
+				this.setup(skeleton);
+			else
+				this.apply1(skeleton, order);
+		}
+	}
+
+	private setup (skeleton: Skeleton): void {
+		const { inFolder, slots } = this;
+		const { drawOrder, slots: allSlots } = skeleton;
+		for (let i = 0, found = 0, done = slots.length; ; i++) {
+			if (inFolder[drawOrder[i].data.index]) {
+				drawOrder[i] = allSlots[slots[found]];
+				if (++found === done) break;
+			}
+		}
+	}
+
+	private apply1 (skeleton: Skeleton, order: number[]): void {
+		const { inFolder, slots } = this;
+		const { drawOrder, slots: allSlots } = skeleton;
+		for (let i = 0, found = 0, done = slots.length; ; i++) {
+			if (inFolder[drawOrder[i].data.index]) {
+				drawOrder[i] = allSlots[slots[order[found]]];
+				if (++found === done) break;
+			}
 		}
 	}
 }

@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AlphaTimeline, Animation, AttachmentTimeline, type BoneTimeline2, type CurveTimeline, type CurveTimeline1, DeformTimeline, DrawOrderTimeline, EventTimeline, IkConstraintTimeline, InheritTimeline, PathConstraintMixTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintMixTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintWindTimeline, RGB2Timeline, RGBA2Timeline, RGBATimeline, RGBTimeline, RotateTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, SequenceTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, SliderMixTimeline, SliderTimeline, type Timeline, TransformConstraintTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline } from "./Animation.js";
+import { AlphaTimeline, Animation, AttachmentTimeline, type BoneTimeline2, type CurveTimeline, type CurveTimeline1, DeformTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, EventTimeline, IkConstraintTimeline, InheritTimeline, PathConstraintMixTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintMixTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintWindTimeline, RGB2Timeline, RGBA2Timeline, RGBATimeline, RGBTimeline, RotateTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, SequenceTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, SliderMixTimeline, SliderTimeline, type Timeline, TransformConstraintTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline } from "./Animation.js";
 import type { Attachment, VertexAttachment } from "./attachments/Attachment.js";
 import type { AttachmentLoader } from "./attachments/AttachmentLoader.js";
 import type { HasSequence } from "./attachments/HasSequence.js";
@@ -419,7 +419,7 @@ export class SkeletonJson {
 
 				for (const slotName in skinMap.attachments) {
 					const slot = skeletonData.findSlot(slotName);
-					if (!slot) throw new Error(`Couldn't find slot ${slotName} for skin ${skinMap.name}.`);
+					if (!slot) throw new Error(`Couldn't find skin slot ${slotName} for skin ${skinMap.name}.`);
 					const slotMap = skinMap.attachments[slotName];
 					for (const entryName in slotMap) {
 						const attachment = this.readAttachment(slotMap[entryName], skin, slot.index, entryName, skeletonData);
@@ -1101,7 +1101,7 @@ export class SkeletonJson {
 				for (const slotMapName in attachmentsMap) {
 					const slotMap = attachmentsMap[slotMapName];
 					const slot = skeletonData.findSlot(slotMapName);
-					if (!slot) throw new Error(`Slot not found: ${slotMapName}`);
+					if (!slot) throw new Error(`Attachment slot not found: ${slotMapName}`);
 					const slotIndex = slot.index;
 					for (const attachmentMapName in slotMap) {
 						const attachmentMap = slotMap[attachmentMapName];
@@ -1172,40 +1172,37 @@ export class SkeletonJson {
 			}
 		}
 
-		// Draw order timelines.
+		// Draw order timeline.
 		if (map.drawOrder) {
 			const timeline = new DrawOrderTimeline(map.drawOrder.length);
 			const slotCount = skeletonData.slots.length;
-			let frame = 0;
-			for (let i = 0; i < map.drawOrder.length; i++, frame++) {
-				const drawOrderMap = map.drawOrder[i];
-				let drawOrder: Array<number> | null = null;
-				const offsets = getValue(drawOrderMap, "offsets", null);
-				if (offsets) {
-					drawOrder = Utils.newArray<number>(slotCount, -1);
-					const unchanged = Utils.newArray<number>(slotCount - offsets.length, 0);
-					let originalIndex = 0, unchangedIndex = 0;
-					for (let ii = 0; ii < offsets.length; ii++) {
-						const offsetMap = offsets[ii];
-						const slot = skeletonData.findSlot(offsetMap.slot);
-						if (!slot) throw new Error(`Slot not found: ${slot}`);
-						const slotIndex = slot.index;
-						// Collect unchanged items.
-						while (originalIndex !== slotIndex)
-							unchanged[unchangedIndex++] = originalIndex++;
-						// Set changed items.
-						drawOrder[originalIndex + offsetMap.offset] = originalIndex++;
-					}
-					// Collect remaining unchanged items.
-					while (originalIndex < slotCount)
-						unchanged[unchangedIndex++] = originalIndex++;
-					// Fill in unchanged items.
-					for (let ii = slotCount - 1; ii >= 0; ii--)
-						if (drawOrder[ii] === -1) drawOrder[ii] = unchanged[--unchangedIndex];
-				}
-				timeline.setFrame(frame, getValue(drawOrderMap, "time", 0), drawOrder);
+			let frame = 0
+			for (const drawOrderMap of (map.drawOrder as DrawOrderKeysType[])) {
+				timeline.setFrame(frame++, getValue(drawOrderMap, "time", 0), readDrawOrder(skeletonData, drawOrderMap, slotCount, null));
 			}
 			timelines.push(timeline);
+		}
+
+		// Draw order folder timelines.
+		if (map.drawOrderFolder) {
+			for (const timelineMap of map.drawOrderFolder) {
+				const slotEntries = getValue(timelineMap, "slots", []) as string[];
+				const folderSlots = new Array<number>(slotEntries.length);
+				let ii = 0;
+				for (const slotEntry of slotEntries) {
+					const slot = skeletonData.findSlot(slotEntry);
+					if (!slot) throw new Error(`Draw order folder slot not found: ${slotEntry}`);
+					folderSlots[ii++] = slot.index;
+				}
+
+				const drawOrderFolderEntries = getValue(timelineMap, "keys", []) as DrawOrderKeysType[];
+				const timeline = new DrawOrderFolderTimeline(drawOrderFolderEntries.length, folderSlots, skeletonData.slots.length);
+				let frame = 0;
+				for (const drawOrderFolderMap of drawOrderFolderEntries) {
+					timeline.setFrame(frame++, getValue(drawOrderFolderMap, "time", 0), readDrawOrder(skeletonData, drawOrderFolderMap, folderSlots.length, folderSlots));
+				}
+				timelines.push(timeline);
+			}
 		}
 
 		// Event timelines.
@@ -1305,6 +1302,46 @@ function readTimeline2 (timelines: Array<Timeline>, keys: Timeline2KeysType[], t
 		value2 = nvalue2;
 		keyMap = nextMap;
 	}
+}
+
+type DrawOrderKeysType = { offsets?: { slot: string, offset: number }[] };
+
+/** @param folderSlots Slot names are resolved to positions within this array. If null, slot indices are used as positions. */
+function readDrawOrder (skeletonData: SkeletonData, keys: DrawOrderKeysType, slotCount: number, folderSlots: number[] | null): number[] | null {
+	const changes = keys.offsets;
+	if (!changes) return null; // Setup draw order.
+	const drawOrder = new Array<number>(slotCount).fill(-1);
+	const unchanged = new Array<number>(slotCount - changes.length);
+	let originalIndex = 0, unchangedIndex = 0;
+	for (const offsetMap of changes) {
+		const slot = skeletonData.findSlot(offsetMap.slot);
+		if (slot == null) throw new Error(`Draw order slot not found: ${offsetMap.slot}`);
+		let index = 0;
+		if (!folderSlots)
+			index = slot.index;
+		else {
+			index = -1;
+			for (let i = 0; i < slotCount; i++) {
+				if (folderSlots[i] === slot.index) {
+					index = i;
+					break;
+				}
+			}
+			if (index === -1) throw new Error(`Slot not in folder: ${offsetMap.slot}`);
+		}
+		// Collect unchanged items.
+		while (originalIndex !== index)
+			unchanged[unchangedIndex++] = originalIndex++;
+		// Set changed items.
+		drawOrder[originalIndex + offsetMap.offset] = originalIndex++;
+	}
+	// Collect remaining unchanged items.
+	while (originalIndex < slotCount)
+		unchanged[unchangedIndex++] = originalIndex++;
+	// Fill in unchanged items.
+	for (let i = slotCount - 1; i >= 0; i--)
+		if (drawOrder[i] === -1) drawOrder[i] = unchanged[--unchangedIndex];
+	return drawOrder;
 }
 
 function readCurve (curve: [number, number, number, number] | "stepped", timeline: CurveTimeline, bezier: number, frame: number, value: number, time1: number, time2: number,

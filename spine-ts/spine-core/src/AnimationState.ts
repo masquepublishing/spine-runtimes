@@ -29,7 +29,7 @@
 
 /** biome-ignore-all lint/style/noNonNullAssertion: reference runtime expects some nullable to not be null */
 
-import { Animation, AttachmentTimeline, DrawOrderTimeline, EventTimeline, MixBlend, MixDirection, RotateTimeline, Timeline } from "./Animation.js";
+import { Animation, AttachmentTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, EventTimeline, MixBlend, MixDirection, RotateTimeline, Timeline } from "./Animation.js";
 import type { AnimationStateData } from "./AnimationStateData.js";
 import type { Event } from "./Event.js";
 import type { Skeleton } from "./Skeleton.js";
@@ -788,7 +788,8 @@ export class AnimationState {
 			if (!propertyIDs.addAll(ids))
 				timelineMode[i] = SUBSEQUENT;
 			else if (!to || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
-				|| timeline instanceof EventTimeline || !to.animation!.hasTimeline(ids)) {
+				|| timeline instanceof DrawOrderFolderTimeline || timeline instanceof EventTimeline
+				|| !to.animation!.hasTimeline(ids)) {
 				timelineMode[i] = FIRST;
 			} else {
 				for (let next = to.mixingTo; next; next = next!.mixingTo) {
