@@ -909,9 +909,12 @@ namespace Spine {
 			HashSet<string> propertyIds = this.propertyIds;
 
 			if (to != null && to.holdPrevious) {
-				for (int i = 0; i < timelinesCount; i++)
-					timelineMode[i] = propertyIds.AddAll(timelines[i].PropertyIds) ? AnimationState.HoldFirst : AnimationState.HoldSubsequent;
-
+				for (int i = 0; i < timelinesCount; i++) {
+					bool first = propertyIds.AddAll(timelines[i].PropertyIds);
+					if (first && timelines[i] is DrawOrderFolderTimeline && propertyIds.Contains(DrawOrderTimeline.propertyID))
+						first = false; // DrawOrderTimeline changed.
+					timelineMode[i] = first ? AnimationState.HoldFirst : AnimationState.HoldSubsequent;
+				}
 				return;
 			}
 
@@ -921,6 +924,8 @@ namespace Spine {
 				String[] ids = timeline.PropertyIds;
 				if (!propertyIds.AddAll(ids))
 					timelineMode[i] = AnimationState.Subsequent;
+				else if (timeline is DrawOrderFolderTimeline && propertyIds.Contains(DrawOrderTimeline.propertyID))
+					timelineMode[i] = AnimationState.Subsequent; // DrawOrderTimeline changed.
 				else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
 						|| timeline is DrawOrderFolderTimeline || timeline is EventTimeline
 						|| !to.animation.HasTimeline(ids)) {
