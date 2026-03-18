@@ -103,7 +103,7 @@ namespace Spine.Unity.Editor {
 			if (currentAsset != null && currentAsset.SkeletonDataAsset != null) {
 				resolvedSkeletonDataAsset = currentAsset.SkeletonDataAsset;
 				// If other SkeletonDataAsset than expected, use assigned asset but show warning color in Inspector.
-				if (resolvedSkeletonDataAsset != expectedSkeletonDataAsset)
+				if (expectedSkeletonDataAsset && resolvedSkeletonDataAsset != expectedSkeletonDataAsset)
 					skeletonDataAssetMismatch = true;
 			} else {
 				resolvedSkeletonDataAsset = expectedSkeletonDataAsset;
