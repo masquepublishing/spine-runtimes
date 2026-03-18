@@ -597,7 +597,7 @@ namespace spine {
 		/// Returns true when all mixing from entries are complete.
 		bool updateMixingFrom(TrackEntry *to, float delta);
 
-		float applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBlend currentPose);
+		float applyMixingFrom(TrackEntry *to, Skeleton &skeleton);
 
 		void queueEvents(TrackEntry *entry, float animationTime);
 

@@ -568,12 +568,14 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		TrackEntry &current = *currentP;
 
 		applied = true;
+
+		// Track 0 animations aren't for layering, so never use current values before the first key.
 		MixBlend blend = i == 0 ? MixBlend_First : current._mixBlend;
 
 		// apply mixing from entries first.
 		float alpha = current._alpha;
 		if (current._mixingFrom != NULL) {
-			alpha *= applyMixingFrom(currentP, skeleton, blend);
+			alpha *= applyMixingFrom(currentP, skeleton);
 		} else if (current._trackTime >= current._trackEnd && current._next == NULL) {
 			alpha = 0;// Set to setup pose the last time the entry will be applied.
 		}
@@ -611,7 +613,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 				Timeline *timeline = timelines[ii];
 				assert(timeline);
 
-				MixBlend timelineBlend = timelineMode[ii] == Subsequent ? blend : MixBlend_Setup;
+				MixBlend timelineBlend = timelineMode[ii] == Subsequent ? current._mixBlend : MixBlend_Setup;
 
 				if (!shortestRotation && timeline->getRTTI().isExactly(RotateTimeline::rtti))
 					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, applyTime, alpha, timelineBlend, timelinesRotation,
@@ -944,21 +946,18 @@ bool AnimationState::updateMixingFrom(TrackEntry *to, float delta) {
 	return false;
 }
 
-float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBlend blend) {
+float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 	TrackEntry *from = to->_mixingFrom;
-	if (from->_mixingFrom != NULL) applyMixingFrom(from, skeleton, blend);
+	if (from->_mixingFrom != NULL) applyMixingFrom(from, skeleton);
 
 	float mix;
-	if (to->_mixDuration == 0) {
-		// Single frame mix to undo mixingFrom changes.
+	if (to->_mixDuration == 0) // Single frame mix to undo mixingFrom changes.
 		mix = 1;
-		if (blend == MixBlend_First) blend = MixBlend_Setup;
-	} else {
+	else {
 		mix = to->_mixTime / to->_mixDuration;
 		if (mix > 1) {
 			mix = 1;
 		}
-		if (blend != MixBlend_First) blend = from->_mixBlend;
 	}
 
 	bool attachments = mix < from->_mixAttachmentThreshold, drawOrder = mix < from->_mixDrawOrderThreshold;
@@ -974,6 +973,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 		if (mix < from->_eventThreshold) events = &_events;
 	}
 
+	MixBlend blend = from->_mixBlend;
 	if (blend == MixBlend_Add) {
 		for (size_t i = 0; i < timelineCount; i++)
 			timelines[i]->apply(skeleton, animationLast, applyTime, events, alphaMix, blend, MixDirection_Out, false);
