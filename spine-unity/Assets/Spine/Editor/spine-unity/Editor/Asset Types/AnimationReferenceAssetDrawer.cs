@@ -81,7 +81,9 @@ namespace Spine.Unity.Editor {
 					new GUIContent(NoneString, SpineEditorUtilities.Icons.animation) :
 					new GUIContent(currentAnimationName, SpineEditorUtilities.Icons.animation);
 
-				GUIStyle usedStyle = isSkeletonDataMismatch ? ErrorPopupStyle : EditorStyles.popup;
+				GUIStyle usedStyle =
+					(isSkeletonDataMismatch && SpineEditorUtilities.Preferences.skeletonDataAssetMismatchWarning) ?
+					ErrorPopupStyle : EditorStyles.popup;
 				if (GUI.Button(dropdownRect, dropdownLabel, usedStyle)) {
 					ShowAnimationMenu(property, skeletonDataAsset, skeletonData);
 				}
