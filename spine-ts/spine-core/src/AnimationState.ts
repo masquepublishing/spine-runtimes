@@ -154,8 +154,8 @@ export class AnimationState {
 		return false;
 	}
 
-	/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
-	 * animation state can be applied to multiple skeletons to pose them identically.
+	/** Poses the skeleton using the track entry animations. The animation state is not changed, so can be applied to multiple
+	 * skeletons to pose them identically.
 	 * @returns True if any animations were applied. */
 	apply (skeleton: Skeleton): boolean {
 		if (!skeleton) throw new Error("skeleton cannot be null.");
@@ -169,12 +169,14 @@ export class AnimationState {
 			const current = tracks[i];
 			if (!current || current.delay > 0) continue;
 			applied = true;
+
+			// Track 0 animations aren't for layering, so never use current values before the first key.
 			const blend: MixBlend = i === 0 ? MixBlend.first : current.mixBlend;
 
 			// Apply mixing from entries first.
 			let alpha = current.alpha;
 			if (current.mixingFrom)
-				alpha *= this.applyMixingFrom(current, skeleton, blend);
+				alpha *= this.applyMixingFrom(current, skeleton);
 			else if (current.trackTime >= current.trackEnd && !current.next)
 				alpha = 0;
 			let attachments = alpha >= current.alphaAttachmentThreshold;
@@ -211,7 +213,7 @@ export class AnimationState {
 
 				for (let ii = 0; ii < timelineCount; ii++) {
 					const timeline = timelines[ii];
-					const timelineBlend = timelineMode[ii] === SUBSEQUENT ? blend : MixBlend.setup;
+					const timelineBlend = timelineMode[ii] === SUBSEQUENT ? current.mixBlend : MixBlend.setup;
 					if (!shortestRotation && timeline instanceof RotateTimeline) {
 						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, current.timelinesRotation, ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline) {
@@ -247,18 +249,16 @@ export class AnimationState {
 		return applied;
 	}
 
-	applyMixingFrom (to: TrackEntry, skeleton: Skeleton, blend: MixBlend) {
+	applyMixingFrom (to: TrackEntry, skeleton: Skeleton) {
 		const from = to.mixingFrom!;
-		if (from.mixingFrom) this.applyMixingFrom(from, skeleton, blend);
+		if (from.mixingFrom) this.applyMixingFrom(from, skeleton);
 
 		let mix = 0;
-		if (to.mixDuration === 0) { // Single frame mix to undo mixingFrom changes.
+		if (to.mixDuration === 0) // Single frame mix to undo mixingFrom changes.
 			mix = 1;
-			if (blend === MixBlend.first) blend = MixBlend.setup;
-		} else {
+		else {
 			mix = to.mixTime / to.mixDuration;
 			if (mix > 1) mix = 1;
-			if (blend !== MixBlend.first) blend = from.mixBlend;
 		}
 
 		const attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
@@ -272,6 +272,7 @@ export class AnimationState {
 		else if (mix < from.eventThreshold)
 			events = this.events;
 
+		const blend = from.mixBlend;
 		if (blend === MixBlend.add) {
 			for (let i = 0; i < timelineCount; i++)
 				timelines[i].apply(skeleton, animationLast, applyTime, events, alphaMix, blend, MixDirection.out, false);
@@ -1011,9 +1012,7 @@ export class TrackEntry {
 		}
 	}
 
-	/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}, which
-	 * replaces the values from the lower tracks with the animation values. {@link MixBlend#add} adds the animation values to
-	 * the values from the lower tracks.
+	/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}.
 	 *
 	 * The `mixBlend` can be set for a new track entry only before {@link AnimationState#apply()} is next
 	 * called. */
