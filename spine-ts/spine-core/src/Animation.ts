@@ -1789,7 +1789,8 @@ export class EventTimeline extends Timeline {
 
 /** Changes a skeleton's {@link Skeleton#drawOrder}. */
 export class DrawOrderTimeline extends Timeline {
-	static propertyIds = [`${Property.drawOrder}`];
+	static readonly propertyID = `${Property.drawOrder}`;
+	static propertyIds = [DrawOrderTimeline.propertyID];
 
 	/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
 	private readonly drawOrders: Array<Array<number> | null>;
@@ -1846,12 +1847,20 @@ export class DrawOrderFolderTimeline extends Timeline {
 	/** @param slots {@link Skeleton#slots} indices controlled by this timeline, in setup order.
 	 * @param slotCount The maximum number of slots in the skeleton. */
 	constructor (frameCount: number, slots: number[], slotCount: number) {
-		super(frameCount, ...DrawOrderTimeline.propertyIds);
+		super(frameCount, ...DrawOrderFolderTimeline.propertyIds(slots));
 		this.slots = slots;
 		this.drawOrders = new Array(frameCount);
 		this.inFolder = new Array(slotCount);
 		for (const i of slots)
 			this.inFolder[i] = true;
+	}
+
+	private static propertyIds (slots: number[]): string[] {
+		const n = slots.length;
+		const ids = new Array(n);
+		for (let i = 0; i < n; i++)
+			ids[i] = `d${slots[i]}`;
+		return ids;
 	}
 
 	getFrameCount (): number {

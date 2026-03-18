@@ -777,8 +777,12 @@ export class AnimationState {
 		const propertyIDs = this.propertyIDs;
 
 		if (to?.holdPrevious) {
-			for (let i = 0; i < timelinesCount; i++)
-				timelineMode[i] = propertyIDs.addAll(timelines[i].getPropertyIds()) ? HOLD_FIRST : HOLD_SUBSEQUENT;
+			for (let i = 0; i < timelinesCount; i++) {
+				let first = propertyIDs.addAll(timelines[i].getPropertyIds());
+				if (first && timelines[i] instanceof DrawOrderFolderTimeline && propertyIDs.contains(DrawOrderTimeline.propertyID))
+					first = false; // DrawOrderTimeline changed.
+				timelineMode[i] = first ? HOLD_FIRST : HOLD_SUBSEQUENT;
+			}
 			return;
 		}
 
@@ -788,6 +792,8 @@ export class AnimationState {
 			const ids = timeline.getPropertyIds();
 			if (!propertyIDs.addAll(ids))
 				timelineMode[i] = SUBSEQUENT;
+			else if (timeline instanceof DrawOrderFolderTimeline && propertyIDs.contains(DrawOrderTimeline.propertyID))
+				timelineMode[i] = SUBSEQUENT; // DrawOrderTimeline changed.
 			else if (!to || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
 				|| timeline instanceof DrawOrderFolderTimeline || timeline instanceof EventTimeline
 				|| !to.animation!.hasTimeline(ids)) {
