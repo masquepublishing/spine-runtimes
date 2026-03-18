@@ -49808,37 +49808,38 @@ abstract class spine_position_mode {
 }
 
 abstract class spine_property {
-  static const int SPINE_PROPERTY_ROTATE = 1;
-  static const int SPINE_PROPERTY_X = 2;
-  static const int SPINE_PROPERTY_Y = 4;
-  static const int SPINE_PROPERTY_SCALE_X = 8;
-  static const int SPINE_PROPERTY_SCALE_Y = 16;
-  static const int SPINE_PROPERTY_SHEAR_X = 32;
-  static const int SPINE_PROPERTY_SHEAR_Y = 64;
-  static const int SPINE_PROPERTY_INHERIT = 128;
-  static const int SPINE_PROPERTY_RGB = 256;
-  static const int SPINE_PROPERTY_ALPHA = 512;
-  static const int SPINE_PROPERTY_RGB2 = 1024;
-  static const int SPINE_PROPERTY_ATTACHMENT = 2048;
-  static const int SPINE_PROPERTY_DEFORM = 4096;
-  static const int SPINE_PROPERTY_EVENT = 8192;
-  static const int SPINE_PROPERTY_DRAW_ORDER = 16384;
-  static const int SPINE_PROPERTY_IK_CONSTRAINT = 32768;
-  static const int SPINE_PROPERTY_TRANSFORM_CONSTRAINT = 65536;
-  static const int SPINE_PROPERTY_PATH_CONSTRAINT_POSITION = 131072;
-  static const int SPINE_PROPERTY_PATH_CONSTRAINT_SPACING = 262144;
-  static const int SPINE_PROPERTY_PATH_CONSTRAINT_MIX = 524288;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_INERTIA = 1048576;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_STRENGTH = 2097152;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_DAMPING = 4194304;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_MASS = 8388608;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_WIND = 16777216;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_GRAVITY = 33554432;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_MIX = 67108864;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_RESET = 134217728;
-  static const int SPINE_PROPERTY_SEQUENCE = 268435456;
-  static const int SPINE_PROPERTY_SLIDER_TIME = 536870912;
-  static const int SPINE_PROPERTY_SLIDER_MIX = 1073741824;
+  static const int SPINE_PROPERTY_ROTATE = 0;
+  static const int SPINE_PROPERTY_X = 1;
+  static const int SPINE_PROPERTY_Y = 2;
+  static const int SPINE_PROPERTY_SCALE_X = 3;
+  static const int SPINE_PROPERTY_SCALE_Y = 4;
+  static const int SPINE_PROPERTY_SHEAR_X = 5;
+  static const int SPINE_PROPERTY_SHEAR_Y = 6;
+  static const int SPINE_PROPERTY_INHERIT = 7;
+  static const int SPINE_PROPERTY_RGB = 8;
+  static const int SPINE_PROPERTY_ALPHA = 9;
+  static const int SPINE_PROPERTY_RGB2 = 10;
+  static const int SPINE_PROPERTY_ATTACHMENT = 11;
+  static const int SPINE_PROPERTY_DEFORM = 12;
+  static const int SPINE_PROPERTY_EVENT = 13;
+  static const int SPINE_PROPERTY_DRAW_ORDER = 14;
+  static const int SPINE_PROPERTY_IK_CONSTRAINT = 15;
+  static const int SPINE_PROPERTY_TRANSFORM_CONSTRAINT = 16;
+  static const int SPINE_PROPERTY_PATH_CONSTRAINT_POSITION = 17;
+  static const int SPINE_PROPERTY_PATH_CONSTRAINT_SPACING = 18;
+  static const int SPINE_PROPERTY_PATH_CONSTRAINT_MIX = 19;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_INERTIA = 20;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_STRENGTH = 21;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_DAMPING = 22;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_MASS = 23;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_WIND = 24;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_GRAVITY = 25;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_MIX = 26;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_RESET = 27;
+  static const int SPINE_PROPERTY_SEQUENCE = 28;
+  static const int SPINE_PROPERTY_SLIDER_TIME = 29;
+  static const int SPINE_PROPERTY_SLIDER_MIX = 30;
+  static const int SPINE_PROPERTY_DRAW_ORDER_FOLDER = 31;
 }
 
 abstract class spine_rotate_mode {

@@ -41,8 +41,12 @@ using namespace spine;
 
 RTTI_IMPL(DrawOrderTimeline, Timeline)
 
+PropertyId DrawOrderTimeline::getPropertyId() {
+	return ((PropertyId) Property_DrawOrder << 32);
+}
+
 DrawOrderTimeline::DrawOrderTimeline(size_t frameCount) : Timeline(frameCount, 1) {
-	PropertyId ids[] = {((PropertyId) Property_DrawOrder << 32)};
+	PropertyId ids[] = {getPropertyId()};
 	setPropertyIds(ids, 1);
 
 	_drawOrders.ensureCapacity(frameCount);

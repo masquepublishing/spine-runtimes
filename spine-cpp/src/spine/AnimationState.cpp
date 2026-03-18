@@ -951,7 +951,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 	if (from->_mixingFrom != NULL) applyMixingFrom(from, skeleton);
 
 	float mix;
-	if (to->_mixDuration == 0) // Single frame mix to undo mixingFrom changes.
+	if (to->_mixDuration == 0)// Single frame mix to undo mixingFrom changes.
 		mix = 1;
 	else {
 		mix = to->_mixTime / to->_mixDuration;
@@ -1187,10 +1187,14 @@ void AnimationState::computeHold(TrackEntry *entry) {
 	timelineMode.setSize(timelinesCount, 0);
 	Array<TrackEntry *> &timelineHoldMix = entry->_timelineHoldMix;
 	timelineHoldMix.setSize(timelinesCount, 0);
+	PropertyId drawOrderPropertyId = DrawOrderTimeline::getPropertyId();
 
 	if (to != NULL && to->_holdPrevious) {
 		for (size_t i = 0; i < timelinesCount; i++) {
-			timelineMode[i] = _propertyIDs.addAll(timelines[i]->getPropertyIds(), true) ? HoldFirst : HoldSubsequent;
+			bool first = _propertyIDs.addAll(timelines[i]->getPropertyIds(), true);
+			if (first && timelines[i]->getRTTI().isExactly(DrawOrderFolderTimeline::rtti) && _propertyIDs.containsKey(drawOrderPropertyId))
+				first = false;
+			timelineMode[i] = first ? HoldFirst : HoldSubsequent;
 		}
 		return;
 	}
@@ -1202,6 +1206,8 @@ continue_outer:
 		Timeline *timeline = timelines[i];
 		Array<PropertyId> &ids = timeline->getPropertyIds();
 		if (!_propertyIDs.addAll(ids, true)) {
+			timelineMode[i] = Subsequent;
+		} else if (timeline->getRTTI().isExactly(DrawOrderFolderTimeline::rtti) && _propertyIDs.containsKey(drawOrderPropertyId)) {
 			timelineMode[i] = Subsequent;
 		} else {
 			if (to == NULL || timeline->getRTTI().isExactly(AttachmentTimeline::rtti) || timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) ||

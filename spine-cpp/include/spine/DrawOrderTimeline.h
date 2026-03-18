@@ -42,6 +42,8 @@ namespace spine {
 		RTTI_DECL
 
 	public:
+		static PropertyId getPropertyId();
+
 		explicit DrawOrderTimeline(size_t frameCount);
 
 		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,

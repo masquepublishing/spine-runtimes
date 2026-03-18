@@ -41,8 +41,9 @@ using namespace spine;
 RTTI_IMPL(DrawOrderFolderTimeline, Timeline)
 
 DrawOrderFolderTimeline::DrawOrderFolderTimeline(size_t frameCount, Array<int> &slots, size_t slotCount) : Timeline(frameCount, 1) {
-	PropertyId ids[] = {((PropertyId) Property_DrawOrder << 32)};
-	setPropertyIds(ids, 1);
+	Array<PropertyId> ids(slots.size());
+	for (size_t i = 0; i < slots.size(); ++i) ids.add(((PropertyId) Property_DrawOrderFolder << 32) | (PropertyId) slots[i]);
+	setPropertyIds(ids.buffer(), ids.size());
 
 	_slots.addAll(slots);
 	_drawOrders.ensureCapacity(frameCount);
