@@ -35,6 +35,8 @@ import spine.Slot;
 
 /** Changes a skeleton's Skeleton#drawOrder. */
 class DrawOrderTimeline extends Timeline {
+	public static final propertyID = Property.drawOrder;
+
 	/** The draw order for each frame. See setFrame(). */
 	public var drawOrders:Array<Array<Int>>;
 

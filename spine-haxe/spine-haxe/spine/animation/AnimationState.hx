@@ -283,7 +283,7 @@ class AnimationState {
 
 				for (ii in 0...timelineCount) {
 					var timeline:Timeline = timelines[ii];
-					var timelineBlend:MixBlend = timelineMode[ii] == SUBSEQUENT ? current.mixBlendblend : MixBlend.setup;
+					var timelineBlend:MixBlend = timelineMode[ii] == SUBSEQUENT ? current.mixBlend : MixBlend.setup;
 					if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
 						this.applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, timelineBlend, current.timelinesRotation,
 							ii << 1, firstFrame);
@@ -875,7 +875,10 @@ class AnimationState {
 
 		if (to != null && to.holdPrevious) {
 			for (i in 0...timelinesCount) {
-				timelineMode[i] = propertyIDs.addAll(timelines[i].propertyIds) ? HOLD_FIRST : HOLD_SUBSEQUENT;
+				var first = propertyIDs.addAll(timelines[i].propertyIds);
+				if (first && Std.isOfType(timelines[i], DrawOrderFolderTimeline) && propertyIDs.contains(DrawOrderTimeline.propertyID))
+					first = false; // DrawOrderTimeline changed.
+				timelineMode[i] = first ? HOLD_FIRST : HOLD_SUBSEQUENT;
 			}
 			return;
 		}
@@ -885,9 +888,11 @@ class AnimationState {
 			continueOuter = false;
 			var timeline:Timeline = timelines[i];
 			var ids:Array<String> = timeline.propertyIds;
-			if (!propertyIDs.addAll(ids)) {
+			if (!propertyIDs.addAll(ids))
 				timelineMode[i] = SUBSEQUENT;
-			} else if (to == null
+			else if (Std.isOfType(timeline, DrawOrderFolderTimeline) && propertyIDs.contains(DrawOrderTimeline.propertyID))
+				timelineMode[i] = SUBSEQUENT; // DrawOrderTimeline changed.
+			else if (to == null
 				|| Std.isOfType(timeline, AttachmentTimeline)
 				|| Std.isOfType(timeline, DrawOrderTimeline)
 				|| Std.isOfType(timeline, DrawOrderFolderTimeline)

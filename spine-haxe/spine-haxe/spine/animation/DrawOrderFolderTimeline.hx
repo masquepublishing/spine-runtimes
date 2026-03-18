@@ -42,7 +42,7 @@ class DrawOrderFolderTimeline extends Timeline {
 	/** @param slots spine.Skeleton.slots indices controlled by this timeline, in setup order.
 	 * @param slotCount The maximum number of slots in the skeleton. */
 	public function new(frameCount:Int, slots:Array<Int>, slotCount:Int) {
-		super(frameCount, Property.drawOrder);
+		super(frameCount, ...DrawOrderFolderTimeline.getPropertyIds(slots));
 		this.slots = slots;
 		drawOrders = new Array<Array<Int>>();
 		drawOrders.resize(frameCount);
@@ -52,6 +52,14 @@ class DrawOrderFolderTimeline extends Timeline {
 			inFolder[i] = false;
 		for (i in slots)
 			inFolder[i] = true;
+	}
+
+	private static function getPropertyIds(slots:Array<Int>):Array<String> {
+		var n = slots.length;
+		var ids = new Array();
+		for (i in 0...n)
+			ids[i] = "d" + slots[i];
+		return ids;
 	}
 
 	public var frameCount(get, never):Int;
@@ -82,9 +90,11 @@ class DrawOrderFolderTimeline extends Timeline {
 	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
 			appliedPose:Bool) {
 		if (direction == MixDirection.mixOut) {
-			if (blend == MixBlend.setup) setupApply(skeleton);
+			if (blend == MixBlend.setup)
+				setupApply(skeleton);
 		} else if (time < frames[0]) {
-			if (blend == MixBlend.setup || blend == MixBlend.first) setupApply(skeleton);
+			if (blend == MixBlend.setup || blend == MixBlend.first)
+				setupApply(skeleton);
 		} else {
 			var order = drawOrders[Timeline.search1(frames, time)];
 			if (order == null)
@@ -103,7 +113,8 @@ class DrawOrderFolderTimeline extends Timeline {
 			if (inFolder[drawOrder[i].data.index]) {
 				drawOrder[i] = allSlots[slots[found]];
 				found++;
-				if (found == done) break;
+				if (found == done)
+					break;
 			}
 			i++;
 		}
@@ -118,7 +129,8 @@ class DrawOrderFolderTimeline extends Timeline {
 			if (inFolder[drawOrder[i].data.index]) {
 				drawOrder[i] = allSlots[slots[order[found]]];
 				found++;
-				if (found == done) break;
+				if (found == done)
+					break;
 			}
 			i++;
 		}
