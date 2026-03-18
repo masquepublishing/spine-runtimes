@@ -238,12 +238,14 @@ class AnimationState {
 			if (current == null || current.delay > 0)
 				continue;
 			applied = true;
+
+			// Track 0 animations aren't for layering, so never use current values before the first key.
 			var blend:MixBlend = i == 0 ? MixBlend.first : current.mixBlend;
 
 			// Apply mixing from entries first.
 			var alpha:Float = current.alpha;
 			if (current.mixingFrom != null) {
-				alpha *= applyMixingFrom(current, skeleton, blend);
+				alpha *= applyMixingFrom(current, skeleton);
 			} else if (current.trackTime >= current.trackEnd && current.next == null) {
 				alpha = 0;
 			}
@@ -281,7 +283,7 @@ class AnimationState {
 
 				for (ii in 0...timelineCount) {
 					var timeline:Timeline = timelines[ii];
-					var timelineBlend:MixBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
+					var timelineBlend:MixBlend = timelineMode[ii] == SUBSEQUENT ? current.mixBlendblend : MixBlend.setup;
 					if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
 						this.applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, timelineBlend, current.timelinesRotation,
 							ii << 1, firstFrame);
@@ -314,23 +316,18 @@ class AnimationState {
 		return applied;
 	}
 
-	private function applyMixingFrom(to:TrackEntry, skeleton:Skeleton, blend:MixBlend):Float {
+	private function applyMixingFrom(to:TrackEntry, skeleton:Skeleton):Float {
 		var from:TrackEntry = to.mixingFrom;
 		if (from.mixingFrom != null)
-			applyMixingFrom(from, skeleton, blend);
+			applyMixingFrom(from, skeleton);
 
 		var mix:Float = 0;
 		if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
-		{
 			mix = 1;
-			if (blend == MixBlend.first)
-				blend = MixBlend.setup;
-		} else {
+		else {
 			mix = to.mixTime / to.mixDuration;
 			if (mix > 1)
 				mix = 1;
-			if (blend != MixBlend.first)
-				blend = from.mixBlend;
 		}
 
 		var attachments:Bool = mix < from.mixAttachmentThreshold,
@@ -349,6 +346,7 @@ class AnimationState {
 			applyEvents = events;
 		}
 
+		var blend = from.mixBlend;
 		if (blend == MixBlend.add) {
 			for (timeline in timelines) {
 				timeline.apply(skeleton, animationLast, applyTime, applyEvents, alphaMix, blend, MixDirection.mixOut, false);
@@ -393,8 +391,8 @@ class AnimationState {
 				if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
 					applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, timelineBlend, from.timelinesRotation, i << 1, firstFrame);
 				} else if (Std.isOfType(timeline, AttachmentTimeline)) {
-					applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime,
-						timelineBlend, true, attachments && alpha >= from.alphaAttachmentThreshold);
+					applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, timelineBlend,
+						true, attachments && alpha >= from.alphaAttachmentThreshold);
 				} else {
 					var direction = MixDirection.mixOut;
 					if (drawOrder && Std.isOfType(timeline, DrawOrderTimeline) && timelineBlend == MixBlend.setup)
@@ -425,7 +423,8 @@ class AnimationState {
 			return;
 
 		if (out) {
-			if (blend == MixBlend.setup) this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+			if (blend == MixBlend.setup)
+				this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 		} else if (time < timeline.frames[0]) { // Time is before first frame.
 			if (blend == MixBlend.setup || blend == MixBlend.first)
 				this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
