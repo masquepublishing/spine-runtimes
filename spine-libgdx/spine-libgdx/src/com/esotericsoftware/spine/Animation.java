@@ -29,8 +29,6 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.Animation.MixBlend.*;
-import static com.esotericsoftware.spine.Animation.MixDirection.*;
 import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import com.badlogic.gdx.graphics.Color;
@@ -82,7 +80,7 @@ public class Animation {
 		Timeline[] items = timelines.items;
 		for (int i = 0; i < n; i++) {
 			Timeline timeline = items[i];
-			timelineIds.addAll(timeline.getPropertyIds());
+			timelineIds.addAll(timeline.propertyIds);
 			if (timeline instanceof BoneTimeline boneTimeline && boneSet.add(boneTimeline.getBoneIndex()))
 				bones.add(boneTimeline.getBoneIndex());
 		}
@@ -112,26 +110,29 @@ public class Animation {
 
 	/** Applies the animation's timelines to the specified skeleton.
 	 * <p>
-	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection, boolean)}.
-	 * @param skeleton The skeleton the animation is being applied to. This provides access to the bones, slots, and other skeleton
+	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+	 * @param skeleton The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton
 	 *           components the timelines may change.
-	 * @param lastTime The last time in seconds this animation was applied. Some timelines trigger only at specific times rather
-	 *           than every frame. Pass -1 the first time an animation is applied to ensure frame 0 is triggered.
-	 * @param time The time in seconds the skeleton is being posed for. Most timelines find the frame before and the frame after
-	 *           this time and interpolate between the frame values. If beyond the {@link #getDuration()} and <code>loop</code> is
-	 *           true then the animation will repeat, else the last frame will be applied.
-	 * @param loop If true, the animation repeats after the {@link #getDuration()}.
-	 * @param events If any events are fired, they are added to this list. Can be null to ignore fired events or if no timelines
-	 *           fire events.
-	 * @param alpha 0 applies the current or setup values (depending on <code>blend</code>). 1 applies the timeline values. Between
-	 *           0 and 1 applies values between the current or setup values and the timeline values. By adjusting
-	 *           <code>alpha</code> over time, an animation can be mixed in or out. <code>alpha</code> can also be useful to apply
-	 *           animations on top of each other (layering).
-	 * @param blend Controls how mixing is applied when <code>alpha</code> < 1.
-	 * @param direction Indicates whether the timelines are mixing in or out. Used by timelines which perform instant transitions,
-	 *           such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}. */
+	 * @param lastTime The last time in seconds this animation was applied. Some timelines trigger only at discrete times, in which
+	 *           case all keys are triggered between <code>lastTime</code> (exclusive) and <code>time</code> (inclusive). Pass -1
+	 *           the first time an animation is applied to ensure frame 0 is triggered.
+	 * @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and
+	 *           interpolate between the frame values.
+	 * @param loop True if <code>time</code> beyond the {@link #getDuration()} repeats the animation, else the last frame is used.
+	 * @param events If any events are fired, they are added to this list. Pass null to ignore fired events or if no timelines fire
+	 *           events.
+	 * @param alpha 0 applies setup or current values (depending on <code>fromSetup</code>), 1 uses timeline values, and
+	 *           intermediate values interpolate between them. Adjusting <code>alpha</code> over time can mix an animation in or
+	 *           out.
+	 * @param fromSetup If true, <code>alpha</code> transitions between setup and timeline values, setup values are used before the
+	 *           first frame (current values are not used). If false, <code>alpha</code> transitions between current and timeline
+	 *           values, no change is made before the first frame.
+	 * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
+	 *           <code>fromSetup</code>).
+	 * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
+	 * @param appliedPose True to modify the {@link Posed#getAppliedPose()}, else modify the {@link Posed#getPose()}. */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, @Null Array<Event> events, float alpha,
-		MixBlend blend, MixDirection direction, boolean appliedPose) {
+		boolean fromSetup, boolean add, boolean out, boolean appliedPose) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
 		if (loop && duration != 0) {
@@ -141,7 +142,7 @@ public class Animation {
 
 		Timeline[] timelines = this.timelines.items;
 		for (int i = 0, n = this.timelines.size; i < n; i++)
-			timelines[i].apply(skeleton, lastTime, time, events, alpha, blend, direction, appliedPose);
+			timelines[i].apply(skeleton, lastTime, time, events, alpha, fromSetup, add, out, appliedPose);
 	}
 
 	/** The animation's name, which is unique across all animations in the skeleton. */
@@ -151,43 +152,6 @@ public class Animation {
 
 	public String toString () {
 		return name;
-	}
-
-	/** Controls how timeline values are mixed with setup pose values or current pose values when a timeline is applied with
-	 * <code>alpha</code> < 1.
-	 * <p>
-	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection, boolean)}. */
-	static public enum MixBlend {
-		/** Transitions between the setup and timeline values (the current value is not used). Before the first frame, the setup
-		 * value is used.
-		 * <p>
-		 * <code>setup</code> is intended to transition to or from the setup pose, not for animations layered on top of others. */
-		setup,
-		/** Transitions between the current and timeline values. Before the first frame, transitions between the current and setup
-		 * values. Timelines which perform instant transitions, such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}, use
-		 * the setup value before the first frame.
-		 * <p>
-		 * <code>first</code> is intended for the first animations applied, not for animations layered on top of others. */
-		first,
-		/** Transitions between the current and timeline values. No change is made before the first frame.
-		 * <p>
-		 * <code>replace</code> is intended for animations layered on top of others, not for the first animations applied. */
-		replace,
-		/** Transitions between the current value and the current plus timeline values. No change is made before the first frame.
-		 * <p>
-		 * <code>add</code> is intended for animations layered on top of others, not for the first animations applied.
-		 * <p>
-		 * Properties set by additive animations must be set manually or by another animation before applying the additive
-		 * animations, else the property values will increase each time the additive animations are applied. */
-		add
-	}
-
-	/** Indicates whether a timeline's <code>alpha</code> is mixing out over time toward 0 (the setup or current pose value) or
-	 * mixing in toward 1 (the timeline's value). Some timelines use this to decide how values are applied.
-	 * <p>
-	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection, boolean)}. */
-	static public enum MixDirection {
-		in, out
 	}
 
 	static private enum Property {
@@ -205,8 +169,9 @@ public class Animation {
 
 	/** The base class for all timelines. */
 	static abstract public class Timeline {
-		private final String[] propertyIds;
+		final String[] propertyIds;
 		final float[] frames;
+		boolean additive, instant;
 
 		/** @param propertyIds Unique identifiers for the properties the timeline modifies. */
 		public Timeline (int frameCount, String... propertyIds) {
@@ -239,28 +204,38 @@ public class Animation {
 			return frames[frames.length - getFrameEntries()];
 		}
 
+		/** True if this timeline supports additive blending. */
+		public boolean getAdditive () {
+			return additive;
+		}
+
+		/** True if this timeline sets values instantaneously and does not support interpolation between frames. */
+		public boolean getInstant () {
+			return instant;
+		}
+
 		/** Applies this timeline to the skeleton.
-		 * @param skeleton The skeleton to which the timeline is being applied. This provides access to the bones, slots, and other
-		 *           skeleton components that the timeline may change.
-		 * @param lastTime The last time in seconds this timeline was applied. Timelines such as {@link EventTimeline} trigger only
-		 *           at specific times rather than every frame. In that case, the timeline triggers everything between
-		 *           <code>lastTime</code> (exclusive) and <code>time</code> (inclusive). Pass -1 the first time an animation is
-		 *           applied to ensure frame 0 is triggered.
-		 * @param time The time in seconds that the skeleton is being posed for. Most timelines find the frame before and the frame
-		 *           after this time and interpolate between the frame values. If beyond the last frame, the last frame will be
-		 *           applied.
-		 * @param events If any events are fired, they are added to this list. Can be null to ignore fired events or if the timeline
-		 *           does not fire events.
-		 * @param alpha 0 applies the current or setup value (depending on <code>blend</code>). 1 applies the timeline value.
-		 *           Between 0 and 1 applies a value between the current or setup value and the timeline value. By adjusting
-		 *           <code>alpha</code> over time, an animation can be mixed in or out. <code>alpha</code> can also be useful to
-		 *           apply animations on top of each other (layering).
-		 * @param blend Controls how mixing is applied when <code>alpha</code> < 1.
-		 * @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
-		 *           such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}, and others such as {@link ScaleTimeline}.
-		 * @param appliedPose True to to modify the applied pose. */
+		 * @param skeleton The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton
+		 *           components the timelines may change.
+		 * @param lastTime The last time in seconds this timline was applied. Some timelines trigger only at discrete times, in
+		 *           which case all keys are triggered between <code>lastTime</code> (exclusive) and <code>time</code> (inclusive).
+		 *           Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
+		 * @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and
+		 *           interpolate between the frame values.
+		 * @param events If any events are fired, they are added to this list. Pass null to ignore fired events or if no timelines
+		 *           fire events.
+		 * @param alpha 0 applies setup or current values (depending on <code>fromSetup</code>), 1 uses timeline values, and
+		 *           intermediate values interpolate between them. Adjusting <code>alpha</code> over time can mix a timeline in or
+		 *           out.
+		 * @param fromSetup If true, <code>alpha</code> transitions between setup and timeline values, setup values are used before
+		 *           the first frame (current values are not used). If false, <code>alpha</code> transitions between current and
+		 *           timeline values, no change is made before the first frame.
+		 * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
+		 *           <code>fromSetup</code>).
+		 * @param out True when the animation is mixing out, else it is mixing in.
+		 * @param appliedPose True to modify the {@link Posed#getAppliedPose()}, else modify the {@link Posed#getPose()}. */
 		abstract public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha,
-			MixBlend blend, MixDirection direction, boolean appliedPose);
+			boolean fromSetup, boolean add, boolean out, boolean appliedPose);
 
 		/** Linear search using a stride of 1.
 		 * @param time Must be >= the first value in <code>frames</code>.
@@ -283,7 +258,7 @@ public class Animation {
 		}
 	}
 
-	/** An interface for timelines which change the property of a slot. */
+	/** An interface for timelines that change the property of a slot. */
 	static public interface SlotTimeline {
 		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed when this timeline is applied. */
 		public int getSlotIndex ();
@@ -438,87 +413,64 @@ public class Animation {
 			};
 		}
 
-		public float getRelativeValue (float time, float alpha, MixBlend blend, float current, float setup) {
-			if (time < frames[0]) {
-				return switch (blend) {
-				case setup -> setup;
-				case first -> current + (setup - current) * alpha;
-				default -> current;
-				};
-			}
+		public float getRelativeValue (float time, float alpha, boolean fromSetup, boolean add, float current, float setup) {
+			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = getCurveValue(time);
-			return switch (blend) {
-			case setup -> setup + value * alpha;
-			case first, replace -> current + (value + setup - current) * alpha;
-			case add -> current + value * alpha;
-			};
+			return fromSetup ? setup + value * alpha : current + (add ? value : value + setup - current) * alpha;
 		}
 
-		public float getAbsoluteValue (float time, float alpha, MixBlend blend, float current, float setup) {
-			if (time < frames[0]) {
-				return switch (blend) {
-				case setup -> setup;
-				case first -> current + (setup - current) * alpha;
-				default -> current;
-				};
-			}
+		public float getAbsoluteValue (float time, float alpha, boolean fromSetup, boolean add, float current, float setup) {
+			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = getCurveValue(time);
-			return switch (blend) {
-			case setup -> setup + (value - setup) * alpha;
-			case first, replace -> current + (value - current) * alpha;
-			case add -> current + value * alpha;
-			};
+			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
-		public float getAbsoluteValue (float time, float alpha, MixBlend blend, float current, float setup, float value) {
-			if (time < frames[0]) {
-				return switch (blend) {
-				case setup -> setup;
-				case first -> current + (setup - current) * alpha;
-				default -> current;
-				};
-			}
-			return switch (blend) {
-			case setup -> setup + (value - setup) * alpha;
-			case first, replace -> current + (value - current) * alpha;
-			case add -> current + value * alpha;
-			};
+		public float getAbsoluteValue (float time, float alpha, boolean fromSetup, boolean add, float current, float setup,
+			float value) {
+			if (time < frames[0]) return fromSetup ? setup : current;
+			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
-		public float getScaleValue (float time, float alpha, MixBlend blend, MixDirection direction, float current, float setup) {
-			float[] frames = this.frames;
-			if (time < frames[0]) {
-				return switch (blend) {
-				case setup -> setup;
-				case first -> current + (setup - current) * alpha;
-				default -> current;
-				};
-			}
+		public float getScaleValue (float time, float alpha, boolean fromSetup, boolean add, boolean out, float current,
+			float setup) {
+			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = getCurveValue(time) * setup;
-			if (alpha == 1) return blend == add ? current + value - setup : value;
-			// Mixing out uses sign of setup or current pose, else use sign of key.
-			if (direction == out) {
-				switch (blend) {
-				case setup:
-					return setup + (Math.abs(value) * Math.signum(setup) - setup) * alpha;
-				case first:
-				case replace:
-					return current + (Math.abs(value) * Math.signum(current) - current) * alpha;
-				}
-			} else {
-				float s;
-				switch (blend) {
-				case setup:
-					s = Math.abs(setup) * Math.signum(value);
-					return s + (value - s) * alpha;
-				case first:
-				case replace:
-					s = Math.abs(current) * Math.signum(value);
-					return s + (value - s) * alpha;
-				}
-			}
-			return current + (value - setup) * alpha;
+			if (alpha == 1) return value;
+			float base = fromSetup ? setup : current;
+			if (add) return base + (value - setup) * alpha;
+			if (out) return base + (Math.abs(value) * Math.signum(base) - base) * alpha;
+			base = Math.abs(base) * Math.signum(value);
+			return base + (value - base) * alpha;
 		}
+	}
+
+	/** An interface for timelines that change the property of a bone. */
+	static public interface BoneTimeline {
+		/** The index of the bone in {@link Skeleton#getBones()} that will be changed when this timeline is applied. */
+		public int getBoneIndex ();
+	}
+
+	static abstract public class BoneTimeline1 extends CurveTimeline1 implements BoneTimeline {
+		final int boneIndex;
+
+		public BoneTimeline1 (int frameCount, int bezierCount, int boneIndex, Property property) {
+			super(frameCount, bezierCount, property.ordinal() + "|" + boneIndex);
+			this.boneIndex = boneIndex;
+			additive = true;
+		}
+
+		public int getBoneIndex () {
+			return boneIndex;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
+			Bone bone = skeleton.bones.items[boneIndex];
+			if (bone.active) apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, fromSetup, add, out);
+		}
+
+		abstract protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out);
 	}
 
 	/** The base class for a {@link CurveTimeline} that is a {@link BoneTimeline} and sets two properties. */
@@ -532,6 +484,7 @@ public class Animation {
 		public BoneTimeline2 (int frameCount, int bezierCount, int boneIndex, Property property1, Property property2) {
 			super(frameCount, bezierCount, property1.ordinal() + "|" + boneIndex, property2.ordinal() + "|" + boneIndex);
 			this.boneIndex = boneIndex;
+			additive = true;
 		}
 
 		public int getFrameEntries () {
@@ -552,44 +505,14 @@ public class Animation {
 			return boneIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			Bone bone = skeleton.bones.items[boneIndex];
-			if (bone.active) apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, blend, direction);
+			if (bone.active) apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, fromSetup, add, out);
 		}
 
-		abstract protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend,
-			MixDirection direction);
-	}
-
-	/** An interface for timelines which change the property of a bone. */
-	static public interface BoneTimeline {
-		/** The index of the bone in {@link Skeleton#getBones()} that will be changed when this timeline is applied. */
-		public int getBoneIndex ();
-	}
-
-	static abstract public class BoneTimeline1 extends CurveTimeline1 implements BoneTimeline {
-		final int boneIndex;
-
-		public BoneTimeline1 (int frameCount, int bezierCount, int boneIndex, Property property) {
-			super(frameCount, bezierCount, property.ordinal() + "|" + boneIndex);
-			this.boneIndex = boneIndex;
-		}
-
-		public int getBoneIndex () {
-			return boneIndex;
-		}
-
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
-			Bone bone = skeleton.bones.items[boneIndex];
-			if (bone.active) apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, blend, direction);
-		}
-
-		abstract protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend,
-			MixDirection direction);
+		abstract protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out);
 	}
 
 	/** Changes a bone's local {@link BoneLocal#getRotation()}. */
@@ -598,8 +521,9 @@ public class Animation {
 			super(frameCount, bezierCount, boneIndex, Property.rotate);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-			pose.rotation = getRelativeValue(time, alpha, blend, pose.rotation, setup.rotation);
+		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out) {
+			pose.rotation = getRelativeValue(time, alpha, fromSetup, add, pose.rotation, setup.rotation);
 		}
 	}
 
@@ -609,18 +533,13 @@ public class Animation {
 			super(frameCount, bezierCount, boneIndex, Property.x, Property.y);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend, MixDirection direction) {
+		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				switch (blend) {
-				case setup -> {
+				if (fromSetup) {
 					pose.x = setup.x;
 					pose.y = setup.y;
-				}
-				case first -> {
-					pose.x += (setup.x - pose.x) * alpha;
-					pose.y += (setup.y - pose.y) * alpha;
-				}
 				}
 				return;
 			}
@@ -646,19 +565,15 @@ public class Animation {
 			}
 			}
 
-			switch (blend) {
-			case setup -> {
+			if (fromSetup) {
 				pose.x = setup.x + x * alpha;
 				pose.y = setup.y + y * alpha;
-			}
-			case first, replace -> {
-				pose.x += (setup.x + x - pose.x) * alpha;
-				pose.y += (setup.y + y - pose.y) * alpha;
-			}
-			case add -> {
+			} else if (add) {
 				pose.x += x * alpha;
 				pose.y += y * alpha;
-			}
+			} else {
+				pose.x += (setup.x + x - pose.x) * alpha;
+				pose.y += (setup.y + y - pose.y) * alpha;
 			}
 		}
 	}
@@ -669,8 +584,9 @@ public class Animation {
 			super(frameCount, bezierCount, boneIndex, Property.x);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-			pose.x = getRelativeValue(time, alpha, blend, pose.x, setup.x);
+		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out) {
+			pose.x = getRelativeValue(time, alpha, fromSetup, add, pose.x, setup.x);
 		}
 	}
 
@@ -680,8 +596,9 @@ public class Animation {
 			super(frameCount, bezierCount, boneIndex, Property.y);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-			pose.y = getRelativeValue(time, alpha, blend, pose.y, setup.y);
+		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out) {
+			pose.y = getRelativeValue(time, alpha, fromSetup, add, pose.y, setup.y);
 		}
 	}
 
@@ -691,18 +608,13 @@ public class Animation {
 			super(frameCount, bezierCount, boneIndex, Property.scaleX, Property.scaleY);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend, MixDirection direction) {
+		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				switch (blend) {
-				case setup -> {
+				if (fromSetup) {
 					pose.scaleX = setup.scaleX;
 					pose.scaleY = setup.scaleY;
-				}
-				case first -> {
-					pose.scaleX += (setup.scaleX - pose.scaleX) * alpha;
-					pose.scaleY += (setup.scaleY - pose.scaleY) * alpha;
-				}
 				}
 				return;
 			}
@@ -730,55 +642,29 @@ public class Animation {
 			x *= setup.scaleX;
 			y *= setup.scaleY;
 
-			if (alpha == 1) {
-				if (blend == add) {
-					pose.scaleX += x - setup.scaleX;
-					pose.scaleY += y - setup.scaleY;
-				} else {
-					pose.scaleX = x;
-					pose.scaleY = y;
-				}
+			if (!add && alpha == 1) {
+				pose.scaleX = x;
+				pose.scaleY = y;
 			} else {
-				// Mixing out uses sign of setup or current pose, else use sign of key.
 				float bx, by;
-				if (direction == out) {
-					switch (blend) {
-					case setup -> {
-						bx = setup.scaleX;
-						by = setup.scaleY;
-						pose.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
-						pose.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
-					}
-					case first, replace -> {
-						bx = pose.scaleX;
-						by = pose.scaleY;
-						pose.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
-						pose.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
-					}
-					case add -> {
-						pose.scaleX += (x - setup.scaleX) * alpha;
-						pose.scaleY += (y - setup.scaleY) * alpha;
-					}
-					}
+				if (fromSetup) {
+					bx = setup.scaleX;
+					by = setup.scaleY;
 				} else {
-					switch (blend) {
-					case setup -> {
-						bx = Math.abs(setup.scaleX) * Math.signum(x);
-						by = Math.abs(setup.scaleY) * Math.signum(y);
-						pose.scaleX = bx + (x - bx) * alpha;
-						pose.scaleY = by + (y - by) * alpha;
-					}
-					case first, replace -> {
-						bx = Math.abs(pose.scaleX) * Math.signum(x);
-						by = Math.abs(pose.scaleY) * Math.signum(y);
-						pose.scaleX = bx + (x - bx) * alpha;
-						pose.scaleY = by + (y - by) * alpha;
-					}
-					case add -> {
-						pose.scaleX += (x - setup.scaleX) * alpha;
-						pose.scaleY += (y - setup.scaleY) * alpha;
-					}
-					}
+					bx = pose.scaleX;
+					by = pose.scaleY;
+				}
+				if (add) {
+					pose.scaleX = bx + (x - setup.scaleX) * alpha;
+					pose.scaleY = by + (y - setup.scaleY) * alpha;
+				} else if (out) {
+					pose.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
+					pose.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
+				} else {
+					bx = Math.abs(bx) * Math.signum(x);
+					by = Math.abs(by) * Math.signum(y);
+					pose.scaleX = bx + (x - bx) * alpha;
+					pose.scaleY = by + (y - by) * alpha;
 				}
 			}
 		}
@@ -790,8 +676,9 @@ public class Animation {
 			super(frameCount, bezierCount, boneIndex, Property.scaleX);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-			pose.scaleX = getScaleValue(time, alpha, blend, direction, pose.scaleX, setup.scaleX);
+		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out) {
+			pose.scaleX = getScaleValue(time, alpha, fromSetup, add, out, pose.scaleX, setup.scaleX);
 		}
 	}
 
@@ -801,8 +688,9 @@ public class Animation {
 			super(frameCount, bezierCount, boneIndex, Property.scaleY);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-			pose.scaleY = getScaleValue(time, alpha, blend, direction, pose.scaleY, setup.scaleY);
+		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out) {
+			pose.scaleY = getScaleValue(time, alpha, fromSetup, add, out, pose.scaleY, setup.scaleY);
 		}
 	}
 
@@ -812,18 +700,13 @@ public class Animation {
 			super(frameCount, bezierCount, boneIndex, Property.shearX, Property.shearY);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend, MixDirection direction) {
+		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				switch (blend) {
-				case setup -> {
+				if (fromSetup) {
 					pose.shearX = setup.shearX;
 					pose.shearY = setup.shearY;
-				}
-				case first -> {
-					pose.shearX += (setup.shearX - pose.shearX) * alpha;
-					pose.shearY += (setup.shearY - pose.shearY) * alpha;
-				}
 				}
 				return;
 			}
@@ -849,19 +732,15 @@ public class Animation {
 			}
 			}
 
-			switch (blend) {
-			case setup -> {
+			if (fromSetup) {
 				pose.shearX = setup.shearX + x * alpha;
 				pose.shearY = setup.shearY + y * alpha;
-			}
-			case first, replace -> {
-				pose.shearX += (setup.shearX + x - pose.shearX) * alpha;
-				pose.shearY += (setup.shearY + y - pose.shearY) * alpha;
-			}
-			case add -> {
+			} else if (add) {
 				pose.shearX += x * alpha;
 				pose.shearY += y * alpha;
-			}
+			} else {
+				pose.shearX += (setup.shearX + x - pose.shearX) * alpha;
+				pose.shearY += (setup.shearY + y - pose.shearY) * alpha;
 			}
 		}
 	}
@@ -872,8 +751,9 @@ public class Animation {
 			super(frameCount, bezierCount, boneIndex, Property.shearX);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-			pose.shearX = getRelativeValue(time, alpha, blend, pose.shearX, setup.shearX);
+		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out) {
+			pose.shearX = getRelativeValue(time, alpha, fromSetup, add, pose.shearX, setup.shearX);
 		}
 	}
 
@@ -883,8 +763,9 @@ public class Animation {
 			super(frameCount, bezierCount, boneIndex, Property.shearY);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-			pose.shearY = getRelativeValue(time, alpha, blend, pose.shearY, setup.shearY);
+		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+			boolean out) {
+			pose.shearY = getRelativeValue(time, alpha, fromSetup, add, pose.shearY, setup.shearY);
 		}
 	}
 
@@ -898,6 +779,7 @@ public class Animation {
 		public InheritTimeline (int frameCount, int boneIndex) {
 			super(frameCount, Property.inherit.ordinal() + "|" + boneIndex);
 			this.boneIndex = boneIndex;
+			instant = true;
 		}
 
 		public int getBoneIndex () {
@@ -917,23 +799,21 @@ public class Animation {
 			frames[frame + INHERIT] = inherit.ordinal();
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			Bone bone = skeleton.bones.items[boneIndex];
 			if (!bone.active) return;
 			BoneLocal pose = appliedPose ? bone.applied : bone.pose;
 
-			if (direction == out) {
-				if (blend == setup) pose.inherit = bone.data.setup.inherit;
-				return;
+			if (out) {
+				if (fromSetup) pose.inherit = bone.data.setup.inherit;
+			} else {
+				float[] frames = this.frames;
+				if (time < frames[0]) {
+					if (fromSetup) pose.inherit = bone.data.setup.inherit;
+				} else
+					pose.inherit = Inherit.values[(int)frames[search(frames, time, ENTRIES) + INHERIT]];
 			}
-
-			float[] frames = this.frames;
-			if (time < frames[0]) {
-				if (blend == setup || blend == first) pose.inherit = bone.data.setup.inherit;
-			} else
-				pose.inherit = Inherit.values[(int)frames[search(frames, time, ENTRIES) + INHERIT]];
 		}
 	}
 
@@ -949,14 +829,13 @@ public class Animation {
 			return slotIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			Slot slot = skeleton.slots.items[slotIndex];
-			if (slot.bone.active) apply(slot, appliedPose ? slot.applied : slot.pose, time, alpha, blend);
+			if (slot.bone.active) apply(slot, appliedPose ? slot.applied : slot.pose, time, alpha, fromSetup, add);
 		}
 
-		abstract protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend);
+		abstract protected void apply (Slot slot, SlotPose pose, float time, float alpha, boolean fromSetup, boolean add);
 	}
 
 	/** Changes a slot's {@link SlotPose#getColor()}. */
@@ -986,16 +865,11 @@ public class Animation {
 			frames[frame + A] = a;
 		}
 
-		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
+		protected void apply (Slot slot, SlotPose pose, float time, float alpha, boolean fromSetup, boolean add) {
 			Color color = pose.color;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				Color setup = slot.data.setup.color;
-				switch (blend) {
-				case setup -> color.set(setup);
-				case first -> color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
-					(setup.a - color.a) * alpha);
-				}
+				if (fromSetup) color.set(slot.data.setup.color);
 				return;
 			}
 
@@ -1031,7 +905,7 @@ public class Animation {
 			if (alpha == 1)
 				color.set(r, g, b, a);
 			else {
-				if (blend == setup) {
+				if (fromSetup) {
 					Color setup = slot.data.setup.color;
 					color.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
 						setup.a + (a - setup.a) * alpha);
@@ -1065,61 +939,54 @@ public class Animation {
 			frames[frame + B] = b;
 		}
 
-		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
+		protected void apply (Slot slot, SlotPose pose, float time, float alpha, boolean fromSetup, boolean add) {
 			Color color = pose.color;
 			float r, g, b;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				Color setup = slot.data.setup.color;
-				switch (blend) {
-				case setup:
+				if (fromSetup) {
+					Color setup = slot.data.setup.color;
 					color.r = setup.r;
 					color.g = setup.g;
 					color.b = setup.b;
-					// Fall through.
-				default:
-					return;
-				case first:
-					r = color.r + (setup.r - color.r) * alpha;
-					g = color.g + (setup.g - color.g) * alpha;
-					b = color.b + (setup.b - color.b) * alpha;
 				}
-			} else {
-				int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
-				switch (curveType) {
-				case LINEAR -> {
-					float before = frames[i];
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					r += (frames[i + ENTRIES + R] - r) * t;
-					g += (frames[i + ENTRIES + G] - g) * t;
-					b += (frames[i + ENTRIES + B] - b) * t;
-				}
-				case STEPPED -> {
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-				}
-				default -> {
-					r = getBezierValue(time, i, R, curveType - BEZIER);
-					g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-					b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-				}
-				}
+				return;
+			}
 
-				if (alpha != 1) {
-					if (blend == setup) {
-						Color setup = slot.data.setup.color;
-						r = setup.r + (r - setup.r) * alpha;
-						g = setup.g + (g - setup.g) * alpha;
-						b = setup.b + (b - setup.b) * alpha;
-					} else {
-						r = color.r + (r - color.r) * alpha;
-						g = color.g + (g - color.g) * alpha;
-						b = color.b + (b - color.b) * alpha;
-					}
+			int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
+			switch (curveType) {
+			case LINEAR -> {
+				float before = frames[i];
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				r += (frames[i + ENTRIES + R] - r) * t;
+				g += (frames[i + ENTRIES + G] - g) * t;
+				b += (frames[i + ENTRIES + B] - b) * t;
+			}
+			case STEPPED -> {
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+			}
+			default -> {
+				r = getBezierValue(time, i, R, curveType - BEZIER);
+				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+			}
+			}
+
+			if (alpha != 1) {
+				if (fromSetup) {
+					Color setup = slot.data.setup.color;
+					r = setup.r + (r - setup.r) * alpha;
+					g = setup.g + (g - setup.g) * alpha;
+					b = setup.b + (b - setup.b) * alpha;
+				} else {
+					r = color.r + (r - color.r) * alpha;
+					g = color.g + (g - color.g) * alpha;
+					b = color.b + (b - color.b) * alpha;
 				}
 			}
 			color.r = r < 0 ? 0 : (r > 1 ? 1 : r);
@@ -1141,9 +1008,8 @@ public class Animation {
 			return slotIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			Slot slot = skeleton.slots.items[slotIndex];
 			if (!slot.bone.active) return;
 
@@ -1151,25 +1017,17 @@ public class Animation {
 			float a;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				Color setup = slot.data.setup.color;
-				switch (blend) {
-				case setup:
-					color.a = setup.a;
-					// Fall through.
-				default:
-					return;
-				case first:
-					a = color.a + (setup.a - color.a) * alpha;
-				}
-			} else {
-				a = getCurveValue(time);
-				if (alpha != 1) {
-					if (blend == setup) {
-						Color setup = slot.data.setup.color;
-						a = setup.a + (a - setup.a) * alpha;
-					} else
-						a = color.a + (a - color.a) * alpha;
-				}
+				if (fromSetup) color.a = slot.data.setup.color.a;
+				return;
+			}
+
+			a = getCurveValue(time);
+			if (alpha != 1) {
+				if (fromSetup) {
+					Color setup = slot.data.setup.color;
+					a = setup.a + (a - setup.a) * alpha;
+				} else
+					a = color.a + (a - color.a) * alpha;
 			}
 			color.a = a < 0 ? 0 : (a > 1 ? 1 : a);
 		}
@@ -1206,88 +1064,79 @@ public class Animation {
 			frames[frame + B2] = b2;
 		}
 
-		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
+		protected void apply (Slot slot, SlotPose pose, float time, float alpha, boolean fromSetup, boolean add) {
 			Color light = pose.color, dark = pose.darkColor;
 			float r2, g2, b2;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				SlotPose setup = slot.data.setup;
-				Color setupLight = setup.color, setupDark = setup.darkColor;
-				switch (blend) {
-				case setup:
-					light.set(setupLight);
+				if (fromSetup) {
+					SlotPose setup = slot.data.setup;
+					light.set(setup.color);
+					Color setupDark = setup.darkColor;
 					dark.r = setupDark.r;
 					dark.g = setupDark.g;
 					dark.b = setupDark.b;
-					// Fall through.
-				default:
-					return;
-				case first:
-					light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
-						(setupLight.a - light.a) * alpha);
-					r2 = dark.r + (setupDark.r - dark.r) * alpha;
-					g2 = dark.g + (setupDark.g - dark.g) * alpha;
-					b2 = dark.b + (setupDark.b - dark.b) * alpha;
 				}
-			} else {
-				float r, g, b, a;
-				int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 3];
-				switch (curveType) {
-				case LINEAR -> {
-					float before = frames[i];
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					a = frames[i + A];
-					r2 = frames[i + R2];
-					g2 = frames[i + G2];
-					b2 = frames[i + B2];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					r += (frames[i + ENTRIES + R] - r) * t;
-					g += (frames[i + ENTRIES + G] - g) * t;
-					b += (frames[i + ENTRIES + B] - b) * t;
-					a += (frames[i + ENTRIES + A] - a) * t;
-					r2 += (frames[i + ENTRIES + R2] - r2) * t;
-					g2 += (frames[i + ENTRIES + G2] - g2) * t;
-					b2 += (frames[i + ENTRIES + B2] - b2) * t;
-				}
-				case STEPPED -> {
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					a = frames[i + A];
-					r2 = frames[i + R2];
-					g2 = frames[i + G2];
-					b2 = frames[i + B2];
-				}
-				default -> {
-					r = getBezierValue(time, i, R, curveType - BEZIER);
-					g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-					b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-					a = getBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
-					r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
-					g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
-					b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
-				}
-				}
+				return;
+			}
 
-				if (alpha == 1)
-					light.set(r, g, b, a);
-				else if (blend == setup) {
-					SlotPose setupPose = slot.data.setup;
-					Color setup = setupPose.color;
-					light.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
-						setup.a + (a - setup.a) * alpha);
-					setup = setupPose.darkColor;
-					r2 = setup.r + (r2 - setup.r) * alpha;
-					g2 = setup.g + (g2 - setup.g) * alpha;
-					b2 = setup.b + (b2 - setup.b) * alpha;
-				} else {
-					light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
-					r2 = dark.r + (r2 - dark.r) * alpha;
-					g2 = dark.g + (g2 - dark.g) * alpha;
-					b2 = dark.b + (b2 - dark.b) * alpha;
-				}
+			float r, g, b, a;
+			int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 3];
+			switch (curveType) {
+			case LINEAR -> {
+				float before = frames[i];
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				a = frames[i + A];
+				r2 = frames[i + R2];
+				g2 = frames[i + G2];
+				b2 = frames[i + B2];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				r += (frames[i + ENTRIES + R] - r) * t;
+				g += (frames[i + ENTRIES + G] - g) * t;
+				b += (frames[i + ENTRIES + B] - b) * t;
+				a += (frames[i + ENTRIES + A] - a) * t;
+				r2 += (frames[i + ENTRIES + R2] - r2) * t;
+				g2 += (frames[i + ENTRIES + G2] - g2) * t;
+				b2 += (frames[i + ENTRIES + B2] - b2) * t;
+			}
+			case STEPPED -> {
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				a = frames[i + A];
+				r2 = frames[i + R2];
+				g2 = frames[i + G2];
+				b2 = frames[i + B2];
+			}
+			default -> {
+				r = getBezierValue(time, i, R, curveType - BEZIER);
+				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				a = getBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
+				r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
+				g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
+				b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
+			}
+			}
+
+			if (alpha == 1)
+				light.set(r, g, b, a);
+			else if (fromSetup) {
+				SlotPose setupPose = slot.data.setup;
+				Color setup = setupPose.color;
+				light.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
+					setup.a + (a - setup.a) * alpha);
+				setup = setupPose.darkColor;
+				r2 = setup.r + (r2 - setup.r) * alpha;
+				g2 = setup.g + (g2 - setup.g) * alpha;
+				b2 = setup.b + (b2 - setup.b) * alpha;
+			} else {
+				light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+				r2 = dark.r + (r2 - dark.r) * alpha;
+				g2 = dark.g + (g2 - dark.g) * alpha;
+				b2 = dark.b + (b2 - dark.b) * alpha;
 			}
 			dark.r = r2 < 0 ? 0 : (r2 > 1 ? 1 : r2);
 			dark.g = g2 < 0 ? 0 : (g2 > 1 ? 1 : g2);
@@ -1324,88 +1173,78 @@ public class Animation {
 			frames[frame + B2] = b2;
 		}
 
-		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
+		protected void apply (Slot slot, SlotPose pose, float time, float alpha, boolean fromSetup, boolean add) {
 			Color light = pose.color, dark = pose.darkColor;
 			float r, g, b, r2, g2, b2;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				SlotPose setup = slot.data.setup;
-				Color setupLight = setup.color, setupDark = setup.darkColor;
-				switch (blend) {
-				case setup:
+				if (fromSetup) {
+					SlotPose setup = slot.data.setup;
+					Color setupLight = setup.color, setupDark = setup.darkColor;
 					light.r = setupLight.r;
 					light.g = setupLight.g;
 					light.b = setupLight.b;
 					dark.r = setupDark.r;
 					dark.g = setupDark.g;
 					dark.b = setupDark.b;
-					// Fall through.
-				default:
-					return;
-				case first:
-					r = light.r + (setupLight.r - light.r) * alpha;
-					g = light.g + (setupLight.g - light.g) * alpha;
-					b = light.b + (setupLight.b - light.b) * alpha;
-					r2 = dark.r + (setupDark.r - dark.r) * alpha;
-					g2 = dark.g + (setupDark.g - dark.g) * alpha;
-					b2 = dark.b + (setupDark.b - dark.b) * alpha;
 				}
-			} else {
-				int i = search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
-				switch (curveType) {
-				case LINEAR -> {
-					float before = frames[i];
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					r2 = frames[i + R2];
-					g2 = frames[i + G2];
-					b2 = frames[i + B2];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					r += (frames[i + ENTRIES + R] - r) * t;
-					g += (frames[i + ENTRIES + G] - g) * t;
-					b += (frames[i + ENTRIES + B] - b) * t;
-					r2 += (frames[i + ENTRIES + R2] - r2) * t;
-					g2 += (frames[i + ENTRIES + G2] - g2) * t;
-					b2 += (frames[i + ENTRIES + B2] - b2) * t;
-				}
-				case STEPPED -> {
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					r2 = frames[i + R2];
-					g2 = frames[i + G2];
-					b2 = frames[i + B2];
-				}
-				default -> {
-					r = getBezierValue(time, i, R, curveType - BEZIER);
-					g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-					b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-					r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
-					g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
-					b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
-				}
-				}
+				return;
+			}
 
-				if (alpha != 1) {
-					if (blend == setup) {
-						SlotPose setupPose = slot.data.setup;
-						Color setup = setupPose.color;
-						r = setup.r + (r - setup.r) * alpha;
-						g = setup.g + (g - setup.g) * alpha;
-						b = setup.b + (b - setup.b) * alpha;
-						setup = setupPose.darkColor;
-						r2 = setup.r + (r2 - setup.r) * alpha;
-						g2 = setup.g + (g2 - setup.g) * alpha;
-						b2 = setup.b + (b2 - setup.b) * alpha;
-					} else {
-						r = light.r + (r - light.r) * alpha;
-						g = light.g + (g - light.g) * alpha;
-						b = light.b + (b - light.b) * alpha;
-						r2 = dark.r + (r2 - dark.r) * alpha;
-						g2 = dark.g + (g2 - dark.g) * alpha;
-						b2 = dark.b + (b2 - dark.b) * alpha;
-					}
+			int i = search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			switch (curveType) {
+			case LINEAR -> {
+				float before = frames[i];
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				r2 = frames[i + R2];
+				g2 = frames[i + G2];
+				b2 = frames[i + B2];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				r += (frames[i + ENTRIES + R] - r) * t;
+				g += (frames[i + ENTRIES + G] - g) * t;
+				b += (frames[i + ENTRIES + B] - b) * t;
+				r2 += (frames[i + ENTRIES + R2] - r2) * t;
+				g2 += (frames[i + ENTRIES + G2] - g2) * t;
+				b2 += (frames[i + ENTRIES + B2] - b2) * t;
+			}
+			case STEPPED -> {
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				r2 = frames[i + R2];
+				g2 = frames[i + G2];
+				b2 = frames[i + B2];
+			}
+			default -> {
+				r = getBezierValue(time, i, R, curveType - BEZIER);
+				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
+				g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
+				b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
+			}
+			}
+
+			if (alpha != 1) {
+				if (fromSetup) {
+					SlotPose setupPose = slot.data.setup;
+					Color setup = setupPose.color;
+					r = setup.r + (r - setup.r) * alpha;
+					g = setup.g + (g - setup.g) * alpha;
+					b = setup.b + (b - setup.b) * alpha;
+					setup = setupPose.darkColor;
+					r2 = setup.r + (r2 - setup.r) * alpha;
+					g2 = setup.g + (g2 - setup.g) * alpha;
+					b2 = setup.b + (b2 - setup.b) * alpha;
+				} else {
+					r = light.r + (r - light.r) * alpha;
+					g = light.g + (g - light.g) * alpha;
+					b = light.b + (b - light.b) * alpha;
+					r2 = dark.r + (r2 - dark.r) * alpha;
+					g2 = dark.g + (g2 - dark.g) * alpha;
+					b2 = dark.b + (b2 - dark.b) * alpha;
 				}
 			}
 			light.r = r < 0 ? 0 : (r > 1 ? 1 : r);
@@ -1426,6 +1265,7 @@ public class Animation {
 			super(frameCount, Property.attachment.ordinal() + "|" + slotIndex);
 			this.slotIndex = slotIndex;
 			attachmentNames = new String[frameCount];
+			instant = true;
 		}
 
 		public int getFrameCount () {
@@ -1449,17 +1289,14 @@ public class Animation {
 			attachmentNames[frame] = attachmentName;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			Slot slot = skeleton.slots.items[slotIndex];
 			if (!slot.bone.active) return;
 			SlotPose pose = appliedPose ? slot.applied : slot.pose;
 
-			if (direction == out) {
-				if (blend == setup) setAttachment(skeleton, pose, slot.data.attachmentName);
-			} else if (time < this.frames[0]) {
-				if (blend == setup || blend == first) setAttachment(skeleton, pose, slot.data.attachmentName);
+			if (out || time < this.frames[0]) {
+				if (fromSetup) setAttachment(skeleton, pose, slot.data.attachmentName);
 			} else
 				setAttachment(skeleton, pose, attachmentNames[search(this.frames, time)]);
 		}
@@ -1478,6 +1315,7 @@ public class Animation {
 			super(frameCount, bezierCount, slotIndex, Property.deform.ordinal() + "|" + slotIndex + "|" + attachment.getId());
 			this.attachment = attachment;
 			vertices = new float[frameCount][];
+			additive = true;
 		}
 
 		public int getFrameCount () {
@@ -1557,37 +1395,19 @@ public class Animation {
 			return y + (1 - y) * (time - x) / (frames[frame + getFrameEntries()] - x);
 		}
 
-		protected void apply (Slot slot, SlotPose pose, float time, float alpha, MixBlend blend) {
+		protected void apply (Slot slot, SlotPose pose, float time, float alpha, boolean fromSetup, boolean add) {
 			if (!(pose.attachment instanceof VertexAttachment vertexAttachment)
 				|| vertexAttachment.getTimelineAttachment() != attachment) return;
 
 			FloatArray deformArray = pose.deform;
-			if (deformArray.size == 0) blend = setup;
+			if (deformArray.size == 0) fromSetup = true;
 
 			float[][] vertices = this.vertices;
 			int vertexCount = vertices[0].length;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				switch (blend) {
-				case setup -> deformArray.clear();
-				case first -> {
-					if (alpha == 1) {
-						deformArray.clear();
-						return;
-					}
-					float[] deform = deformArray.setSize(vertexCount);
-					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions.
-						float[] setupVertices = vertexAttachment.getVertices();
-						for (int i = 0; i < vertexCount; i++)
-							deform[i] += (setupVertices[i] - deform[i]) * alpha;
-					} else { // Weighted deform offsets.
-						alpha = 1 - alpha;
-						for (int i = 0; i < vertexCount; i++)
-							deform[i] *= alpha;
-					}
-				}
-				}
+				if (fromSetup) deformArray.clear();
 				return;
 			}
 
@@ -1596,7 +1416,7 @@ public class Animation {
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				float[] lastVertices = vertices[frames.length - 1];
 				if (alpha == 1) {
-					if (blend == add) {
+					if (add && !fromSetup) {
 						if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, no alpha.
 							float[] setupVertices = vertexAttachment.getVertices();
 							for (int i = 0; i < vertexCount; i++)
@@ -1607,35 +1427,29 @@ public class Animation {
 						}
 					} else // Vertex positions or deform offsets, no alpha.
 						arraycopy(lastVertices, 0, deform, 0, vertexCount);
-				} else {
-					switch (blend) {
-					case setup -> {
-						if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
-							float[] setupVertices = vertexAttachment.getVertices();
-							for (int i = 0; i < vertexCount; i++) {
-								float setup = setupVertices[i];
-								deform[i] = setup + (lastVertices[i] - setup) * alpha;
-							}
-						} else { // Weighted deform offsets, with alpha.
-							for (int i = 0; i < vertexCount; i++)
-								deform[i] = lastVertices[i] * alpha;
+				} else if (fromSetup) {
+					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.getVertices();
+						for (int i = 0; i < vertexCount; i++) {
+							float setup = setupVertices[i];
+							deform[i] = setup + (lastVertices[i] - setup) * alpha;
 						}
-					}
-					case first, replace -> { // Vertex positions or deform offsets, with alpha.
+					} else { // Weighted deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++)
-							deform[i] += (lastVertices[i] - deform[i]) * alpha;
+							deform[i] = lastVertices[i] * alpha;
 					}
-					case add -> {
-						if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, no alpha.
-							float[] setupVertices = vertexAttachment.getVertices();
-							for (int i = 0; i < vertexCount; i++)
-								deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
-						} else { // Weighted deform offsets, alpha.
-							for (int i = 0; i < vertexCount; i++)
-								deform[i] += lastVertices[i] * alpha;
-						}
+				} else if (add) {
+					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.getVertices();
+						for (int i = 0; i < vertexCount; i++)
+							deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+					} else { // Weighted deform offsets, with alpha.
+						for (int i = 0; i < vertexCount; i++)
+							deform[i] += lastVertices[i] * alpha;
 					}
-					}
+				} else { // Vertex positions or deform offsets, with alpha.
+					for (int i = 0; i < vertexCount; i++)
+						deform[i] += (lastVertices[i] - deform[i]) * alpha;
 				}
 				return;
 			}
@@ -1646,7 +1460,7 @@ public class Animation {
 			float[] nextVertices = vertices[frame + 1];
 
 			if (alpha == 1) {
-				if (blend == add) {
+				if (add && !fromSetup) {
 					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, no alpha.
 						float[] setupVertices = vertexAttachment.getVertices();
 						for (int i = 0; i < vertexCount; i++) {
@@ -1667,42 +1481,36 @@ public class Animation {
 						deform[i] = prev + (nextVertices[i] - prev) * percent;
 					}
 				}
-			} else {
-				switch (blend) {
-				case setup -> {
-					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
-						float[] setupVertices = vertexAttachment.getVertices();
-						for (int i = 0; i < vertexCount; i++) {
-							float prev = prevVertices[i], setup = setupVertices[i];
-							deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
-						}
-					} else { // Weighted deform offsets, with alpha.
-						for (int i = 0; i < vertexCount; i++) {
-							float prev = prevVertices[i];
-							deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
-						}
+			} else if (fromSetup) {
+				if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
+					float[] setupVertices = vertexAttachment.getVertices();
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i], setup = setupVertices[i];
+						deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 					}
-				}
-				case first, replace -> {// Vertex positions or deform offsets, with alpha.
+				} else { // Weighted deform offsets, with alpha.
 					for (int i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
-						deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
+						deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 					}
 				}
-				case add -> {
-					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
-						float[] setupVertices = vertexAttachment.getVertices();
-						for (int i = 0; i < vertexCount; i++) {
-							float prev = prevVertices[i];
-							deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
-						}
-					} else { // Weighted deform offsets, with alpha.
-						for (int i = 0; i < vertexCount; i++) {
-							float prev = prevVertices[i];
-							deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
-						}
+			} else if (add) {
+				if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
+					float[] setupVertices = vertexAttachment.getVertices();
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i];
+						deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+					}
+				} else { // Weighted deform offsets, with alpha.
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i];
+						deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
 					}
 				}
+			} else { // Vertex positions or deform offsets, with alpha.
+				for (int i = 0; i < vertexCount; i++) {
+					float prev = prevVertices[i];
+					deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 				}
 			}
 		}
@@ -1720,6 +1528,7 @@ public class Animation {
 			super(frameCount, Property.sequence.ordinal() + "|" + slotIndex + "|" + ((HasSequence)attachment).getSequence().getId());
 			this.slotIndex = slotIndex;
 			this.attachment = (HasSequence)attachment;
+			instant = true;
 		}
 
 		public int getFrameEntries () {
@@ -1747,9 +1556,8 @@ public class Animation {
 			frames[frame + DELAY] = delay;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			Slot slot = skeleton.slots.items[slotIndex];
 			if (!slot.bone.active) return;
 			SlotPose pose = appliedPose ? slot.applied : slot.pose;
@@ -1757,14 +1565,14 @@ public class Animation {
 			Attachment slotAttachment = pose.attachment;
 			if (!(slotAttachment instanceof HasSequence hasSequence) || slotAttachment.getTimelineAttachment() != attachment) return;
 
-			if (direction == out) {
-				if (blend == setup) pose.setSequenceIndex(-1);
+			if (out) {
+				if (fromSetup) pose.setSequenceIndex(-1);
 				return;
 			}
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (blend == setup || blend == first) pose.setSequenceIndex(-1);
+				if (fromSetup) pose.setSequenceIndex(-1);
 				return;
 			}
 
@@ -1807,6 +1615,7 @@ public class Animation {
 		public EventTimeline (int frameCount) {
 			super(frameCount, propertyIds);
 			events = new Event[frameCount];
+			instant = true;
 		}
 
 		public int getFrameCount () {
@@ -1827,15 +1636,14 @@ public class Animation {
 
 		/** Fires events for frames > <code>lastTime</code> and <= <code>time</code>. */
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> firedEvents, float alpha,
-			MixBlend blend, MixDirection direction, boolean appliedPose) {
-
+			boolean fromSetup, boolean add, boolean out, boolean appliedPose) {
 			if (firedEvents == null) return;
 
 			float[] frames = this.frames;
 			int frameCount = frames.length;
 
 			if (lastTime > time) { // Apply after lastTime for looped animations.
-				apply(skeleton, lastTime, Integer.MAX_VALUE, firedEvents, alpha, blend, direction, appliedPose);
+				apply(null, lastTime, Integer.MAX_VALUE, firedEvents, 0, false, false, false, false);
 				lastTime = -1f;
 			} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
 				return;
@@ -1867,6 +1675,7 @@ public class Animation {
 		public DrawOrderTimeline (int frameCount) {
 			super(frameCount, propertyIds);
 			drawOrders = new int[frameCount][];
+			instant = true;
 		}
 
 		public int getFrameCount () {
@@ -1887,17 +1696,10 @@ public class Animation {
 			drawOrders[frame] = drawOrder;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
-			if (direction == out) {
-				if (blend == setup) arraycopy(skeleton.slots.items, 0, skeleton.drawOrder.items, 0, skeleton.slots.size);
-				return;
-			}
-
-			if (time < frames[0]) {
-				if (blend == setup || blend == first)
-					arraycopy(skeleton.slots.items, 0, skeleton.drawOrder.items, 0, skeleton.slots.size);
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
+			if (out || time < frames[0]) {
+				if (fromSetup) arraycopy(skeleton.slots.items, 0, skeleton.drawOrder.items, 0, skeleton.slots.size);
 				return;
 			}
 
@@ -1928,6 +1730,7 @@ public class Animation {
 			inFolder = new boolean[slotCount];
 			for (int i : slots)
 				inFolder[i] = true;
+			instant = true;
 		}
 
 		static private String[] propertyIds (int[] slots) {
@@ -1961,13 +1764,10 @@ public class Animation {
 			drawOrders[frame] = drawOrder;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
-			if (direction == out) {
-				if (blend == setup) setup(skeleton);
-			} else if (time < frames[0]) {
-				if (blend == setup || blend == first) setup(skeleton);
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
+			if (out || time < frames[0]) {
+				if (fromSetup) setup(skeleton);
 			} else {
 				int[] order = drawOrders[search(frames, time)];
 				if (order == null)
@@ -2045,31 +1845,21 @@ public class Animation {
 			frames[frame + STRETCH] = stretch ? 1 : 0;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (IkConstraint)skeleton.constraints.items[constraintIndex];
 			if (!constraint.active) return;
 			IkConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				IkConstraintPose setup = constraint.data.setup;
-				switch (blend) {
-				case setup -> {
+				if (fromSetup) {
+					IkConstraintPose setup = constraint.data.setup;
 					pose.mix = setup.mix;
 					pose.softness = setup.softness;
 					pose.bendDirection = setup.bendDirection;
 					pose.compress = setup.compress;
 					pose.stretch = setup.stretch;
-				}
-				case first -> {
-					pose.mix += (setup.mix - pose.mix) * alpha;
-					pose.softness += (setup.softness - pose.softness) * alpha;
-					pose.bendDirection = setup.bendDirection;
-					pose.compress = setup.compress;
-					pose.stretch = setup.stretch;
-				}
 				}
 				return;
 			}
@@ -2095,24 +1885,20 @@ public class Animation {
 			}
 			}
 
-			if (blend == setup) {
-				IkConstraintPose setup = constraint.data.setup;
-				pose.mix = setup.mix + (mix - setup.mix) * alpha;
-				pose.softness = setup.softness + (softness - setup.softness) * alpha;
-				if (direction == out) {
-					pose.bendDirection = setup.bendDirection;
-					pose.compress = setup.compress;
-					pose.stretch = setup.stretch;
-					return;
+			IkConstraintPose base = fromSetup ? constraint.data.setup : pose;
+			pose.mix = base.mix + (mix - base.mix) * alpha;
+			pose.softness = base.softness + (softness - base.softness) * alpha;
+			if (out) {
+				if (fromSetup) {
+					pose.bendDirection = base.bendDirection;
+					pose.compress = base.compress;
+					pose.stretch = base.stretch;
 				}
 			} else {
-				pose.mix += (mix - pose.mix) * alpha;
-				pose.softness += (softness - pose.softness) * alpha;
-				if (direction == out) return;
+				pose.bendDirection = (int)frames[i + BEND_DIRECTION];
+				pose.compress = frames[i + COMPRESS] != 0;
+				pose.stretch = frames[i + STRETCH] != 0;
 			}
-			pose.bendDirection = (int)frames[i + BEND_DIRECTION];
-			pose.compress = frames[i + COMPRESS] != 0;
-			pose.stretch = frames[i + STRETCH] != 0;
 		}
 	}
 
@@ -2128,6 +1914,7 @@ public class Animation {
 		public TransformConstraintTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, Property.transformConstraint.ordinal() + "|" + constraintIndex);
 			this.constraintIndex = constraintIndex;
+			additive = true;
 		}
 
 		public int getFrameEntries () {
@@ -2153,33 +1940,22 @@ public class Animation {
 			frames[frame + SHEARY] = mixShearY;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (TransformConstraint)skeleton.constraints.items[constraintIndex];
 			if (!constraint.active) return;
 			TransformConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				TransformConstraintPose setup = constraint.data.setup;
-				switch (blend) {
-				case setup -> {
+				if (fromSetup) {
+					TransformConstraintPose setup = constraint.data.setup;
 					pose.mixRotate = setup.mixRotate;
 					pose.mixX = setup.mixX;
 					pose.mixY = setup.mixY;
 					pose.mixScaleX = setup.mixScaleX;
 					pose.mixScaleY = setup.mixScaleY;
 					pose.mixShearY = setup.mixShearY;
-				}
-				case first -> {
-					pose.mixRotate += (setup.mixRotate - pose.mixRotate) * alpha;
-					pose.mixX += (setup.mixX - pose.mixX) * alpha;
-					pose.mixY += (setup.mixY - pose.mixY) * alpha;
-					pose.mixScaleX += (setup.mixScaleX - pose.mixScaleX) * alpha;
-					pose.mixScaleY += (setup.mixScaleY - pose.mixScaleY) * alpha;
-					pose.mixShearY += (setup.mixShearY - pose.mixShearY) * alpha;
-				}
 				}
 				return;
 			}
@@ -2221,32 +1997,21 @@ public class Animation {
 			}
 			}
 
-			switch (blend) {
-			case setup -> {
-				TransformConstraintPose setup = constraint.data.setup;
-				pose.mixRotate = setup.mixRotate + (rotate - setup.mixRotate) * alpha;
-				pose.mixX = setup.mixX + (x - setup.mixX) * alpha;
-				pose.mixY = setup.mixY + (y - setup.mixY) * alpha;
-				pose.mixScaleX = setup.mixScaleX + (scaleX - setup.mixScaleX) * alpha;
-				pose.mixScaleY = setup.mixScaleY + (scaleY - setup.mixScaleY) * alpha;
-				pose.mixShearY = setup.mixShearY + (shearY - setup.mixShearY) * alpha;
-			}
-			case first, replace -> {
-				pose.mixRotate += (rotate - pose.mixRotate) * alpha;
-				pose.mixX += (x - pose.mixX) * alpha;
-				pose.mixY += (y - pose.mixY) * alpha;
-				pose.mixScaleX += (scaleX - pose.mixScaleX) * alpha;
-				pose.mixScaleY += (scaleY - pose.mixScaleY) * alpha;
-				pose.mixShearY += (shearY - pose.mixShearY) * alpha;
-			}
-			case add -> {
-				pose.mixRotate += rotate * alpha;
-				pose.mixX += x * alpha;
-				pose.mixY += y * alpha;
-				pose.mixScaleX += scaleX * alpha;
-				pose.mixScaleY += scaleY * alpha;
-				pose.mixShearY += shearY * alpha;
-			}
+			TransformConstraintPose base = fromSetup ? constraint.data.setup : pose;
+			if (add) {
+				pose.mixRotate = base.mixRotate + rotate * alpha;
+				pose.mixX = base.mixX + x * alpha;
+				pose.mixY = base.mixY + y * alpha;
+				pose.mixScaleX = base.mixScaleX + scaleX * alpha;
+				pose.mixScaleY = base.mixScaleY + scaleY * alpha;
+				pose.mixShearY = base.mixShearY + shearY * alpha;
+			} else {
+				pose.mixRotate = base.mixRotate + (rotate - base.mixRotate) * alpha;
+				pose.mixX = base.mixX + (x - base.mixX) * alpha;
+				pose.mixY = base.mixY + (y - base.mixY) * alpha;
+				pose.mixScaleX = base.mixScaleX + (scaleX - base.mixScaleX) * alpha;
+				pose.mixScaleY = base.mixScaleY + (scaleY - base.mixScaleY) * alpha;
+				pose.mixShearY = base.mixShearY + (shearY - base.mixShearY) * alpha;
 			}
 		}
 	}
@@ -2268,15 +2033,15 @@ public class Animation {
 	static public class PathConstraintPositionTimeline extends ConstraintTimeline1 {
 		public PathConstraintPositionTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.pathConstraintPosition);
+			additive = true;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (PathConstraint)skeleton.constraints.items[constraintIndex];
 			if (constraint.active) {
 				PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.position = getAbsoluteValue(time, alpha, blend, pose.position, constraint.data.setup.position);
+				pose.position = getAbsoluteValue(time, alpha, fromSetup, add, pose.position, constraint.data.setup.position);
 			}
 		}
 	}
@@ -2287,14 +2052,12 @@ public class Animation {
 			super(frameCount, bezierCount, constraintIndex, Property.pathConstraintSpacing);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (PathConstraint)skeleton.constraints.items[constraintIndex];
 			if (constraint.active) {
 				PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.spacing = getAbsoluteValue(time, alpha, blend == add ? replace : blend, pose.spacing,
-					constraint.data.setup.spacing);
+				pose.spacing = getAbsoluteValue(time, alpha, fromSetup, false, pose.spacing, constraint.data.setup.spacing);
 			}
 		}
 	}
@@ -2310,6 +2073,7 @@ public class Animation {
 		public PathConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, Property.pathConstraintMix.ordinal() + "|" + constraintIndex);
 			this.constraintIndex = constraintIndex;
+			additive = true;
 		}
 
 		public int getFrameEntries () {
@@ -2331,27 +2095,19 @@ public class Animation {
 			frames[frame + Y] = mixY;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (PathConstraint)skeleton.constraints.items[constraintIndex];
 			if (!constraint.active) return;
 			PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				PathConstraintPose setup = constraint.data.setup;
-				switch (blend) {
-				case setup -> {
+				if (fromSetup) {
+					PathConstraintPose setup = constraint.data.setup;
 					pose.mixRotate = setup.mixRotate;
 					pose.mixX = setup.mixX;
 					pose.mixY = setup.mixY;
-				}
-				case first -> {
-					pose.mixRotate += (setup.mixRotate - pose.mixRotate) * alpha;
-					pose.mixX += (setup.mixX - pose.mixX) * alpha;
-					pose.mixY += (setup.mixY - pose.mixY) * alpha;
-				}
 				}
 				return;
 			}
@@ -2381,32 +2137,23 @@ public class Animation {
 			}
 			}
 
-			if (blend == setup) {
-				PathConstraintPose setup = constraint.data.setup;
-				pose.mixRotate = setup.mixRotate + (rotate - setup.mixRotate) * alpha;
-				pose.mixX = setup.mixX + (x - setup.mixX) * alpha;
-				pose.mixY = setup.mixY + (y - setup.mixY) * alpha;
-			} else {
-				pose.mixRotate += (rotate - pose.mixRotate) * alpha;
-				pose.mixX += (x - pose.mixX) * alpha;
-				pose.mixY += (y - pose.mixY) * alpha;
-			}
+			PathConstraintPose base = fromSetup ? constraint.data.setup : pose;
+			pose.mixRotate = base.mixRotate + (rotate - base.mixRotate) * alpha;
+			pose.mixX = base.mixX + (x - base.mixX) * alpha;
+			pose.mixY = base.mixY + (y - base.mixY) * alpha;
 		}
 	}
 
 	/** The base class for most {@link PhysicsConstraint} timelines. */
 	static abstract public class PhysicsConstraintTimeline extends ConstraintTimeline1 {
-		boolean additive;
-
 		/** @param constraintIndex -1 for all physics constraints in the skeleton. */
 		public PhysicsConstraintTimeline (int frameCount, int bezierCount, int constraintIndex, Property property) {
 			super(frameCount, bezierCount, constraintIndex, property);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
-			if (blend == add && !additive) blend = replace;
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
+			if (add && !additive) add = false;
 			if (constraintIndex == -1) {
 				float value = time >= frames[0] ? getCurveValue(time) : 0;
 				PhysicsConstraint[] constraints = skeleton.physics.items;
@@ -2414,14 +2161,14 @@ public class Animation {
 					PhysicsConstraint constraint = constraints[i];
 					if (constraint.active && global(constraint.data)) {
 						PhysicsConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-						set(pose, getAbsoluteValue(time, alpha, blend, get(pose), get(constraint.data.setup), value));
+						set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint.data.setup), value));
 					}
 				}
 			} else {
 				var constraint = (PhysicsConstraint)skeleton.constraints.items[constraintIndex];
 				if (constraint.active) {
 					PhysicsConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-					set(pose, getAbsoluteValue(time, alpha, blend, get(pose), get(constraint.data.setup)));
+					set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint.data.setup)));
 				}
 			}
 		}
@@ -2578,6 +2325,7 @@ public class Animation {
 		public PhysicsConstraintResetTimeline (int frameCount, int constraintIndex) {
 			super(frameCount, propertyIds);
 			this.constraintIndex = constraintIndex;
+			instant = true;
 		}
 
 		/** The index of the physics constraint in {@link Skeleton#getConstraints()} that will be reset when this timeline is
@@ -2597,9 +2345,8 @@ public class Animation {
 		}
 
 		/** Resets the physics constraint when frames > <code>lastTime</code> and <= <code>time</code>. */
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> firedEvents, float alpha,
-			MixBlend blend, MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			PhysicsConstraint constraint = null;
 			if (constraintIndex != -1) {
 				constraint = (PhysicsConstraint)skeleton.constraints.items[constraintIndex];
@@ -2609,7 +2356,7 @@ public class Animation {
 			float[] frames = this.frames;
 
 			if (lastTime > time) { // Apply after lastTime for looped animations.
-				apply(skeleton, lastTime, Integer.MAX_VALUE, null, alpha, blend, direction, appliedPose);
+				apply(skeleton, lastTime, Integer.MAX_VALUE, null, alpha, false, false, false, false);
 				lastTime = -1f;
 			} else if (lastTime >= frames[frames.length - 1]) // Last time is after last frame.
 				return;
@@ -2633,15 +2380,15 @@ public class Animation {
 	static public class SliderTimeline extends ConstraintTimeline1 {
 		public SliderTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.sliderTime);
+			additive = true;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (Slider)skeleton.constraints.items[constraintIndex];
 			if (constraint.active) {
 				SliderPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.time = getAbsoluteValue(time, alpha, blend, pose.time, constraint.data.setup.time);
+				pose.time = getAbsoluteValue(time, alpha, fromSetup, add, pose.time, constraint.data.setup.time);
 			}
 		}
 	}
@@ -2650,15 +2397,15 @@ public class Animation {
 	static public class SliderMixTimeline extends ConstraintTimeline1 {
 		public SliderMixTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.sliderMix);
+			additive = true;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction, boolean appliedPose) {
-
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (Slider)skeleton.constraints.items[constraintIndex];
 			if (constraint.active) {
 				SliderPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.mix = getAbsoluteValue(time, alpha, blend, pose.mix, constraint.data.setup.mix);
+				pose.mix = getAbsoluteValue(time, alpha, fromSetup, add, pose.mix, constraint.data.setup.mix);
 			}
 		}
 	}

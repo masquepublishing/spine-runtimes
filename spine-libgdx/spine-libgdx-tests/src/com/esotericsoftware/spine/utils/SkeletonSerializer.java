@@ -1900,8 +1900,8 @@ public class SkeletonSerializer {
 		json.writeName("mixDuration");
 		json.writeValue(obj.getMixDuration());
 
-		json.writeName("mixBlend");
-		json.writeValue(obj.getMixBlend().name());
+		json.writeName("additive");
+		json.writeValue(obj.getAdditive());
 
 		json.writeName("mixingFrom");
 		if (obj.getMixingFrom() == null) {

@@ -67,7 +67,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 
 import java.awt.FileDialog;
@@ -572,7 +571,7 @@ class SkeletonViewerUI {
 					loopCheckbox.setChecked(current.getLoop());
 					reverseCheckbox.setChecked(current.getReverse());
 					if (track > 0) {
-						addCheckbox.setChecked(current.getMixBlend() == MixBlend.add);
+						addCheckbox.setChecked(current.getAdditive());
 						holdPrevCheckbox.setChecked(current.getHoldPrevious());
 					}
 				}

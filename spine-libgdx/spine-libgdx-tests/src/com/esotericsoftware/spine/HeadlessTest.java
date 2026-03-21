@@ -36,6 +36,7 @@ import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+
 import com.esotericsoftware.spine.utils.SkeletonSerializer;
 
 public class HeadlessTest implements ApplicationListener {

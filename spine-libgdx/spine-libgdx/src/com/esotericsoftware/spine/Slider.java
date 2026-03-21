@@ -30,8 +30,6 @@
 package com.esotericsoftware.spine;
 
 import com.esotericsoftware.spine.Animation.ConstraintTimeline;
-import com.esotericsoftware.spine.Animation.MixBlend;
-import com.esotericsoftware.spine.Animation.MixDirection;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintTimeline;
 import com.esotericsoftware.spine.Animation.SlotTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
@@ -78,8 +76,7 @@ public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 		for (int i = 0, n = animation.bones.size; i < n; i++)
 			bones[indices[i]].applied.modifyLocal(skeleton);
 
-		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, data.additive ? MixBlend.add : MixBlend.replace,
-			MixDirection.in, true);
+		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, false, data.additive, false, true);
 	}
 
 	void sort (Skeleton skeleton) {
