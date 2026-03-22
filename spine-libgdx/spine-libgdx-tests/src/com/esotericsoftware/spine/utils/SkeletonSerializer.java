@@ -3346,7 +3346,8 @@ public class SkeletonSerializer {
 			json.writeValue(visitedObjects.get(obj));
 			return;
 		}
-		String refString = obj.getName() != null ? "<SkinEntry-" + obj.getName() + ">" : "<SkinEntry-" + (nextId++) + ">";
+		String refString = obj.getPlaceholderName() != null ? "<SkinEntry-" + obj.getPlaceholderName() + ">"
+			: "<SkinEntry-" + (nextId++) + ">";
 		visitedObjects.put(obj, refString);
 
 		json.writeObjectStart();
@@ -3359,7 +3360,7 @@ public class SkeletonSerializer {
 		json.writeValue(obj.getSlotIndex());
 
 		json.writeName("name");
-		json.writeValue(obj.getName());
+		json.writeValue(obj.getPlaceholderName());
 
 		json.writeName("attachment");
 		writeAttachment(obj.getAttachment());
