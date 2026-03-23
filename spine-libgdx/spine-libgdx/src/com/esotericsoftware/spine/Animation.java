@@ -435,7 +435,7 @@ public class Animation {
 			float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = getCurveValue(time) * setup;
-			if (alpha == 1) return value;
+			if (alpha == 1 && !add) return value;
 			float base = fromSetup ? setup : current;
 			if (add) return base + (value - setup) * alpha;
 			if (out) return base + (Math.abs(value) * Math.signum(base) - base) * alpha;
@@ -642,7 +642,7 @@ public class Animation {
 			x *= setup.scaleX;
 			y *= setup.scaleY;
 
-			if (!add && alpha == 1) {
+			if (alpha == 1 && !add) {
 				pose.scaleX = x;
 				pose.scaleY = y;
 			} else {
@@ -2138,9 +2138,15 @@ public class Animation {
 			}
 
 			PathConstraintPose base = fromSetup ? constraint.data.setup : pose;
-			pose.mixRotate = base.mixRotate + (rotate - base.mixRotate) * alpha;
-			pose.mixX = base.mixX + (x - base.mixX) * alpha;
-			pose.mixY = base.mixY + (y - base.mixY) * alpha;
+			if (add) {
+				pose.mixRotate = base.mixRotate + rotate * alpha;
+				pose.mixX = base.mixX + x * alpha;
+				pose.mixY = base.mixY + y * alpha;
+			} else {
+				pose.mixRotate = base.mixRotate + (rotate - base.mixRotate) * alpha;
+				pose.mixX = base.mixX + (x - base.mixX) * alpha;
+				pose.mixY = base.mixY + (y - base.mixY) * alpha;
+			}
 		}
 	}
 
