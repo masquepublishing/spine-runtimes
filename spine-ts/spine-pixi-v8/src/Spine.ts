@@ -802,7 +802,10 @@ export class Spine extends ViewContainer {
 
 		const pose = slot.applied;
 		const followAttachmentValue = slotAttachment.followAttachmentTimeline ? Boolean(pose.attachment) : true;
-		container.visible = this.skeleton.drawOrder.includes(slot) && followAttachmentValue;
+		const slotAlpha = this.skeleton.color.a * pose.color.a;
+
+		container.visible = this.skeleton.drawOrder.includes(slot) && followAttachmentValue
+			&& this.alpha > 0 && slotAlpha > 0;
 
 		if (container.visible) {
 			const applied = slot.bone.applied;
@@ -816,7 +819,7 @@ export class Spine extends ViewContainer {
 			matrix.ty = applied.worldY;
 			container.setFromMatrix(matrix);
 
-			container.alpha = this.skeleton.color.a * pose.color.a;
+			container.alpha = slotAlpha;
 		}
 	}
 
