@@ -211,10 +211,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 			state.setEmptyAnimation(track, 0);
 			entry = state.addAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked(), 0);
 			entry.setMixDuration(ui.mixSlider.getValue());
-		} else {
+		} else
 			entry = state.setAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
-			entry.setHoldPrevious(track > 0 && ui.holdPrevCheckbox.isChecked());
-		}
 		entry.setAdditive(track > 0 && ui.addCheckbox.isChecked());
 		entry.setReverse(ui.reverseCheckbox.isChecked());
 		entry.setAlpha(ui.alphaSlider.getValue());

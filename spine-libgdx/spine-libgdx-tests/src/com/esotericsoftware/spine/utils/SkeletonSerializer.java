@@ -1917,9 +1917,6 @@ public class SkeletonSerializer {
 			writeTrackEntry(obj.getMixingTo());
 		}
 
-		json.writeName("holdPrevious");
-		json.writeValue(obj.getHoldPrevious());
-
 		json.writeName("shortestRotation");
 		json.writeValue(obj.getShortestRotation());
 

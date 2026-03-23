@@ -570,10 +570,7 @@ class SkeletonViewerUI {
 				if (current != null) {
 					loopCheckbox.setChecked(current.getLoop());
 					reverseCheckbox.setChecked(current.getReverse());
-					if (track > 0) {
-						addCheckbox.setChecked(current.getAdditive());
-						holdPrevCheckbox.setChecked(current.getHoldPrevious());
-					}
+					if (track > 0) addCheckbox.setChecked(current.getAdditive());
 				}
 			}
 		};

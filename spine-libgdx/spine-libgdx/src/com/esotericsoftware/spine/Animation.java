@@ -1673,7 +1673,7 @@ public class Animation {
 		}
 
 		/** Fires events for frames > <code>lastTime</code> and <= <code>time</code>. */
-		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> firedEvents, float alpha,
+		public void apply (@Null Skeleton skeleton, float lastTime, float time, @Null Array<Event> firedEvents, float alpha,
 			boolean fromSetup, boolean add, boolean out, boolean appliedPose) {
 			if (firedEvents == null) return;
 
