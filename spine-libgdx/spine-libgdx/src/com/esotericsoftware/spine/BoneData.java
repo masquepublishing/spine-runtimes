@@ -58,11 +58,19 @@ public class BoneData extends PosedData<BoneLocal> {
 		setup.set(data.setup);
 	}
 
-	/** The index of the bone in {@link Skeleton#getBones()}. */
+	/** The bone's name, unique across all bones in the skeleton.
+	 * <p>
+	 * See {@link SkeletonData#findBone(String)} and {@link Skeleton#findBone(String)}. */
+	public String getName () { // Do not port.
+		return super.getName();
+	}
+
+	/** The {@link Skeleton#getBones()} index. */
 	public int getIndex () {
 		return index;
 	}
 
+	/** The parent bone, or null if this bone is the root. */
 	public @Null BoneData getParent () {
 		return parent;
 	}
@@ -82,7 +90,7 @@ public class BoneData extends PosedData<BoneLocal> {
 		return color;
 	}
 
-	/** The bone icon as it was in Spine, or null if nonessential data was not exported. */
+	/** The bone icon name as it was in Spine, or null if nonessential data was not exported. */
 	public @Null String getIcon () {
 		return icon;
 	}

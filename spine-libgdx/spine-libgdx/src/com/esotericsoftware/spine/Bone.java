@@ -32,12 +32,15 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
-// BOZO - Update javadocs.
-/** The current pose for a bone, before constraints are applied.
- * <p>
- * A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
- * local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
- * constraint or application code modifies the world transform after it was computed from the local transform. */
+/** A bone has a number of poses:
+ * <ul>
+ * <li>{@link BoneData#getSetupPose()}: The setup pose.
+ * <li>{@link #getPose()}: The local pose. Set by animations and app code.
+ * <li>{@link #getAppliedPose()}: The applied local pose. This is the local pose modified by constraints and app code.
+ * <li>The world transform on the applied pose, computed by {@link Skeleton#updateWorldTransform(Physics)} and
+ * {@link BonePose#updateWorldTransform(Skeleton)}.
+ * </ul>
+ */
 public class Bone extends PosedActive<BoneData, BoneLocal, BonePose> {
 	@Null final Bone parent;
 	final Array<Bone> children = new Array(true, 4, Bone[]::new);

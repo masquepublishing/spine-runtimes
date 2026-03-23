@@ -350,7 +350,7 @@ public class Skeleton {
 		return null;
 	}
 
-	/** The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order. */
+	/** The skeleton's slots in the order they should be drawn. The returned list may be modified to change the draw order. */
 	public Array<Slot> getDrawOrder () {
 		return drawOrder;
 	}
@@ -650,7 +650,7 @@ public class Skeleton {
 			constraints[i].rotate(x, y, degrees);
 	}
 
-	/** Returns the skeleton's time. This is used for time-based manipulations, such as {@link PhysicsConstraint}.
+	/** Returns the skeleton's time, used for time-based manipulations, such as {@link PhysicsConstraint}.
 	 * <p>
 	 * See {@link #update(float)}. */
 	public float getTime () {

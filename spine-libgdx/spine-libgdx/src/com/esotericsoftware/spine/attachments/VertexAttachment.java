@@ -40,7 +40,7 @@ import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 import com.esotericsoftware.spine.SlotPose;
 
-/** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
+/** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by
  * {@link SlotPose#getDeform()}. */
 abstract public class VertexAttachment extends Attachment {
 	static private int nextID;
@@ -73,8 +73,8 @@ abstract public class VertexAttachment extends Attachment {
 		worldVerticesLength = other.worldVerticesLength;
 	}
 
-	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot's {@link SlotPose#getDeform()}
-	 * is not empty, it is used to deform the vertices.
+	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the {@link SlotPose#getDeform()} is not
+	 * empty, it is used to deform the vertices.
 	 * <p>
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
@@ -142,9 +142,9 @@ abstract public class VertexAttachment extends Attachment {
 		}
 	}
 
-	/** The bones which affect the {@link #getVertices()}. The array entries are, for each vertex, the number of bones affecting
-	 * the vertex followed by that many bone indices, which is the index of the bone in {@link Skeleton#getBones()}. Will be null
-	 * if this attachment has no weights. */
+	/** The bones that affect the {@link #getVertices()}. The entries are, for each vertex, the number of bones affecting the
+	 * vertex followed by that many bone indices, which is the {@link Skeleton#getBones()} index. Null if this attachment has no
+	 * weights. */
 	public @Null int[] getBones () {
 		return bones;
 	}
@@ -154,9 +154,9 @@ abstract public class VertexAttachment extends Attachment {
 		this.bones = bones;
 	}
 
-	/** The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are <code>x,y</code>
-	 * entries for each vertex. For a weighted attachment, the values are <code>x,y,weight</code> entries for each bone affecting
-	 * each vertex. */
+	/** The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are <code>x,y</code> pairs
+	 * for each vertex. For a weighted attachment, the values are <code>x,y,weight</code> triplets for each bone affecting each
+	 * vertex. */
 	public float[] getVertices () {
 		return vertices;
 	}

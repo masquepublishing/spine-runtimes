@@ -16,11 +16,8 @@ abstract public class PosedActive< //
 
 	/** Returns false when this constraint won't be updated by
 	 * {@link Skeleton#updateWorldTransform(com.esotericsoftware.spine.Physics)} because a skin is required and the
-	 * {@link Skeleton#getSkin() active skin} does not contain this item.
-	 * @see Skin#getBones()
-	 * @see Skin#getConstraints()
-	 * @see PosedData#getSkinRequired()
-	 * @see Skeleton#updateCache() */
+	 * {@link Skeleton#getSkin() active skin} does not contain this item. See {@link Skin#getBones()},
+	 * {@link Skin#getConstraints()}, {@link PosedData#getSkinRequired()}, and {@link Skeleton#updateCache()}. */
 	public boolean isActive () {
 		return active;
 	}

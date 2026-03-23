@@ -39,7 +39,7 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 
 /** Stores attachments by slot index and placeholder name.
  * <p>
- * See SkeletonData {@link SkeletonData#defaultSkin}, Skeleton {@link Skeleton#skin}, and
+ * See {@link SkeletonData#defaultSkin}, {@link Skeleton#skin}, and
  * <a href="https://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
 public class Skin {
 	final String name;
@@ -138,7 +138,9 @@ public class Skin {
 		return constraints;
 	}
 
-	/** The skin's name, which is unique across all skins in the skeleton. */
+	/** The skin's name, unique across all skins in the skeleton.
+	 * <p>
+	 * See {@link SkeletonData#findSkin(String)}. */
 	public String getName () {
 		return name;
 	}

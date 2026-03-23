@@ -34,9 +34,8 @@ import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
 
 /** Stores the current pose values for an {@link Event}.
  * <p>
- * See Timeline
- * {@link Timeline#apply(Skeleton, float, float, com.badlogic.gdx.utils.Array, float, boolean, boolean, boolean, boolean)},
- * AnimationStateListener {@link AnimationStateListener#event(com.esotericsoftware.spine.AnimationState.TrackEntry, Event)}, and
+ * See {@link Timeline#apply(Skeleton, float, float, com.badlogic.gdx.utils.Array, float, boolean, boolean, boolean, boolean)},
+ * {@link AnimationStateListener#event(com.esotericsoftware.spine.AnimationState.TrackEntry, Event)}, and
  * <a href="https://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide. */
 public class Event {
 	final EventData data;

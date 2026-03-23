@@ -94,7 +94,9 @@ public class EventData {
 		this.balance = balance;
 	}
 
-	/** The name of the event, which is unique across all events in the skeleton. */
+	/** The name of the event, unique across all events in the skeleton.
+	 * <p>
+	 * See {@link SkeletonData#findEvent(String)}. */
 	public String getName () {
 		return name;
 	}

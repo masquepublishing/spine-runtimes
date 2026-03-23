@@ -41,7 +41,6 @@ abstract public class PosedData<P extends Pose> {
 		this.setup = setup;
 	}
 
-	/** The constraint's name, which is unique across all constraints in the skeleton of the same type. */
 	public String getName () {
 		return name;
 	}

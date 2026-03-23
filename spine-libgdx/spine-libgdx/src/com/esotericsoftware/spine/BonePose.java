@@ -9,8 +9,15 @@ import com.badlogic.gdx.math.Vector2;
 
 import com.esotericsoftware.spine.BoneData.Inherit;
 
-/** The applied pose for a bone. This is the {@link Bone} pose with constraints applied and the world transform computed by
- * {@link Skeleton#updateWorldTransform(Physics)}. */
+/** The applied local pose and world transform for a bone. This is the {@link Bone#getPose()} with constraints applied and the
+ * world transform computed by {@link Skeleton#updateWorldTransform(Physics)} and {@link #updateWorldTransform(Skeleton)}.
+ * <p>
+ * If the world transform is changed, call {@link #updateLocalTransform(Skeleton)} before using the local transform. The local
+ * transform may be needed by other code (eg to apply another constraint).
+ * <p>
+ * After changing the world transform, call {@link #updateWorldTransform(Skeleton)} on every descendant bone. It may be more
+ * convenient to modify the local transform instead, then call {@link Skeleton#updateWorldTransform(Physics)} to update the world
+ * transforms for all bones and apply constraints. */
 public class BonePose extends BoneLocal implements Update {
 	Bone bone;
 	float a, b, worldX;
@@ -22,7 +29,8 @@ public class BonePose extends BoneLocal implements Update {
 		if (world != skeleton.update) updateWorldTransform(skeleton);
 	}
 
-	/** Computes the world transform using the parent bone's applied pose and this pose. Child bones are not updated.
+	/** Computes the world transform using the parent bone's world transform and this applied local pose. Child bones are not
+	 * updated.
 	 * <p>
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
@@ -131,10 +139,6 @@ public class BonePose extends BoneLocal implements Update {
 
 	/** Computes the local transform values from the world transform.
 	 * <p>
-	 * If the world transform is modified (by a constraint, {@link #rotateWorld(float)}, etc) then this method should be called so
-	 * the local transform matches the world transform. The local transform may be needed by other code (eg to apply another
-	 * constraint).
-	 * <p>
 	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The local transform after
 	 * calling this method is equivalent to the local transform used to compute the world transform, but may not be identical. */
 	public void updateLocalTransform (Skeleton skeleton) {
@@ -218,8 +222,9 @@ public class BonePose extends BoneLocal implements Update {
 		}
 	}
 
-	/** If the world transform has been modified and the local transform no longer matches, {@link #updateLocalTransform(Skeleton)}
-	 * is called. */
+	/** If the world transform has been modified by constraints and the local transform no longer matches,
+	 * {@link #updateLocalTransform(Skeleton)} is called. Call this after {@link Skeleton#updateWorldTransform(Physics)} before
+	 * using the applied local transform. */
 	public void validateLocalTransform (Skeleton skeleton) {
 		if (local == skeleton.update) updateLocalTransform(skeleton);
 	}
@@ -248,7 +253,7 @@ public class BonePose extends BoneLocal implements Update {
 		}
 	}
 
-	/** Part of the world transform matrix for the X axis. If changed, {@link #updateLocalTransform(Skeleton)} should be called. */
+	/** Part of the world transform matrix for the X axis. */
 	public float getA () {
 		return a;
 	}
@@ -257,7 +262,7 @@ public class BonePose extends BoneLocal implements Update {
 		this.a = a;
 	}
 
-	/** Part of the world transform matrix for the Y axis. If changed, {@link #updateLocalTransform(Skeleton)} should be called. */
+	/** Part of the world transform matrix for the Y axis. */
 	public float getB () {
 		return b;
 	}
@@ -266,7 +271,7 @@ public class BonePose extends BoneLocal implements Update {
 		this.b = b;
 	}
 
-	/** Part of the world transform matrix for the X axis. If changed, {@link #updateLocalTransform(Skeleton)} should be called. */
+	/** Part of the world transform matrix for the X axis. */
 	public float getC () {
 		return c;
 	}
@@ -275,7 +280,7 @@ public class BonePose extends BoneLocal implements Update {
 		this.c = c;
 	}
 
-	/** Part of the world transform matrix for the Y axis. If changed, {@link #updateLocalTransform(Skeleton)} should be called. */
+	/** Part of the world transform matrix for the Y axis. */
 	public float getD () {
 		return d;
 	}
@@ -284,7 +289,7 @@ public class BonePose extends BoneLocal implements Update {
 		this.d = d;
 	}
 
-	/** The world X position. If changed, {@link #updateLocalTransform(Skeleton)} should be called. */
+	/** The world X position. */
 	public float getWorldX () {
 		return worldX;
 	}
@@ -293,7 +298,7 @@ public class BonePose extends BoneLocal implements Update {
 		this.worldX = worldX;
 	}
 
-	/** The world Y position. If changed, {@link #updateLocalTransform(Skeleton)} should be called. */
+	/** The world Y position. */
 	public float getWorldY () {
 		return worldY;
 	}
@@ -382,10 +387,7 @@ public class BonePose extends BoneLocal implements Update {
 		return atan2Deg(cos * c + sin * d, cos * a + sin * b);
 	}
 
-	/** Rotates the world transform the specified amount.
-	 * <p>
-	 * After changes are made to the world transform, {@link #updateLocalTransform(Skeleton)} should be called on this bone and any
-	 * child bones, recursively. */
+	/** Rotates the world transform the specified amount. */
 	public void rotateWorld (float degrees) {
 		degrees *= degRad;
 		float sin = sin(degrees), cos = cos(degrees);

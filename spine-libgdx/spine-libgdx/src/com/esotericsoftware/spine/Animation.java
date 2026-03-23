@@ -64,7 +64,8 @@ public class Animation {
 		setTimelines(timelines);
 	}
 
-	/** If the returned array or the timelines it contains are modified, {@link #setTimelines(Array)} must be called. */
+	/** If this list or the timelines it contains are modified, the timelines must be set again to recompute the animation's bone
+	 * indices and timeline property IDs. */
 	public Array<Timeline> getTimelines () {
 		return timelines;
 	}
@@ -87,15 +88,17 @@ public class Animation {
 		bones.shrink();
 	}
 
-	/** Returns true if this animation contains a timeline with any of the specified property IDs. */
+	/** Returns true if this animation contains a timeline with any of the specified property IDs.
+	 * <p>
+	 * See {@link Timeline#getPropertyIds()}. */
 	public boolean hasTimeline (String[] propertyIds) {
 		for (String id : propertyIds)
 			if (timelineIds.contains(id)) return true;
 		return false;
 	}
 
-	/** The duration of the animation in seconds, which is usually the highest time of all frames in the timeline. The duration is
-	 * used to know when it has completed and when it should loop back to the start. */
+	/** The duration of the animation in seconds, which is usually the highest time of all frames in the timelines. The duration is
+	 * used to know when the animation has completed and, for animations that repeat, when it should loop back to the start. */
 	public float getDuration () {
 		return duration;
 	}
@@ -104,13 +107,16 @@ public class Animation {
 		this.duration = duration;
 	}
 
+	/** {@link Skeleton#getBones()} indices that this animation's timelines modify.
+	 * <p>
+	 * See {@link BoneTimeline#getBoneIndex()}. */
 	public IntArray getBones () {
 		return bones;
 	}
 
 	/** Applies the animation's timelines to the specified skeleton.
 	 * <p>
-	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+	 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
 	 * @param skeleton The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton
 	 *           components the timelines may change.
 	 * @param lastTime The last time in seconds this animation was applied. Some timelines trigger only at discrete times, in which
@@ -130,7 +136,7 @@ public class Animation {
 	 * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
 	 *           <code>fromSetup</code>).
 	 * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
-	 * @param appliedPose True to modify the {@link Posed#getAppliedPose()}, else modify the {@link Posed#getPose()}. */
+	 * @param appliedPose True to modify the {@link Posed#getAppliedPose()}, else the {@link Posed#getPose()} is modified. */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, @Null Array<Event> events, float alpha,
 		boolean fromSetup, boolean add, boolean out, boolean appliedPose) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -145,7 +151,9 @@ public class Animation {
 			timelines[i].apply(skeleton, lastTime, time, events, alpha, fromSetup, add, out, appliedPose);
 	}
 
-	/** The animation's name, which is unique across all animations in the skeleton. */
+	/** The animation's name, unique across all animations in the skeleton.
+	 * <p>
+	 * See {@link SkeletonData#findAnimation(String)}. */
 	public String getName () {
 		return name;
 	}
@@ -190,16 +198,17 @@ public class Animation {
 			return frames;
 		}
 
-		/** The number of entries stored per frame. */
+		/** The number of values stored per frame. */
 		public int getFrameEntries () {
 			return 1;
 		}
 
-		/** The number of frames for this timeline. */
+		/** The number of frames in this timeline. */
 		public int getFrameCount () {
 			return frames.length / getFrameEntries();
 		}
 
+		/** The duration of the timeline in seconds, which is usually the highest time of all frames in the timeline. */
 		public float getDuration () {
 			return frames[frames.length - getFrameEntries()];
 		}
@@ -217,7 +226,7 @@ public class Animation {
 		/** Applies this timeline to the skeleton.
 		 * @param skeleton The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton
 		 *           components the timelines may change.
-		 * @param lastTime The last time in seconds this timline was applied. Some timelines trigger only at discrete times, in
+		 * @param lastTime The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in
 		 *           which case all keys are triggered between <code>lastTime</code> (exclusive) and <code>time</code> (inclusive).
 		 *           Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
 		 * @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and
@@ -232,8 +241,9 @@ public class Animation {
 		 *           timeline values, no change is made before the first frame.
 		 * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
 		 *           <code>fromSetup</code>).
-		 * @param out True when the animation is mixing out, else it is mixing in.
-		 * @param appliedPose True to modify the {@link Posed#getAppliedPose()}, else modify the {@link Posed#getPose()}. */
+		 * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
+		 *           transitions.
+		 * @param appliedPose True to modify the {@link Posed#getAppliedPose()}, else the {@link Posed#getPose()} is modified. */
 		abstract public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha,
 			boolean fromSetup, boolean add, boolean out, boolean appliedPose);
 
@@ -258,7 +268,7 @@ public class Animation {
 		}
 	}
 
-	/** An interface for timelines that change the property of a slot. */
+	/** An interface for timelines that change a slot's properties. */
 	static public interface SlotTimeline {
 		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed when this timeline is applied. */
 		public int getSlotIndex ();
@@ -266,7 +276,9 @@ public class Animation {
 
 	/** The base class for timelines that interpolate between frame values using stepped, linear, or a Bezier curve. */
 	static abstract public class CurveTimeline extends Timeline {
-		static public final int LINEAR = 0, STEPPED = 1, BEZIER = 2, BEZIER_SIZE = 18;
+		static public final int LINEAR = 0, STEPPED = 1, BEZIER = 2;
+		/** The number of values stored for each 10 segment Bezier curve. */
+		static public final int BEZIER_SIZE = 18;
 
 		float[] curves;
 
@@ -367,7 +379,7 @@ public class Animation {
 		}
 	}
 
-	/** The base class for a {@link CurveTimeline} that sets one property. */
+	/** The base class for a {@link CurveTimeline} that sets one property with a curve. */
 	static abstract public class CurveTimeline1 extends CurveTimeline {
 		static public final int ENTRIES = 2;
 		static final int VALUE = 1;
@@ -413,24 +425,48 @@ public class Animation {
 			};
 		}
 
+		/** Returns the interpolated value for properties relative to the setup value. The timeline value is added to the setup
+		 * value, rather than replacing it.
+		 * <p>
+		 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+		 * @param current The current value for the property.
+		 * @param setup The setup value for the property. */
 		public float getRelativeValue (float time, float alpha, boolean fromSetup, boolean add, float current, float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = getCurveValue(time);
 			return fromSetup ? setup + value * alpha : current + (add ? value : value + setup - current) * alpha;
 		}
 
+		/** Returns the interpolated value for properties set as absolute values. The timeline value replaces the setup value,
+		 * rather than being relative to it.
+		 * <p>
+		 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+		 * @param current The current value for the property.
+		 * @param setup The setup value for the property. */
 		public float getAbsoluteValue (float time, float alpha, boolean fromSetup, boolean add, float current, float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = getCurveValue(time);
 			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
+		/** Returns the interpolated value for properties set as absolute values, using the specified timeline value rather than
+		 * calling {@link #getCurveValue(float)}.
+		 * <p>
+		 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+		 * @param current The current value for the property.
+		 * @param setup The setup value for the property.
+		 * @param value The timeline value to apply. */
 		public float getAbsoluteValue (float time, float alpha, boolean fromSetup, boolean add, float current, float setup,
 			float value) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
+		/** Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.
+		 * <p>
+		 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+		 * @param current The current value for the property.
+		 * @param setup The setup value for the property. */
 		public float getScaleValue (float time, float alpha, boolean fromSetup, boolean add, boolean out, float current,
 			float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
@@ -444,12 +480,13 @@ public class Animation {
 		}
 	}
 
-	/** An interface for timelines that change the property of a bone. */
+	/** An interface for timelines that change a bone's properties. */
 	static public interface BoneTimeline {
-		/** The index of the bone in {@link Skeleton#getBones()} that will be changed when this timeline is applied. */
+		/** The index of the bone in {@link Skeleton#getBones()} that is changed by this timeline. */
 		public int getBoneIndex ();
 	}
 
+	/** The base class for timelines that change 1 bone property with a curve. */
 	static abstract public class BoneTimeline1 extends CurveTimeline1 implements BoneTimeline {
 		final int boneIndex;
 
@@ -473,7 +510,7 @@ public class Animation {
 			boolean out);
 	}
 
-	/** The base class for a {@link CurveTimeline} that is a {@link BoneTimeline} and sets two properties. */
+	/** The base class for timelines that change two bone properties with a curve. */
 	static abstract public class BoneTimeline2 extends CurveTimeline implements BoneTimeline {
 		static public final int ENTRIES = 3;
 		static final int VALUE1 = 1, VALUE2 = 2;
@@ -515,7 +552,7 @@ public class Animation {
 			boolean out);
 	}
 
-	/** Changes a bone's local {@link BoneLocal#getRotation()}. */
+	/** Changes {@link BoneLocal#getRotation()}. */
 	static public class RotateTimeline extends BoneTimeline1 {
 		public RotateTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.rotate);
@@ -527,7 +564,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a bone's local {@link BoneLocal#getX()} and {@link BoneLocal#getY()}. */
+	/** Changes {@link BoneLocal#getX()} and {@link BoneLocal#getY()}. */
 	static public class TranslateTimeline extends BoneTimeline2 {
 		public TranslateTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.x, Property.y);
@@ -578,7 +615,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a bone's local {@link BoneLocal#getX()}. */
+	/** Changes {@link BoneLocal#getX()}. */
 	static public class TranslateXTimeline extends BoneTimeline1 {
 		public TranslateXTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.x);
@@ -590,7 +627,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a bone's local {@link BoneLocal#getY()}. */
+	/** Changes {@link BoneLocal#getY()}. */
 	static public class TranslateYTimeline extends BoneTimeline1 {
 		public TranslateYTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.y);
@@ -602,7 +639,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a bone's local {@link BoneLocal#getScaleX()} and {@link BoneLocal#getScaleY()}. */
+	/** Changes {@link BoneLocal#getScaleX()} and {@link BoneLocal#getScaleY()}. */
 	static public class ScaleTimeline extends BoneTimeline2 {
 		public ScaleTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.scaleX, Property.scaleY);
@@ -670,7 +707,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a bone's local {@link BoneLocal#getScaleX()}. */
+	/** Changes {@link BoneLocal#getScaleX()}. */
 	static public class ScaleXTimeline extends BoneTimeline1 {
 		public ScaleXTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.scaleX);
@@ -682,7 +719,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a bone's local {@link BoneLocal#getScaleY()}. */
+	/** Changes {@link BoneLocal#getScaleY()}. */
 	static public class ScaleYTimeline extends BoneTimeline1 {
 		public ScaleYTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.scaleY);
@@ -694,7 +731,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a bone's local {@link BoneLocal#getShearX()} and {@link BoneLocal#getShearY()}. */
+	/** Changes {@link BoneLocal#getShearX()} and {@link BoneLocal#getShearY()}. */
 	static public class ShearTimeline extends BoneTimeline2 {
 		public ShearTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.shearX, Property.shearY);
@@ -745,7 +782,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a bone's local {@link BoneLocal#getShearX()}. */
+	/** Changes {@link BoneLocal#getShearX()}. */
 	static public class ShearXTimeline extends BoneTimeline1 {
 		public ShearXTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.shearX);
@@ -757,7 +794,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a bone's local {@link BoneLocal#getShearY()}. */
+	/** Changes {@link BoneLocal#getShearY()}. */
 	static public class ShearYTimeline extends BoneTimeline1 {
 		public ShearYTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.shearY);
@@ -769,7 +806,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a bone's {@link BoneLocal#getInherit()}. */
+	/** Changes {@link BoneLocal#getInherit()}. */
 	static public class InheritTimeline extends Timeline implements BoneTimeline {
 		static public final int ENTRIES = 2;
 		static private final int INHERIT = 1;
@@ -817,6 +854,7 @@ public class Animation {
 		}
 	}
 
+	/** The base class for timelines that change any number of slot properties with a curve. */
 	static abstract public class SlotCurveTimeline extends CurveTimeline implements SlotTimeline {
 		final int slotIndex;
 
@@ -838,7 +876,7 @@ public class Animation {
 		abstract protected void apply (Slot slot, SlotPose pose, float time, float alpha, boolean fromSetup, boolean add);
 	}
 
-	/** Changes a slot's {@link SlotPose#getColor()}. */
+	/** Changes {@link SlotPose#getColor()}. */
 	static public class RGBATimeline extends SlotCurveTimeline {
 		static public final int ENTRIES = 5;
 		static private final int R = 1, G = 2, B = 3, A = 4;
@@ -915,7 +953,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes the RGB for a slot's {@link SlotPose#getColor()}. */
+	/** Changes RGB for a slot's {@link SlotPose#getColor()}. */
 	static public class RGBTimeline extends SlotCurveTimeline {
 		static public final int ENTRIES = 4;
 		static private final int R = 1, G = 2, B = 3;
@@ -995,7 +1033,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes the alpha for a slot's {@link SlotPose#getColor()}. */
+	/** Changes alpha for a slot's {@link SlotPose#getColor()}. */
 	static public class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
 		final int slotIndex;
 
@@ -1033,7 +1071,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a slot's {@link SlotPose#getColor()} and {@link SlotPose#getDarkColor()} for two color tinting. */
+	/** Changes {@link SlotPose#getColor()} and {@link SlotPose#getDarkColor()} for two color tinting. */
 	static public class RGBA2Timeline extends SlotCurveTimeline {
 		static public final int ENTRIES = 8;
 		static private final int R = 1, G = 2, B = 3, A = 4, R2 = 5, G2 = 6, B2 = 7;
@@ -1144,7 +1182,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes the RGB for a slot's {@link SlotPose#getColor()} and {@link SlotPose#getDarkColor()} for two color tinting. */
+	/** Changes RGB for a slot's {@link SlotPose#getColor()} and {@link SlotPose#getDarkColor()} for two color tinting. */
 	static public class RGB2Timeline extends SlotCurveTimeline {
 		static public final int ENTRIES = 7;
 		static private final int R = 1, G = 2, B = 3, R2 = 4, G2 = 5, B2 = 6;
@@ -1256,7 +1294,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a slot's {@link SlotPose#getAttachment()}. */
+	/** Changes {@link SlotPose#getAttachment()}. */
 	static public class AttachmentTimeline extends Timeline implements SlotTimeline {
 		final int slotIndex;
 		final String[] attachmentNames;
@@ -1306,7 +1344,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a slot's {@link SlotPose#getDeform()} to deform a {@link VertexAttachment}. */
+	/** Changes {@link SlotPose#getDeform()} to deform a {@link VertexAttachment}. */
 	static public class DeformTimeline extends SlotCurveTimeline {
 		final VertexAttachment attachment;
 		private final float[][] vertices;
@@ -1516,7 +1554,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a slot's {@link SlotPose#getSequenceIndex()} for an attachment's {@link Sequence}. */
+	/** Changes {@link SlotPose#getSequenceIndex()} for an attachment's {@link Sequence}. */
 	static public class SequenceTimeline extends Timeline implements SlotTimeline {
 		static public final int ENTRIES = 3;
 		static private final int MODE = 1, DELAY = 2;
@@ -1665,7 +1703,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a skeleton's {@link Skeleton#getDrawOrder()}. */
+	/** Changes {@link Skeleton#getDrawOrder()}. */
 	static public class DrawOrderTimeline extends Timeline {
 		static final String propertyID = Integer.toString(Property.drawOrder.ordinal());
 		static private final String[] propertyIds = {propertyID};
@@ -1715,7 +1753,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a subset of a skeleton's {@link Skeleton#getDrawOrder()}. */
+	/** Changes a subset of {@link Skeleton#getDrawOrder()}. */
 	static public class DrawOrderFolderTimeline extends Timeline {
 		private final int[] slots;
 		private final boolean[] inFolder;
@@ -1808,7 +1846,7 @@ public class Animation {
 		public int getConstraintIndex ();
 	}
 
-	/** Changes an IK constraint's {@link IkConstraintPose#getMix()}, {@link IkConstraintPose#getSoftness()},
+	/** Changes {@link IkConstraintPose#getMix()}, {@link IkConstraintPose#getSoftness()},
 	 * {@link IkConstraintPose#getBendDirection()}, {@link IkConstraintPose#getStretch()}, and
 	 * {@link IkConstraintPose#getCompress()}. */
 	static public class IkConstraintTimeline extends CurveTimeline implements ConstraintTimeline {
@@ -1902,7 +1940,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a transform constraint's {@link TransformConstraintPose#getMixRotate()}, {@link TransformConstraintPose#getMixX()},
+	/** Changes {@link TransformConstraintPose#getMixRotate()}, {@link TransformConstraintPose#getMixX()},
 	 * {@link TransformConstraintPose#getMixY()}, {@link TransformConstraintPose#getMixScaleX()},
 	 * {@link TransformConstraintPose#getMixScaleY()}, and {@link TransformConstraintPose#getMixShearY()}. */
 	static public class TransformConstraintTimeline extends CurveTimeline implements ConstraintTimeline {
@@ -2016,6 +2054,7 @@ public class Animation {
 		}
 	}
 
+	/** The base class for timelines that change 1 constraint property with a curve. */
 	static abstract public class ConstraintTimeline1 extends CurveTimeline1 implements ConstraintTimeline {
 		final int constraintIndex;
 
@@ -2029,7 +2068,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a path constraint's {@link PathConstraintPose#getPosition()}. */
+	/** Changes {@link PathConstraintPose#getPosition()}. */
 	static public class PathConstraintPositionTimeline extends ConstraintTimeline1 {
 		public PathConstraintPositionTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.pathConstraintPosition);
@@ -2046,7 +2085,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a path constraint's {@link PathConstraintPose#getSpacing()}. */
+	/** Changes {@link PathConstraintPose#getSpacing()}. */
 	static public class PathConstraintSpacingTimeline extends ConstraintTimeline1 {
 		public PathConstraintSpacingTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.pathConstraintSpacing);
@@ -2062,7 +2101,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a path constraint's {@link PathConstraintPose#getMixRotate()}, {@link PathConstraintPose#getMixX()}, and
+	/** Changes {@link PathConstraintPose#getMixRotate()}, {@link PathConstraintPose#getMixX()}, and
 	 * {@link PathConstraintPose#getMixY()}. */
 	static public class PathConstraintMixTimeline extends CurveTimeline implements ConstraintTimeline {
 		static public final int ENTRIES = 4;
@@ -2186,7 +2225,7 @@ public class Animation {
 		abstract protected boolean global (PhysicsConstraintData constraint);
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraintPose#getInertia()}. */
+	/** Changes {@link PhysicsConstraintPose#getInertia()}. */
 	static public class PhysicsConstraintInertiaTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintInertiaTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintInertia);
@@ -2205,7 +2244,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraintPose#getStrength()}. */
+	/** Changes {@link PhysicsConstraintPose#getStrength()}. */
 	static public class PhysicsConstraintStrengthTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintStrengthTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintStrength);
@@ -2224,7 +2263,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraintPose#getDamping()}. */
+	/** Changes {@link PhysicsConstraintPose#getDamping()}. */
 	static public class PhysicsConstraintDampingTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintDampingTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintDamping);
@@ -2243,7 +2282,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraintPose#getMassInverse()}. The timeline values are not inverted. */
+	/** Changes {@link PhysicsConstraintPose#getMassInverse()}. The timeline values are not inverted. */
 	static public class PhysicsConstraintMassTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintMassTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintMass);
@@ -2262,7 +2301,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraintPose#getWind()}. */
+	/** Changes {@link PhysicsConstraintPose#getWind()}. */
 	static public class PhysicsConstraintWindTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintWindTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintWind);
@@ -2282,7 +2321,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraintPose#getGravity()}. */
+	/** Changes {@link PhysicsConstraintPose#getGravity()}. */
 	static public class PhysicsConstraintGravityTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintGravityTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintGravity);
@@ -2302,7 +2341,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a physics constraint's {@link PhysicsConstraintPose#getMix()}. */
+	/** Changes {@link PhysicsConstraintPose#getMix()}. */
 	static public class PhysicsConstraintMixTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintMix);
@@ -2382,7 +2421,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a slider's {@link SliderPose#getTime()}. */
+	/** Changes {@link SliderPose#getTime()}. */
 	static public class SliderTimeline extends ConstraintTimeline1 {
 		public SliderTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.sliderTime);
@@ -2399,7 +2438,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a slider's {@link SliderPose#getMix()}. */
+	/** Changes {@link SliderPose#getMix()}. */
 	static public class SliderMixTimeline extends ConstraintTimeline1 {
 		public SliderMixTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.sliderMix);
