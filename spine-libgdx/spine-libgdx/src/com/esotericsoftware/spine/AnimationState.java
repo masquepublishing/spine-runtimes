@@ -252,22 +252,27 @@ public class AnimationState {
 		TrackEntry from = to.mixingFrom;
 		float fromMix = from.mixingFrom != null ? applyMixingFrom(from, skeleton) : 1;
 		float mix = to.mixDuration == 0 ? 1 : Math.min(1, to.mixTime / to.mixDuration);
-		boolean attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
-		int timelineCount = from.animation.timelines.size;
-		Timeline[] timelines = from.animation.timelines.items;
+
 		float a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
 		float alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
+
+		int timelineCount = from.animation.timelines.size;
+		Timeline[] timelines = from.animation.timelines.items;
+		int[] timelineMode = from.timelineMode.items;
+		TrackEntry[] timelineHoldMix = from.timelineHoldMix.items;
+
+		boolean attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
+		boolean add = from.additive, shortestRotation = add || from.shortestRotation;
+		boolean firstFrame = !shortestRotation && from.timelinesRotation.size != timelineCount << 1;
+		float[] timelinesRotation = firstFrame ? from.timelinesRotation.setSize(timelineCount << 1) : from.timelinesRotation.items;
+
 		float animationLast = from.animationLast, animationTime = from.getAnimationTime(), applyTime = animationTime;
 		Array<Event> events = null;
 		if (from.reverse)
 			applyTime = from.animation.duration - applyTime;
 		else if (mix < from.eventThreshold) //
 			events = this.events;
-		int[] timelineMode = from.timelineMode.items;
-		TrackEntry[] timelineHoldMix = from.timelineHoldMix.items;
-		boolean add = from.additive, shortestRotation = add || from.shortestRotation;
-		boolean firstFrame = !shortestRotation && from.timelinesRotation.size != timelineCount << 1;
-		float[] timelinesRotation = firstFrame ? from.timelinesRotation.setSize(timelineCount << 1) : from.timelinesRotation.items;
+
 		from.totalAlpha = 0;
 		for (int i = 0; i < timelineCount; i++) {
 			Timeline timeline = timelines[i];
@@ -292,8 +297,10 @@ public class AnimationState {
 				timeline.apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
 			}
 		}
+
 		if (to.mixDuration > 0) queueEvents(from, animationTime);
 		this.events.clear();
+
 		from.nextAnimationLast = animationTime;
 		from.nextTrackLast = from.trackTime;
 		return mix;
