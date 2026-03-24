@@ -8,7 +8,7 @@
 
 ## Files to never commit
 - **NEVER** commit Eclipse settings files (`.settings/`, `.classpath`, `.project`). These are IDE-specific and must not be checked in. If `git status` shows changes to these files, revert them before committing.
-- **NEVER** commit the spine-cpp copies inside `spine-ue/` or `spine-godot/`. These are managed by setup scripts (`spine-ue/setup.sh`, `spine-godot/build/setup.sh`) and are gitignored. Only commit changes to the wrapper code in those runtimes, not the vendored spine-cpp sources.
+- **NEVER** commit the vendored spine-cpp copies inside `spine-ue/`, `spine-godot/`, `spine-flutter/`, or `spine-ios/`. These are managed by setup/build scripts and are gitignored. Only commit changes to the wrapper/binding code in those runtimes, not the vendored spine-cpp sources.
 
 ## Git commit subject prefix (required)
 Every commit subject must start with a runtime prefix.
