@@ -42,6 +42,13 @@ SPINE_C_API spine_bone_pose spine_bone_get_applied_pose(spine_bone self);
 SPINE_C_API void spine_bone_reset_constrained(spine_bone self);
 SPINE_C_API void spine_bone_constrained(spine_bone self);
 SPINE_C_API bool spine_bone_is_pose_equal_to_applied(spine_bone self);
+/**
+ * Returns false when this won't be updated by
+ * Skeleton::updateWorldTransform(Physics) because a skin is required and the
+ * active skin does not contain this item. See Skin::getBones(),
+ * Skin::getConstraints(), PosedData::getSkinRequired(), and
+ * Skeleton::updateCache().
+ */
 SPINE_C_API bool spine_bone_is_active(spine_bone self);
 SPINE_C_API void spine_bone_set_active(spine_bone self, bool active);
 SPINE_C_API spine_rtti spine_bone_rtti(void);

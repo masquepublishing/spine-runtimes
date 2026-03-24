@@ -33,23 +33,13 @@ SPINE_C_API /*@null*/ spine_track_entry spine_track_entry_get_previous(spine_tra
 SPINE_C_API bool spine_track_entry_get_loop(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_loop(spine_track_entry self, bool inValue);
 /**
- * If true, when mixing from the previous animation to this animation, the
- * previous animation is applied as normal instead of being mixed out.
- *
- * When mixing between animations that key the same property, if a lower track
- * also keys that property then the value will briefly dip toward the lower
- * track value during the mix. This happens because the first animation mixes
- * from 100% to 0% while the second animation mixes from 0% to 100%. Setting
- * holdPrevious to true applies the first animation at 100% during the mix so
- * the lower track value is overwritten. Such dipping does not occur on the
- * lowest track which keys the property, only when a higher track also keys the
- * property.
- *
- * Snapping will occur if holdPrevious is true and this animation does not key
- * all the same properties as the previous animation.
+ * When true, timelines in this animation that support additive have their
+ * values added to the setup or current pose values instead of replacing them.
+ * Additive can be set for a new track entry only before AnimationState::apply()
+ * is next called.
  */
-SPINE_C_API bool spine_track_entry_get_hold_previous(spine_track_entry self);
-SPINE_C_API void spine_track_entry_set_hold_previous(spine_track_entry self, bool inValue);
+SPINE_C_API bool spine_track_entry_get_additive(spine_track_entry self);
+SPINE_C_API void spine_track_entry_set_additive(spine_track_entry self, bool inValue);
 SPINE_C_API bool spine_track_entry_get_reverse(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_reverse(spine_track_entry self, bool inValue);
 SPINE_C_API bool spine_track_entry_get_shortest_rotation(spine_track_entry self);
@@ -223,19 +213,16 @@ SPINE_C_API void spine_track_entry_set_mix_duration_1(spine_track_entry self, fl
  * @param delay If > 0, sets TrackEntry::getDelay(). If < = 0, the delay set is the duration of the previous track entry minus the specified mix duration plus the specified delay (ie the mix ends at (delay = 0) or before (delay < 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
  */
 SPINE_C_API void spine_track_entry_set_mix_duration_2(spine_track_entry self, float mixDuration, float delay);
-SPINE_C_API spine_mix_blend spine_track_entry_get_mix_blend(spine_track_entry self);
-SPINE_C_API void spine_track_entry_set_mix_blend(spine_track_entry self, spine_mix_blend blend);
 /**
- * The track entry for the previous animation when mixing from the previous
- * animation to this animation, or NULL if no mixing is currently occuring. When
- * mixing from multiple animations, MixingFrom makes up a double linked list
- * with MixingTo.
+ * The track entry for the previous animation when mixing to this animation, or
+ * NULL if no mixing is currently occurring. When mixing from multiple
+ * animations, MixingFrom makes up a doubly linked list with MixingTo.
  */
 SPINE_C_API /*@null*/ spine_track_entry spine_track_entry_get_mixing_from(spine_track_entry self);
 /**
  * The track entry for the next animation when mixing from this animation, or
- * NULL if no mixing is currently occuring. When mixing from multiple
- * animations, MixingTo makes up a double linked list with MixingFrom.
+ * NULL if no mixing is currently occurring. When mixing to multiple animations,
+ * MixingTo makes up a doubly linked list with MixingFrom.
  */
 SPINE_C_API /*@null*/ spine_track_entry spine_track_entry_get_mixing_to(spine_track_entry self);
 /**

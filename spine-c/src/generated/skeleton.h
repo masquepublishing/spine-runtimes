@@ -54,6 +54,10 @@ SPINE_C_API spine_array_slot spine_skeleton_get_slots(spine_skeleton self);
  * @return May be NULL.
  */
 SPINE_C_API /*@null*/ spine_slot spine_skeleton_find_slot(spine_skeleton self, const char *slotName);
+/**
+ * The skeleton's slots in the order they should be drawn. The returned array
+ * may be modified to change the draw order.
+ */
 SPINE_C_API spine_array_slot spine_skeleton_get_draw_order(spine_skeleton self);
 SPINE_C_API /*@null*/ spine_skin spine_skeleton_get_skin(spine_skeleton self);
 /**
@@ -143,6 +147,12 @@ SPINE_C_API void spine_skeleton_physics_translate(spine_skeleton self, float x, 
  * Calls {
  */
 SPINE_C_API void spine_skeleton_physics_rotate(spine_skeleton self, float x, float y, float degrees);
+/**
+ * Returns the skeleton's time, used for time-based manipulations, such as
+ * PhysicsConstraint.
+ *
+ * See update().
+ */
 SPINE_C_API float spine_skeleton_get_time(spine_skeleton self);
 SPINE_C_API void spine_skeleton_set_time(spine_skeleton self, float time);
 SPINE_C_API void spine_skeleton_update(spine_skeleton self, float delta);
