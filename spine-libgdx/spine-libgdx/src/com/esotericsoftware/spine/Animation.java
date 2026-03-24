@@ -46,7 +46,10 @@ import com.esotericsoftware.spine.attachments.Sequence;
 import com.esotericsoftware.spine.attachments.Sequence.SequenceMode;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
-/** Stores a list of timelines to animate a skeleton's pose over time. */
+/** Stores a list of timelines to animate a skeleton's pose over time.
+ * <p>
+ * See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine Runtimes
+ * Guide. */
 public class Animation {
 	final String name;
 	float duration;
@@ -116,7 +119,9 @@ public class Animation {
 
 	/** Applies the animation's timelines to the specified skeleton.
 	 * <p>
-	 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+	 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)} and
+	 * <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine Runtimes
+	 * Guide.
 	 * @param skeleton The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton
 	 *           components the timelines may change.
 	 * @param lastTime The last time in seconds this animation was applied. Some timelines trigger only at discrete times, in which
@@ -136,7 +141,7 @@ public class Animation {
 	 * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
 	 *           <code>fromSetup</code>).
 	 * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
-	 * @param appliedPose True to modify the {@link Posed#getAppliedPose()}, else the {@link Posed#getPose()} is modified. */
+	 * @param appliedPose True to modify {@link Posed#getAppliedPose()}, else {@link Posed#getPose()} is modified. */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, @Null Array<Event> events, float alpha,
 		boolean fromSetup, boolean add, boolean out, boolean appliedPose) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -175,7 +180,10 @@ public class Animation {
 		sliderTime, sliderMix
 	}
 
-	/** The base class for all timelines. */
+	/** The base class for all timelines.
+	 * <p>
+	 * See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
+	 * Runtimes Guide. */
 	static abstract public class Timeline {
 		final String[] propertyIds;
 		final float[] frames;
@@ -224,6 +232,9 @@ public class Animation {
 		}
 
 		/** Applies this timeline to the skeleton.
+		 * <p>
+		 * See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
+		 * Runtimes Guide.
 		 * @param skeleton The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton
 		 *           components the timelines may change.
 		 * @param lastTime The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in
@@ -243,7 +254,7 @@ public class Animation {
 		 *           <code>fromSetup</code>).
 		 * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
 		 *           transitions.
-		 * @param appliedPose True to modify the {@link Posed#getAppliedPose()}, else the {@link Posed#getPose()} is modified. */
+		 * @param appliedPose True to modify {@link Posed#getAppliedPose()}, else {@link Posed#getPose()} is modified. */
 		abstract public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha,
 			boolean fromSetup, boolean add, boolean out, boolean appliedPose);
 
@@ -1577,7 +1588,7 @@ public class Animation {
 			return slotIndex;
 		}
 
-		/** The attachment for which the {@link SlotPose#getSequenceIndex()} will be set.
+		/** The attachment for which {@link SlotPose#getSequenceIndex()} will be set.
 		 * <p>
 		 * See {@link VertexAttachment#getTimelineAttachment()}. */
 		public Attachment getAttachment () {

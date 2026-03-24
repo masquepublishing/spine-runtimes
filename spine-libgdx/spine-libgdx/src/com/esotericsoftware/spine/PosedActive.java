@@ -1,6 +1,7 @@
 
 package com.esotericsoftware.spine;
 
+/** A posed object that may be active or inactive. */
 abstract public class PosedActive< //
 	D extends PosedData<P>, //
 	P extends Pose, //

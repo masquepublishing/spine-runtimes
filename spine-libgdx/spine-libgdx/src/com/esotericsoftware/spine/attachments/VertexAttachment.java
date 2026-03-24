@@ -73,7 +73,7 @@ abstract public class VertexAttachment extends Attachment {
 		worldVerticesLength = other.worldVerticesLength;
 	}
 
-	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the {@link SlotPose#getDeform()} is not
+	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If {@link SlotPose#getDeform()} is not
 	 * empty, it is used to deform the vertices.
 	 * <p>
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
@@ -143,7 +143,7 @@ abstract public class VertexAttachment extends Attachment {
 	}
 
 	/** The bones that affect the {@link #getVertices()}. The entries are, for each vertex, the number of bones affecting the
-	 * vertex followed by that many bone indices, which is the {@link Skeleton#getBones()} index. Null if this attachment has no
+	 * vertex followed by that many bone indices, which is {@link Skeleton#getBones()} index. Null if this attachment has no
 	 * weights. */
 	public @Null int[] getBones () {
 		return bones;

@@ -47,7 +47,8 @@ import com.esotericsoftware.spine.Animation.Timeline;
 /** Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
  * multiple animations on top of each other (layering).
  * <p>
- * See <a href='https://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide. */
+ * See <a href='https://esotericsoftware.com/spine-applying-animations#AnimationState-API'>Applying Animations</a> in the Spine
+ * Runtimes Guide. */
 public class AnimationState {
 	static final Animation emptyAnimation = new Animation("<empty>", new Array(true, 0, Timeline[]::new), 0);
 	static private final int SUBSEQUENT = 0, FIRST = 1, HOLD = 2, HOLD_FIRST = 3, SETUP = 1, CURRENT = 2;
@@ -575,11 +576,11 @@ public class AnimationState {
 	 * <p>
 	 * Mixing in is done by first setting an empty animation, then adding an animation using
 	 * {@link #addAnimation(int, Animation, boolean, float)} with the desired delay (an empty animation has a duration of 0) and on
-	 * the returned track entry, set the {@link TrackEntry#setMixDuration(float)}. Mixing from an empty animation causes the new
+	 * the returned track entry set {@link TrackEntry#setMixDuration(float)}. Mixing from an empty animation causes the new
 	 * animation to be applied more and more over the mix duration. Properties keyed in the new animation transition from the value
 	 * from lower tracks or from the setup pose value if no lower tracks key the property to the value keyed in the new animation.
 	 * <p>
-	 * See <a href='https://esotericsoftware.com/spine-applying-animations/#Empty-animations'>Empty animations</a> in the Spine
+	 * See <a href='https://esotericsoftware.com/spine-applying-animations#Empty-animations'>Empty animations</a> in the Spine
 	 * Runtimes Guide. */
 	public TrackEntry setEmptyAnimation (int trackIndex, float mixDuration) {
 		TrackEntry entry = setAnimation(trackIndex, emptyAnimation, false);
@@ -593,8 +594,8 @@ public class AnimationState {
 	 * {@link #setEmptyAnimation(int, float)}.
 	 * <p>
 	 * See {@link #setEmptyAnimation(int, float)} and
-	 * <a href='https://esotericsoftware.com/spine-applying-animations/#Empty-animations'>Empty animations</a> in the Spine
-	 * Runtimes Guide.
+	 * <a href='https://esotericsoftware.com/spine-applying-animations#Empty-animations'>Empty animations</a> in the Spine Runtimes
+	 * Guide.
 	 * @param delay If > 0, sets {@link TrackEntry#getDelay()}. If <= 0, the delay set is the duration of the previous track entry
 	 *           minus any mix duration plus the specified <code>delay</code> (ie the mix ends at (when <code>delay</code> = 0) or
 	 *           before (when <code>delay</code> < 0) the previous track entry duration). If the previous entry is looping, its
@@ -611,7 +612,7 @@ public class AnimationState {
 
 	/** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
 	 * <p>
-	 * See <a href='https://esotericsoftware.com/spine-applying-animations/#Empty-animations'>Empty animations</a> in the Spine
+	 * See <a href='https://esotericsoftware.com/spine-applying-animations#Empty-animations'>Empty animations</a> in the Spine
 	 * Runtimes Guide. */
 	public void setEmptyAnimations (float mixDuration) {
 		boolean oldDrainDisabled = queue.drainDisabled;
@@ -667,7 +668,7 @@ public class AnimationState {
 		return entry;
 	}
 
-	/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
+	/** Removes {@link TrackEntry#getNext()} and all entries after it for the specified entry. */
 	public void clearNext (TrackEntry entry) {
 		TrackEntry next = entry.next;
 		while (next != null) {

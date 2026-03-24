@@ -29,7 +29,7 @@
 
 package com.esotericsoftware.spine;
 
-/** The base class for all constrained datas. */
+/** The base class for storing setup data for a posed object. May be shared with multiple instances. */
 abstract public class PosedData<P extends Pose> {
 	final String name;
 	final P setup;

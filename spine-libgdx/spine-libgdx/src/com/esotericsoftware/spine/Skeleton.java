@@ -374,8 +374,8 @@ public class Skeleton {
 		setSkin(skin);
 	}
 
-	/** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}. If the
-	 * skin is changed, {@link #updateCache()} is called.
+	/** Sets the skin used to look up attachments before looking in {@link SkeletonData#getDefaultSkin()}. If the skin is changed,
+	 * {@link #updateCache()} is called.
 	 * <p>
 	 * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
 	 * old skin, each slot's setup mode attachment is attached from the new skin.

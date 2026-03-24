@@ -253,7 +253,7 @@ public class BonePose extends BoneLocal implements Update {
 		}
 	}
 
-	/** Part of the world transform matrix for the X axis. */
+	/** The world transform <code>[a b][c d]</code> x-axis x component. */
 	public float getA () {
 		return a;
 	}
@@ -262,7 +262,7 @@ public class BonePose extends BoneLocal implements Update {
 		this.a = a;
 	}
 
-	/** Part of the world transform matrix for the Y axis. */
+	/** The world transform <code>[a b][c d]</code> y-axis x component. */
 	public float getB () {
 		return b;
 	}
@@ -271,7 +271,7 @@ public class BonePose extends BoneLocal implements Update {
 		this.b = b;
 	}
 
-	/** Part of the world transform matrix for the X axis. */
+	/** The world transform <code>[a b][c d]</code> x-axis y component. */
 	public float getC () {
 		return c;
 	}
@@ -280,7 +280,7 @@ public class BonePose extends BoneLocal implements Update {
 		this.c = c;
 	}
 
-	/** Part of the world transform matrix for the Y axis. */
+	/** The world transform <code>[a b][c d]</code> y-axis y component. */
 	public float getD () {
 		return d;
 	}
@@ -307,7 +307,8 @@ public class BonePose extends BoneLocal implements Update {
 		this.worldY = worldY;
 	}
 
-	/** The world rotation for the X axis, calculated using {@link #a} and {@link #c}. */
+	/** The world rotation for the X axis, calculated using {@link #a} and {@link #c}. This is the direction the bone is
+	 * pointing. */
 	public float getWorldRotationX () {
 		return atan2Deg(c, a);
 	}

@@ -32,13 +32,14 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
-/** A bone has a number of poses:
+/** A node in a skeleton's hierarchy with a transform that affects its children and their attachments. A bone has a number of
+ * poses:
  * <ul>
- * <li>{@link BoneData#getSetupPose()}: The setup pose.
- * <li>{@link #getPose()}: The local pose. Set by animations and app code.
- * <li>{@link #getAppliedPose()}: The applied local pose. This is the local pose modified by constraints and app code.
- * <li>The world transform on the applied pose, computed by {@link Skeleton#updateWorldTransform(Physics)} and
- * {@link BonePose#updateWorldTransform(Skeleton)}.
+ * <li>{@link #getData()}: The setup pose.
+ * <li>{@link #getPose()}: The unconstrained local pose. Set by animations and application code.
+ * <li>{@link #getAppliedPose()}: The constrained local pose. The {@link #getPose()} with modifications by constraints.
+ * <li>World transform (on the applied pose): the {@link #getAppliedPose()} combined with the parent world transform. Computed by
+ * {@link Skeleton#updateWorldTransform(Physics)} and {@link BonePose#updateWorldTransform(Skeleton)}.
  * </ul>
  */
 public class Bone extends PosedActive<BoneData, BoneLocal, BonePose> {

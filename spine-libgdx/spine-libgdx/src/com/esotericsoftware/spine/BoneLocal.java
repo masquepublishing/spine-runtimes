@@ -66,6 +66,7 @@ public class BoneLocal implements Pose<BoneLocal> {
 		this.y = y;
 	}
 
+	/** Sets local x and y translation. */
 	public void setPosition (float x, float y) {
 		this.x = x;
 		this.y = y;
@@ -98,11 +99,13 @@ public class BoneLocal implements Pose<BoneLocal> {
 		this.scaleY = scaleY;
 	}
 
+	/** Sets local x and y scale. */
 	public void setScale (float scaleX, float scaleY) {
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
 	}
 
+	/** Sets local x and y scale to the same value. */
 	public void setScale (float scale) {
 		scaleX = scale;
 		scaleY = scale;
