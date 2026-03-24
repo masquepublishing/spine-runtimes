@@ -517,7 +517,7 @@ public class Animation {
 			if (bone.active) apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, fromSetup, add, out);
 		}
 
-		abstract protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+		abstract protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add,
 			boolean out);
 	}
 
@@ -559,30 +559,28 @@ public class Animation {
 			if (bone.active) apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, fromSetup, add, out);
 		}
 
-		abstract protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
+		abstract protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add,
 			boolean out);
 	}
 
-	/** Changes {@link BoneLocal#getRotation()}. */
+	/** Changes {@link BonePose#getRotation()}. */
 	static public class RotateTimeline extends BoneTimeline1 {
 		public RotateTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.rotate);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
-			boolean out) {
+		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
 			pose.rotation = getRelativeValue(time, alpha, fromSetup, add, pose.rotation, setup.rotation);
 		}
 	}
 
-	/** Changes {@link BoneLocal#getX()} and {@link BoneLocal#getY()}. */
+	/** Changes {@link BonePose#getX()} and {@link BonePose#getY()}. */
 	static public class TranslateTimeline extends BoneTimeline2 {
 		public TranslateTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.x, Property.y);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
-			boolean out) {
+		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
@@ -626,38 +624,35 @@ public class Animation {
 		}
 	}
 
-	/** Changes {@link BoneLocal#getX()}. */
+	/** Changes {@link BonePose#getX()}. */
 	static public class TranslateXTimeline extends BoneTimeline1 {
 		public TranslateXTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.x);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
-			boolean out) {
+		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
 			pose.x = getRelativeValue(time, alpha, fromSetup, add, pose.x, setup.x);
 		}
 	}
 
-	/** Changes {@link BoneLocal#getY()}. */
+	/** Changes {@link BonePose#getY()}. */
 	static public class TranslateYTimeline extends BoneTimeline1 {
 		public TranslateYTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.y);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
-			boolean out) {
+		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
 			pose.y = getRelativeValue(time, alpha, fromSetup, add, pose.y, setup.y);
 		}
 	}
 
-	/** Changes {@link BoneLocal#getScaleX()} and {@link BoneLocal#getScaleY()}. */
+	/** Changes {@link BonePose#getScaleX()} and {@link BonePose#getScaleY()}. */
 	static public class ScaleTimeline extends BoneTimeline2 {
 		public ScaleTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.scaleX, Property.scaleY);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
-			boolean out) {
+		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
@@ -718,38 +713,35 @@ public class Animation {
 		}
 	}
 
-	/** Changes {@link BoneLocal#getScaleX()}. */
+	/** Changes {@link BonePose#getScaleX()}. */
 	static public class ScaleXTimeline extends BoneTimeline1 {
 		public ScaleXTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.scaleX);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
-			boolean out) {
+		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
 			pose.scaleX = getScaleValue(time, alpha, fromSetup, add, out, pose.scaleX, setup.scaleX);
 		}
 	}
 
-	/** Changes {@link BoneLocal#getScaleY()}. */
+	/** Changes {@link BonePose#getScaleY()}. */
 	static public class ScaleYTimeline extends BoneTimeline1 {
 		public ScaleYTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.scaleY);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
-			boolean out) {
+		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
 			pose.scaleY = getScaleValue(time, alpha, fromSetup, add, out, pose.scaleY, setup.scaleY);
 		}
 	}
 
-	/** Changes {@link BoneLocal#getShearX()} and {@link BoneLocal#getShearY()}. */
+	/** Changes {@link BonePose#getShearX()} and {@link BonePose#getShearY()}. */
 	static public class ShearTimeline extends BoneTimeline2 {
 		public ShearTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.shearX, Property.shearY);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
-			boolean out) {
+		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
@@ -793,31 +785,29 @@ public class Animation {
 		}
 	}
 
-	/** Changes {@link BoneLocal#getShearX()}. */
+	/** Changes {@link BonePose#getShearX()}. */
 	static public class ShearXTimeline extends BoneTimeline1 {
 		public ShearXTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.shearX);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
-			boolean out) {
+		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
 			pose.shearX = getRelativeValue(time, alpha, fromSetup, add, pose.shearX, setup.shearX);
 		}
 	}
 
-	/** Changes {@link BoneLocal#getShearY()}. */
+	/** Changes {@link BonePose#getShearY()}. */
 	static public class ShearYTimeline extends BoneTimeline1 {
 		public ShearYTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, boneIndex, Property.shearY);
 		}
 
-		protected void apply (BoneLocal pose, BoneLocal setup, float time, float alpha, boolean fromSetup, boolean add,
-			boolean out) {
+		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
 			pose.shearY = getRelativeValue(time, alpha, fromSetup, add, pose.shearY, setup.shearY);
 		}
 	}
 
-	/** Changes {@link BoneLocal#getInherit()}. */
+	/** Changes {@link BonePose#getInherit()}. */
 	static public class InheritTimeline extends Timeline implements BoneTimeline {
 		static public final int ENTRIES = 2;
 		static private final int INHERIT = 1;
@@ -851,7 +841,7 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			Bone bone = skeleton.bones.items[boneIndex];
 			if (!bone.active) return;
-			BoneLocal pose = appliedPose ? bone.applied : bone.pose;
+			BonePose pose = appliedPose ? bone.applied : bone.pose;
 
 			if (out) {
 				if (fromSetup) pose.inherit = bone.data.setup.inherit;

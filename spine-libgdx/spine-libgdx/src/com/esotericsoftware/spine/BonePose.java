@@ -18,11 +18,118 @@ import com.esotericsoftware.spine.BoneData.Inherit;
  * After changing the world transform, call {@link #updateWorldTransform(Skeleton)} on every descendant bone. It may be more
  * convenient to modify the local transform instead, then call {@link Skeleton#updateWorldTransform(Physics)} to update the world
  * transforms for all bones and apply constraints. */
-public class BonePose extends BoneLocal implements Update {
+public class BonePose implements Pose<BonePose>, Update {
 	Bone bone;
+
+	float x, y, rotation, scaleX, scaleY, shearX, shearY;
+	Inherit inherit;
+
 	float a, b, worldX;
 	float c, d, worldY;
 	int world, local;
+
+	public void set (BonePose pose) {
+		if (pose == null) throw new IllegalArgumentException("pose cannot be null.");
+		x = pose.x;
+		y = pose.y;
+		rotation = pose.rotation;
+		scaleX = pose.scaleX;
+		scaleY = pose.scaleY;
+		shearX = pose.shearX;
+		shearY = pose.shearY;
+		inherit = pose.inherit;
+	}
+
+	/** The local x translation. */
+	public float getX () {
+		return x;
+	}
+
+	public void setX (float x) {
+		this.x = x;
+	}
+
+	/** The local y translation. */
+	public float getY () {
+		return y;
+	}
+
+	public void setY (float y) {
+		this.y = y;
+	}
+
+	/** Sets local x and y translation. */
+	public void setPosition (float x, float y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	/** The local rotation in degrees, counter clockwise. */
+	public float getRotation () {
+		return rotation;
+	}
+
+	public void setRotation (float rotation) {
+		this.rotation = rotation;
+	}
+
+	/** The local scaleX. */
+	public float getScaleX () {
+		return scaleX;
+	}
+
+	public void setScaleX (float scaleX) {
+		this.scaleX = scaleX;
+	}
+
+	/** The local scaleY. */
+	public float getScaleY () {
+		return scaleY;
+	}
+
+	public void setScaleY (float scaleY) {
+		this.scaleY = scaleY;
+	}
+
+	/** Sets local x and y scale. */
+	public void setScale (float scaleX, float scaleY) {
+		this.scaleX = scaleX;
+		this.scaleY = scaleY;
+	}
+
+	/** Sets local x and y scale to the same value. */
+	public void setScale (float scale) {
+		scaleX = scale;
+		scaleY = scale;
+	}
+
+	/** The local shearX. */
+	public float getShearX () {
+		return shearX;
+	}
+
+	public void setShearX (float shearX) {
+		this.shearX = shearX;
+	}
+
+	/** The local shearY. */
+	public float getShearY () {
+		return shearY;
+	}
+
+	public void setShearY (float shearY) {
+		this.shearY = shearY;
+	}
+
+	/** Determines how parent world transforms affect this bone. */
+	public Inherit getInherit () {
+		return inherit;
+	}
+
+	public void setInherit (Inherit inherit) {
+		if (inherit == null) throw new IllegalArgumentException("inherit cannot be null.");
+		this.inherit = inherit;
+	}
 
 	/** Called by {@link Skeleton#updateCache()} to compute the world transform, if needed. */
 	public void update (Skeleton skeleton, Physics physics) {

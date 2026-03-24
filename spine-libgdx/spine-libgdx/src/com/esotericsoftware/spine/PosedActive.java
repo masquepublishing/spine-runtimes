@@ -4,13 +4,12 @@ package com.esotericsoftware.spine;
 /** A posed object that may be active or inactive. */
 abstract public class PosedActive< //
 	D extends PosedData<P>, //
-	P extends Pose, //
-	A extends P> //
-	extends Posed<D, P, A> {
+	P extends Pose> //
+	extends Posed<D, P> {
 
 	boolean active;
 
-	public PosedActive (D data, A pose, A constrained) {
+	protected PosedActive (D data, P pose, P constrained) {
 		super(data, pose, constrained);
 		setupPose();
 	}

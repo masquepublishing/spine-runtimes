@@ -230,7 +230,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				String name = input.readString();
 				BoneData parent = i == 0 ? null : bones[input.readInt(true)];
 				var data = new BoneData(i, name, parent);
-				BoneLocal setup = data.setup;
+				BonePose setup = data.setup;
 				setup.rotation = input.readFloat();
 				setup.x = input.readFloat() * scale;
 				setup.y = input.readFloat() * scale;

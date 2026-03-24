@@ -42,7 +42,7 @@ import com.badlogic.gdx.utils.Null;
  * {@link Skeleton#updateWorldTransform(Physics)} and {@link BonePose#updateWorldTransform(Skeleton)}.
  * </ul>
  */
-public class Bone extends PosedActive<BoneData, BoneLocal, BonePose> {
+public class Bone extends PosedActive<BoneData, BonePose> {
 	@Null final Bone parent;
 	final Array<Bone> children = new Array(true, 4, Bone[]::new);
 	boolean sorted;

@@ -10,15 +10,14 @@ package com.esotericsoftware.spine;
  */
 abstract public class Posed< //
 	D extends PosedData<P>, //
-	P extends Pose, //
-	A extends P> {
+	P extends Pose> {
 
 	final D data;
-	final A pose;
-	final A constrained;
-	A applied;
+	final P pose;
+	final P constrained;
+	P applied;
 
-	public Posed (D data, A pose, A constrained) {
+	protected Posed (D data, P pose, P constrained) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		this.data = data;
 		this.pose = pose;
@@ -43,7 +42,7 @@ abstract public class Posed< //
 
 	/** If no constraints modify this object, the applied pose is the same as the {@link #pose}. Otherwise it is a copy of the
 	 * {@link #pose} modified by constraints. */
-	public A getAppliedPose () {
+	public P getAppliedPose () {
 		return applied;
 	}
 

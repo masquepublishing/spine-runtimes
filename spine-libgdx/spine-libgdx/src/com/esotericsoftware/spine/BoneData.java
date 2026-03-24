@@ -33,7 +33,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Null;
 
 /** The setup pose for a bone. */
-public class BoneData extends PosedData<BoneLocal> {
+public class BoneData extends PosedData<BonePose> {
 	final int index;
 	@Null final BoneData parent;
 	float length;
@@ -44,7 +44,7 @@ public class BoneData extends PosedData<BoneLocal> {
 	boolean visible;
 
 	public BoneData (int index, String name, @Null BoneData parent) {
-		super(name, new BoneLocal());
+		super(name, new BonePose());
 		if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.index = index;

@@ -34,7 +34,7 @@ import com.badlogic.gdx.graphics.Color;
 /** Stores a slot's current pose. Slots organize attachments for {@link Skeleton#drawOrder} purposes and provide a place to store
  * state for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared
  * across multiple skeletons. */
-public class Slot extends Posed<SlotData, SlotPose, SlotPose> {
+public class Slot extends Posed<SlotData, SlotPose> {
 	final Skeleton skeleton;
 	final Bone bone;
 	int attachmentState;

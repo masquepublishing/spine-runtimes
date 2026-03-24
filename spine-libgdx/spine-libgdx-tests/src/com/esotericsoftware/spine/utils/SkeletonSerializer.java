@@ -17,7 +17,6 @@ import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.AnimationStateData;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.BoneData;
-import com.esotericsoftware.spine.BoneLocal;
 import com.esotericsoftware.spine.BonePose;
 import com.esotericsoftware.spine.Constraint;
 import com.esotericsoftware.spine.ConstraintData;
@@ -1999,7 +1998,7 @@ public class SkeletonSerializer {
 		writeBoneData(obj.getData());
 
 		json.writeName("pose");
-		writeBoneLocal(obj.getPose());
+		writeBonePose(obj.getPose());
 
 		json.writeName("appliedPose");
 		writeBonePose(obj.getAppliedPose());
@@ -2047,51 +2046,10 @@ public class SkeletonSerializer {
 		json.writeValue(obj.getName());
 
 		json.writeName("setupPose");
-		writeBoneLocal(obj.getSetupPose());
+		writeBonePose(obj.getSetupPose());
 
 		json.writeName("skinRequired");
 		json.writeValue(obj.getSkinRequired());
-
-		json.writeObjectEnd();
-	}
-
-	private void writeBoneLocal (BoneLocal obj) {
-		if (visitedObjects.containsKey(obj)) {
-			json.writeValue(visitedObjects.get(obj));
-			return;
-		}
-		String refString = "<BoneLocal-" + (nextId++) + ">";
-		visitedObjects.put(obj, refString);
-
-		json.writeObjectStart();
-		json.writeName("refString");
-		json.writeValue(refString);
-		json.writeName("type");
-		json.writeValue("BoneLocal");
-
-		json.writeName("x");
-		json.writeValue(obj.getX());
-
-		json.writeName("y");
-		json.writeValue(obj.getY());
-
-		json.writeName("rotation");
-		json.writeValue(obj.getRotation());
-
-		json.writeName("scaleX");
-		json.writeValue(obj.getScaleX());
-
-		json.writeName("scaleY");
-		json.writeValue(obj.getScaleY());
-
-		json.writeName("shearX");
-		json.writeValue(obj.getShearX());
-
-		json.writeName("shearY");
-		json.writeValue(obj.getShearY());
-
-		json.writeName("inherit");
-		json.writeValue(obj.getInherit().name());
 
 		json.writeObjectEnd();
 	}

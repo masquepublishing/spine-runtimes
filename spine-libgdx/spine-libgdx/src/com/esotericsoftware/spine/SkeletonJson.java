@@ -189,7 +189,7 @@ public class SkeletonJson extends SkeletonLoader {
 				}
 				var data = new BoneData(skeletonData.bones.size, boneMap.getString("name"), parent);
 				data.length = boneMap.getFloat("length", 0) * scale;
-				BoneLocal setup = data.setup;
+				BonePose setup = data.setup;
 				setup.x = boneMap.getFloat("x", 0) * scale;
 				setup.y = boneMap.getFloat("y", 0) * scale;
 				setup.rotation = boneMap.getFloat("rotation", 0);

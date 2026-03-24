@@ -35,7 +35,7 @@ abstract public class PosedData<P extends Pose> {
 	final P setup;
 	boolean skinRequired;
 
-	public PosedData (String name, P setup) {
+	protected PosedData (String name, P setup) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
 		this.setup = setup;
