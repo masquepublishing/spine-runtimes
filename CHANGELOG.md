@@ -238,6 +238,15 @@
 
 - **Additions**
   - Added `SpineSlider` and `SpineSliderData` classes for slider constraints
+  - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
+
+- **Breaking changes (since previous 4.3 beta)**
+  - `SpineTrackEntry.get_hold_previous()` / `set_hold_previous()` removed.
+  - `SpineTrackEntry.get_mix_blend()` / `set_mix_blend()` removed. Use `get_additive()` / `set_additive()` for additive blending.
+  - `SpineConstant.MixBlend` and `SpineConstant.MixDirection` enums removed.
+  - `SpineTimeline.apply()` signature changed: `blend` and `direction` parameters replaced with `from_setup`, `add`, `out`.
+  - `SpineAnimation.apply()` signature changed to match.
+  - `SpineAnimationTrack` property `hold_previous` replaced with `additive`, property `mix_blend` removed.
   - Added `SpineBoneLocal` and `SpineBonePose` classes for new pose system
   - Added pose classes for constraints: `SpineIkConstraintPose`, `SpinePathConstraintPose`, `SpinePhysicsConstraintPose`, `SpineSliderPose`, `SpineTransformConstraintPose`
 
