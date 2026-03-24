@@ -6,6 +6,9 @@
 - Before editing, read files in full, especially if the read tool truncates them.
 - Follow existing code style in touched files (naming, type usage, control flow, and error handling patterns).
 
+## Files to never commit
+- **NEVER** commit Eclipse settings files (`.settings/`, `.classpath`, `.project`). These are IDE-specific and must not be checked in. If `git status` shows changes to these files, revert them before committing.
+
 ## Git commit subject prefix (required)
 Every commit subject must start with a runtime prefix.
 
