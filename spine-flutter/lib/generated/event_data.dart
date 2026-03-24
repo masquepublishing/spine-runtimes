@@ -52,7 +52,7 @@ class EventData {
     SpineBindings.bindings.spine_event_data_dispose(_ptr);
   }
 
-  /// The name of the event, which is unique within the skeleton.
+  /// The name of the event, unique across all events in the skeleton.
   String get name {
     final result = SpineBindings.bindings.spine_event_data_get_name(_ptr);
     return result.cast<Utf8>().toDartString();

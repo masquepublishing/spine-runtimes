@@ -58,13 +58,13 @@ class BoneData extends PosedData {
     SpineBindings.bindings.spine_bone_data_dispose(_ptr);
   }
 
-  /// The index of the bone in Skeleton.Bones
+  /// The Skeleton::getBones() index.
   int get index {
     final result = SpineBindings.bindings.spine_bone_data_get_index(_ptr);
     return result;
   }
 
-  /// May be NULL.
+  /// The parent bone, or NULL if this bone is the root.
   BoneData? get parent {
     final result = SpineBindings.bindings.spine_bone_data_get_parent(_ptr);
     return result.address == 0 ? null : BoneData.fromPointer(result);
@@ -84,6 +84,8 @@ class BoneData extends PosedData {
     return Color.fromPointer(result);
   }
 
+  /// The bone icon name as it was in Spine, or empty if nonessential data was
+  /// not exported.
   String get icon {
     final result = SpineBindings.bindings.spine_bone_data_get_icon(_ptr);
     return result.cast<Utf8>().toDartString();

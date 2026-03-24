@@ -38,8 +38,7 @@ import 'event_data.dart';
 /// Stores the current pose values for an Event.
 ///
 /// See Timeline::apply(), AnimationStateListener::event(), and
-///
-/// See also: https://esotericsoftware.com/spine-events Events in the Spine User Guide.
+/// https://esotericsoftware.com/spine-events Events in the Spine User Guide.
 class Event {
   final Pointer<spine_event_wrapper> _ptr;
 

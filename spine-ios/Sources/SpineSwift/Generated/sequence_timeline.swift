@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a slot's SlotPose::getSequenceIndex() for an attachment's Sequence.
+/// Changes SlotPose::getSequenceIndex() for an attachment's Sequence.
 @objc(SpineSequenceTimeline)
 @objcMembers
 public class SequenceTimeline: Timeline, SlotTimeline {

@@ -149,6 +149,8 @@ class Skeleton {
     return result.address == 0 ? null : Slot.fromPointer(result);
   }
 
+  /// The skeleton's slots in the order they should be drawn. The returned array
+  /// may be modified to change the draw order.
   ArraySlot get drawOrder {
     final result = SpineBindings.bindings.spine_skeleton_get_draw_order(_ptr);
     return ArraySlot.fromPointer(result);
@@ -270,6 +272,10 @@ class Skeleton {
     SpineBindings.bindings.spine_skeleton_physics_rotate(_ptr, x, y, degrees);
   }
 
+  /// Returns the skeleton's time, used for time-based manipulations, such as
+  /// PhysicsConstraint.
+  ///
+  /// See update().
   double get time {
     final result = SpineBindings.bindings.spine_skeleton_get_time(_ptr);
     return result;

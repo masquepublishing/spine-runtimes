@@ -102,8 +102,11 @@ class RGBATimeline extends SlotCurveTimeline {
 		else {
 			if (blend == MixBlend.setup) {
 				var setup = slot.data.setup.color;
-				color.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
-					setup.a + (a - setup.a) * alpha);
+				color.set(setup.r
+					+ (r - setup.r) * alpha, setup.g
+					+ (g - setup.g) * alpha, setup.b
+					+ (b - setup.b) * alpha, setup.a
+					+ (a - setup.a) * alpha);
 			} else
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 		}

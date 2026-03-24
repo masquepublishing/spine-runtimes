@@ -695,7 +695,8 @@ class SkeletonJson {
 	/** @param folderSlots Slot names are resolved to positions within this array. If null, slot indices are used as positions. */
 	private function readDrawOrder(skeletonData:SkeletonData, keyMap:Dynamic, slotCount:Int, folderSlots:Array<Int>):Array<Int> {
 		var changes:Array<Dynamic> = Reflect.getProperty(keyMap, "offsets");
-		if (changes == null) return null;
+		if (changes == null)
+			return null;
 		var drawOrder:Array<Int> = new Array<Int>();
 		drawOrder.resize(slotCount);
 		for (i in 0...slotCount)
@@ -705,7 +706,8 @@ class SkeletonJson {
 		var originalIndex:Int = 0, unchangedIndex:Int = 0;
 		for (offsetMap in changes) {
 			var slot = skeletonData.findSlot(Reflect.getProperty(offsetMap, "slot"));
-			if (slot == null) throw new SpineException("Draw order slot not found: " + Reflect.getProperty(offsetMap, "slot"));
+			if (slot == null)
+				throw new SpineException("Draw order slot not found: " + Reflect.getProperty(offsetMap, "slot"));
 			var index:Int;
 			if (folderSlots == null)
 				index = slot.index;
@@ -717,7 +719,8 @@ class SkeletonJson {
 						break;
 					}
 				}
-				if (index == -1) throw new SpineException("Slot not in folder: " + Reflect.getProperty(offsetMap, "slot"));
+				if (index == -1)
+					throw new SpineException("Slot not in folder: " + Reflect.getProperty(offsetMap, "slot"));
 			}
 			while (originalIndex != index)
 				unchanged[unchangedIndex++] = originalIndex++;
@@ -727,7 +730,8 @@ class SkeletonJson {
 			unchanged[unchangedIndex++] = originalIndex++;
 		var i:Int = slotCount - 1;
 		while (i >= 0) {
-			if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+			if (drawOrder[i] == -1)
+				drawOrder[i] = unchanged[--unchangedIndex];
 			i--;
 		}
 		return drawOrder;
@@ -1376,7 +1380,8 @@ class SkeletonJson {
 					var ii:Int = 0;
 					for (slotEntry in slotEntries) {
 						var slot = skeletonData.findSlot(cast(slotEntry, String));
-						if (slot == null) throw new SpineException("Draw order folder slot not found: " + cast(slotEntry, String));
+						if (slot == null)
+							throw new SpineException("Draw order folder slot not found: " + cast(slotEntry, String));
 						folderSlots[ii++] = slot.index;
 					}
 

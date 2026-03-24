@@ -66,7 +66,8 @@ class RGB2Timeline extends SlotCurveTimeline {
 		var r:Float = 0, g:Float = 0, b:Float = 0, r2:Float = 0, g2:Float = 0, b2:Float = 0;
 		if (time < frames[0]) {
 			var setup = slot.data.setup;
-			var setupLight:Color = setup.color, setupDark:Color = setup.darkColor;
+			var setupLight:Color = setup.color,
+				setupDark:Color = setup.darkColor;
 			switch (blend) {
 				case MixBlend.setup:
 					light.r = setupLight.r;

@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a slot's SlotPose::getDeform() to deform a VertexAttachment.
+/// Changes SlotPose::getDeform() to deform a VertexAttachment.
 @objc(SpineDeformTimeline)
 @objcMembers
 public class DeformTimeline: SlotCurveTimeline {

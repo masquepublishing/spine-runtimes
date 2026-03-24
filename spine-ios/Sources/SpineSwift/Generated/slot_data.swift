@@ -46,7 +46,7 @@ public class SlotData: PosedData {
         self.init(fromPointer: ptr!)
     }
 
-    /// The index of the slot in Skeleton::getSlots().
+    /// The Skeleton::getSlots() index.
     public var index: Int32 {
         let result = spine_slot_data_get_index(_ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self))
         return result

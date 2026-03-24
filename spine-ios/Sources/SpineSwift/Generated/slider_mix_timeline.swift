@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a slider's SliderPose::getMix().
+/// Changes SliderPose::getMix().
 @objc(SpineSliderMixTimeline)
 @objcMembers
 public class SliderMixTimeline: ConstraintTimeline1 {

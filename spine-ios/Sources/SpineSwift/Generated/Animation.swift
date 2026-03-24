@@ -97,22 +97,23 @@ public class Animation: NSObject {
     ///
     /// See Timeline::apply().
     ///
-    /// - Parameter skeleton: The skeleton the animation is being applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
-    /// - Parameter lastTime: The last time in seconds this animation was applied. Some timelines trigger only at specific times rather than every frame. Pass -1 the first time an animation is applied to ensure frame 0 is triggered.
-    /// - Parameter time: The time in seconds the skeleton is being posed for. Most timelines find the frame before and the frame after this time and interpolate between the frame values. If beyond the getDuration() and loop is true then the animation will repeat, else the last frame will be applied.
-    /// - Parameter loop: If true, the animation repeats after the getDuration().
-    /// - Parameter events: If any events are fired, they are added to this list. Can be null to ignore fired events or if no timelines fire events.
-    /// - Parameter alpha: 0 applies the current or setup values (depending on blend). 1 applies the timeline values. Between 0 and 1 applies values between the current or setup values and the timeline values. By adjusting alpha over time, an animation can be mixed in or out. alpha can also be useful to apply animations on top of each other (layering).
-    /// - Parameter blend: Controls how mixing is applied when alpha < 1.
-    /// - Parameter direction: Indicates whether the timelines are mixing in or out. Used by timelines which perform instant transitions, such as DrawOrderTimeline or AttachmentTimeline.
+    /// - Parameter skeleton: The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
+    /// - Parameter lastTime: The last time in seconds this animation was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time an animation is applied to ensure frame 0 is triggered.
+    /// - Parameter time: The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
+    /// - Parameter loop: True if time beyond the getDuration() repeats the animation, else the last frame is used.
+    /// - Parameter events: If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
+    /// - Parameter alpha: 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix an animation in or out.
+    /// - Parameter fromSetup: If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+    /// - Parameter add: If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+    /// - Parameter out: True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
+    /// - Parameter appliedPose: True to modify the applied pose, else the pose is modified.
     public func apply(
-        _ skeleton: Skeleton, _ lastTime: Float, _ time: Float, _ loop: Bool, _ events: ArrayEvent?, _ alpha: Float, _ blend: MixBlend,
-        _ direction: MixDirection, _ appliedPose: Bool
+        _ skeleton: Skeleton, _ lastTime: Float, _ time: Float, _ loop: Bool, _ events: ArrayEvent?, _ alpha: Float, _ fromSetup: Bool, _ add: Bool,
+        _ out: Bool, _ appliedPose: Bool
     ) {
         spine_animation_apply(
             _ptr.assumingMemoryBound(to: spine_animation_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), lastTime,
-            time, loop, events?._ptr.assumingMemoryBound(to: spine_array_event_wrapper.self), alpha,
-            spine_mix_blend(rawValue: UInt32(blend.rawValue)), spine_mix_direction(rawValue: UInt32(direction.rawValue)), appliedPose)
+            time, loop, events?._ptr.assumingMemoryBound(to: spine_array_event_wrapper.self), alpha, fromSetup, add, out, appliedPose)
     }
 
     /// - Parameter target: After the first and before the last entry.

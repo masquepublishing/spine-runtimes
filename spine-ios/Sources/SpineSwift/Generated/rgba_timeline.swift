@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a slot's SlotPose::getColor().
+/// Changes SlotPose::getColor().
 @objc(SpineRgbaTimeline)
 @objcMembers
 public class RgbaTimeline: SlotCurveTimeline {

@@ -34,7 +34,6 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'animation.dart';
 import 'animation_state.dart';
-import 'mix_blend.dart';
 
 /// State for the playback of an animation
 class TrackEntry {
@@ -87,27 +86,17 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_loop(_ptr, value);
   }
 
-  /// If true, when mixing from the previous animation to this animation, the
-  /// previous animation is applied as normal instead of being mixed out.
-  ///
-  /// When mixing between animations that key the same property, if a lower
-  /// track also keys that property then the value will briefly dip toward the
-  /// lower track value during the mix. This happens because the first animation
-  /// mixes from 100% to 0% while the second animation mixes from 0% to 100%.
-  /// Setting holdPrevious to true applies the first animation at 100% during
-  /// the mix so the lower track value is overwritten. Such dipping does not
-  /// occur on the lowest track which keys the property, only when a higher
-  /// track also keys the property.
-  ///
-  /// Snapping will occur if holdPrevious is true and this animation does not
-  /// key all the same properties as the previous animation.
-  bool get holdPrevious {
-    final result = SpineBindings.bindings.spine_track_entry_get_hold_previous(_ptr);
+  /// When true, timelines in this animation that support additive have their
+  /// values added to the setup or current pose values instead of replacing
+  /// them. Additive can be set for a new track entry only before
+  /// AnimationState::apply() is next called.
+  bool get additive {
+    final result = SpineBindings.bindings.spine_track_entry_get_additive(_ptr);
     return result;
   }
 
-  set holdPrevious(bool value) {
-    SpineBindings.bindings.spine_track_entry_set_hold_previous(_ptr, value);
+  set additive(bool value) {
+    SpineBindings.bindings.spine_track_entry_set_additive(_ptr, value);
   }
 
   bool get reverse {
@@ -366,27 +355,17 @@ class TrackEntry {
     return result;
   }
 
-  MixBlend get mixBlend {
-    final result = SpineBindings.bindings.spine_track_entry_get_mix_blend(_ptr);
-    return MixBlend.fromValue(result);
-  }
-
-  set mixBlend(MixBlend value) {
-    SpineBindings.bindings.spine_track_entry_set_mix_blend(_ptr, value.value);
-  }
-
-  /// The track entry for the previous animation when mixing from the previous
-  /// animation to this animation, or NULL if no mixing is currently occuring.
-  /// When mixing from multiple animations, MixingFrom makes up a double linked
-  /// list with MixingTo.
+  /// The track entry for the previous animation when mixing to this animation,
+  /// or NULL if no mixing is currently occurring. When mixing from multiple
+  /// animations, MixingFrom makes up a doubly linked list with MixingTo.
   TrackEntry? get mixingFrom {
     final result = SpineBindings.bindings.spine_track_entry_get_mixing_from(_ptr);
     return result.address == 0 ? null : TrackEntry.fromPointer(result);
   }
 
   /// The track entry for the next animation when mixing from this animation, or
-  /// NULL if no mixing is currently occuring. When mixing from multiple
-  /// animations, MixingTo makes up a double linked list with MixingFrom.
+  /// NULL if no mixing is currently occurring. When mixing to multiple
+  /// animations, MixingTo makes up a doubly linked list with MixingFrom.
   TrackEntry? get mixingTo {
     final result = SpineBindings.bindings.spine_track_entry_get_mixing_to(_ptr);
     return result.address == 0 ? null : TrackEntry.fromPointer(result);

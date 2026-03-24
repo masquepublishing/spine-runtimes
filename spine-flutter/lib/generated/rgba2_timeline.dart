@@ -34,8 +34,8 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'slot_curve_timeline.dart';
 
-/// Changes a slot's SlotPose::getColor() and SlotPose::getDarkColor() for two
-/// color tinting.
+/// Changes SlotPose::getColor() and SlotPose::getDarkColor() for two color
+/// tinting.
 class Rgba2Timeline extends SlotCurveTimeline {
   final Pointer<spine_rgba2_timeline_wrapper> _ptr;
 

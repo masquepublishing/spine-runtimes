@@ -35,9 +35,7 @@ import SpineC
 /// Stores the current pose values for an Event.
 ///
 /// See Timeline::apply(), AnimationStateListener::event(), and
-///
-/// - SeeAlso:
-///   - https://esotericsoftware.com/spine-events Events in the Spine User Guide.
+/// https://esotericsoftware.com/spine-events Events in the Spine User Guide.
 @objc(SpineEvent)
 @objcMembers
 public class Event: NSObject {

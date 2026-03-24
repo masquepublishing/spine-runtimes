@@ -46,13 +46,13 @@ public class BoneData: PosedData {
         self.init(fromPointer: ptr!)
     }
 
-    /// The index of the bone in Skeleton.Bones
+    /// The Skeleton::getBones() index.
     public var index: Int32 {
         let result = spine_bone_data_get_index(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
         return result
     }
 
-    /// May be NULL.
+    /// The parent bone, or NULL if this bone is the root.
     public var parent: BoneData? {
         let result = spine_bone_data_get_parent(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
         return result.map { BoneData(fromPointer: $0) }
@@ -73,6 +73,7 @@ public class BoneData: PosedData {
         return Color(fromPointer: result!)
     }
 
+    /// The bone icon name as it was in Spine, or empty if nonessential data was not exported.
     public var icon: String {
         get {
             let result = spine_bone_data_get_icon(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))

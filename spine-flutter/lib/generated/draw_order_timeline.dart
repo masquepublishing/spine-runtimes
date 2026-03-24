@@ -35,7 +35,7 @@ import '../spine_bindings.dart';
 import 'arrays.dart';
 import 'timeline.dart';
 
-/// Changes a skeleton's Skeleton::getDrawOrder().
+/// Changes Skeleton::getDrawOrder().
 class DrawOrderTimeline extends Timeline {
   final Pointer<spine_draw_order_timeline_wrapper> _ptr;
 

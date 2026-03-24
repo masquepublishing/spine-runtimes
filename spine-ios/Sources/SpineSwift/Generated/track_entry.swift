@@ -83,25 +83,16 @@ public class TrackEntry: NSObject {
         }
     }
 
-    /// If true, when mixing from the previous animation to this animation, the previous animation
-    /// is applied as normal instead of being mixed out.
-    ///
-    /// When mixing between animations that key the same property, if a lower track also keys that
-    /// property then the value will briefly dip toward the lower track value during the mix. This
-    /// happens because the first animation mixes from 100% to 0% while the second animation mixes
-    /// from 0% to 100%. Setting holdPrevious to true applies the first animation at 100% during the
-    /// mix so the lower track value is overwritten. Such dipping does not occur on the lowest track
-    /// which keys the property, only when a higher track also keys the property.
-    ///
-    /// Snapping will occur if holdPrevious is true and this animation does not key all the same
-    /// properties as the previous animation.
-    public var holdPrevious: Bool {
+    /// When true, timelines in this animation that support additive have their values added to the
+    /// setup or current pose values instead of replacing them. Additive can be set for a new track
+    /// entry only before AnimationState::apply() is next called.
+    public var additive: Bool {
         get {
-            let result = spine_track_entry_get_hold_previous(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
+            let result = spine_track_entry_get_additive(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
             return result
         }
         set {
-            spine_track_entry_set_hold_previous(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self), newValue)
+            spine_track_entry_set_additive(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self), newValue)
         }
     }
 
@@ -358,27 +349,16 @@ public class TrackEntry: NSObject {
         return result
     }
 
-    public var mixBlend: MixBlend {
-        get {
-            let result = spine_track_entry_get_mix_blend(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
-            return MixBlend(rawValue: Int32(result.rawValue))!
-        }
-        set {
-            spine_track_entry_set_mix_blend(
-                _ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self), spine_mix_blend(rawValue: UInt32(newValue.rawValue)))
-        }
-    }
-
-    /// The track entry for the previous animation when mixing from the previous animation to this
-    /// animation, or NULL if no mixing is currently occuring. When mixing from multiple animations,
-    /// MixingFrom makes up a double linked list with MixingTo.
+    /// The track entry for the previous animation when mixing to this animation, or NULL if no
+    /// mixing is currently occurring. When mixing from multiple animations, MixingFrom makes up a
+    /// doubly linked list with MixingTo.
     public var mixingFrom: TrackEntry? {
         let result = spine_track_entry_get_mixing_from(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
         return result.map { TrackEntry(fromPointer: $0) }
     }
 
     /// The track entry for the next animation when mixing from this animation, or NULL if no mixing
-    /// is currently occuring. When mixing from multiple animations, MixingTo makes up a double
+    /// is currently occurring. When mixing to multiple animations, MixingTo makes up a doubly
     /// linked list with MixingFrom.
     public var mixingTo: TrackEntry? {
         let result = spine_track_entry_get_mixing_to(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))

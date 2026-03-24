@@ -48,7 +48,7 @@ public class EventData: NSObject {
         self.init(fromPointer: ptr!)
     }
 
-    /// The name of the event, which is unique within the skeleton.
+    /// The name of the event, unique across all events in the skeleton.
     public var name: String {
         let result = spine_event_data_get_name(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
         return String(cString: result!)

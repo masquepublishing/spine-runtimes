@@ -32,12 +32,11 @@
 import Foundation
 import SpineC
 
-/// The current pose for a bone, before constraints are applied.
-///
-/// A bone has a local transform which is used to compute its world transform. A bone also has an
-/// applied transform, which is a local transform that can be applied to compute the world
-/// transform. The local transform and applied transform may differ if a constraint or application
-/// code modifies the world transform after it was computed from the local transform.
+/// A bone has a number of poses: - BoneData::getSetupPose(): The setup pose. - getPose(): The local
+/// pose. Set by animations and app code. - getAppliedPose(): The applied local pose. This is the
+/// local pose modified by constraints and app code. - The world transform on the applied pose,
+/// computed by Skeleton::updateWorldTransform(Physics) and
+/// BonePose::updateWorldTransform(Skeleton).
 @objc(SpineBone)
 @objcMembers
 public class Bone: PosedActive, Posed, Update {

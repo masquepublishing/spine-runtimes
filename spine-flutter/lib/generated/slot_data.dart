@@ -59,7 +59,7 @@ class SlotData extends PosedData {
     SpineBindings.bindings.spine_slot_data_dispose(_ptr);
   }
 
-  /// The index of the slot in Skeleton::getSlots().
+  /// The Skeleton::getSlots() index.
   int get index {
     final result = SpineBindings.bindings.spine_slot_data_get_index(_ptr);
     return result;

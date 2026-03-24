@@ -73,6 +73,8 @@ public class Skeleton: NSObject {
         return ArraySlot(fromPointer: result!)
     }
 
+    /// The skeleton's slots in the order they should be drawn. The returned array may be modified
+    /// to change the draw order.
     public var drawOrder: ArraySlot {
         let result = spine_skeleton_get_draw_order(_ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         return ArraySlot(fromPointer: result!)
@@ -178,6 +180,9 @@ public class Skeleton: NSObject {
         }
     }
 
+    /// Returns the skeleton's time, used for time-based manipulations, such as PhysicsConstraint.
+    ///
+    /// See update().
     public var time: Float {
         get {
             let result = spine_skeleton_get_time(_ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
