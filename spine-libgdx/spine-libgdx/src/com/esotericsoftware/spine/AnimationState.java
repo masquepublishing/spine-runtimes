@@ -255,7 +255,8 @@ public class AnimationState {
 		boolean attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 		int timelineCount = from.animation.timelines.size;
 		Timeline[] timelines = from.animation.timelines.items;
-		float alphaMix = from.alpha * fromMix * (1 - mix), keep = 1 - mix * to.alpha, alphaHold = keep > 0 ? alphaMix / keep : 0;
+		float a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
+		float alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
 		float animationLast = from.animationLast, animationTime = from.getAnimationTime(), applyTime = animationTime;
 		Array<Event> events = null;
 		if (from.reverse)
@@ -291,12 +292,10 @@ public class AnimationState {
 				timeline.apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
 			}
 		}
-
 		if (to.mixDuration > 0) queueEvents(from, animationTime);
 		this.events.clear();
 		from.nextAnimationLast = animationTime;
 		from.nextTrackLast = from.trackTime;
-
 		return mix;
 	}
 
