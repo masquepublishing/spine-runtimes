@@ -10,6 +10,11 @@
 - **NEVER** commit Eclipse settings files (`.settings/`, `.classpath`, `.project`). These are IDE-specific and must not be checked in. If `git status` shows changes to these files, revert them before committing.
 - **NEVER** commit the vendored spine-cpp copies inside `spine-ue/`, `spine-godot/`, `spine-flutter/`, or `spine-ios/`. These are managed by setup/build scripts and are gitignored. Only commit changes to the wrapper/binding code in those runtimes, not the vendored spine-cpp sources.
 
+## CHANGELOG.md
+- When making API changes, adding features, or fixing bugs, add entries to `CHANGELOG.md` under the appropriate runtime section(s) in the `# 4.3` block.
+- Use `- **Additions**` for new features, `- **Breaking changes**` for API changes, `- **Bug fixes**` for fixes.
+- Add entries for every runtime affected, including downstream runtimes that get regenerated bindings (C, Flutter, iOS, Godot).
+
 ## Git commit subject prefix (required)
 Every commit subject must start with a runtime prefix.
 
