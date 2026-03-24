@@ -82,7 +82,7 @@ void Slider::update(Skeleton &skeleton, Physics physics) {
 	const Array<int> &indices = animation->getBones();
 	for (size_t i = 0, n = indices.size(); i < n; i++) bones[indices[i]]->_applied->modifyLocal(skeleton);
 
-	animation->apply(skeleton, p._time, p._time, _data._loop, NULL, p._mix, _data._additive ? MixBlend_Add : MixBlend_Replace, MixDirection_In, true);
+	animation->apply(skeleton, p._time, p._time, _data._loop, NULL, p._mix, false, _data._additive, false, true);
 }
 
 void Slider::sort(Skeleton &skeleton) {

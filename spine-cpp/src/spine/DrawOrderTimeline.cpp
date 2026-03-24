@@ -48,6 +48,7 @@ PropertyId DrawOrderTimeline::getPropertyId() {
 DrawOrderTimeline::DrawOrderTimeline(size_t frameCount) : Timeline(frameCount, 1) {
 	PropertyId ids[] = {getPropertyId()};
 	setPropertyIds(ids, 1);
+	_instant = true;
 
 	_drawOrders.ensureCapacity(frameCount);
 	for (size_t i = 0; i < frameCount; ++i) {
@@ -56,26 +57,18 @@ DrawOrderTimeline::DrawOrderTimeline(size_t frameCount) : Timeline(frameCount, 1
 	}
 }
 
-void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-							  MixDirection direction, bool appliedPose) {
+void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+							  bool appliedPose) {
 	SP_UNUSED(appliedPose);
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 	SP_UNUSED(alpha);
+	SP_UNUSED(add);
 
 	Array<Slot *> &drawOrder = skeleton._drawOrder;
 	Array<Slot *> &slots = skeleton._slots;
-	if (direction == MixDirection_Out) {
-		if (blend == MixBlend_Setup) {
-			drawOrder.clear();
-			drawOrder.ensureCapacity(slots.size());
-			for (size_t i = 0, n = slots.size(); i < n; ++i) drawOrder.add(slots[i]);
-		}
-		return;
-	}
-
-	if (time < _frames[0]) {
-		if (blend == MixBlend_Setup || blend == MixBlend_First) {
+	if (out || time < _frames[0]) {
+		if (fromSetup) {
 			drawOrder.clear();
 			drawOrder.ensureCapacity(slots.size());
 			for (size_t i = 0, n = slots.size(); i < n; ++i) drawOrder.add(slots[i]);

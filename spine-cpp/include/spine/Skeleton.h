@@ -200,6 +200,7 @@ namespace spine {
 		/// @return May be NULL.
 		Slot *findSlot(const String &slotName);
 
+		/// The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order.
 		Array<Slot *> &getDrawOrder();
 
 		Skin *getSkin();
@@ -310,6 +311,9 @@ namespace spine {
 		/// Calls {@link PhysicsConstraint#rotate(float, float, float)} for each physics constraint. */
 		void physicsRotate(float x, float y, float degrees);
 
+		/// Returns the skeleton's time, used for time-based manipulations, such as PhysicsConstraint.
+		///
+		/// See update().
 		float getTime();
 
 		void setTime(float time);

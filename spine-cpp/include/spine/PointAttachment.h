@@ -53,22 +53,27 @@ namespace spine {
 	public:
 		explicit PointAttachment(const String &name);
 
+		/// The local X position.
 		float getX();
 
 		void setX(float inValue);
 
+		/// The local Y position.
 		float getY();
 
 		void setY(float inValue);
 
+		/// The local rotation in degrees, counter clockwise.
 		float getRotation();
 
 		void setRotation(float inValue);
 
 		Color &getColor();
 
+		/// Computes the world position from the local position.
 		void computeWorldPosition(BonePose &bone, float &ox, float &oy);
 
+		/// Computes the world rotation from the local rotation.
 		float computeWorldRotation(BonePose &bone);
 
 		virtual Attachment &copy() override;

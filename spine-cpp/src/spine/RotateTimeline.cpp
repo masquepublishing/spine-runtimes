@@ -39,7 +39,7 @@ RotateTimeline::RotateTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_Rotate) {
 }
 
-void RotateTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-	SP_UNUSED(direction);
-	pose._rotation = getRelativeValue(time, alpha, blend, pose._rotation, setup._rotation);
+void RotateTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+	SP_UNUSED(out);
+	pose._rotation = getRelativeValue(time, alpha, fromSetup, add, pose._rotation, setup._rotation);
 }

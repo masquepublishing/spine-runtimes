@@ -56,8 +56,8 @@ namespace spine {
 		/// @param time The frame time in seconds.
 		void setFrame(int frame, float time, Inherit inherit);
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 
 		virtual int getBoneIndex() const override {

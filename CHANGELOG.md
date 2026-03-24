@@ -4,6 +4,15 @@
 
 - **Additions**
   - Added `spine_slider` and `spine_slider_data` types for slider constraints
+  - Regenerated C bindings for the AnimationState additive/hold rework and Skin placeholder name rename in spine-cpp.
+
+- **Breaking changes**
+  - `spine_track_entry_get_mix_blend()` / `spine_track_entry_set_mix_blend()` removed. Use `spine_track_entry_get_additive()` / `spine_track_entry_set_additive()` instead.
+  - `spine_track_entry_get_hold_previous()` / `spine_track_entry_set_hold_previous()` removed.
+  - `spine_skin_entry_get_name()` renamed to `spine_skin_entry_get_placeholder_name()`.
+  - Timeline `apply()` signature changed: `spine_mix_blend` and `spine_mix_direction` parameters replaced with `bool fromSetup, bool add, bool out`.
+  - `spine_animation_apply()` signature changed to match.
+  - `spine_curve_timeline1_get_absolute_value()`, `spine_curve_timeline1_get_relative_value()`, `spine_curve_timeline1_get_scale_value()` signatures changed.
   - Added `spine_slider_timeline` and `spine_slider_mix_timeline` for animating sliders
   - Added new pose system with `spine_bone_local`, `spine_bone_pose`, and related types
   - Added `spine_pose`, `spine_posed`, and `spine_posed_active` base types
@@ -77,11 +86,23 @@
   - Added `HasRendererObject` interface for attachments with renderer-specific data
   - Ported the latest parser fixes from spine-libgdx, including the 4.3 path constraint flag fix and the weighted mesh binary vertex allocation/count fix.
   - Ported the latest additive timeline updates and alpha/RGB timeline flicker fixes from spine-libgdx.
+  - Ported the AnimationState additive/hold rework from spine-libgdx. `MixBlend` and `MixDirection` are no longer used by timelines. The new system uses `bool fromSetup, bool add, bool out` parameters and a bitmask-based hold system that replaces `holdPrevious` and `interruptAlpha`.
+  - Added `Timeline::getAdditive()` and `Timeline::getInstant()` to query timeline blending capabilities.
+  - Added `TrackEntry::getAdditive()` / `TrackEntry::setAdditive()` to control additive blending per track entry.
+  - Ported the Skin placeholder name rename from spine-libgdx. `Skin::AttachmentMap::Entry::_name` renamed to `_placeholderName`.
+  - Fixed `SkeletonBinary::readLong()` sign extension bug that truncated 64-bit hash values to 32 bits.
   - Ported the sequence attachment refactor from spine-libgdx. `Sequence` now precomputes per-frame regions, UVs, and region offsets, and `RegionAttachment` / `MeshAttachment` now mirror the libgdx implementation.
 
 - **Breaking changes**
   - Headers reorganized from `spine-cpp/spine-cpp/include/spine/` to `spine-cpp/include/spine/`
-  - Timeline `apply()` methods now take an additional `appliedPose` parameter
+  - Timeline `apply()` signature changed: `MixBlend blend, MixDirection direction` replaced with `bool fromSetup, bool add, bool out`. All timeline subclasses updated.
+  - `Animation::apply()` signature changed to match the new timeline parameters.
+  - `CurveTimeline1::getRelativeValue()`, `getAbsoluteValue()`, and `getScaleValue()` signatures changed from `MixBlend`/`MixDirection` to `bool fromSetup, bool add, bool out`.
+  - `TrackEntry::getHoldPrevious()` / `setHoldPrevious()` removed. Use `TrackEntry::getAdditive()` / `setAdditive()` instead for additive blending.
+  - `TrackEntry::getMixBlend()` / `setMixBlend()` removed.
+  - `TrackEntry::_interruptAlpha` removed.
+  - `Skin::AttachmentMap::Entry::_name` renamed to `_placeholderName`. All `Skin` methods use `placeholderName` parameter names instead of `name`/`attachmentName`.
+  - `AnimationState` hold constants changed: `HoldSubsequent` and `HoldMix` removed, replaced with bitmask system (`Subsequent=0, First=1, Hold=2, HoldFirst=3`).
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
   - Changed timeline class hierarchy with new base classes `BoneTimeline`, `SlotCurveTimeline`, and `ConstraintTimeline`
@@ -598,6 +619,19 @@
 
 - **Additions**
   - Added `Slider` and `SliderData` classes for slider constraints
+  - Reworked AnimationState hold system. Replaced `MixBlend`/`MixDirection` in timeline `apply()` with `boolean fromSetup, boolean add, boolean out`. The new bitmask-based hold system prevents dipping during crossfades without requiring `holdPrevious`.
+  - Added `Timeline.getAdditive()` and `Timeline.getInstant()` to query timeline blending capabilities.
+  - Added `TrackEntry.getAdditive()` / `TrackEntry.setAdditive()` for additive blending per track entry.
+  - Renamed `Skin.SkinEntry.getName()` to `getPlaceholderName()`. All `Skin` methods now use `placeholderName` parameter names.
+
+- **Breaking changes (since previous 4.3 beta)**
+  - `TrackEntry.getHoldPrevious()` / `setHoldPrevious()` removed.
+  - `TrackEntry.getMixBlend()` / `setMixBlend()` removed. Use `TrackEntry.getAdditive()` / `setAdditive()` for additive blending.
+  - `MixBlend` and `MixDirection` enums removed from `Animation`.
+  - Timeline `apply()` signature changed: `MixBlend blend, MixDirection direction` replaced with `boolean fromSetup, boolean add, boolean out`.
+  - `Animation.apply()` signature changed to match.
+  - `CurveTimeline1.getRelativeValue()`, `getAbsoluteValue()`, `getScaleValue()` signatures changed.
+  - `Skin.SkinEntry.getName()` renamed to `getPlaceholderName()`.
   - Added `SliderTimeline` and `SliderMixTimeline` for animating sliders
   - Added new pose system with `BoneLocal`, `BonePose`, and related classes
   - Added `Pose`, `Posed`, and `PosedActive` base classes for unified pose management

@@ -44,6 +44,9 @@ namespace spine {
 		virtual ~PosedActive() {
 		}
 
+		/// Returns false when this won't be updated by Skeleton::updateWorldTransform(Physics) because a skin is
+		/// required and the active skin does not contain this item. See Skin::getBones(), Skin::getConstraints(),
+		/// PosedData::getSkinRequired(), and Skeleton::updateCache().
 		bool isActive() const {
 			return _active;
 		}

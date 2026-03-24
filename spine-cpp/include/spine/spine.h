@@ -73,8 +73,6 @@
 #include <spine/LinkedMesh.h>
 #include <spine/MathUtil.h>
 #include <spine/MeshAttachment.h>
-#include <spine/MixBlend.h>
-#include <spine/MixDirection.h>
 #include <spine/PathAttachment.h>
 #include <spine/PathConstraint.h>
 #include <spine/PathConstraintData.h>

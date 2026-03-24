@@ -35,7 +35,7 @@
 
 namespace spine {
 
-	/// Changes a transform constraint's TransformConstraintPose::getMixRotate(), TransformConstraintPose::getMixX(),
+	/// Changes TransformConstraintPose::getMixRotate(), TransformConstraintPose::getMixX(),
 	/// TransformConstraintPose::getMixY(), TransformConstraintPose::getMixScaleX(),
 	/// TransformConstraintPose::getMixScaleY(), and TransformConstraintPose::getMixShearY().
 	class SP_API TransformConstraintTimeline : public CurveTimeline, public ConstraintTimeline {
@@ -50,8 +50,8 @@ namespace spine {
 
 		virtual ~TransformConstraintTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 		/// Sets the time, rotate mix, translate mix, scale mix, and shear mix for the specified frame.
 		/// @param frame Between 0 and frameCount, inclusive.

@@ -49,23 +49,23 @@ DrawOrderFolderTimeline::DrawOrderFolderTimeline(size_t frameCount, Array<int> &
 	_drawOrders.ensureCapacity(frameCount);
 	_inFolder.setSize(slotCount, false);
 	for (size_t i = 0; i < _slots.size(); ++i) _inFolder[_slots[i]] = true;
+	_instant = true;
 	for (size_t i = 0; i < frameCount; ++i) {
 		Array<int> vec;
 		_drawOrders.add(vec);
 	}
 }
 
-void DrawOrderFolderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-									MixDirection direction, bool appliedPose) {
+void DrawOrderFolderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add,
+									bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 	SP_UNUSED(alpha);
+	SP_UNUSED(add);
 	SP_UNUSED(appliedPose);
 
-	if (direction == MixDirection_Out) {
-		if (blend == MixBlend_Setup) setup(skeleton);
-	} else if (time < _frames[0]) {
-		if (blend == MixBlend_Setup || blend == MixBlend_First) setup(skeleton);
+	if (out || time < _frames[0]) {
+		if (fromSetup) setup(skeleton);
 	} else {
 		Array<int> &drawOrder = _drawOrders[Animation::search(_frames, time)];
 		if (drawOrder.size() == 0)

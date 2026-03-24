@@ -66,7 +66,6 @@ namespace spine {
 		PosedData(const String &name);
 		virtual ~PosedData();
 
-		/// The constraint's name, which is unique across all constraints in the skeleton of the same type.
 		const String &getName() const {
 			return _name;
 		};

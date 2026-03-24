@@ -1864,21 +1864,8 @@ namespace spine {
 			_json.writeName("mixDuration");
 			_json.writeValue(obj->getMixDuration());
 
-			_json.writeName("mixBlend");
-			_json.writeValue([&]() -> String {
-				switch (obj->getMixBlend()) {
-					case MixBlend_Setup:
-						return "setup";
-					case MixBlend_First:
-						return "first";
-					case MixBlend_Replace:
-						return "replace";
-					case MixBlend_Add:
-						return "add";
-					default:
-						return "unknown";
-				}
-			}());
+			_json.writeName("additive");
+			_json.writeValue(obj->getAdditive());
 
 			_json.writeName("mixingFrom");
 			if (obj->getMixingFrom() == nullptr) {
@@ -1894,8 +1881,6 @@ namespace spine {
 				writeTrackEntry(obj->getMixingTo());
 			}
 
-			_json.writeName("holdPrevious");
-			_json.writeValue(obj->getHoldPrevious());
 
 			_json.writeName("shortestRotation");
 			_json.writeValue(obj->getShortestRotation());
@@ -2208,11 +2193,15 @@ namespace spine {
 			writeColor(obj->getColor());
 
 			_json.writeName("bones");
-			_json.writeArrayStart();
-			for (size_t i = 0; i < obj->getBones().size(); i++) {
-				_json.writeValue(obj->getBones()[i]);
+			if (obj->getBones().size() == 0) {
+				_json.writeNull();
+			} else {
+				_json.writeArrayStart();
+				for (size_t i = 0; i < obj->getBones().size(); i++) {
+					_json.writeValue(obj->getBones()[i]);
+				}
+				_json.writeArrayEnd();
 			}
-			_json.writeArrayEnd();
 
 			_json.writeName("vertices");
 			_json.writeArrayStart();
@@ -2271,11 +2260,15 @@ namespace spine {
 			writeColor(obj->getColor());
 
 			_json.writeName("bones");
-			_json.writeArrayStart();
-			for (size_t i = 0; i < obj->getBones().size(); i++) {
-				_json.writeValue(obj->getBones()[i]);
+			if (obj->getBones().size() == 0) {
+				_json.writeNull();
+			} else {
+				_json.writeArrayStart();
+				for (size_t i = 0; i < obj->getBones().size(); i++) {
+					_json.writeValue(obj->getBones()[i]);
+				}
+				_json.writeArrayEnd();
 			}
-			_json.writeArrayEnd();
 
 			_json.writeName("vertices");
 			_json.writeArrayStart();
@@ -2605,11 +2598,7 @@ namespace spine {
 			_json.writeValue(obj->getHeight());
 
 			_json.writeName("sequence");
-			if (!obj->getSequence().hasPathSuffix()) {
-				_json.writeNull();
-			} else {
-				writeSequence(&obj->getSequence());
-			}
+			writeSequence(&obj->getSequence());
 
 			_json.writeName("parentMesh");
 			if (obj->getParentMesh() == nullptr) {
@@ -2619,11 +2608,15 @@ namespace spine {
 			}
 
 			_json.writeName("bones");
-			_json.writeArrayStart();
-			for (size_t i = 0; i < obj->getBones().size(); i++) {
-				_json.writeValue(obj->getBones()[i]);
+			if (obj->getBones().size() == 0) {
+				_json.writeNull();
+			} else {
+				_json.writeArrayStart();
+				for (size_t i = 0; i < obj->getBones().size(); i++) {
+					_json.writeValue(obj->getBones()[i]);
+				}
+				_json.writeArrayEnd();
 			}
-			_json.writeArrayEnd();
 
 			_json.writeName("vertices");
 			_json.writeArrayStart();
@@ -2688,11 +2681,15 @@ namespace spine {
 			writeColor(obj->getColor());
 
 			_json.writeName("bones");
-			_json.writeArrayStart();
-			for (size_t i = 0; i < obj->getBones().size(); i++) {
-				_json.writeValue(obj->getBones()[i]);
+			if (obj->getBones().size() == 0) {
+				_json.writeNull();
+			} else {
+				_json.writeArrayStart();
+				for (size_t i = 0; i < obj->getBones().size(); i++) {
+					_json.writeValue(obj->getBones()[i]);
+				}
+				_json.writeArrayEnd();
 			}
-			_json.writeArrayEnd();
 
 			_json.writeName("vertices");
 			_json.writeArrayStart();
@@ -3128,11 +3125,7 @@ namespace spine {
 			_json.writeValue(obj->getPath());
 
 			_json.writeName("sequence");
-			if (!obj->getSequence().hasPathSuffix()) {
-				_json.writeNull();
-			} else {
-				writeSequence(&obj->getSequence());
-			}
+			writeSequence(&obj->getSequence());
 
 			_json.writeName("name");
 			_json.writeValue(obj->getName());
@@ -3440,10 +3433,10 @@ namespace spine {
 
 		void writeSkinEntry(Skin::AttachmentMap::Entry *obj) {
 			_json.writeObjectStart();
-			String name = obj->_name;
+			String placeholderName = obj->_placeholderName;
 			String refString;
-			if (!name.isEmpty()) {
-				refString.append("<SkinEntry-").append(name).append(">");
+			if (!placeholderName.isEmpty()) {
+				refString.append("<SkinEntry-").append(placeholderName).append(">");
 			} else {
 				refString.append("<SkinEntry-").append(_nextId++).append(">");
 			}
@@ -3454,7 +3447,7 @@ namespace spine {
 			_json.writeName("slotIndex");
 			_json.writeValue((int) obj->_slotIndex);
 			_json.writeName("name");
-			_json.writeValue(obj->_name);
+			_json.writeValue(obj->_placeholderName);
 			_json.writeName("attachment");
 			writeAttachment(obj->_attachment);
 			_json.writeObjectEnd();

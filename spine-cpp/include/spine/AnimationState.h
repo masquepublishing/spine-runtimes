@@ -33,7 +33,6 @@
 #include <spine/Array.h>
 #include <spine/Pool.h>
 #include <spine/Property.h>
-#include <spine/MixBlend.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 #include <spine/HasRendererObject.h>
@@ -116,20 +115,11 @@ namespace spine {
 
 		void setLoop(bool inValue);
 
-		/// If true, when mixing from the previous animation to this animation, the previous animation is applied as normal instead
-		/// of being mixed out.
-		///
-		/// When mixing between animations that key the same property, if a lower track also keys that property then the value will
-		/// briefly dip toward the lower track value during the mix. This happens because the first animation mixes from 100% to 0%
-		/// while the second animation mixes from 0% to 100%. Setting holdPrevious to true applies the first animation
-		/// at 100% during the mix so the lower track value is overwritten. Such dipping does not occur on the lowest track which
-		/// keys the property, only when a higher track also keys the property.
-		///
-		/// Snapping will occur if holdPrevious is true and this animation does not key all the same properties as the
-		/// previous animation.
-		bool getHoldPrevious();
+		/// When true, timelines in this animation that support additive have their values added to the setup or current pose values
+		/// instead of replacing them. Additive can be set for a new track entry only before AnimationState::apply() is next called.
+		bool getAdditive();
 
-		void setHoldPrevious(bool inValue);
+		void setAdditive(bool inValue);
 
 		bool getReverse();
 
@@ -285,16 +275,12 @@ namespace spine {
 		///           entry is looping, its next loop completion is used instead of its duration.
 		void setMixDuration(float mixDuration, float delay);
 
-		MixBlend getMixBlend();
-
-		void setMixBlend(MixBlend blend);
-
-		/// The track entry for the previous animation when mixing from the previous animation to this animation, or NULL if no
-		/// mixing is currently occuring. When mixing from multiple animations, MixingFrom makes up a double linked list with MixingTo.
+		/// The track entry for the previous animation when mixing to this animation, or NULL if no mixing is currently occurring.
+		/// When mixing from multiple animations, MixingFrom makes up a doubly linked list with MixingTo.
 		TrackEntry *getMixingFrom();
 
-		/// The track entry for the next animation when mixing from this animation, or NULL if no mixing is currently occuring.
-		/// When mixing from multiple animations, MixingTo makes up a double linked list with MixingFrom.
+		/// The track entry for the next animation when mixing from this animation, or NULL if no mixing is currently occurring.
+		/// When mixing to multiple animations, MixingTo makes up a doubly linked list with MixingFrom.
 		TrackEntry *getMixingTo();
 
 		/// Resets the rotation directions for mixing this entry's rotate timelines. This can be useful to avoid bones rotating the
@@ -347,12 +333,11 @@ namespace spine {
 		TrackEntry *_mixingTo;
 		int _trackIndex;
 
-		bool _loop, _holdPrevious, _reverse, _shortestRotation;
+		bool _loop, _additive, _reverse, _shortestRotation, _keepHold;
 		float _eventThreshold, _mixAttachmentThreshold, _alphaAttachmentThreshold, _mixDrawOrderThreshold;
 		float _animationStart, _animationEnd, _animationLast, _nextAnimationLast;
 		float _delay, _trackTime, _trackLast, _nextTrackLast, _trackEnd, _timeScale;
-		float _alpha, _mixTime, _mixDuration, _interruptAlpha, _totalAlpha;
-		MixBlend _mixBlend;
+		float _alpha, _mixTime, _mixDuration, _totalAlpha;
 		Array<int> _timelineMode;
 		Array<TrackEntry *> _timelineHoldMix;
 		Array<float> _timelinesRotation;
@@ -551,9 +536,8 @@ namespace spine {
 	private:
 		static const int Subsequent = 0;
 		static const int First = 1;
-		static const int HoldSubsequent = 2;
+		static const int Hold = 2;
 		static const int HoldFirst = 3;
-		static const int HoldMix = 4;
 
 		static const int Setup = 1;
 		static const int Current = 2;
@@ -584,14 +568,14 @@ namespace spine {
 
 		/// Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
 		/// the first time the mixing was applied.
-		static void applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleton &skeleton, float time, float alpha, MixBlend pose,
+		static void applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleton &skeleton, float time, float alpha, bool fromSetup,
 										Array<float> &timelinesRotation, size_t i, bool firstFrame);
 
 		/// Applies the attachment timeline and sets Slot::attachmentState.
 		/// @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
 		/// is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
 		/// timelines see any deform.
-		void applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float animationTime, MixBlend pose, bool out,
+		void applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float animationTime, bool fromSetup, bool out,
 									 bool attachments);
 
 		/// Returns true when all mixing from entries are complete.
