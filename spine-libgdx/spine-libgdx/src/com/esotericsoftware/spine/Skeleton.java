@@ -408,38 +408,38 @@ public class Skeleton {
 	 * name.
 	 * <p>
 	 * See {@link #getAttachment(int, String)}. */
-	public @Null Attachment getAttachment (String slotName, String attachmentName) {
+	public @Null Attachment getAttachment (String slotName, String placeholderName) {
 		SlotData slot = data.findSlot(slotName);
 		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
-		return getAttachment(slot.getIndex(), attachmentName);
+		return getAttachment(slot.getIndex(), placeholderName);
 	}
 
-	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and
-	 * attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
+	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and skin
+	 * placeholder name. First the skin is checked and if the attachment was not found, the default skin is checked.
 	 * <p>
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
-	public @Null Attachment getAttachment (int slotIndex, String attachmentName) {
-		if (attachmentName == null) throw new IllegalArgumentException("attachmentName cannot be null.");
+	public @Null Attachment getAttachment (int slotIndex, String placeholderName) {
+		if (placeholderName == null) throw new IllegalArgumentException("placeholderName cannot be null.");
 		if (skin != null) {
-			Attachment attachment = skin.getAttachment(slotIndex, attachmentName);
+			Attachment attachment = skin.getAttachment(slotIndex, placeholderName);
 			if (attachment != null) return attachment;
 		}
-		if (data.defaultSkin != null) return data.defaultSkin.getAttachment(slotIndex, attachmentName);
+		if (data.defaultSkin != null) return data.defaultSkin.getAttachment(slotIndex, placeholderName);
 		return null;
 	}
 
 	/** A convenience method to set an attachment by finding the slot with {@link #findSlot(String)}, finding the attachment with
 	 * {@link #getAttachment(int, String)}, then setting the slot's {@link SlotPose#attachment}.
-	 * @param attachmentName May be null to clear the slot's attachment. */
-	public void setAttachment (String slotName, @Null String attachmentName) {
+	 * @param placeholderName May be null to clear the slot's attachment. */
+	public void setAttachment (String slotName, @Null String placeholderName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Slot slot = findSlot(slotName);
 		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
 		Attachment attachment = null;
-		if (attachmentName != null) {
-			attachment = getAttachment(slot.data.index, attachmentName);
+		if (placeholderName != null) {
+			attachment = getAttachment(slot.data.index, placeholderName);
 			if (attachment == null)
-				throw new IllegalArgumentException("Attachment not found: " + attachmentName + ", for slot: " + slotName);
+				throw new IllegalArgumentException("Attachment not found: " + placeholderName + ", for slot: " + slotName);
 		}
 		slot.pose.setAttachment(attachment);
 	}
@@ -449,10 +449,13 @@ public class Skeleton {
 		return constraints;
 	}
 
+	/** The skeleton's physics constraints. */
 	public Array<PhysicsConstraint> getPhysicsConstraints () {
 		return physics;
 	}
 
+	/** Finds a constraint of the specified type by comparing each constraints's name. It is more efficient to cache the results of
+	 * this method than to call it multiple times. */
 	public @Null <T extends Constraint> T findConstraint (String constraintName, Class<T> type) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		if (type == null) throw new IllegalArgumentException("type cannot be null.");
@@ -604,6 +607,7 @@ public class Skeleton {
 		this.y = y;
 	}
 
+	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose#getWind()} is applied. */
 	public float getWindX () {
 		return windX;
 	}
@@ -612,6 +616,7 @@ public class Skeleton {
 		this.windX = windX;
 	}
 
+	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose#getWind()} is applied. */
 	public float getWindY () {
 		return windY;
 	}
@@ -620,6 +625,7 @@ public class Skeleton {
 		this.windY = windY;
 	}
 
+	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose#getGravity()} is applied. */
 	public float getGravityX () {
 		return gravityX;
 	}
@@ -628,6 +634,7 @@ public class Skeleton {
 		this.gravityX = gravityX;
 	}
 
+	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose#getGravity()} is applied. */
 	public float getGravityY () {
 		return gravityY;
 	}

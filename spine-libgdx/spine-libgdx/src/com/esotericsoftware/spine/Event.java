@@ -29,10 +29,11 @@
 
 package com.esotericsoftware.spine;
 
+import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
 
-/** Stores the current pose values for an {@link Event}.
+/** Fired by {@link EventTimeline} when specific animation times are reached.
  * <p>
  * See {@link Timeline#apply(Skeleton, float, float, com.badlogic.gdx.utils.Array, float, boolean, boolean, boolean, boolean)},
  * {@link AnimationStateListener#event(com.esotericsoftware.spine.AnimationState.TrackEntry, Event)}, and

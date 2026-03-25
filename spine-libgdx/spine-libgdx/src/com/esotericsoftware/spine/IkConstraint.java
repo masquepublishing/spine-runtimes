@@ -35,8 +35,8 @@ import com.badlogic.gdx.utils.Array;
 
 import com.esotericsoftware.spine.BoneData.Inherit;
 
-/** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
- * the last bone is as close to the target bone as possible.
+/** Adjusts the local rotation of 1 or 2 constrained bones so the world position of the tip of the last bone is as close to the
+ * target bone as possible.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide. */
 public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstraintPose> {

@@ -60,7 +60,7 @@ public class PointAttachment extends Attachment {
 		color.set(other.color);
 	}
 
-	/** The local X position. */
+	/** The local x position. */
 	public float getX () {
 		return x;
 	}
@@ -69,7 +69,7 @@ public class PointAttachment extends Attachment {
 		this.x = x;
 	}
 
-	/** The local Y position. */
+	/** The local y position. */
 	public float getY () {
 		return y;
 	}

@@ -91,13 +91,13 @@ public class BonePose implements Pose<BonePose>, Update {
 		this.scaleY = scaleY;
 	}
 
-	/** Sets local x and y scale. */
+	/** Sets local scaleX and scaleY. */
 	public void setScale (float scaleX, float scaleY) {
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
 	}
 
-	/** Sets local x and y scale to the same value. */
+	/** Sets local scaleX and scaleY to the same value. */
 	public void setScale (float scale) {
 		scaleX = scale;
 		scaleY = scale;

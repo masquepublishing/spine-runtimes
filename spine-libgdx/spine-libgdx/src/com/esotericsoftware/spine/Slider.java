@@ -34,9 +34,9 @@ import com.esotericsoftware.spine.Animation.PhysicsConstraintTimeline;
 import com.esotericsoftware.spine.Animation.SlotTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 
-/** Stores the setup pose for a {@link PhysicsConstraint}.
+/** Applies an animation based on either the slider's {@link SliderPose#time} or a bone's transform property.
  * <p>
- * See <a href="https://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
+ * See <a href="https://esotericsoftware.com/spine-sliders">Sliders</a> in the Spine User Guide. */
 public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 	static private final float[] offsets = new float[6];
 
@@ -114,6 +114,7 @@ public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 		}
 	}
 
+	/** When set, the bone's transform property is used to set the slider's {@link SliderPose#time}. */
 	public Bone getBone () {
 		return bone;
 	}

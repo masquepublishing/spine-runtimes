@@ -29,6 +29,8 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.utils.Null;
+
 /** Stores the setup pose values for an {@link Event}.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide. */
@@ -36,7 +38,8 @@ public class EventData {
 	final String name;
 	int intValue;
 	float floatValue;
-	String stringValue, audioPath;
+	String stringValue;
+	@Null String audioPath;
 	float volume, balance;
 
 	public EventData (String name) {
@@ -69,15 +72,17 @@ public class EventData {
 		this.stringValue = stringValue;
 	}
 
-	public String getAudioPath () {
+	/** Path to an audio file relative to the audio path in the Spine project. */
+	public @Null String getAudioPath () {
 		return audioPath;
 	}
 
-	public void setAudioPath (String audioPath) {
+	public void setAudioPath (@Null String audioPath) {
 		if (audioPath == null) throw new IllegalArgumentException("audioPath cannot be null.");
 		this.audioPath = audioPath;
 	}
 
+	/** If an audio path is set, the volume for the audio. */
 	public float getVolume () {
 		return volume;
 	}
@@ -86,6 +91,7 @@ public class EventData {
 		this.volume = volume;
 	}
 
+	/** If an audio path is set, the left/right balance for the audio. */
 	public float getBalance () {
 		return balance;
 	}

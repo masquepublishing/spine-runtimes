@@ -186,6 +186,7 @@ public class Skin {
 			hashCode = placeholderName.hashCode() + slotIndex * 37;
 		}
 
+		/** The {@link Skeleton#getSlots()} index. */
 		public int getSlotIndex () {
 			return slotIndex;
 		}
@@ -195,6 +196,7 @@ public class Skin {
 			return placeholderName;
 		}
 
+		/** The attachment for this skin entry. */
 		public Attachment getAttachment () {
 			return attachment;
 		}

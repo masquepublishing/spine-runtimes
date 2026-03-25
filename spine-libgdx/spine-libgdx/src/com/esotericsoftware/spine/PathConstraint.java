@@ -43,8 +43,7 @@ import com.esotericsoftware.spine.Skin.SkinEntry;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 
-/** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
- * constrained bones so they follow a {@link PathAttachment}.
+/** Adjusts the rotation, translation, and scale of the constrained bones so they follow a {@link PathAttachment}.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
 public class PathConstraint extends Constraint<PathConstraint, PathConstraintData, PathConstraintPose> {

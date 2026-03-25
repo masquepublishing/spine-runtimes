@@ -45,6 +45,7 @@ abstract public class PosedData<P extends Pose> {
 		return name;
 	}
 
+	/** The setup pose that most animations are relative to. */
 	public P getSetupPose () {
 		return setup;
 	}

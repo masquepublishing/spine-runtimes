@@ -36,8 +36,7 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.TransformConstraintData.FromProperty;
 import com.esotericsoftware.spine.TransformConstraintData.ToProperty;
 
-/** Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained
- * bones to match that of the source bone.
+/** Adjusts the world transform of the constrained bones to match that of the source bone.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide. */
 public class TransformConstraint extends Constraint<TransformConstraint, TransformConstraintData, TransformConstraintPose> {
