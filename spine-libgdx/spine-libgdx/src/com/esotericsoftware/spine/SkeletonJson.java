@@ -501,13 +501,14 @@ public class SkeletonJson extends SkeletonLoader {
 			// Events.
 			for (JsonValue eventMap = root.getChild("events"); eventMap != null; eventMap = eventMap.next) {
 				var data = new EventData(eventMap.name);
-				data.intValue = eventMap.getInt("int", 0);
-				data.floatValue = eventMap.getFloat("float", 0f);
-				data.stringValue = eventMap.getString("string", "");
+				Event setup = data.setupPose;
+				setup.intValue = eventMap.getInt("int", 0);
+				setup.floatValue = eventMap.getFloat("float", 0f);
+				setup.stringValue = eventMap.getString("string", "");
 				data.audioPath = eventMap.getString("audio", null);
 				if (data.audioPath != null) {
-					data.volume = eventMap.getFloat("volume", 1);
-					data.balance = eventMap.getFloat("balance", 0);
+					setup.volume = eventMap.getFloat("volume", 1);
+					setup.balance = eventMap.getFloat("balance", 0);
 				}
 				skeletonData.events.add(data);
 			}
@@ -1243,15 +1244,16 @@ public class SkeletonJson extends SkeletonLoader {
 			var timeline = new EventTimeline(eventsMap.size);
 			int frame = 0;
 			for (JsonValue keyMap = eventsMap.child; keyMap != null; keyMap = keyMap.next, frame++) {
-				EventData eventData = skeletonData.findEvent(keyMap.getString("name"));
-				if (eventData == null) throw new SerializationException("Event not found: " + keyMap.getString("name"));
-				var event = new Event(keyMap.getFloat("time", 0), eventData);
-				event.intValue = keyMap.getInt("int", eventData.intValue);
-				event.floatValue = keyMap.getFloat("float", eventData.floatValue);
-				event.stringValue = keyMap.getString("string", eventData.stringValue);
+				EventData data = skeletonData.findEvent(keyMap.getString("name"));
+				if (data == null) throw new SerializationException("Event not found: " + keyMap.getString("name"));
+				Event setup = data.setupPose;
+				var event = new Event(keyMap.getFloat("time", 0), data);
+				event.intValue = keyMap.getInt("int", setup.intValue);
+				event.floatValue = keyMap.getFloat("float", setup.floatValue);
+				event.stringValue = keyMap.getString("string", setup.stringValue);
 				if (event.data.audioPath != null) {
-					event.volume = keyMap.getFloat("volume", eventData.volume);
-					event.balance = keyMap.getFloat("balance", eventData.balance);
+					event.volume = keyMap.getFloat("volume", setup.volume);
+					event.balance = keyMap.getFloat("balance", setup.balance);
 				}
 				timeline.setFrame(frame, event);
 			}

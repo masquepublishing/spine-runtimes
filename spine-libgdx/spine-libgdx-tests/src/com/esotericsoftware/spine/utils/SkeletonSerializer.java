@@ -2326,23 +2326,24 @@ public class SkeletonSerializer {
 		json.writeName("type");
 		json.writeValue("EventData");
 
+		Event setup = obj.getSetupPose();
 		json.writeName("int");
-		json.writeValue(obj.getInt());
+		json.writeValue(setup.getInt());
 
 		json.writeName("float");
-		json.writeValue(obj.getFloat());
+		json.writeValue(setup.getFloat());
 
 		json.writeName("string");
-		json.writeValue(obj.getString());
+		json.writeValue(setup.getString());
 
 		json.writeName("audioPath");
 		json.writeValue(obj.getAudioPath());
 
 		json.writeName("volume");
-		json.writeValue(obj.getVolume());
+		json.writeValue(setup.getVolume());
 
 		json.writeName("balance");
-		json.writeValue(obj.getBalance());
+		json.writeValue(setup.getBalance());
 
 		json.writeName("name");
 		json.writeValue(obj.getName());

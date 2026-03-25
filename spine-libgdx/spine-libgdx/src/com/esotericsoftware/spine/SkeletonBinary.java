@@ -485,13 +485,14 @@ public class SkeletonBinary extends SkeletonLoader {
 			o = skeletonData.events.setSize(n = input.readInt(true));
 			for (int i = 0; i < n; i++) {
 				var data = new EventData(input.readString());
-				data.intValue = input.readInt(false);
-				data.floatValue = input.readFloat();
-				data.stringValue = input.readString();
+				Event setup = data.setupPose;
+				setup.intValue = input.readInt(false);
+				setup.floatValue = input.readFloat();
+				setup.stringValue = input.readString();
 				data.audioPath = input.readString();
 				if (data.audioPath != null) {
-					data.volume = input.readFloat();
-					data.balance = input.readFloat();
+					setup.volume = input.readFloat();
+					setup.balance = input.readFloat();
 				}
 				o[i] = data;
 			}
@@ -1196,7 +1197,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				event.intValue = input.readInt(false);
 				event.floatValue = input.readFloat();
 				event.stringValue = input.readString();
-				if (event.stringValue == null) event.stringValue = eventData.stringValue;
+				if (event.stringValue == null) event.stringValue = eventData.setupPose.stringValue;
 				if (event.data.audioPath != null) {
 					event.volume = input.readFloat();
 					event.balance = input.readFloat();
