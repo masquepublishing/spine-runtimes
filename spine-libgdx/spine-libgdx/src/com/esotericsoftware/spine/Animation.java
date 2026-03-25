@@ -63,12 +63,14 @@ public class Animation {
 	}
 
 	/** If this list or the timelines it contains are modified, the timelines must be set again to recompute the animation's bone
-	 * indices and timeline property IDs. Setting this property computes the unique {@link #bones}. */
+	 * indices and timeline property IDs.
+	 * <p>
+	 * See {@link #setTimelines(Array, IntArray)}. */
 	public Array<Timeline> getTimelines () {
 		return timelines;
 	}
 
-	/** Sets the {@link #timelines} and {@link #bones}. It can be more efficient to determine the unique bones externally. */
+	/** Sets the {@link #timelines} and {@link #bones}. */
 	public void setTimelines (Array<Timeline> timelines, IntArray bones) {
 		if (timelines == null) throw new IllegalArgumentException("timelines cannot be null.");
 		if (bones == null) throw new IllegalArgumentException("bones cannot be null.");
@@ -106,7 +108,7 @@ public class Animation {
 
 	/** {@link Skeleton#bones} indices that this animation's timelines modify.
 	 * <p>
-	 * See {@link BoneTimeline#getBoneIndex()}. */
+	 * See {@link #setTimelines(Array, IntArray)} and {@link BoneTimeline#getBoneIndex()}. */
 	public IntArray getBones () {
 		return bones;
 	}
