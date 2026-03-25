@@ -230,7 +230,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				String name = input.readString();
 				BoneData parent = i == 0 ? null : bones[input.readInt(true)];
 				var data = new BoneData(i, name, parent);
-				BonePose setup = data.setup;
+				BonePose setup = data.setupPose;
 				setup.rotation = input.readFloat();
 				setup.x = input.readFloat() * scale;
 				setup.y = input.readFloat() * scale;
@@ -255,10 +255,10 @@ public class SkeletonBinary extends SkeletonLoader {
 				String slotName = input.readString();
 				var boneData = bones[input.readInt(true)];
 				var data = new SlotData(i, slotName, boneData);
-				Color.rgba8888ToColor(data.setup.color, input.readInt());
+				Color.rgba8888ToColor(data.setupPose.color, input.readInt());
 
 				int darkColor = input.readInt();
-				if (darkColor != -1) Color.rgb888ToColor(data.setup.darkColor = new Color(), darkColor);
+				if (darkColor != -1) Color.rgb888ToColor(data.setupPose.darkColor = new Color(), darkColor);
 
 				data.attachmentName = input.readStringRef();
 				data.blendMode = BlendMode.values[input.readInt(true)];
@@ -282,7 +282,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					int flags = input.read();
 					data.skinRequired = (flags & 1) != 0;
 					data.uniform = (flags & 2) != 0;
-					IkConstraintPose setup = data.setup;
+					IkConstraintPose setup = data.setupPose;
 					setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup.compress = (flags & 8) != 0;
 					setup.stretch = (flags & 16) != 0;
@@ -354,7 +354,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					if ((flags & 16) != 0) data.offsets[TransformConstraintData.SCALEY] = input.readFloat();
 					if ((flags & 32) != 0) data.offsets[TransformConstraintData.SHEARY] = input.readFloat();
 					flags = input.read();
-					TransformConstraintPose setup = data.setup;
+					TransformConstraintPose setup = data.setupPose;
 					if ((flags & 1) != 0) setup.mixRotate = input.readFloat();
 					if ((flags & 2) != 0) setup.mixX = input.readFloat();
 					if ((flags & 4) != 0) setup.mixY = input.readFloat();
@@ -375,7 +375,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					data.spacingMode = SpacingMode.values[(flags >> 2) & 0b11];
 					data.rotateMode = RotateMode.values[(flags >> 4) & 0b11];
 					if ((flags & 128) != 0) data.offsetRotation = input.readFloat();
-					PathConstraintPose setup = data.setup;
+					PathConstraintPose setup = data.setupPose;
 					setup.position = input.readFloat();
 					if (data.positionMode == PositionMode.fixed) setup.position *= scale;
 					setup.spacing = input.readFloat();
@@ -397,7 +397,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					if ((flags & 32) != 0) data.shearX = input.readFloat();
 					data.limit = ((flags & 64) != 0 ? input.readFloat() : 5000) * scale;
 					data.step = 1f / input.readUnsignedByte();
-					PhysicsConstraintPose setup = data.setup;
+					PhysicsConstraintPose setup = data.setupPose;
 					setup.inertia = input.readFloat();
 					setup.strength = input.readFloat();
 					setup.damping = input.readFloat();
@@ -421,8 +421,8 @@ public class SkeletonBinary extends SkeletonLoader {
 					data.skinRequired = (flags & 1) != 0;
 					data.loop = (flags & 2) != 0;
 					data.additive = (flags & 4) != 0;
-					if ((flags & 8) != 0) data.setup.time = input.readFloat();
-					if ((flags & 16) != 0) data.setup.mix = (flags & 32) != 0 ? input.readFloat() : 1;
+					if ((flags & 8) != 0) data.setupPose.time = input.readFloat();
+					if ((flags & 16) != 0) data.setupPose.mix = (flags & 32) != 0 ? input.readFloat() : 1;
 					if ((flags & 64) != 0) {
 						data.local = (flags & 128) != 0;
 						data.bone = bones[input.readInt(true)];

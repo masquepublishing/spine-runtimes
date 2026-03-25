@@ -81,7 +81,7 @@ public class SkeletonRenderer {
 		for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder[i];
 			if (!slot.bone.active) continue;
-			SlotPose pose = slot.applied;
+			SlotPose pose = slot.appliedPose;
 			Attachment attachment = pose.attachment;
 			if (attachment instanceof RegionAttachment region) {
 				Sequence sequence = region.getSequence();
@@ -150,7 +150,7 @@ public class SkeletonRenderer {
 		for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder[i];
 			if (slot.bone.active) {
-				SlotPose pose = slot.applied;
+				SlotPose pose = slot.appliedPose;
 				Attachment attachment = pose.attachment;
 				if (attachment != null) {
 					Texture texture = null;
@@ -249,7 +249,7 @@ public class SkeletonRenderer {
 		for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder[i];
 			if (slot.bone.active) {
-				SlotPose pose = slot.applied;
+				SlotPose pose = slot.appliedPose;
 				Attachment attachment = pose.attachment;
 				if (attachment != null) {
 					Texture texture = null;

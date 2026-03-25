@@ -160,7 +160,7 @@ public class BonePose implements Pose<BonePose>, Update {
 			return;
 		}
 
-		BonePose parent = bone.parent.applied;
+		BonePose parent = bone.parent.appliedPose;
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		worldX = pa * x + pb * y + parent.worldX;
 		worldY = pc * x + pd * y + parent.worldY;
@@ -264,7 +264,7 @@ public class BonePose implements Pose<BonePose>, Update {
 			return;
 		}
 
-		BonePose parent = bone.parent.applied;
+		BonePose parent = bone.parent.appliedPose;
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		float pid = 1 / (pa * pd - pb * pc);
 		float ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
@@ -351,7 +351,7 @@ public class BonePose implements Pose<BonePose>, Update {
 	void resetWorld (int update) {
 		Bone[] children = bone.children.items;
 		for (int i = 0, n = bone.children.size; i < n; i++) {
-			BonePose child = children[i].applied;
+			BonePose child = children[i].appliedPose;
 			if (child.world == update) {
 				child.world = 0;
 				child.local = 0;
@@ -472,13 +472,13 @@ public class BonePose implements Pose<BonePose>, Update {
 	/** Transforms a point from world coordinates to the parent bone's local coordinates. */
 	public Vector2 worldToParent (Vector2 world) {
 		if (world == null) throw new IllegalArgumentException("world cannot be null.");
-		return bone.parent == null ? world : bone.parent.applied.worldToLocal(world);
+		return bone.parent == null ? world : bone.parent.appliedPose.worldToLocal(world);
 	}
 
 	/** Transforms a point from the parent bone's coordinates to world coordinates. */
 	public Vector2 parentToWorld (Vector2 world) {
 		if (world == null) throw new IllegalArgumentException("world cannot be null.");
-		return bone.parent == null ? world : bone.parent.applied.localToWorld(world);
+		return bone.parent == null ? world : bone.parent.appliedPose.localToWorld(world);
 	}
 
 	/** Transforms a world rotation to a local rotation. */

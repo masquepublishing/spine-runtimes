@@ -195,11 +195,11 @@ public class Skeleton {
 		Object[] updateCache = this.updateCache.items;
 		n = this.updateCache.size;
 		for (int i = 0; i < n; i++)
-			if (updateCache[i] instanceof Bone bone) updateCache[i] = bone.applied;
+			if (updateCache[i] instanceof Bone bone) updateCache[i] = bone.appliedPose;
 	}
 
 	void constrained (Posed object) {
-		if (object.pose == object.applied) {
+		if (object.pose == object.appliedPose) {
 			object.constrained();
 			resetCache.add(object);
 		}
@@ -255,7 +255,7 @@ public class Skeleton {
 			resetCache[i].reset();
 
 		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
-		BonePose rootBone = getRootBone().applied;
+		BonePose rootBone = getRootBone().appliedPose;
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		rootBone.worldX = pa * x + pb * y + parent.worldX;
 		rootBone.worldY = pc * x + pd * y + parent.worldY;
@@ -498,7 +498,7 @@ public class Skeleton {
 				if (attachment instanceof RegionAttachment region) {
 					verticesLength = 8;
 					vertices = temp.setSize(8);
-					region.computeWorldVertices(slot, region.getOffsets(slot.applied), vertices, 0, 2);
+					region.computeWorldVertices(slot, region.getOffsets(slot.appliedPose), vertices, 0, 2);
 					triangles = quadTriangles;
 				} else if (attachment instanceof MeshAttachment mesh) {
 					verticesLength = mesh.getWorldVerticesLength();

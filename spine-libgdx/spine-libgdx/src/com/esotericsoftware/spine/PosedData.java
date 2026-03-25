@@ -32,13 +32,13 @@ package com.esotericsoftware.spine;
 /** The base class for storing setup data for a posed object. May be shared with multiple instances. */
 abstract public class PosedData<P extends Pose> {
 	final String name;
-	final P setup;
+	final P setupPose;
 	boolean skinRequired;
 
-	protected PosedData (String name, P setup) {
+	protected PosedData (String name, P setupPose) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
-		this.setup = setup;
+		this.setupPose = setupPose;
 	}
 
 	public String getName () {
@@ -47,7 +47,7 @@ abstract public class PosedData<P extends Pose> {
 
 	/** The setup pose that most animations are relative to. */
 	public P getSetupPose () {
-		return setup;
+		return setupPose;
 	}
 
 	/** When true, {@link Skeleton#updateWorldTransform(Physics)} only updates this constraint if the {@link Skeleton#skin}

@@ -141,7 +141,7 @@ public class Animation {
 	 * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
 	 *           <code>fromSetup</code>).
 	 * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
-	 * @param appliedPose True to modify {@link Posed#getAppliedPose()}, else {@link Posed#pose} is modified. */
+	 * @param appliedPose True to modify {@link Posed#appliedPose}, else {@link Posed#pose} is modified. */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, @Null Array<Event> events, float alpha,
 		boolean fromSetup, boolean add, boolean out, boolean appliedPose) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -254,7 +254,7 @@ public class Animation {
 		 *           <code>fromSetup</code>).
 		 * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
 		 *           transitions.
-		 * @param appliedPose True to modify {@link Posed#getAppliedPose()}, else {@link Posed#pose} is modified. */
+		 * @param appliedPose True to modify {@link Posed#appliedPose}, else {@link Posed#pose} is modified. */
 		abstract public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha,
 			boolean fromSetup, boolean add, boolean out, boolean appliedPose);
 
@@ -514,7 +514,8 @@ public class Animation {
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
 			boolean add, boolean out, boolean appliedPose) {
 			Bone bone = skeleton.bones.items[boneIndex];
-			if (bone.active) apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, fromSetup, add, out);
+			if (bone.active)
+				apply(appliedPose ? bone.appliedPose : bone.pose, bone.data.setupPose, time, alpha, fromSetup, add, out);
 		}
 
 		abstract protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add,
@@ -556,7 +557,8 @@ public class Animation {
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
 			boolean add, boolean out, boolean appliedPose) {
 			Bone bone = skeleton.bones.items[boneIndex];
-			if (bone.active) apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, fromSetup, add, out);
+			if (bone.active)
+				apply(appliedPose ? bone.appliedPose : bone.pose, bone.data.setupPose, time, alpha, fromSetup, add, out);
 		}
 
 		abstract protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add,
@@ -841,14 +843,14 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			Bone bone = skeleton.bones.items[boneIndex];
 			if (!bone.active) return;
-			BonePose pose = appliedPose ? bone.applied : bone.pose;
+			BonePose pose = appliedPose ? bone.appliedPose : bone.pose;
 
 			if (out) {
-				if (fromSetup) pose.inherit = bone.data.setup.inherit;
+				if (fromSetup) pose.inherit = bone.data.setupPose.inherit;
 			} else {
 				float[] frames = this.frames;
 				if (time < frames[0]) {
-					if (fromSetup) pose.inherit = bone.data.setup.inherit;
+					if (fromSetup) pose.inherit = bone.data.setupPose.inherit;
 				} else
 					pose.inherit = Inherit.values[(int)frames[search(frames, time, ENTRIES) + INHERIT]];
 			}
@@ -871,7 +873,7 @@ public class Animation {
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
 			boolean add, boolean out, boolean appliedPose) {
 			Slot slot = skeleton.slots.items[slotIndex];
-			if (slot.bone.active) apply(slot, appliedPose ? slot.applied : slot.pose, time, alpha, fromSetup, add);
+			if (slot.bone.active) apply(slot, appliedPose ? slot.appliedPose : slot.pose, time, alpha, fromSetup, add);
 		}
 
 		abstract protected void apply (Slot slot, SlotPose pose, float time, float alpha, boolean fromSetup, boolean add);
@@ -908,7 +910,7 @@ public class Animation {
 			Color color = pose.color;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) color.set(slot.data.setup.color);
+				if (fromSetup) color.set(slot.data.setupPose.color);
 				return;
 			}
 
@@ -945,7 +947,7 @@ public class Animation {
 				color.set(r, g, b, a);
 			else {
 				if (fromSetup) {
-					Color setup = slot.data.setup.color;
+					Color setup = slot.data.setupPose.color;
 					color.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
 						setup.a + (a - setup.a) * alpha);
 				} else
@@ -984,7 +986,7 @@ public class Animation {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					Color setup = slot.data.setup.color;
+					Color setup = slot.data.setupPose.color;
 					color.r = setup.r;
 					color.g = setup.g;
 					color.b = setup.b;
@@ -1018,7 +1020,7 @@ public class Animation {
 
 			if (alpha != 1) {
 				if (fromSetup) {
-					Color setup = slot.data.setup.color;
+					Color setup = slot.data.setupPose.color;
 					r = setup.r + (r - setup.r) * alpha;
 					g = setup.g + (g - setup.g) * alpha;
 					b = setup.b + (b - setup.b) * alpha;
@@ -1052,18 +1054,18 @@ public class Animation {
 			Slot slot = skeleton.slots.items[slotIndex];
 			if (!slot.bone.active) return;
 
-			Color color = (appliedPose ? slot.applied : slot.pose).color;
+			Color color = (appliedPose ? slot.appliedPose : slot.pose).color;
 			float a;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) color.a = slot.data.setup.color.a;
+				if (fromSetup) color.a = slot.data.setupPose.color.a;
 				return;
 			}
 
 			a = getCurveValue(time);
 			if (alpha != 1) {
 				if (fromSetup) {
-					Color setup = slot.data.setup.color;
+					Color setup = slot.data.setupPose.color;
 					a = setup.a + (a - setup.a) * alpha;
 				} else
 					a = color.a + (a - color.a) * alpha;
@@ -1109,7 +1111,7 @@ public class Animation {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					SlotPose setup = slot.data.setup;
+					SlotPose setup = slot.data.setupPose;
 					light.set(setup.color);
 					Color setupDark = setup.darkColor;
 					dark.r = setupDark.r;
@@ -1163,7 +1165,7 @@ public class Animation {
 			if (alpha == 1)
 				light.set(r, g, b, a);
 			else if (fromSetup) {
-				SlotPose setupPose = slot.data.setup;
+				SlotPose setupPose = slot.data.setupPose;
 				Color setup = setupPose.color;
 				light.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
 					setup.a + (a - setup.a) * alpha);
@@ -1218,7 +1220,7 @@ public class Animation {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					SlotPose setup = slot.data.setup;
+					SlotPose setup = slot.data.setupPose;
 					Color setupLight = setup.color, setupDark = setup.darkColor;
 					light.r = setupLight.r;
 					light.g = setupLight.g;
@@ -1268,7 +1270,7 @@ public class Animation {
 
 			if (alpha != 1) {
 				if (fromSetup) {
-					SlotPose setupPose = slot.data.setup;
+					SlotPose setupPose = slot.data.setupPose;
 					Color setup = setupPose.color;
 					r = setup.r + (r - setup.r) * alpha;
 					g = setup.g + (g - setup.g) * alpha;
@@ -1332,7 +1334,7 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			Slot slot = skeleton.slots.items[slotIndex];
 			if (!slot.bone.active) return;
-			SlotPose pose = appliedPose ? slot.applied : slot.pose;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
 
 			if (out || time < this.frames[0]) {
 				if (fromSetup) setAttachment(skeleton, pose, slot.data.attachmentName);
@@ -1599,7 +1601,7 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			Slot slot = skeleton.slots.items[slotIndex];
 			if (!slot.bone.active) return;
-			SlotPose pose = appliedPose ? slot.applied : slot.pose;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
 
 			Attachment slotAttachment = pose.attachment;
 			if (!(slotAttachment instanceof HasSequence hasSequence) || slotAttachment.getTimelineAttachment() != attachment) return;
@@ -1887,12 +1889,12 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (IkConstraint)skeleton.constraints.items[constraintIndex];
 			if (!constraint.active) return;
-			IkConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
+			IkConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					IkConstraintPose setup = constraint.data.setup;
+					IkConstraintPose setup = constraint.data.setupPose;
 					pose.mix = setup.mix;
 					pose.softness = setup.softness;
 					pose.bendDirection = setup.bendDirection;
@@ -1923,7 +1925,7 @@ public class Animation {
 			}
 			}
 
-			IkConstraintPose base = fromSetup ? constraint.data.setup : pose;
+			IkConstraintPose base = fromSetup ? constraint.data.setupPose : pose;
 			pose.mix = base.mix + (mix - base.mix) * alpha;
 			pose.softness = base.softness + (softness - base.softness) * alpha;
 			if (out) {
@@ -1982,12 +1984,12 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (TransformConstraint)skeleton.constraints.items[constraintIndex];
 			if (!constraint.active) return;
-			TransformConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
+			TransformConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					TransformConstraintPose setup = constraint.data.setup;
+					TransformConstraintPose setup = constraint.data.setupPose;
 					pose.mixRotate = setup.mixRotate;
 					pose.mixX = setup.mixX;
 					pose.mixY = setup.mixY;
@@ -2035,7 +2037,7 @@ public class Animation {
 			}
 			}
 
-			TransformConstraintPose base = fromSetup ? constraint.data.setup : pose;
+			TransformConstraintPose base = fromSetup ? constraint.data.setupPose : pose;
 			if (add) {
 				pose.mixRotate = base.mixRotate + rotate * alpha;
 				pose.mixX = base.mixX + x * alpha;
@@ -2079,8 +2081,8 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (PathConstraint)skeleton.constraints.items[constraintIndex];
 			if (constraint.active) {
-				PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.position = getAbsoluteValue(time, alpha, fromSetup, add, pose.position, constraint.data.setup.position);
+				PathConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+				pose.position = getAbsoluteValue(time, alpha, fromSetup, add, pose.position, constraint.data.setupPose.position);
 			}
 		}
 	}
@@ -2095,8 +2097,8 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (PathConstraint)skeleton.constraints.items[constraintIndex];
 			if (constraint.active) {
-				PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.spacing = getAbsoluteValue(time, alpha, fromSetup, false, pose.spacing, constraint.data.setup.spacing);
+				PathConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+				pose.spacing = getAbsoluteValue(time, alpha, fromSetup, false, pose.spacing, constraint.data.setupPose.spacing);
 			}
 		}
 	}
@@ -2137,12 +2139,12 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (PathConstraint)skeleton.constraints.items[constraintIndex];
 			if (!constraint.active) return;
-			PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
+			PathConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					PathConstraintPose setup = constraint.data.setup;
+					PathConstraintPose setup = constraint.data.setupPose;
 					pose.mixRotate = setup.mixRotate;
 					pose.mixX = setup.mixX;
 					pose.mixY = setup.mixY;
@@ -2175,7 +2177,7 @@ public class Animation {
 			}
 			}
 
-			PathConstraintPose base = fromSetup ? constraint.data.setup : pose;
+			PathConstraintPose base = fromSetup ? constraint.data.setupPose : pose;
 			if (add) {
 				pose.mixRotate = base.mixRotate + rotate * alpha;
 				pose.mixX = base.mixX + x * alpha;
@@ -2204,15 +2206,15 @@ public class Animation {
 				for (int i = 0, n = skeleton.physics.size; i < n; i++) {
 					PhysicsConstraint constraint = constraints[i];
 					if (constraint.active && global(constraint.data)) {
-						PhysicsConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-						set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint.data.setup), value));
+						PhysicsConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+						set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint.data.setupPose), value));
 					}
 				}
 			} else {
 				var constraint = (PhysicsConstraint)skeleton.constraints.items[constraintIndex];
 				if (constraint.active) {
-					PhysicsConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-					set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint.data.setup)));
+					PhysicsConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+					set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint.data.setupPose)));
 				}
 			}
 		}
@@ -2431,8 +2433,8 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (Slider)skeleton.constraints.items[constraintIndex];
 			if (constraint.active) {
-				SliderPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.time = getAbsoluteValue(time, alpha, fromSetup, add, pose.time, constraint.data.setup.time);
+				SliderPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+				pose.time = getAbsoluteValue(time, alpha, fromSetup, add, pose.time, constraint.data.setupPose.time);
 			}
 		}
 	}
@@ -2448,8 +2450,8 @@ public class Animation {
 			boolean add, boolean out, boolean appliedPose) {
 			var constraint = (Slider)skeleton.constraints.items[constraintIndex];
 			if (constraint.active) {
-				SliderPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.mix = getAbsoluteValue(time, alpha, fromSetup, add, pose.mix, constraint.data.setup.mix);
+				SliderPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+				pose.mix = getAbsoluteValue(time, alpha, fromSetup, add, pose.mix, constraint.data.setupPose.mix);
 			}
 		}
 	}

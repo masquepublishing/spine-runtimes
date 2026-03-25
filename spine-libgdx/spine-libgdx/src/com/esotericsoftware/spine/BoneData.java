@@ -55,7 +55,7 @@ public class BoneData extends PosedData<BonePose> {
 	public BoneData (BoneData data, @Null BoneData parent) {
 		this(data.index, data.name, parent);
 		length = data.length;
-		setup.set(data.setup);
+		setupPose.set(data.setupPose);
 	}
 
 	/** The bone's name, unique across all bones in the skeleton.

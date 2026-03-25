@@ -5,7 +5,7 @@ package com.esotericsoftware.spine;
  * <ul>
  * <li>{@link #data}: The setup pose.
  * <li>{@link #pose}: The unconstrained pose. Set by animations and application code.
- * <li>{@link #getAppliedPose()}: The constrained pose. The {@link #pose} with modifications by constraints.
+ * <li>{@link #appliedPose}: The constrained pose. The {@link #pose} with modifications by constraints.
  * </ul>
  */
 abstract public class Posed< //
@@ -14,20 +14,20 @@ abstract public class Posed< //
 
 	final D data;
 	final P pose;
-	final P constrained;
-	P applied;
+	final P constrainedPose;
+	P appliedPose;
 
-	protected Posed (D data, P pose, P constrained) {
+	protected Posed (D data, P pose, P constrainedPose) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		this.data = data;
 		this.pose = pose;
-		this.constrained = constrained;
-		applied = pose;
+		this.constrainedPose = constrainedPose;
+		appliedPose = pose;
 	}
 
 	/** Sets the unconstrained pose to the setup pose. */
 	public void setupPose () {
-		pose.set(data.setup);
+		pose.set(data.setupPose);
 	}
 
 	/** The setup pose data. May be shared with multiple instances. */
@@ -43,22 +43,22 @@ abstract public class Posed< //
 	/** If no constraints modify this object, the applied pose is the same as the {@link #pose}. Otherwise it is a copy of the
 	 * {@link #pose} modified by constraints. */
 	public P getAppliedPose () {
-		return applied;
+		return appliedPose;
 	}
 
 	/** Sets the applied pose to the unconstrained pose, for when no constraints will modify the pose. */
 	void pose () { // Port: usePose
-		applied = pose;
+		appliedPose = pose;
 	}
 
 	/** Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints. */
 	void constrained () { // Port: useConstrained
-		applied = constrained;
+		appliedPose = constrainedPose;
 	}
 
 	/** Sets the constrained pose to the unconstrained pose, as a starting point for constraints to be applied. */
 	void reset () { // Port: resetConstrained
-		constrained.set(pose);
+		constrainedPose.set(pose);
 	}
 
 	public String toString () {

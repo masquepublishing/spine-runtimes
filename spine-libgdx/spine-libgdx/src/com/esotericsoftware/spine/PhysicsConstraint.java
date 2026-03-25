@@ -49,7 +49,7 @@ public class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		super(data, new PhysicsConstraintPose(), new PhysicsConstraintPose());
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
-		bone = skeleton.bones.items[data.bone.index].constrained;
+		bone = skeleton.bones.items[data.bone.index].constrainedPose;
 	}
 
 	public PhysicsConstraint copy (Skeleton skeleton) {
@@ -97,7 +97,7 @@ public class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 
 	/** Applies the constraint to the constrained bones. */
 	public void update (Skeleton skeleton, Physics physics) {
-		PhysicsConstraintPose p = applied;
+		PhysicsConstraintPose p = appliedPose;
 		float mix = p.mix;
 		if (mix == 0) return;
 

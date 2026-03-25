@@ -189,7 +189,7 @@ public class SkeletonJson extends SkeletonLoader {
 				}
 				var data = new BoneData(skeletonData.bones.size, boneMap.getString("name"), parent);
 				data.length = boneMap.getFloat("length", 0) * scale;
-				BonePose setup = data.setup;
+				BonePose setup = data.setupPose;
 				setup.x = boneMap.getFloat("x", 0) * scale;
 				setup.y = boneMap.getFloat("y", 0) * scale;
 				setup.rotation = boneMap.getFloat("rotation", 0);
@@ -219,10 +219,10 @@ public class SkeletonJson extends SkeletonLoader {
 				var data = new SlotData(skeletonData.slots.size, slotName, boneData);
 
 				String color = slotMap.getString("color", null);
-				if (color != null) Color.valueOf(color, data.setup.getColor());
+				if (color != null) Color.valueOf(color, data.setupPose.getColor());
 
 				String dark = slotMap.getString("dark", null);
-				if (dark != null) data.setup.darkColor = Color.valueOf(dark);
+				if (dark != null) data.setupPose.darkColor = Color.valueOf(dark);
 
 				data.attachmentName = slotMap.getString("attachment", null);
 				data.blendMode = BlendMode.valueOf(slotMap.getString("blend", BlendMode.normal.name()));
@@ -250,7 +250,7 @@ public class SkeletonJson extends SkeletonLoader {
 					if (data.target == null) throw new SerializationException("IK target bone not found: " + targetName);
 
 					data.uniform = constraintMap.getBoolean("uniform", false);
-					IkConstraintPose setup = data.setup;
+					IkConstraintPose setup = data.setupPose;
 					setup.mix = constraintMap.getFloat("mix", 1);
 					setup.softness = constraintMap.getFloat("softness", 0) * scale;
 					setup.bendDirection = constraintMap.getBoolean("bendPositive", true) ? 1 : -1;
@@ -331,7 +331,7 @@ public class SkeletonJson extends SkeletonLoader {
 					data.offsets[TransformConstraintData.SCALEY] = constraintMap.getFloat("scaleY", 0);
 					data.offsets[TransformConstraintData.SHEARY] = constraintMap.getFloat("shearY", 0);
 
-					TransformConstraintPose setup = data.setup;
+					TransformConstraintPose setup = data.setupPose;
 					if (rotate) setup.mixRotate = constraintMap.getFloat("mixRotate", 1);
 					if (x) setup.mixX = constraintMap.getFloat("mixX", 1);
 					if (y) setup.mixY = constraintMap.getFloat("mixY", setup.mixX);
@@ -359,7 +359,7 @@ public class SkeletonJson extends SkeletonLoader {
 					data.spacingMode = SpacingMode.valueOf(constraintMap.getString("spacingMode", "length"));
 					data.rotateMode = RotateMode.valueOf(constraintMap.getString("rotateMode", "tangent"));
 					data.offsetRotation = constraintMap.getFloat("rotation", 0);
-					PathConstraintPose setup = data.setup;
+					PathConstraintPose setup = data.setupPose;
 					setup.position = constraintMap.getFloat("position", 0);
 					if (data.positionMode == PositionMode.fixed) setup.position *= scale;
 					setup.spacing = constraintMap.getFloat("spacing", 0);
@@ -385,7 +385,7 @@ public class SkeletonJson extends SkeletonLoader {
 					data.shearX = constraintMap.getFloat("shearX", 0);
 					data.limit = constraintMap.getFloat("limit", 5000) * scale;
 					data.step = 1f / constraintMap.getInt("fps", 60);
-					PhysicsConstraintPose setup = data.setup;
+					PhysicsConstraintPose setup = data.setupPose;
 					setup.inertia = constraintMap.getFloat("inertia", 0.5f);
 					setup.strength = constraintMap.getFloat("strength", 100);
 					setup.damping = constraintMap.getFloat("damping", 0.85f);
@@ -408,8 +408,8 @@ public class SkeletonJson extends SkeletonLoader {
 					data.skinRequired = skinRequired;
 					data.additive = constraintMap.getBoolean("additive", false);
 					data.loop = constraintMap.getBoolean("loop", false);
-					data.setup.time = constraintMap.getFloat("time", 0);
-					data.setup.mix = constraintMap.getFloat("mix", 1);
+					data.setupPose.time = constraintMap.getFloat("time", 0);
+					data.setupPose.mix = constraintMap.getFloat("mix", 1);
 
 					String boneName = constraintMap.getString("bone", null);
 					if (boneName != null) {
