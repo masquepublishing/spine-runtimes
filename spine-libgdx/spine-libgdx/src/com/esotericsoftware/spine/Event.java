@@ -70,7 +70,7 @@ public class Event {
 		this.floatValue = floatValue;
 	}
 
-	/** The string payload for this event.  */
+	/** The string payload for this event. */
 	public String getString () {
 		return stringValue;
 	}
