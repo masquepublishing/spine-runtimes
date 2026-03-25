@@ -495,8 +495,8 @@ public class Animation {
 	static abstract public class BoneTimeline1 extends CurveTimeline1 implements BoneTimeline {
 		final int boneIndex;
 
-		public BoneTimeline1 (int frameCount, int bezierCount, int boneIndex, Property property) {
-			super(frameCount, bezierCount, property.ordinal() << 53 | boneIndex);
+		public BoneTimeline1 (int frameCount, int bezierCount, int boneIndex, long property) {
+			super(frameCount, bezierCount, property << 53 | boneIndex);
 			this.boneIndex = boneIndex;
 			additive = true;
 		}
@@ -524,8 +524,8 @@ public class Animation {
 		final int boneIndex;
 
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}. */
-		public BoneTimeline2 (int frameCount, int bezierCount, int boneIndex, Property property1, Property property2) {
-			super(frameCount, bezierCount, property1.ordinal() << 53 | boneIndex, property2.ordinal() << 53 | +boneIndex);
+		public BoneTimeline2 (int frameCount, int bezierCount, int boneIndex, long property1, long property2) {
+			super(frameCount, bezierCount, property1 << 53 | boneIndex, property2 << 53 | +boneIndex);
 			this.boneIndex = boneIndex;
 			additive = true;
 		}
@@ -562,7 +562,7 @@ public class Animation {
 	/** Changes {@link BonePose#rotation}. */
 	static public class RotateTimeline extends BoneTimeline1 {
 		public RotateTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, boneIndex, Property.rotate);
+			super(frameCount, bezierCount, boneIndex, Property.rotate.ordinal());
 		}
 
 		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
@@ -573,7 +573,7 @@ public class Animation {
 	/** Changes {@link BonePose#x} and {@link BonePose#y}. */
 	static public class TranslateTimeline extends BoneTimeline2 {
 		public TranslateTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, boneIndex, Property.x, Property.y);
+			super(frameCount, bezierCount, boneIndex, Property.x.ordinal(), Property.y.ordinal());
 		}
 
 		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
@@ -623,7 +623,7 @@ public class Animation {
 	/** Changes {@link BonePose#x}. */
 	static public class TranslateXTimeline extends BoneTimeline1 {
 		public TranslateXTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, boneIndex, Property.x);
+			super(frameCount, bezierCount, boneIndex, Property.x.ordinal());
 		}
 
 		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
@@ -634,7 +634,7 @@ public class Animation {
 	/** Changes {@link BonePose#y}. */
 	static public class TranslateYTimeline extends BoneTimeline1 {
 		public TranslateYTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, boneIndex, Property.y);
+			super(frameCount, bezierCount, boneIndex, Property.y.ordinal());
 		}
 
 		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
@@ -645,7 +645,7 @@ public class Animation {
 	/** Changes {@link BonePose#scaleX} and {@link BonePose#scaleY}. */
 	static public class ScaleTimeline extends BoneTimeline2 {
 		public ScaleTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, boneIndex, Property.scaleX, Property.scaleY);
+			super(frameCount, bezierCount, boneIndex, Property.scaleX.ordinal(), Property.scaleY.ordinal());
 		}
 
 		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
@@ -712,7 +712,7 @@ public class Animation {
 	/** Changes {@link BonePose#scaleX}. */
 	static public class ScaleXTimeline extends BoneTimeline1 {
 		public ScaleXTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, boneIndex, Property.scaleX);
+			super(frameCount, bezierCount, boneIndex, Property.scaleX.ordinal());
 		}
 
 		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
@@ -723,7 +723,7 @@ public class Animation {
 	/** Changes {@link BonePose#scaleY}. */
 	static public class ScaleYTimeline extends BoneTimeline1 {
 		public ScaleYTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, boneIndex, Property.scaleY);
+			super(frameCount, bezierCount, boneIndex, Property.scaleY.ordinal());
 		}
 
 		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
@@ -734,7 +734,7 @@ public class Animation {
 	/** Changes {@link BonePose#shearX} and {@link BonePose#shearY}. */
 	static public class ShearTimeline extends BoneTimeline2 {
 		public ShearTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, boneIndex, Property.shearX, Property.shearY);
+			super(frameCount, bezierCount, boneIndex, Property.shearX.ordinal(), Property.shearY.ordinal());
 		}
 
 		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
@@ -784,7 +784,7 @@ public class Animation {
 	/** Changes {@link BonePose#shearX}. */
 	static public class ShearXTimeline extends BoneTimeline1 {
 		public ShearXTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, boneIndex, Property.shearX);
+			super(frameCount, bezierCount, boneIndex, Property.shearX.ordinal());
 		}
 
 		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
@@ -795,7 +795,7 @@ public class Animation {
 	/** Changes {@link BonePose#shearY}. */
 	static public class ShearYTimeline extends BoneTimeline1 {
 		public ShearYTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, boneIndex, Property.shearY);
+			super(frameCount, bezierCount, boneIndex, Property.shearY.ordinal());
 		}
 
 		protected void apply (BonePose pose, BonePose setup, float time, float alpha, boolean fromSetup, boolean add, boolean out) {
@@ -2054,8 +2054,8 @@ public class Animation {
 	static abstract public class ConstraintTimeline1 extends CurveTimeline1 implements ConstraintTimeline {
 		final int constraintIndex;
 
-		public ConstraintTimeline1 (int frameCount, int bezierCount, int constraintIndex, Property property) {
-			super(frameCount, bezierCount, property.ordinal() << 53 | constraintIndex);
+		public ConstraintTimeline1 (int frameCount, int bezierCount, int constraintIndex, long property) {
+			super(frameCount, bezierCount, property << 53 | constraintIndex);
 			this.constraintIndex = constraintIndex;
 		}
 
@@ -2067,7 +2067,7 @@ public class Animation {
 	/** Changes {@link PathConstraintPose#position}. */
 	static public class PathConstraintPositionTimeline extends ConstraintTimeline1 {
 		public PathConstraintPositionTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.pathConstraintPosition);
+			super(frameCount, bezierCount, constraintIndex, Property.pathConstraintPosition.ordinal());
 			additive = true;
 		}
 
@@ -2084,7 +2084,7 @@ public class Animation {
 	/** Changes {@link PathConstraintPose#spacing}. */
 	static public class PathConstraintSpacingTimeline extends ConstraintTimeline1 {
 		public PathConstraintSpacingTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.pathConstraintSpacing);
+			super(frameCount, bezierCount, constraintIndex, Property.pathConstraintSpacing.ordinal());
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
@@ -2187,7 +2187,7 @@ public class Animation {
 	/** The base class for most {@link PhysicsConstraint} timelines. */
 	static abstract public class PhysicsConstraintTimeline extends ConstraintTimeline1 {
 		/** @param constraintIndex -1 for all physics constraints in the skeleton. */
-		public PhysicsConstraintTimeline (int frameCount, int bezierCount, int constraintIndex, Property property) {
+		public PhysicsConstraintTimeline (int frameCount, int bezierCount, int constraintIndex, long property) {
 			super(frameCount, bezierCount, constraintIndex, property);
 		}
 
@@ -2223,7 +2223,7 @@ public class Animation {
 	/** Changes {@link PhysicsConstraintPose#inertia}. */
 	static public class PhysicsConstraintInertiaTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintInertiaTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintInertia);
+			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintInertia.ordinal());
 		}
 
 		protected float get (PhysicsConstraintPose pose) {
@@ -2242,7 +2242,7 @@ public class Animation {
 	/** Changes {@link PhysicsConstraintPose#strength}. */
 	static public class PhysicsConstraintStrengthTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintStrengthTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintStrength);
+			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintStrength.ordinal());
 		}
 
 		protected float get (PhysicsConstraintPose pose) {
@@ -2261,7 +2261,7 @@ public class Animation {
 	/** Changes {@link PhysicsConstraintPose#damping}. */
 	static public class PhysicsConstraintDampingTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintDampingTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintDamping);
+			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintDamping.ordinal());
 		}
 
 		protected float get (PhysicsConstraintPose pose) {
@@ -2280,7 +2280,7 @@ public class Animation {
 	/** Changes {@link PhysicsConstraintPose#massInverse}. The timeline values are not inverted. */
 	static public class PhysicsConstraintMassTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintMassTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintMass);
+			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintMass.ordinal());
 		}
 
 		protected float get (PhysicsConstraintPose pose) {
@@ -2299,7 +2299,7 @@ public class Animation {
 	/** Changes {@link PhysicsConstraintPose#wind}. */
 	static public class PhysicsConstraintWindTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintWindTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintWind);
+			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintWind.ordinal());
 			additive = true;
 		}
 
@@ -2319,7 +2319,7 @@ public class Animation {
 	/** Changes {@link PhysicsConstraintPose#gravity}. */
 	static public class PhysicsConstraintGravityTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintGravityTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintGravity);
+			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintGravity.ordinal());
 			additive = true;
 		}
 
@@ -2339,7 +2339,7 @@ public class Animation {
 	/** Changes {@link PhysicsConstraintPose#mix}. */
 	static public class PhysicsConstraintMixTimeline extends PhysicsConstraintTimeline {
 		public PhysicsConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintMix);
+			super(frameCount, bezierCount, constraintIndex, Property.physicsConstraintMix.ordinal());
 		}
 
 		protected float get (PhysicsConstraintPose pose) {
@@ -2419,7 +2419,7 @@ public class Animation {
 	/** Changes {@link SliderPose#time}. */
 	static public class SliderTimeline extends ConstraintTimeline1 {
 		public SliderTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.sliderTime);
+			super(frameCount, bezierCount, constraintIndex, Property.sliderTime.ordinal());
 			additive = true;
 		}
 
@@ -2436,7 +2436,7 @@ public class Animation {
 	/** Changes {@link SliderPose#mix}. */
 	static public class SliderMixTimeline extends ConstraintTimeline1 {
 		public SliderMixTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, constraintIndex, Property.sliderMix);
+			super(frameCount, bezierCount, constraintIndex, Property.sliderMix.ordinal());
 			additive = true;
 		}
 
