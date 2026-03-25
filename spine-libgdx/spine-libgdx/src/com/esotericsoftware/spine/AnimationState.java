@@ -50,8 +50,12 @@ import com.esotericsoftware.spine.Animation.Timeline;
  * See <a href='https://esotericsoftware.com/spine-applying-animations#AnimationState-API'>Applying Animations</a> in the Spine
  * Runtimes Guide. */
 public class AnimationState {
-	static final Animation emptyAnimation = new Animation("<empty>", new Array(true, 0, Timeline[]::new), 0);
 	static private final int SUBSEQUENT = 0, FIRST = 1, HOLD = 2, HOLD_FIRST = 3, SETUP = 1, CURRENT = 2;
+
+	static final Animation emptyAnimation = new Animation("<empty>");
+	static {
+		emptyAnimation.setTimelines(new Array(true, 0, Timeline[]::new), new IntArray(0));
+	}
 
 	private AnimationStateData data;
 	final Array<TrackEntry> tracks = new Array(true, 4, TrackEntry[]::new);

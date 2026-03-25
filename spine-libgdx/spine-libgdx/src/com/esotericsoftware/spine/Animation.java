@@ -35,7 +35,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.LongSet;
 import com.badlogic.gdx.utils.Null;
 
@@ -54,41 +53,36 @@ public class Animation {
 	final String name;
 	float duration;
 	Array<Timeline> timelines;
-	final LongSet timelineIds;
-	final IntArray bones;
+	LongSet timelineIds;
+	IntArray bones;
 
-	public Animation (String name, Array<Timeline> timelines, float duration) {
+	/** Creates a new animation. {@link #timelines} must be set before use. */
+	public Animation (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
-		this.duration = duration;
-		int n = timelines.size << 1;
-		timelineIds = new LongSet(n);
-		bones = new IntArray(n);
-		setTimelines(timelines);
 	}
 
 	/** If this list or the timelines it contains are modified, the timelines must be set again to recompute the animation's bone
-	 * indices and timeline property IDs. */
+	 * indices and timeline property IDs. Setting this property computes the unique {@link #bones}. */
 	public Array<Timeline> getTimelines () {
 		return timelines;
 	}
 
-	public void setTimelines (Array<Timeline> timelines) {
+	/** Sets the {@link #timelines} and {@link #bones}. It can be more efficient to determine the unique bones externally. */
+	public void setTimelines (Array<Timeline> timelines, IntArray bones) {
 		if (timelines == null) throw new IllegalArgumentException("timelines cannot be null.");
+		if (bones == null) throw new IllegalArgumentException("bones cannot be null.");
 		this.timelines = timelines;
+		this.bones = bones;
 
 		int n = timelines.size;
-		timelineIds.clear(n << 1);
-		bones.clear();
-		var boneSet = new IntSet();
+		if (timelineIds == null)
+			timelineIds = new LongSet(n << 1);
+		else
+			timelineIds.clear(n << 1);
 		Timeline[] items = timelines.items;
-		for (int i = 0; i < n; i++) {
-			Timeline timeline = items[i];
-			timelineIds.addAll(timeline.propertyIds);
-			if (timeline instanceof BoneTimeline boneTimeline && boneSet.add(boneTimeline.getBoneIndex()))
-				bones.add(boneTimeline.getBoneIndex());
-		}
-		bones.shrink();
+		for (int i = 0; i < n; i++)
+			timelineIds.addAll(items[i].propertyIds);
 	}
 
 	/** Returns true if this animation contains a timeline with any of the specified property IDs.

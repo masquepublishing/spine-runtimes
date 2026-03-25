@@ -39,6 +39,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DataInput;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.SerializationException;
 
@@ -924,8 +925,11 @@ public class SkeletonBinary extends SkeletonLoader {
 		}
 
 		// Bone timelines.
-		for (int i = 0, n = input.readInt(true); i < n; i++) {
+		int boneCount = input.readInt(true);
+		var bones = new IntArray(boneCount);
+		for (int i = 0; i < boneCount; i++) {
 			int boneIndex = input.readInt(true);
+			bones.add(boneIndex);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				int type = input.readByte(), frameCount = input.readInt(true);
 				if (type == BONE_INHERIT) {
@@ -1211,7 +1215,11 @@ public class SkeletonBinary extends SkeletonLoader {
 		Timeline[] items = timelines.items;
 		for (int i = 0, n = timelines.size; i < n; i++)
 			duration = Math.max(duration, items[i].getDuration());
-		return new Animation(name, timelines, duration);
+
+		Animation animation = new Animation(name);
+		animation.setTimelines(timelines, bones);
+		animation.setDuration(duration);
+		return animation;
 	}
 
 	private void readTimeline (SkeletonInput input, Array<Timeline> timelines, CurveTimeline1 timeline, float scale)

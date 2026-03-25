@@ -911,9 +911,12 @@ public class SkeletonJson extends SkeletonLoader {
 		}
 
 		// Bone timelines.
-		for (JsonValue boneMap = map.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
+		JsonValue boneMap = map.getChild("bones");
+		var bones = new IntArray(boneMap.size);
+		for (; boneMap != null; boneMap = boneMap.next) {
 			BoneData bone = skeletonData.findBone(boneMap.name);
 			if (bone == null) throw new SerializationException("Bone not found: " + boneMap.name);
+			bones.add(bone.index);
 			for (JsonValue timelineMap = boneMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				JsonValue keyMap = timelineMap.child;
 				if (keyMap == null) continue;
@@ -1265,7 +1268,11 @@ public class SkeletonJson extends SkeletonLoader {
 		Timeline[] items = timelines.items;
 		for (int i = 0, n = timelines.size; i < n; i++)
 			duration = Math.max(duration, items[i].getDuration());
-		skeletonData.animations.add(new Animation(name, timelines, duration));
+
+		Animation animation = new Animation(name);
+		animation.setTimelines(timelines, bones);
+		animation.setDuration(duration);
+		skeletonData.animations.add(animation);
 	}
 
 	private void readTimeline (Array<Timeline> timelines, JsonValue keyMap, CurveTimeline1 timeline, float defaultValue,
