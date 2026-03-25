@@ -32,8 +32,8 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.LongSet;
 import com.badlogic.gdx.utils.Null;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.SnapshotArray;
@@ -58,7 +58,7 @@ public class AnimationState {
 	private final Array<Event> events = new Array(true, 4, Event[]::new);
 	final SnapshotArray<AnimationStateListener> listeners = new SnapshotArray(true, 16, AnimationStateListener[]::new);
 	private final EventQueue queue = new EventQueue();
-	private final ObjectSet<String> propertyIds = new ObjectSet();
+	private final LongSet propertyIds = new LongSet();
 	boolean animationsChanged;
 	private float timeScale = 1;
 	private int unkeyedState;
@@ -703,14 +703,14 @@ public class AnimationState {
 		int[] timelineMode = entry.timelineMode.setSize(timelinesCount);
 		entry.timelineHoldMix.clear();
 		TrackEntry[] timelineHoldMix = entry.timelineHoldMix.setSize(timelinesCount);
-		ObjectSet<String> propertyIds = this.propertyIds;
+		LongSet propertyIds = this.propertyIds;
 		boolean add = entry.additive, keepHold = entry.keepHold;
 		TrackEntry to = entry.mixingTo;
 
 		outer:
 		for (int i = 0; i < timelinesCount; i++) {
 			Timeline timeline = timelines[i];
-			String[] ids = timeline.propertyIds;
+			long[] ids = timeline.propertyIds;
 			boolean first = propertyIds.addAll(ids)
 				&& !(timeline instanceof DrawOrderFolderTimeline && propertyIds.contains(DrawOrderTimeline.propertyID));
 

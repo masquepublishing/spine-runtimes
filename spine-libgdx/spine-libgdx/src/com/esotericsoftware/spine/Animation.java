@@ -36,8 +36,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.LongSet;
 import com.badlogic.gdx.utils.Null;
-import com.badlogic.gdx.utils.ObjectSet;
 
 import com.esotericsoftware.spine.BoneData.Inherit;
 import com.esotericsoftware.spine.attachments.Attachment;
@@ -54,7 +54,7 @@ public class Animation {
 	final String name;
 	float duration;
 	Array<Timeline> timelines;
-	final ObjectSet<String> timelineIds;
+	final LongSet timelineIds;
 	final IntArray bones;
 
 	public Animation (String name, Array<Timeline> timelines, float duration) {
@@ -62,7 +62,7 @@ public class Animation {
 		this.name = name;
 		this.duration = duration;
 		int n = timelines.size << 1;
-		timelineIds = new ObjectSet(n);
+		timelineIds = new LongSet(n);
 		bones = new IntArray(n);
 		setTimelines(timelines);
 	}
@@ -94,8 +94,8 @@ public class Animation {
 	/** Returns true if this animation contains a timeline with any of the specified property IDs.
 	 * <p>
 	 * See {@link Timeline#propertyIds}. */
-	public boolean hasTimeline (String[] propertyIds) {
-		for (String id : propertyIds)
+	public boolean hasTimeline (long[] propertyIds) {
+		for (long id : propertyIds)
 			if (timelineIds.contains(id)) return true;
 		return false;
 	}
@@ -185,19 +185,19 @@ public class Animation {
 	 * See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
 	 * Runtimes Guide. */
 	static abstract public class Timeline {
-		final String[] propertyIds;
+		final long[] propertyIds;
 		final float[] frames;
 		boolean additive, instant;
 
 		/** @param propertyIds Unique identifiers for the properties the timeline modifies. */
-		public Timeline (int frameCount, String... propertyIds) {
+		public Timeline (int frameCount, long... propertyIds) {
 			if (propertyIds == null) throw new IllegalArgumentException("propertyIds cannot be null.");
 			this.propertyIds = propertyIds;
 			frames = new float[frameCount * getFrameEntries()];
 		}
 
 		/** Uniquely encodes both the type of this timeline and the skeleton properties that it affects. */
-		public String[] getPropertyIds () {
+		public long[] getPropertyIds () {
 			return propertyIds;
 		}
 
@@ -295,7 +295,7 @@ public class Animation {
 
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
 		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
-		public CurveTimeline (int frameCount, int bezierCount, String... propertyIds) {
+		public CurveTimeline (int frameCount, int bezierCount, long... propertyIds) {
 			super(frameCount, propertyIds);
 			curves = new float[frameCount + bezierCount * BEZIER_SIZE];
 			curves[frameCount - 1] = STEPPED;
@@ -397,7 +397,7 @@ public class Animation {
 
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
 		 * @param propertyId Unique identifier for the property the timeline modifies. */
-		public CurveTimeline1 (int frameCount, int bezierCount, String propertyId) {
+		public CurveTimeline1 (int frameCount, int bezierCount, long propertyId) {
 			super(frameCount, bezierCount, propertyId);
 		}
 
@@ -502,7 +502,7 @@ public class Animation {
 		final int boneIndex;
 
 		public BoneTimeline1 (int frameCount, int bezierCount, int boneIndex, Property property) {
-			super(frameCount, bezierCount, property.ordinal() + "|" + boneIndex);
+			super(frameCount, bezierCount, property.ordinal() << 53 | boneIndex);
 			this.boneIndex = boneIndex;
 			additive = true;
 		}
@@ -531,7 +531,7 @@ public class Animation {
 
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}. */
 		public BoneTimeline2 (int frameCount, int bezierCount, int boneIndex, Property property1, Property property2) {
-			super(frameCount, bezierCount, property1.ordinal() + "|" + boneIndex, property2.ordinal() + "|" + boneIndex);
+			super(frameCount, bezierCount, property1.ordinal() << 53 | boneIndex, property2.ordinal() << 53 | +boneIndex);
 			this.boneIndex = boneIndex;
 			additive = true;
 		}
@@ -817,7 +817,7 @@ public class Animation {
 		final int boneIndex;
 
 		public InheritTimeline (int frameCount, int boneIndex) {
-			super(frameCount, Property.inherit.ordinal() + "|" + boneIndex);
+			super(frameCount, Property.inherit.ordinal() << 53 | boneIndex);
 			this.boneIndex = boneIndex;
 			instant = true;
 		}
@@ -861,7 +861,7 @@ public class Animation {
 	static abstract public class SlotCurveTimeline extends CurveTimeline implements SlotTimeline {
 		final int slotIndex;
 
-		public SlotCurveTimeline (int frameCount, int bezierCount, int slotIndex, String... propertyIds) {
+		public SlotCurveTimeline (int frameCount, int bezierCount, int slotIndex, long... propertyIds) {
 			super(frameCount, bezierCount, propertyIds);
 			this.slotIndex = slotIndex;
 		}
@@ -886,8 +886,8 @@ public class Animation {
 
 		public RGBATimeline (int frameCount, int bezierCount, int slotIndex) {
 			super(frameCount, bezierCount, slotIndex, //
-				Property.rgb.ordinal() + "|" + slotIndex, //
-				Property.alpha.ordinal() + "|" + slotIndex);
+				Property.rgb.ordinal() << 53 | slotIndex, //
+				Property.alpha.ordinal() << 53 | slotIndex);
 		}
 
 		public int getFrameEntries () {
@@ -962,7 +962,7 @@ public class Animation {
 		static private final int R = 1, G = 2, B = 3;
 
 		public RGBTimeline (int frameCount, int bezierCount, int slotIndex) {
-			super(frameCount, bezierCount, slotIndex, Property.rgb.ordinal() + "|" + slotIndex);
+			super(frameCount, bezierCount, slotIndex, Property.rgb.ordinal() << 53 | slotIndex);
 		}
 
 		public int getFrameEntries () {
@@ -1041,7 +1041,7 @@ public class Animation {
 		final int slotIndex;
 
 		public AlphaTimeline (int frameCount, int bezierCount, int slotIndex) {
-			super(frameCount, bezierCount, Property.alpha.ordinal() + "|" + slotIndex);
+			super(frameCount, bezierCount, Property.alpha.ordinal() << 53 | slotIndex);
 			this.slotIndex = slotIndex;
 		}
 
@@ -1081,9 +1081,9 @@ public class Animation {
 
 		public RGBA2Timeline (int frameCount, int bezierCount, int slotIndex) {
 			super(frameCount, bezierCount, slotIndex, //
-				Property.rgb.ordinal() + "|" + slotIndex, //
-				Property.alpha.ordinal() + "|" + slotIndex, //
-				Property.rgb2.ordinal() + "|" + slotIndex);
+				Property.rgb.ordinal() << 53 | slotIndex, //
+				Property.alpha.ordinal() << 53 | slotIndex, //
+				Property.rgb2.ordinal() << 53 | slotIndex);
 		}
 
 		public int getFrameEntries () {
@@ -1192,8 +1192,8 @@ public class Animation {
 
 		public RGB2Timeline (int frameCount, int bezierCount, int slotIndex) {
 			super(frameCount, bezierCount, slotIndex, //
-				Property.rgb.ordinal() + "|" + slotIndex, //
-				Property.rgb2.ordinal() + "|" + slotIndex);
+				Property.rgb.ordinal() << 53 | slotIndex, //
+				Property.rgb2.ordinal() << 53 | slotIndex);
 		}
 
 		public int getFrameEntries () {
@@ -1303,7 +1303,7 @@ public class Animation {
 		final String[] attachmentNames;
 
 		public AttachmentTimeline (int frameCount, int slotIndex) {
-			super(frameCount, Property.attachment.ordinal() + "|" + slotIndex);
+			super(frameCount, Property.attachment.ordinal() << 53 | slotIndex);
 			this.slotIndex = slotIndex;
 			attachmentNames = new String[frameCount];
 			instant = true;
@@ -1353,7 +1353,7 @@ public class Animation {
 		private final float[][] vertices;
 
 		public DeformTimeline (int frameCount, int bezierCount, int slotIndex, VertexAttachment attachment) {
-			super(frameCount, bezierCount, slotIndex, Property.deform.ordinal() + "|" + slotIndex + "|" + attachment.getId());
+			super(frameCount, bezierCount, slotIndex, Property.deform.ordinal() << 53 | slotIndex << 32 | +attachment.getId());
 			this.attachment = attachment;
 			vertices = new float[frameCount][];
 			additive = true;
@@ -1566,7 +1566,7 @@ public class Animation {
 		final HasSequence attachment;
 
 		public SequenceTimeline (int frameCount, int slotIndex, Attachment attachment) {
-			super(frameCount, Property.sequence.ordinal() + "|" + slotIndex + "|" + ((HasSequence)attachment).getSequence().getId());
+			super(frameCount, Property.sequence.ordinal() << 53 | slotIndex << 32 | ((HasSequence)attachment).getSequence().getId());
 			this.slotIndex = slotIndex;
 			this.attachment = (HasSequence)attachment;
 			instant = true;
@@ -1649,7 +1649,7 @@ public class Animation {
 
 	/** Fires an {@link Event} when specific animation times are reached. */
 	static public class EventTimeline extends Timeline {
-		static private final String[] propertyIds = {Integer.toString(Property.event.ordinal())};
+		static private final long[] propertyIds = {Property.event.ordinal()};
 
 		private final Event[] events;
 
@@ -1708,8 +1708,8 @@ public class Animation {
 
 	/** Changes {@link Skeleton#drawOrder}. */
 	static public class DrawOrderTimeline extends Timeline {
-		static final String propertyID = Integer.toString(Property.drawOrder.ordinal());
-		static private final String[] propertyIds = {propertyID};
+		static final long propertyID = Property.drawOrder.ordinal();
+		static private final long[] propertyIds = {propertyID};
 
 		private final int[][] drawOrders;
 
@@ -1774,11 +1774,11 @@ public class Animation {
 			instant = true;
 		}
 
-		static private String[] propertyIds (int[] slots) {
+		static private long[] propertyIds (int[] slots) {
 			int n = slots.length;
-			String[] ids = new String[n];
+			var ids = new long[n];
 			for (int i = 0; i < n; i++)
-				ids[i] = "d" + slots[i];
+				ids[i] = slots[i];
 			return ids;
 		}
 
@@ -1858,7 +1858,7 @@ public class Animation {
 		final int constraintIndex;
 
 		public IkConstraintTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, Property.ikConstraint.ordinal() + "|" + constraintIndex);
+			super(frameCount, bezierCount, Property.ikConstraint.ordinal() << 53 | constraintIndex);
 			this.constraintIndex = constraintIndex;
 		}
 
@@ -1952,7 +1952,7 @@ public class Animation {
 		final int constraintIndex;
 
 		public TransformConstraintTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, Property.transformConstraint.ordinal() + "|" + constraintIndex);
+			super(frameCount, bezierCount, Property.transformConstraint.ordinal() << 53 | constraintIndex);
 			this.constraintIndex = constraintIndex;
 			additive = true;
 		}
@@ -2061,7 +2061,7 @@ public class Animation {
 		final int constraintIndex;
 
 		public ConstraintTimeline1 (int frameCount, int bezierCount, int constraintIndex, Property property) {
-			super(frameCount, bezierCount, property.ordinal() + "|" + constraintIndex);
+			super(frameCount, bezierCount, property.ordinal() << 53 | constraintIndex);
 			this.constraintIndex = constraintIndex;
 		}
 
@@ -2111,7 +2111,7 @@ public class Animation {
 		final int constraintIndex;
 
 		public PathConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, Property.pathConstraintMix.ordinal() + "|" + constraintIndex);
+			super(frameCount, bezierCount, Property.pathConstraintMix.ordinal() << 53 | constraintIndex);
 			this.constraintIndex = constraintIndex;
 			additive = true;
 		}
@@ -2363,7 +2363,7 @@ public class Animation {
 
 	/** Resets a physics constraint when specific animation times are reached. */
 	static public class PhysicsConstraintResetTimeline extends Timeline implements ConstraintTimeline {
-		static private final String[] propertyIds = {Integer.toString(Property.physicsConstraintReset.ordinal())};
+		static private final long[] propertyIds = {Property.physicsConstraintReset.ordinal()};
 
 		final int constraintIndex;
 
