@@ -73,13 +73,13 @@ abstract public class VertexAttachment extends Attachment {
 		worldVerticesLength = other.worldVerticesLength;
 	}
 
-	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If {@link SlotPose#getDeform()} is not
-	 * empty, it is used to deform the vertices.
+	/** Transforms the attachment's local {@link #vertices} to world coordinates. If {@link SlotPose#getDeform()} is not empty, it
+	 * is used to deform the vertices.
 	 * <p>
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
-	 * @param start The index of the first {@link #getVertices()} value to transform. Each vertex has 2 values, x and y.
-	 * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - <code>start</code>.
+	 * @param start The index of the first {@link #vertices} value to transform. Each vertex has 2 values, x and y.
+	 * @param count The number of world vertex values to output. Must be <= {@link #worldVerticesLength} - <code>start</code>.
 	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + <code>count</code> *
 	 *           <code>stride</code> / 2.
 	 * @param offset The <code>worldVertices</code> index to begin writing values.
@@ -142,9 +142,8 @@ abstract public class VertexAttachment extends Attachment {
 		}
 	}
 
-	/** The bones that affect the {@link #getVertices()}. The entries are, for each vertex, the number of bones affecting the
-	 * vertex followed by that many bone indices, which is {@link Skeleton#getBones()} index. Null if this attachment has no
-	 * weights. */
+	/** The bones that affect the {@link #vertices}. The entries are, for each vertex, the number of bones affecting the vertex
+	 * followed by that many bone indices, which is {@link Skeleton#getBones()} index. Null if this attachment has no weights. */
 	public @Null int[] getBones () {
 		return bones;
 	}

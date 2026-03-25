@@ -35,9 +35,9 @@ import com.badlogic.gdx.utils.Null;
 /** A node in a skeleton's hierarchy with a transform that affects its children and their attachments. A bone has a number of
  * poses:
  * <ul>
- * <li>{@link #getData()}: The setup pose.
- * <li>{@link #getPose()}: The unconstrained local pose. Set by animations and application code.
- * <li>{@link #getAppliedPose()}: The constrained local pose. The {@link #getPose()} with modifications by constraints.
+ * <li>{@link #data}: The setup pose.
+ * <li>{@link #pose}: The unconstrained local pose. Set by animations and application code.
+ * <li>{@link #getAppliedPose()}: The constrained local pose. The {@link #pose} with modifications by constraints.
  * <li>World transform (on the applied pose): the {@link #getAppliedPose()} combined with the parent world transform. Computed by
  * {@link Skeleton#updateWorldTransform(Physics)} and {@link BonePose#updateWorldTransform(Skeleton)}.
  * </ul>
@@ -54,7 +54,7 @@ public class Bone extends PosedActive<BoneData, BonePose> {
 		constrained.bone = this;
 	}
 
-	/** Copy constructor. Does not copy the {@link #getChildren()} bones. */
+	/** Copy constructor. Does not copy the {@link #children} bones. */
 	public Bone (Bone bone, @Null Bone parent) {
 		this(bone.data, parent);
 		pose.set(bone.pose);

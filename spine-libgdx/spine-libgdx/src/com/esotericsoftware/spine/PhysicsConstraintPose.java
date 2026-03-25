@@ -79,7 +79,7 @@ public class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
 		this.massInverse = massInverse;
 	}
 
-	/** Applies a constant force along the world X axis. */
+	/** Applies a constant force along the {@link Skeleton#windX}, {@link Skeleton#windY} vector. */
 	public float getWind () {
 		return wind;
 	}
@@ -88,7 +88,7 @@ public class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
 		this.wind = wind;
 	}
 
-	/** Applies a constant force along the world Y axis. */
+	/** Applies a constant force along the {@link Skeleton#gravityX}, {@link Skeleton#gravityY} vector. */
 	public float getGravity () {
 		return gravity;
 	}

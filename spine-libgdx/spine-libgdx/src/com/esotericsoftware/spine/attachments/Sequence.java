@@ -35,8 +35,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import com.esotericsoftware.spine.SlotPose;
 
-/** Holds texture regions, UVs, and vertex offsets for rendering a region or mesh attachment. {@link #getRegions() Regions} must
- * be populated and {@link #update(HasSequence)} called before use. */
+/** Holds texture regions, UVs, and vertex offsets for rendering a region or mesh attachment. {@link #regions Regions} must be
+ * populated and {@link #update(HasSequence)} called before use. */
 public class Sequence {
 	static private int nextID;
 
@@ -103,7 +103,7 @@ public class Sequence {
 		return regions;
 	}
 
-	/** Returns the {@link #getRegions()} index for the {@link SlotPose#getSequenceIndex()}. */
+	/** Returns the {@link #regions} index for the {@link SlotPose#getSequenceIndex()}. */
 	public int resolveIndex (SlotPose pose) {
 		int index = pose.getSequenceIndex();
 		if (index == -1) index = setupIndex;
@@ -111,13 +111,13 @@ public class Sequence {
 		return index;
 	}
 
-	/** Returns the texture region from {@link #getRegions()} for the specified index. */
+	/** Returns the texture region from {@link #regions} for the specified index. */
 	public TextureRegion getRegion (int index) {
 		return regions[index];
 	}
 
-	/** Returns the UVs for the specified index. {@link #getRegions() Regions} must be populated and {@link #update(HasSequence)}
-	 * called before calling this method. */
+	/** Returns the UVs for the specified index. {@link #regions Regions} must be populated and {@link #update(HasSequence)} called
+	 * before calling this method. */
 	public float[] getUVs (int index) {
 		return uvs[index];
 	}
@@ -181,7 +181,7 @@ public class Sequence {
 		return nextID++;
 	}
 
-	/** Controls how {@link Sequence#getRegions()} are displayed over time. */
+	/** Controls how {@link Sequence#regions} are displayed over time. */
 	static public enum SequenceMode {
 		hold, once, loop, pingpong, onceReverse, loopReverse, pingpongReverse;
 

@@ -65,7 +65,7 @@ public class BoneData extends PosedData<BonePose> {
 		return super.getName();
 	}
 
-	/** The {@link Skeleton#getBones()} index. */
+	/** The {@link Skeleton#bones} index. */
 	public int getIndex () {
 		return index;
 	}

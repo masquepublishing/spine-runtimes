@@ -74,7 +74,7 @@ public class AnimationStateData {
 	}
 
 	/** Returns the mix duration to use when changing from the specified animation to the other on the same track, or the
-	 * {@link #getDefaultMix()} if no mix duration has been set. */
+	 * {@link #defaultMix} if no mix duration has been set. */
 	public float getMix (Animation from, Animation to) {
 		if (from == null) throw new IllegalArgumentException("from cannot be null.");
 		if (to == null) throw new IllegalArgumentException("to cannot be null.");

@@ -148,8 +148,8 @@ public class Skeleton {
 		updateCache();
 	}
 
-	/** Caches information about bones and constraints. Must be called if the {@link #getSkin()} is modified or if bones,
-	 * constraints, or weighted path attachments are added or removed. */
+	/** Caches information about bones and constraints. Must be called if the {@link #skin} is modified or if bones, constraints,
+	 * or weighted path attachments are added or removed. */
 	public void updateCache () {
 		updateCache.clear();
 		resetCache.clear();
@@ -374,7 +374,7 @@ public class Skeleton {
 		setSkin(skin);
 	}
 
-	/** Sets the skin used to look up attachments before looking in {@link SkeletonData#getDefaultSkin()}. If the skin is changed,
+	/** Sets the skin used to look up attachments before looking in {@link SkeletonData#defaultSkin}. If the skin is changed,
 	 * {@link #updateCache()} is called.
 	 * <p>
 	 * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
@@ -536,13 +536,13 @@ public class Skeleton {
 		return color;
 	}
 
-	/** A convenience method for setting the skeleton color. The color can also be set by modifying {@link #getColor()}. */
+	/** A convenience method for setting the skeleton color. The color can also be set by modifying {@link #color}. */
 	public void setColor (Color color) {
 		if (color == null) throw new IllegalArgumentException("color cannot be null.");
 		this.color.set(color);
 	}
 
-	/** A convenience method for setting the skeleton color. The color can also be set by modifying {@link #getColor()}. */
+	/** A convenience method for setting the skeleton color. The color can also be set by modifying {@link #color}. */
 	public void setColor (float r, float g, float b, float a) {
 		color.set(r, g, b, a);
 	}
@@ -607,7 +607,7 @@ public class Skeleton {
 		this.y = y;
 	}
 
-	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose#getWind()} is applied. */
+	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose#wind} is applied. */
 	public float getWindX () {
 		return windX;
 	}
@@ -616,7 +616,7 @@ public class Skeleton {
 		this.windX = windX;
 	}
 
-	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose#getWind()} is applied. */
+	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose#wind} is applied. */
 	public float getWindY () {
 		return windY;
 	}
@@ -625,7 +625,7 @@ public class Skeleton {
 		this.windY = windY;
 	}
 
-	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose#getGravity()} is applied. */
+	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose#gravity} is applied. */
 	public float getGravityX () {
 		return gravityX;
 	}
@@ -634,7 +634,7 @@ public class Skeleton {
 		this.gravityX = gravityX;
 	}
 
-	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose#getGravity()} is applied. */
+	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose#gravity} is applied. */
 	public float getGravityY () {
 		return gravityY;
 	}

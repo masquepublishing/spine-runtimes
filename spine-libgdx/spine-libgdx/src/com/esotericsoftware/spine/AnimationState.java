@@ -78,7 +78,7 @@ public class AnimationState {
 		this.data = data;
 	}
 
-	/** Increments each track entry {@link TrackEntry#getTrackTime()}, setting queued animations as current if needed. */
+	/** Increments each track entry {@link TrackEntry#trackTime}, setting queued animations as current if needed. */
 	public void update (float delta) {
 		delta *= timeScale;
 		TrackEntry[] tracks = this.tracks.items;
@@ -496,7 +496,7 @@ public class AnimationState {
 	 * If the formerly current track entry is for the same animation and was never applied to a skeleton, it is replaced (not mixed
 	 * from).
 	 * @param loop If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
-	 *           duration. In either case {@link TrackEntry#getTrackEnd()} determines when the track is cleared.
+	 *           duration. In either case {@link TrackEntry#trackEnd} determines when the track is cleared.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	public TrackEntry setAnimation (int trackIndex, Animation animation, boolean loop) {
@@ -533,8 +533,8 @@ public class AnimationState {
 
 	/** Adds an animation to be played after the current or last queued animation for a track. If the track has no entries, this is
 	 * equivalent to calling {@link #setAnimation(int, Animation, boolean)}.
-	 * @param delay If > 0, sets {@link TrackEntry#getDelay()}. If <= 0, the delay set is the duration of the previous track entry
-	 *           minus any mix duration (from {@link #data}) plus the specified <code>delay</code> (ie the mix ends at (when
+	 * @param delay If > 0, sets {@link TrackEntry#delay}. If <= 0, the delay set is the duration of the previous track entry minus
+	 *           any mix duration (from {@link #data}) plus the specified <code>delay</code> (ie the mix ends at (when
 	 *           <code>delay</code> = 0) or before (when <code>delay</code> < 0) the previous track entry duration). If the
 	 *           previous entry is looping, its next loop completion is used instead of its duration.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
@@ -566,7 +566,7 @@ public class AnimationState {
 	}
 
 	/** Sets an empty animation for a track, discarding any queued animations, and sets the track entry's
-	 * {@link TrackEntry#getMixDuration()}. An empty animation has no timelines and serves as a placeholder for mixing in or out.
+	 * {@link TrackEntry#mixDuration}. An empty animation has no timelines and serves as a placeholder for mixing in or out.
 	 * <p>
 	 * Mixing out is done by setting an empty animation with a mix duration using either {@link #setEmptyAnimation(int, float)},
 	 * {@link #setEmptyAnimations(float)}, or {@link #addEmptyAnimation(int, float, float)}. Mixing to an empty animation causes
@@ -590,16 +590,16 @@ public class AnimationState {
 	}
 
 	/** Adds an empty animation to be played after the current or last queued animation for a track, and sets the track entry's
-	 * {@link TrackEntry#getMixDuration()}. If the track has no entries, it is equivalent to calling
+	 * {@link TrackEntry#mixDuration}. If the track has no entries, it is equivalent to calling
 	 * {@link #setEmptyAnimation(int, float)}.
 	 * <p>
 	 * See {@link #setEmptyAnimation(int, float)} and
 	 * <a href='https://esotericsoftware.com/spine-applying-animations#Empty-animations'>Empty animations</a> in the Spine Runtimes
 	 * Guide.
-	 * @param delay If > 0, sets {@link TrackEntry#getDelay()}. If <= 0, the delay set is the duration of the previous track entry
-	 *           minus any mix duration plus the specified <code>delay</code> (ie the mix ends at (when <code>delay</code> = 0) or
-	 *           before (when <code>delay</code> < 0) the previous track entry duration). If the previous entry is looping, its
-	 *           next loop completion is used instead of its duration.
+	 * @param delay If > 0, sets {@link TrackEntry#delay}. If <= 0, the delay set is the duration of the previous track entry minus
+	 *           any mix duration plus the specified <code>delay</code> (ie the mix ends at (when <code>delay</code> = 0) or before
+	 *           (when <code>delay</code> < 0) the previous track entry duration). If the previous entry is looping, its next loop
+	 *           completion is used instead of its duration.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	public TrackEntry addEmptyAnimation (int trackIndex, float mixDuration, float delay) {
@@ -668,7 +668,7 @@ public class AnimationState {
 		return entry;
 	}
 
-	/** Removes {@link TrackEntry#getNext()} and all entries after it for the specified entry. */
+	/** Removes {@link TrackEntry#next} and all entries after it for the specified entry. */
 	public void clearNext (TrackEntry entry) {
 		TrackEntry next = entry.next;
 		while (next != null) {
@@ -779,7 +779,7 @@ public class AnimationState {
 	/** Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower
 	 * or faster. Defaults to 1.
 	 * <p>
-	 * See {@link TrackEntry#getTimeScale()} to affect a single animation. */
+	 * See {@link TrackEntry#timeScale} to affect a single animation. */
 	public float getTimeScale () {
 		return timeScale;
 	}
@@ -879,14 +879,14 @@ public class AnimationState {
 		}
 
 		/** Seconds to postpone playing the animation. Must be >= 0. When this track entry is the current track entry,
-		 * <code>delay</code> postpones incrementing the {@link #getTrackTime()}. When this track entry is queued,
-		 * <code>delay</code> is the time from the start of the previous animation to when this track entry will become the current
-		 * track entry (ie when the previous track entry {@link #getTrackTime()} >= this track entry's <code>delay</code>).
+		 * <code>delay</code> postpones incrementing the {@link #trackTime}. When this track entry is queued, <code>delay</code> is
+		 * the time from the start of the previous animation to when this track entry will become the current track entry (ie when
+		 * the previous track entry {@link #trackTime} >= this track entry's <code>delay</code>).
 		 * <p>
-		 * {@link #getTimeScale()} affects the delay.
+		 * {@link #timeScale} affects the delay.
 		 * <p>
 		 * When passing <code>delay</code> <= 0 to {@link AnimationState#addAnimation(int, Animation, boolean, float)} this
-		 * <code>delay</code> is set using a mix duration from {@link AnimationStateData}. To change the {@link #getMixDuration()}
+		 * <code>delay</code> is set using a mix duration from {@link AnimationStateData}. To change the {@link #mixDuration}
 		 * afterward, use {@link #setMixDuration(float, float)} so this <code>delay</code> is adjusted. */
 		public float getDelay () {
 			return delay;
@@ -923,11 +923,11 @@ public class AnimationState {
 			this.trackEnd = trackEnd;
 		}
 
-		/** If this track entry is non-looping, this is the track time in seconds when {@link #getAnimationEnd()} is reached, or the
-		 * current {@link #getTrackTime()} if it has already been reached.
+		/** If this track entry is non-looping, this is the track time in seconds when {@link #animationEnd} is reached, or the
+		 * current {@link #trackTime} if it has already been reached.
 		 * <p>
-		 * If this track entry is looping, this is the track time when this animation will reach its next {@link #getAnimationEnd()}
-		 * (the next loop completion). */
+		 * If this track entry is looping, this is the track time when this animation will reach its next {@link #animationEnd} (the
+		 * next loop completion). */
 		public float getTrackComplete () {
 			float duration = animationEnd - animationStart;
 			if (duration != 0) {
@@ -939,8 +939,8 @@ public class AnimationState {
 
 		/** Seconds when this animation starts, both initially and after looping. Defaults to 0.
 		 * <p>
-		 * When changing the <code>animationStart</code> time, it often makes sense to set {@link #getAnimationLast()} to the same
-		 * value to prevent timeline keys before the start time from triggering. */
+		 * When changing the <code>animationStart</code> time, it often makes sense to set {@link #animationLast} to the same value
+		 * to prevent timeline keys before the start time from triggering. */
 		public float getAnimationStart () {
 			return animationStart;
 		}
@@ -950,7 +950,7 @@ public class AnimationState {
 		}
 
 		/** Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will
-		 * loop back to {@link #getAnimationStart()} at this time. Defaults to the animation {@link Animation#duration}. */
+		 * loop back to {@link #animationStart} at this time. Defaults to the animation {@link Animation#duration}. */
 		public float getAnimationEnd () {
 			return animationEnd;
 		}
@@ -972,12 +972,12 @@ public class AnimationState {
 			nextAnimationLast = animationLast;
 		}
 
-		/** Uses {@link #getTrackTime()} to compute the <code>animationTime</code>. When the <code>trackTime</code> is 0, the
+		/** Uses {@link #trackTime} to compute the <code>animationTime</code>. When the <code>trackTime</code> is 0, the
 		 * <code>animationTime</code> is equal to the <code>animationStart</code> time.
 		 * <p>
-		 * The <code>animationTime</code> is between {@link #getAnimationStart()} and {@link #getAnimationEnd()}, except if this
-		 * track entry is non-looping and {@link #getAnimationEnd()} is >= to the {@link Animation#duration}, then
-		 * <code>animationTime</code> continues to increase past {@link #getAnimationEnd()}. */
+		 * The <code>animationTime</code> is between {@link #animationStart} and {@link #animationEnd}, except if this track entry
+		 * is non-looping and {@link #animationEnd} is >= to the {@link Animation#duration}, then <code>animationTime</code>
+		 * continues to increase past {@link #animationEnd}. */
 		public float getAnimationTime () {
 			if (loop) {
 				float duration = animationEnd - animationStart;
@@ -991,16 +991,16 @@ public class AnimationState {
 		/** Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or
 		 * faster. Defaults to 1.
 		 * <p>
-		 * Values < 0 are not supported. To play an animation in reverse, use {@link #getReverse()}.
+		 * Values < 0 are not supported. To play an animation in reverse, use {@link #reverse}.
 		 * <p>
-		 * {@link #getMixTime()} is not affected by track entry time scale, so {@link #getMixDuration()} may need to be adjusted to
-		 * match the animation speed.
+		 * {@link #mixTime} is not affected by track entry time scale, so {@link #mixDuration} may need to be adjusted to match the
+		 * animation speed.
 		 * <p>
 		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, the
-		 * {@link #getDelay()} is set using the mix duration from {@link AnimationState#data}, assuming time scale to be 1. If the
-		 * time scale is not 1, the delay may need to be adjusted.
+		 * {@link #delay} is set using the mix duration from {@link AnimationState#data}, assuming time scale to be 1. If the time
+		 * scale is not 1, the delay may need to be adjusted.
 		 * <p>
-		 * See {@link AnimationState#getTimeScale()} to affect all animations. */
+		 * See {@link AnimationState#timeScale} to affect all animations. */
 		public float getTimeScale () {
 			return timeScale;
 		}
@@ -1026,7 +1026,7 @@ public class AnimationState {
 		 * <p>
 		 * Alpha should be 1 on track 0.
 		 * <p>
-		 * See {@link #getAlphaAttachmentThreshold()}. */
+		 * See {@link #alphaAttachmentThreshold}. */
 		public float getAlpha () {
 			return alpha;
 		}
@@ -1035,9 +1035,9 @@ public class AnimationState {
 			this.alpha = alpha;
 		}
 
-		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
-		 * <code>eventThreshold</code>, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
-		 * timelines are not applied while this animation is being mixed out. */
+		/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the <code>eventThreshold</code>, event
+		 * timelines are applied while this animation is being mixed out. Defaults to 0, so event timelines are not applied while
+		 * this animation is being mixed out. */
 		public float getEventThreshold () {
 			return eventThreshold;
 		}
@@ -1047,7 +1047,7 @@ public class AnimationState {
 		}
 
 		/** When the computed alpha is greater than <code>alphaAttachmentThreshold</code>, attachment timelines are applied. The
-		 * computed alpha includes {@link #getAlpha()} and the mix percentage. Defaults to 0, so attachment timelines are always
+		 * computed alpha includes {@link #alpha} and the mix percentage. Defaults to 0, so attachment timelines are always
 		 * applied. */
 		public float getAlphaAttachmentThreshold () {
 			return alphaAttachmentThreshold;
@@ -1057,9 +1057,9 @@ public class AnimationState {
 			this.alphaAttachmentThreshold = alphaAttachmentThreshold;
 		}
 
-		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
-		 * <code>mixAttachmentThreshold</code>, attachment timelines are applied while this animation is being mixed out. Defaults
-		 * to 0, so attachment timelines are not applied while this animation is being mixed out. */
+		/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the <code>mixAttachmentThreshold</code>,
+		 * attachment timelines are applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not
+		 * applied while this animation is being mixed out. */
 		public float getMixAttachmentThreshold () {
 			return mixAttachmentThreshold;
 		}
@@ -1068,9 +1068,9 @@ public class AnimationState {
 			this.mixAttachmentThreshold = mixAttachmentThreshold;
 		}
 
-		/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
-		 * <code>mixDrawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to
-		 * 0, so draw order timelines are not applied while this animation is being mixed out. */
+		/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the <code>mixDrawOrderThreshold</code>,
+		 * draw order timelines are applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not
+		 * applied while this animation is being mixed out. */
 		public float getMixDrawOrderThreshold () {
 			return mixDrawOrderThreshold;
 		}
@@ -1099,7 +1099,7 @@ public class AnimationState {
 			return nextTrackLast != -1;
 		}
 
-		/** Returns true if there is a {@link #getNext()} track entry and it will become the current track entry during the next
+		/** Returns true if there is a {@link #next} track entry and it will become the current track entry during the next
 		 * {@link AnimationState#update(float)}. */
 		public boolean isNextReady () {
 			return next != null && nextTrackLast - next.delay >= 0;
@@ -1112,8 +1112,8 @@ public class AnimationState {
 			return trackTime >= animationEnd - animationStart;
 		}
 
-		/** Seconds elapsed from 0 to the {@link #getMixDuration()} when mixing from the previous animation to this animation. May
-		 * be slightly more than <code>mixDuration</code> when the mix is complete. */
+		/** Seconds elapsed from 0 to the {@link #mixDuration} when mixing from the previous animation to this animation. May be
+		 * slightly more than <code>mixDuration</code> when the mix is complete. */
 		public float getMixTime () {
 			return mixTime;
 		}
@@ -1133,7 +1133,7 @@ public class AnimationState {
 		 * track entry only before {@link AnimationState#update(float)} is next called.
 		 * <p>
 		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, the
-		 * {@link #getDelay()} is set using the mix duration from {@link AnimationState#data}. If <code>mixDuration</code> is set
+		 * {@link #delay} is set using the mix duration from {@link AnimationState#data}. If <code>mixDuration</code> is set
 		 * afterward, the delay needs to be adjusted:
 		 * 
 		 * <pre>
@@ -1155,11 +1155,11 @@ public class AnimationState {
 			this.mixDuration = mixDuration;
 		}
 
-		/** Sets both {@link #getMixDuration()} and {@link #getDelay()}.
-		 * @param delay If > 0, sets {@link #getDelay()}. If <= 0, the delay set is the duration of the previous track entry minus
-		 *           the specified mix duration plus the specified <code>delay</code> (ie the mix ends at (when <code>delay</code> =
-		 *           0) or before (when <code>delay</code> < 0) the previous track entry duration). If the previous entry is
-		 *           looping, its next loop completion is used instead of its duration. */
+		/** Sets both {@link #mixDuration} and {@link #delay}.
+		 * @param delay If > 0, sets {@link #delay}. If <= 0, the delay set is the duration of the previous track entry minus the
+		 *           specified mix duration plus the specified <code>delay</code> (ie the mix ends at (when <code>delay</code> = 0)
+		 *           or before (when <code>delay</code> < 0) the previous track entry duration). If the previous entry is looping,
+		 *           its next loop completion is used instead of its duration. */
 		public void setMixDuration (float mixDuration, float delay) {
 			this.mixDuration = mixDuration;
 			if (delay <= 0) delay = previous == null ? 0 : Math.max(delay + previous.getTrackComplete() - mixDuration, 0);
@@ -1205,7 +1205,7 @@ public class AnimationState {
 		}
 
 		/** When {@link #shortestRotation} is false, this clears the directions for mixing this entry's rotation. This can be useful
-		 * to avoid bones rotating the long way around when using {@link #getAlpha()} and starting animations on other tracks.
+		 * to avoid bones rotating the long way around when using {@link #alpha} and starting animations on other tracks.
 		 * <p>
 		 * Mixing involves finding a rotation between two others. There are two possible solutions: the short or the long way
 		 * around. When the two rotations change over time, which direction is the short or long way can also change. If the short
@@ -1366,7 +1366,7 @@ public class AnimationState {
 		/** Invoked every time this entry's animation completes a loop. This may occur during mixing (after
 		 * {@link #interrupt(TrackEntry)}).
 		 * <p>
-		 * If this entry's {@link TrackEntry#getMixingTo()} is not null, this entry is mixing out (it is not the current entry).
+		 * If this entry's {@link TrackEntry#mixingTo} is not null, this entry is mixing out (it is not the current entry).
 		 * <p>
 		 * Because this event is triggered at the end of {@link AnimationState#apply(Skeleton)}, any animations set in response to
 		 * the event won't be applied until the next time the AnimationState is applied. */

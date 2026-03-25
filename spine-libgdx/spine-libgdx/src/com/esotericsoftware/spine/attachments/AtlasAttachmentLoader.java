@@ -58,7 +58,7 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		this.allowMissingRegions = allowMissingRegions;
 	}
 
-	/** Sets each {@link Sequence#getRegions()} by calling {@link #findRegion(String, String)} for each texture region using
+	/** Sets each {@link Sequence#regions} by calling {@link #findRegion(String, String)} for each texture region using
 	 * {@link Sequence#getPath(String, int)}. */
 	protected void findRegions (String name, String basePath, Sequence sequence) {
 		TextureRegion[] regions = sequence.getRegions();

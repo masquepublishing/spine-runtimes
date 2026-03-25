@@ -56,7 +56,7 @@ public class SlotData extends PosedData<SlotPose> {
 		return super.getName();
 	}
 
-	/** The {@link Skeleton#getSlots()} index. */
+	/** The {@link Skeleton#slots} index. */
 	public int getIndex () {
 		return index;
 	}

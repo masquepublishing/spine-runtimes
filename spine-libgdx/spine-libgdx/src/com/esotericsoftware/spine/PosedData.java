@@ -50,10 +50,10 @@ abstract public class PosedData<P extends Pose> {
 		return setup;
 	}
 
-	/** When true, {@link Skeleton#updateWorldTransform(Physics)} only updates this constraint if the {@link Skeleton#getSkin()}
+	/** When true, {@link Skeleton#updateWorldTransform(Physics)} only updates this constraint if the {@link Skeleton#skin}
 	 * contains this constraint.
 	 * <p>
-	 * See {@link Skin#getConstraints()}. */
+	 * See {@link Skin#constraints}. */
 	public boolean getSkinRequired () {
 		return skinRequired;
 	}

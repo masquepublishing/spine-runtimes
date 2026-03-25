@@ -9,8 +9,8 @@ import com.badlogic.gdx.math.Vector2;
 
 import com.esotericsoftware.spine.BoneData.Inherit;
 
-/** The applied local pose and world transform for a bone. This is the {@link Bone#getPose()} with constraints applied and the
- * world transform computed by {@link Skeleton#updateWorldTransform(Physics)} and {@link #updateWorldTransform(Skeleton)}.
+/** The applied local pose and world transform for a bone. This is the {@link Bone#pose} with constraints applied and the world
+ * transform computed by {@link Skeleton#updateWorldTransform(Physics)} and {@link #updateWorldTransform(Skeleton)}.
  * <p>
  * If the world transform is changed, call {@link #updateLocalTransform(Skeleton)} before using the local transform. The local
  * transform may be needed by other code (eg to apply another constraint).

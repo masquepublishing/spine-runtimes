@@ -3,9 +3,9 @@ package com.esotericsoftware.spine;
 
 /** The base class for an object with a number of poses:
  * <ul>
- * <li>{@link #getData()}: The setup pose.
- * <li>{@link #getPose()}: The unconstrained pose. Set by animations and application code.
- * <li>{@link #getAppliedPose()}: The constrained pose. The {@link #getPose()} with modifications by constraints.
+ * <li>{@link #data}: The setup pose.
+ * <li>{@link #pose}: The unconstrained pose. Set by animations and application code.
+ * <li>{@link #getAppliedPose()}: The constrained pose. The {@link #pose} with modifications by constraints.
  * </ul>
  */
 abstract public class Posed< //
