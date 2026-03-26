@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, type Bone, Color, type Disposable, type Downloader, MathUtils, MixBlend, MixDirection, Physics, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, type StringMap, type TextureAtlas, TextureFilter, TimeKeeper, type TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
+import { type Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, type Bone, Color, type Disposable, type Downloader, MathUtils, Physics, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, type StringMap, type TextureAtlas, TextureFilter, TimeKeeper, type TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
 import { AssetManager, type GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
 
 export interface SpinePlayerConfig {
@@ -602,7 +602,7 @@ export class SpinePlayer implements Disposable {
 					const bone = skeleton.findBone(controlBones[i]);
 					if (!bone) continue;
 					const distance = renderer.camera.worldToScreen(
-						coords.set(bone.applied.worldX, bone.applied.worldY, 0),
+						coords.set(bone.appliedPose.worldX, bone.appliedPose.worldY, 0),
 						canvas.clientWidth, canvas.clientHeight).distance(mouse);
 					if (distance < bestDistance) {
 						bestDistance = distance;
@@ -632,9 +632,9 @@ export class SpinePlayer implements Disposable {
 						x = MathUtils.clamp(x + offset.x, 0, canvas.clientWidth)
 						y = MathUtils.clamp(y - offset.y, 0, canvas.clientHeight);
 						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
-						const applied = target.applied;
+						const applied = target.appliedPose;
 						if (target.parent) {
-							target.parent.applied.worldToLocal(position.set(coords.x - skeleton.x, coords.y - skeleton.y));
+							target.parent.appliedPose.worldToLocal(position.set(coords.x - skeleton.x, coords.y - skeleton.y));
 							applied.x = position.x;
 							applied.y = position.y;
 						} else {
@@ -801,7 +801,7 @@ export class SpinePlayer implements Disposable {
 
 		const tempArray = [0, 0];
 		for (let i = 0; i < steps; i++, time += stepTime) {
-			animation.apply(this.skeleton!, time, time, false, [], 1, MixBlend.setup, MixDirection.in, false);
+			animation.apply(this.skeleton!, time, time, false, [], 1, true, false, false, false);
 			this.skeleton!.updateWorldTransform(Physics.update);
 			this.skeleton!.getBounds(offset, size, tempArray, this.sceneRenderer!.skeletonRenderer.getSkeletonClipping());
 
@@ -937,7 +937,7 @@ export class SpinePlayer implements Disposable {
 						if (!bone) continue;
 						const colorInner = selectedBones[i] ? BONE_INNER_OVER : BONE_INNER;
 						const colorOuter = selectedBones[i] ? BONE_OUTER_OVER : BONE_OUTER;
-						const applied = bone.applied;
+						const applied = bone.appliedPose;
 						renderer.circle(true, skeleton.x + applied.worldX, skeleton.y + applied.worldY, 20, colorInner);
 						renderer.circle(false, skeleton.x + applied.worldX, skeleton.y + applied.worldY, 20, colorOuter);
 					}

@@ -27,66 +27,47 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Inherit } from "./BoneData.js";
-import type { Pose } from "./Pose.js"
+import type { Slot } from "./Slot";
+import { Utils } from "./Utils";
 
-/** Stores a bone's local pose. */
-export class BoneLocal implements Pose<BoneLocal> {
+/** Stores the skeleton's draw order, which is the order that each slot's attachment is rendered. */
+export class DrawOrder {
+	readonly setupPose: Slot[];
 
-	/** The local x translation. */
-	x = 0;
+	/** The unconstrained draw order, set by animations and application code. */
+	readonly pose: Slot[];
+	readonly constrainedPose: Slot[];
 
-	/** The local y translation. */
-	y = 0;
+	/** The constrained draw order for rendering. If no constraints modify the draw order, this is the same as {@link #pose}.
+	 * Otherwise it is a copy of {@link #pose} modified by constraints. */
+	appliedPose: Slot[];
 
-	/** The local rotation in degrees, counter clockwise. */
-	rotation = 0;
-
-	/** The local scaleX. */
-	scaleX = 0;
-
-	/** The local scaleY. */
-	scaleY = 0;
-
-	/** The local shearX. */
-	shearX = 0;
-
-	/** The local shearY. */
-	shearY = 0;
-
-	inherit = Inherit.Normal;
-
-	set (pose: BoneLocal): void {
-		if (pose == null) throw new Error("pose cannot be null.");
-		this.x = pose.x;
-		this.y = pose.y;
-		this.rotation = pose.rotation;
-		this.scaleX = pose.scaleX;
-		this.scaleY = pose.scaleY;
-		this.shearX = pose.shearX;
-		this.shearY = pose.shearY;
-		this.inherit = pose.inherit;
+	constructor (setupPose: Slot[]) {
+		this.setupPose = setupPose;
+		this.pose = [...setupPose];
+		this.constrainedPose = [];
+		this.appliedPose = this.pose;
 	}
 
-	setPosition (x: number, y: number): void {
-		this.x = x;
-		this.y = y;
+	/** Sets the unconstrained draw order to the setup pose order. */
+	useSetupPose () {
+		this.pose.length = this.setupPose.length;
+		Utils.arrayCopy(this.setupPose, 0, this.pose, 0, this.setupPose.length);
 	}
 
-	setScale (scaleX: number, scaleY: number): void;
-	setScale (scale: number): void;
-	setScale (scaleOrX: number, scaleY?: number): void {
-		this.scaleX = scaleOrX;
-		this.scaleY = scaleY === undefined ? scaleOrX : scaleY;
+	/** Sets the applied pose to the unconstrained pose, for when no constraints will modify the draw order. */
+	usePose () {
+		this.appliedPose = this.pose;
 	}
 
-	/** Determines how parent world transforms affect this bone. */
-	public getInherit (): Inherit {
-		return this.inherit;
+	/** Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints. */
+	useConstrained () {
+		this.appliedPose = this.constrainedPose;
 	}
 
-	public setInherit (inherit: Inherit): void {
-		if (inherit == null) throw new Error("inherit cannot be null.");
-		this.inherit = inherit;
+	/** Copies the unconstrained pose to the constrained pose, as a starting point for constraints to be applied. */
+	resetConstrained () {
+		this.constrainedPose.length = this.pose.length;
+		Utils.arrayCopy(this.pose, 0, this.constrainedPose, 0, this.pose.length);
 	}
 }

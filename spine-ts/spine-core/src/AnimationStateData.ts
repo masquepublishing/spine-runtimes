@@ -32,7 +32,7 @@ import type { SkeletonData } from "./SkeletonData.js";
 import type { StringMap } from "./Utils.js";
 
 
-/** Stores mix (crossfade) durations to be applied when {@link AnimationState} animations are changed. */
+/** Stores mix (crossfade) durations to be applied when {@link AnimationState} animations are changed on the same track. */
 export class AnimationStateData {
 	/** The SkeletonData to look up animations when they are specified by name. */
 	skeletonData: SkeletonData;
@@ -78,8 +78,8 @@ export class AnimationStateData {
 		this.animationToMixTime[key] = duration;
 	}
 
-	/** Returns the mix duration to use when changing from the specified animation to the other, or the {@link #defaultMix} if
-	  * no mix duration has been set. */
+	/** Returns the mix duration to use when changing from the specified animation to the other on the same track, or the
+	 * {@link #defaultMix} if no mix duration has been set. */
 	getMix (from: Animation, to: Animation) {
 		const key = `${from.name}.${to.name}`;
 		const value = this.animationToMixTime[key];

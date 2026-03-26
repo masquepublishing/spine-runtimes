@@ -33,12 +33,10 @@ import type { Sequence } from "./attachments/Sequence.js";
 import type { Pose } from "./Pose.js";
 import { Color } from "./Utils.js";
 
-/** Stores a slot's pose. Slots organize attachments for {@link Skeleton#drawOrder} purposes and provide a place to store state
- * for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared across
- * multiple skeletons. */
+/** Stores a slot's pose. */
 export class SlotPose implements Pose<SlotPose> {
-	/** The color used to tint the slot's attachment. If {@link darkColor} is set, this is used as the light color for two
-	 * color tinting. */
+	/** The color used to tint the slot's attachment. If {@link #darkColor} is set, this is used as the light color for two color
+	 * tinting. */
 	readonly color = new Color(1, 1, 1, 1);
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark

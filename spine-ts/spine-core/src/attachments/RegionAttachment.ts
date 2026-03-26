@@ -53,7 +53,7 @@ export class RegionAttachment extends Attachment implements HasSequence {
 	/** The local scaleY. */
 	scaleY = 1;
 
-	/** The local rotation. */
+	/** The local rotation in degrees, counter clockwise. */
 	rotation = 0;
 
 	/** The width of the region attachment in Spine. */
@@ -98,7 +98,7 @@ export class RegionAttachment extends Attachment implements HasSequence {
 	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
 	computeWorldVertices (slot: Slot, vertexOffsets: NumberArrayLike, worldVertices: NumberArrayLike, offset: number, stride: number) {
 
-		const bone = slot.bone.applied;
+		const bone = slot.bone.appliedPose;
 		const x = bone.worldX, y = bone.worldY;
 		const a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 

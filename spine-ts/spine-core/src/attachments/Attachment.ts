@@ -31,7 +31,7 @@ import type { Skeleton } from "src/Skeleton.js";
 import type { Slot } from "../Slot.js";
 import { type NumberArrayLike, Utils } from "../Utils.js";
 
-/** The base class for all attachments. */
+/** The base class for all attachments. Multiple {@link Skeleton} instances, slots, or skins can use the same attachments. */
 export abstract class Attachment {
 	name: string;
 
@@ -48,7 +48,7 @@ export abstract class Attachment {
 	abstract copy (): Attachment;
 }
 
-/** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
+/** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by
  * {@link SlotPose.deform}. */
 export abstract class VertexAttachment extends Attachment {
 	private static nextID = 0;
@@ -56,13 +56,12 @@ export abstract class VertexAttachment extends Attachment {
 	/** The unique ID for this attachment. */
 	id = VertexAttachment.nextID++;
 
-	/** The bones which affect the {@link vertices}. The array entries are, for each vertex, the number of bones affecting
-	 * the vertex followed by that many bone indices, which is the index of the bone in {@link Skeleton.bones}. Will be null
-	 * if this attachment has no weights. */
+	/** The bones that affect the {@link #vertices}. The entries are, for each vertex, the number of bones affecting the vertex
+	 * followed by that many bone indices, which is {@link Skeleton#getBones()} index. Null if this attachment has no weights. */
 	bones: Array<number> | null = null;
 
 	/** The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are `x,y`
-	 * entries for each vertex. For a weighted attachment, the values are `x,y,weight` entries for each bone affecting
+	 * entries for each vertex. For a weighted attachment, the values are `x,y,weight` triplets for each bone affecting
 	 * each vertex. */
 	vertices: NumberArrayLike = [];
 
@@ -74,27 +73,27 @@ export abstract class VertexAttachment extends Attachment {
 		super(name);
 	}
 
-	/** Transforms the attachment's local {@link #vertices} to world coordinates. If the slot's {@link SlotPose.deform} is
-	 * not empty, it is used to deform the vertices.
-	 *
-	 * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+	/** Transforms the attachment's local {@link #vertices} to world coordinates. If {@link SlotPose#getDeform()} is not empty, it
+	 * is used to deform the vertices.
+	 * <p>
+	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
 	 * @param start The index of the first {@link #vertices} value to transform. Each vertex has 2 values, x and y.
-	 * @param count The number of world vertex values to output. Must be <= {@link #worldVerticesLength} - `start`.
-	 * @param worldVertices The output world vertices. Must have a length >= `offset` + `count` *
-	 *           `stride` / 2.
-	 * @param offset The `worldVertices` index to begin writing values.
-	 * @param stride The number of `worldVertices` entries between the value pairs written. */
+	 * @param count The number of world vertex values to output. Must be <= {@link #worldVerticesLength} - <code>start</code>.
+	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + <code>count</code> *
+	 *           <code>stride</code> / 2.
+	 * @param offset The <code>worldVertices</code> index to begin writing values.
+	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
 	computeWorldVertices (skeleton: Skeleton, slot: Slot, start: number, count: number, worldVertices: NumberArrayLike, offset: number,
 		stride: number) {
 
 		count = offset + (count >> 1) * stride;
-		const deformArray = slot.applied.deform;
+		const deformArray = slot.appliedPose.deform;
 		let vertices = this.vertices;
 		const bones = this.bones;
 		if (!bones) {
 			if (deformArray.length > 0) vertices = deformArray;
-			const bone = slot.bone.applied;
+			const bone = slot.bone.appliedPose;
 			const x = bone.worldX;
 			const y = bone.worldY;
 			const a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -118,7 +117,7 @@ export abstract class VertexAttachment extends Attachment {
 				let n = bones[v++];
 				n += v;
 				for (; v < n; v++, b += 3) {
-					const bone = skeletonBones[bones[v]].applied;
+					const bone = skeletonBones[bones[v]].appliedPose;
 					const vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
 					wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
 					wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
@@ -133,7 +132,7 @@ export abstract class VertexAttachment extends Attachment {
 				let n = bones[v++];
 				n += v;
 				for (; v < n; v++, b += 3, f += 2) {
-					const bone = skeletonBones[bones[v]].applied;
+					const bone = skeletonBones[bones[v]].appliedPose;
 					const vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
 					wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
 					wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;

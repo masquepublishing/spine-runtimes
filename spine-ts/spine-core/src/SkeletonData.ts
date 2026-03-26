@@ -94,10 +94,10 @@ export class SkeletonData {
 	/** The dopesheet FPS in Spine. Available only when nonessential data was exported. */
 	fps = 30;
 
-	/** The path to the images directory as defined in Spine. Available only when nonessential data was exported. May be null. */
+	/** The path to the images folder as defined in Spine. Available only when nonessential data was exported. May be null. */
 	imagesPath: string | null = null;
 
-	/** The path to the audio directory as defined in Spine. Available only when nonessential data was exported. May be null. */
+	/** The path to the audio folder as defined in Spine. Available only when nonessential data was exported. May be null. */
 	audioPath: string | null = null;
 
 	/** Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
@@ -170,6 +170,8 @@ export class SkeletonData {
 
 	// --- Constraints.
 
+	/** Finds a constraint of the specified type by comparing each constraints's name. It is more efficient to cache the results of
+	  * this method than to call it multiple times. */
 	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
 	findConstraint<T extends ConstraintData<any, any>> (constraintName: string, type: new (name: string) => T): T | null {
 		if (!constraintName) throw new Error("constraintName cannot be null.");

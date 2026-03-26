@@ -34,7 +34,7 @@ import { SlotPose } from "./SlotPose.js";
 
 /** Stores the setup pose for a {@link Slot}. */
 export class SlotData extends PosedData<SlotPose> {
-	/** The index of the slot in {@link Skeleton.getSlots()}. */
+	/** The index of the slot in {@link Skeleton.slots}. */
 	index: number = 0;
 
 	/** The bone this slot belongs to. */
