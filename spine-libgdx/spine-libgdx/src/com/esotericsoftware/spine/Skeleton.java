@@ -338,7 +338,7 @@ public class Skeleton {
 		return null;
 	}
 
-	/** The skeleton's slots. */
+	/** The skeleton's slots. To add a slot, also add it to {@link DrawOrder#pose}. */
 	public Array<Slot> getSlots () {
 		return slots;
 	}
