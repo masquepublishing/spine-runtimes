@@ -30,6 +30,8 @@
 package com.esotericsoftware.spine;
 
 import com.esotericsoftware.spine.Animation.ConstraintTimeline;
+import com.esotericsoftware.spine.Animation.DrawOrderFolderTimeline;
+import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintTimeline;
 import com.esotericsoftware.spine.Animation.SlotTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
@@ -101,6 +103,8 @@ public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 			Timeline t = timelines[i];
 			if (t instanceof SlotTimeline timeline)
 				skeleton.constrained(slots[timeline.getSlotIndex()]);
+			else if (t instanceof DrawOrderTimeline || t instanceof DrawOrderFolderTimeline)
+				skeleton.drawOrder.constrained();
 			else if (t instanceof PhysicsConstraintTimeline timeline) {
 				if (timeline.constraintIndex == -1) {
 					for (int ii = 0; ii < physicsCount; ii++)

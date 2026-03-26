@@ -53,7 +53,7 @@ public class Skeleton {
 	final SkeletonData data;
 	final Array<Bone> bones;
 	final Array<Slot> slots;
-	Array<Slot> drawOrder;
+	final DrawOrder drawOrder;
 	final Array<Constraint> constraints;
 	final Array<PhysicsConstraint> physics;
 	final Array updateCache = new Array();
@@ -82,12 +82,9 @@ public class Skeleton {
 		}
 
 		slots = new Array(true, data.slots.size, Slot[]::new);
-		drawOrder = new Array(true, data.slots.size, Slot[]::new);
-		for (SlotData slotData : data.slots) {
-			var slot = new Slot(slotData, this);
-			slots.add(slot);
-			drawOrder.add(slot);
-		}
+		for (SlotData slotData : data.slots)
+			slots.add(new Slot(slotData, this));
+		drawOrder = new DrawOrder(slots);
 
 		physics = new Array(true, 8, PhysicsConstraint[]::new);
 		constraints = new Array(true, data.constraints.size, Constraint[]::new);
@@ -125,9 +122,10 @@ public class Skeleton {
 		for (Slot slot : skeleton.slots)
 			slots.add(new Slot(slot, bones.items[slot.bone.data.index], this));
 
-		drawOrder = new Array(true, slots.size, Slot[]::new);
-		for (Slot slot : skeleton.drawOrder)
-			drawOrder.add(slots.items[slot.data.index]);
+		drawOrder = new DrawOrder(slots);
+		drawOrder.pose.clear();
+		for (Slot slot : skeleton.drawOrder.pose)
+			drawOrder.pose.add(slots.items[slot.data.index]);
 
 		physics = new Array(true, skeleton.physics.size, PhysicsConstraint[]::new);
 		constraints = new Array(true, skeleton.constraints.size, Constraint[]::new);
@@ -154,6 +152,7 @@ public class Skeleton {
 		updateCache.clear();
 		resetCache.clear();
 
+		drawOrder.pose();
 		Slot[] slots = this.slots.items;
 		for (int i = 0, n = this.slots.size; i < n; i++)
 			slots[i].pose();
@@ -231,6 +230,7 @@ public class Skeleton {
 	public void updateWorldTransform (Physics physics) {
 		update++;
 
+		drawOrder.reset();
 		Posed[] resetCache = this.resetCache.items;
 		for (int i = 0, n = this.resetCache.size; i < n; i++)
 			resetCache[i].reset();
@@ -250,6 +250,7 @@ public class Skeleton {
 
 		update++;
 
+		drawOrder.reset();
 		Posed[] resetCache = this.resetCache.items;
 		for (int i = 0, n = this.resetCache.size; i < n; i++)
 			resetCache[i].reset();
@@ -298,10 +299,9 @@ public class Skeleton {
 
 	/** Sets the slots and draw order to their setup pose values. */
 	public void setupPoseSlots () {
+		drawOrder.setupPose();
 		Slot[] slots = this.slots.items;
-		int n = this.slots.size;
-		arraycopy(slots, 0, drawOrder.items, 0, n);
-		for (int i = 0; i < n; i++)
+		for (int i = 0, n = this.slots.size; i < n; i++)
 			slots[i].setupPose();
 	}
 
@@ -350,14 +350,10 @@ public class Skeleton {
 		return null;
 	}
 
-	/** The skeleton's slots in the order they should be drawn. The returned list may be modified to change the draw order. */
-	public Array<Slot> getDrawOrder () {
+	/** The skeleton's draw order. Use {@link DrawOrder#appliedPose} for rendering and {@link DrawOrder#pose} for changing the draw
+	 * order. */
+	public DrawOrder getDrawOrder () {
 		return drawOrder;
-	}
-
-	public void setDrawOrder (Array<Slot> drawOrder) {
-		if (drawOrder == null) throw new IllegalArgumentException("drawOrder cannot be null.");
-		this.drawOrder = drawOrder;
 	}
 
 	/** The skeleton's current skin. */
@@ -485,15 +481,16 @@ public class Skeleton {
 		if (offset == null) throw new IllegalArgumentException("offset cannot be null.");
 		if (size == null) throw new IllegalArgumentException("size cannot be null.");
 		if (temp == null) throw new IllegalArgumentException("temp cannot be null.");
-		Slot[] drawOrder = this.drawOrder.items;
+		Array<Slot> drawOrder = this.drawOrder.appliedPose;
+		Slot[] slots = drawOrder.items;
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
-		for (int i = 0, n = this.drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder[i];
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = slots[i];
 			if (!slot.bone.active) continue;
 			int verticesLength = 0;
 			float[] vertices = null;
 			short[] triangles = null;
-			Attachment attachment = slot.pose.attachment;
+			Attachment attachment = slot.appliedPose.attachment;
 			if (attachment != null) {
 				if (attachment instanceof RegionAttachment region) {
 					verticesLength = 8;

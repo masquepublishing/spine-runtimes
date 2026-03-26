@@ -3091,11 +3091,16 @@ public class SkeletonSerializer {
 		}
 		json.writeArrayEnd();
 
-		json.writeName("drawOrder");
+		json.writeName("drawOrderPose");
 		json.writeArrayStart();
-		for (Slot item : obj.getDrawOrder()) {
+		for (Slot item : obj.getDrawOrder().getPose())
 			writeSlot(item);
-		}
+		json.writeArrayEnd();
+
+		json.writeName("drawOrderApplied");
+		json.writeArrayStart();
+		for (Slot item : obj.getDrawOrder().getAppliedPose())
+			writeSlot(item);
 		json.writeArrayEnd();
 
 		json.writeName("skin");

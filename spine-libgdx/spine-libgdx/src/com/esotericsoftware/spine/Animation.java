@@ -1735,19 +1735,19 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
 			boolean add, boolean out, boolean appliedPose) {
+			Slot[] pose = (appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose).items;
+			Slot[] setup = skeleton.slots.items;
 			if (out || time < frames[0]) {
-				if (fromSetup) arraycopy(skeleton.slots.items, 0, skeleton.drawOrder.items, 0, skeleton.slots.size);
+				if (fromSetup) arraycopy(setup, 0, pose, 0, skeleton.slots.size);
 				return;
 			}
 
-			int[] drawOrderToSetupIndex = drawOrders[search(frames, time)];
-			if (drawOrderToSetupIndex == null)
-				arraycopy(skeleton.slots.items, 0, skeleton.drawOrder.items, 0, skeleton.slots.size);
+			int[] order = drawOrders[search(frames, time)];
+			if (order == null)
+				arraycopy(setup, 0, pose, 0, skeleton.slots.size);
 			else {
-				Slot[] slots = skeleton.slots.items;
-				Slot[] drawOrder = skeleton.drawOrder.items;
-				for (int i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
-					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+				for (int i = 0, n = order.length; i < n; i++)
+					pose[i] = setup[order[i]];
 			}
 		}
 	}
@@ -1803,36 +1803,33 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
 			boolean add, boolean out, boolean appliedPose) {
+			Slot[] pose = (appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose).items;
+			Slot[] setup = skeleton.slots.items;
 			if (out || time < frames[0]) {
-				if (fromSetup) setup(skeleton);
+				if (fromSetup) setup(pose, setup);
 			} else {
 				int[] order = drawOrders[search(frames, time)];
 				if (order == null)
-					setup(skeleton);
-				else
-					apply(skeleton, order);
-			}
-		}
-
-		private void setup (Skeleton skeleton) {
-			boolean[] inFolder = this.inFolder;
-			Slot[] drawOrder = skeleton.drawOrder.items, allSlots = skeleton.slots.items;
-			int[] slots = this.slots;
-			for (int i = 0, found = 0, done = slots.length;; i++) {
-				if (inFolder[drawOrder[i].data.index]) {
-					drawOrder[i] = allSlots[slots[found]];
-					if (++found == done) break;
+					setup(pose, setup);
+				else {
+					boolean[] inFolder = this.inFolder;
+					int[] slots = this.slots;
+					for (int i = 0, found = 0, done = slots.length;; i++) {
+						if (inFolder[pose[i].data.index]) {
+							pose[i] = setup[slots[order[found]]];
+							if (++found == done) break;
+						}
+					}
 				}
 			}
 		}
 
-		private void apply (Skeleton skeleton, int[] order) {
+		private void setup (Slot[] pose, Slot[] setup) {
 			boolean[] inFolder = this.inFolder;
-			Slot[] drawOrder = skeleton.drawOrder.items, allSlots = skeleton.slots.items;
 			int[] slots = this.slots;
 			for (int i = 0, found = 0, done = slots.length;; i++) {
-				if (inFolder[drawOrder[i].data.index]) {
-					drawOrder[i] = allSlots[slots[order[found]]];
+				if (inFolder[pose[i].data.index]) {
+					pose[i] = setup[slots[found]];
 					if (++found == done) break;
 				}
 			}
