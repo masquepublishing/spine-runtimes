@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 import { Event } from "./Event.js";
+import type { SkeletonData } from "./SkeletonData.js";
 
 /** Stores the setup pose values for an {@link Event}.
  *
@@ -35,7 +36,7 @@ import { Event } from "./Event.js";
 export class EventData {
 	/** The name of the event, unique across all events in the skeleton.
 	 *
-	 * See {@link SkeletonData#findEvent(String)}. */
+	 * See {@link SkeletonData.findEvent}. */
 	name: string;
 
 	_audioPath: string | null = null;

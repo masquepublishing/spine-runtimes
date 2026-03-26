@@ -27,7 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { Animation } from "./Animation.js"
+import type { Animation } from "./Animation.js";
+import type { Skeleton } from "./Skeleton.js";
 import type { BoneData } from "./BoneData.js";
 import type { ConstraintData } from "./ConstraintData.js";
 import type { EventData } from "./EventData.js";
@@ -54,7 +55,7 @@ export class SkeletonData {
 
 	/** The skeleton's default skin. By default this skin contains all attachments that were not in a skin in Spine.
 	 *
-	 * See {@link Skeleton#getAttachmentByName()}.
+	 * See {@link Skeleton.getAttachmentByName}.
 	 * May be null. */
 	defaultSkin: Skin | null = null;
 
@@ -145,7 +146,7 @@ export class SkeletonData {
 	}
 
 	/** Collects animations used by {@link SliderData slider constraints}.
-	 * <p>
+	 *
 	 * Slider animations are designed to be applied by slider constraints rather than on their own. Applications that have a user
 	 * choose an animation may want to exclude them. */
 	findSliderAnimations (animations: Animation[]): Animation[] {

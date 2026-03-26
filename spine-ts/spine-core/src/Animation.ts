@@ -30,19 +30,26 @@
 import { type Attachment, VertexAttachment } from "./attachments/Attachment.js";
 import { type HasSequence, isHasSequence } from "./attachments/HasSequence.js";
 import { SequenceMode, SequenceModeValues } from "./attachments/Sequence.js";
+import type { Bone } from "./Bone.js";
 import type { Inherit } from "./BoneData.js";
 import type { BonePose } from "./BonePose.js";
 import type { Event } from "./Event.js";
 import type { IkConstraint } from "./IkConstraint.js";
+import type { IkConstraintPose } from "./IkConstraintPose.js";
 import type { PathConstraint } from "./PathConstraint.js";
+import type { PathConstraintPose } from "./PathConstraintPose.js";
 import type { PhysicsConstraint } from "./PhysicsConstraint.js";
 import type { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 import type { PhysicsConstraintPose } from "./PhysicsConstraintPose.js";
+import type { Posed } from "./Posed.js";
 import type { Skeleton } from "./Skeleton.js";
+import type { SkeletonData } from "./SkeletonData.js";
 import type { Slider } from "./Slider.js";
+import type { SliderPose } from "./SliderPose.js";
 import type { Slot } from "./Slot.js";
 import type { SlotPose } from "./SlotPose.js";
 import type { TransformConstraint } from "./TransformConstraint.js";
+import type { TransformConstraintPose } from "./TransformConstraintPose.js";
 import { type NumberArrayLike, StringSet, Utils } from "./Utils.js";
 
 /** Stores a list of timelines to animate a skeleton's pose over time.
@@ -52,7 +59,7 @@ import { type NumberArrayLike, StringSet, Utils } from "./Utils.js";
 export class Animation {
 	/** The animation's name, unique across all animations in the skeleton.
 	 *
-	 * See {@link SkeletonData#findAnimation(String)}. */
+	 * See {@link SkeletonData.findAnimation}. */
 	readonly name: string;
 
 	/** The duration of the animation in seconds, which is usually the highest time of all frames in the timelines. The duration is
@@ -61,9 +68,9 @@ export class Animation {
 
 	readonly timelineIds: StringSet;
 
-	/** {@link Skeleton#getBones()} indices that this animation's timelines modify.
+	/** {@link Skeleton.getBones} indices that this animation's timelines modify.
 	 *
-	 * See {@link BoneTimeline#bones}. */
+	 * See {@link BoneTimeline.bones}. */
 	readonly bones: Array<number>;
 
 	/** The duration of the animation in seconds, which is usually the highest time of all frames in the timeline. The duration is
@@ -98,7 +105,7 @@ export class Animation {
 
 	/** Returns true if this animation contains a timeline with any of the specified property IDs.
 	 *
-	 * See {@link Timeline#propertyIds()}. */
+	 * See {@link Timeline.propertyIds}. */
 	hasTimeline (ids: string[]): boolean {
 		for (let i = 0; i < ids.length; i++)
 			if (this.timelineIds.contains(ids[i])) return true;
@@ -106,30 +113,30 @@ export class Animation {
 	}
 
 	/** Applies the animation's timelines to the specified skeleton.
-	 * <p>
-	 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)} and
+	 *
+	 * See {@link Timeline.apply} and
 	 * <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine Runtimes
 	 * Guide.
 	 * @param skeleton The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton
 	 *           components the timelines may change.
 	 * @param lastTime The last time in seconds this animation was applied. Some timelines trigger only at discrete times, in which
-	 *           case all keys are triggered between <code>lastTime</code> (exclusive) and <code>time</code> (inclusive). Pass -1
+	 *           case all keys are triggered between `lastTime` (exclusive) and `time` (inclusive). Pass -1
 	 *           the first time an animation is applied to ensure frame 0 is triggered.
 	 * @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and
 	 *           interpolate between the frame values.
-	 * @param loop True if <code>time</code> beyond the {@link #duration} repeats the animation, else the last frame is used.
+	 * @param loop True if `time` beyond the {@link duration} repeats the animation, else the last frame is used.
 	 * @param events If any events are fired, they are added to this list. Pass null to ignore fired events or if no timelines fire
 	 *           events.
-	 * @param alpha 0 applies setup or current values (depending on <code>fromSetup</code>), 1 uses timeline values, and
-	 *           intermediate values interpolate between them. Adjusting <code>alpha</code> over time can mix an animation in or
+	 * @param alpha 0 applies setup or current values (depending on `fromSetup`), 1 uses timeline values, and
+	 *           intermediate values interpolate between them. Adjusting `alpha` over time can mix an animation in or
 	 *           out.
-	 * @param fromSetup If true, <code>alpha</code> transitions between setup and timeline values, setup values are used before the
-	 *           first frame (current values are not used). If false, <code>alpha</code> transitions between current and timeline
+	 * @param fromSetup If true, `alpha` transitions between setup and timeline values, setup values are used before the
+	 *           first frame (current values are not used). If false, `alpha` transitions between current and timeline
 	 *           values, no change is made before the first frame.
 	 * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
-	 *           <code>fromSetup</code>).
+	 *           `fromSetup`).
 	 * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
-	 * @param appliedPose True to modify {@link Posed#appliedPose}, else {@link Posed#pose} is modified. */
+	 * @param appliedPose True to modify {@link Posed.appliedPose}, else {@link Posed.pose} is modified. */
 	apply (skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event> | null, alpha: number,
 		fromSetup: boolean, add: boolean, out: boolean, appliedPose: boolean) {
 		if (!skeleton) throw new Error("skeleton cannot be null.");
@@ -181,7 +188,7 @@ export enum Property {
 }
 
 /** The base class for all timelines.
- * <p>
+ *
  * See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
  * Runtimes Guide. */
 export abstract class Timeline {
@@ -219,35 +226,35 @@ export abstract class Timeline {
 	}
 
 	/** Applies this timeline to the skeleton.
-	 * <p>
+	 *
 	 * See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
 	 * Runtimes Guide.
 	 * @param skeleton The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton
 	 *           components the timelines may change.
 	 * @param lastTime The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in
-	 *           which case all keys are triggered between <code>lastTime</code> (exclusive) and <code>time</code> (inclusive).
+	 *           which case all keys are triggered between `lastTime` (exclusive) and `time` (inclusive).
 	 *           Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
 	 * @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and
 	 *           interpolate between the frame values.
 	 * @param events If any events are fired, they are added to this list. Pass null to ignore fired events or if no timelines
 	 *           fire events.
-	 * @param alpha 0 applies setup or current values (depending on <code>fromSetup</code>), 1 uses timeline values, and
-	 *           intermediate values interpolate between them. Adjusting <code>alpha</code> over time can mix a timeline in or
+	 * @param alpha 0 applies setup or current values (depending on `fromSetup`), 1 uses timeline values, and
+	 *           intermediate values interpolate between them. Adjusting `alpha` over time can mix a timeline in or
 	 *           out.
-	 * @param fromSetup If true, <code>alpha</code> transitions between setup and timeline values, setup values are used before
-	 *           the first frame (current values are not used). If false, <code>alpha</code> transitions between current and
+	 * @param fromSetup If true, `alpha` transitions between setup and timeline values, setup values are used before
+	 *           the first frame (current values are not used). If false, `alpha` transitions between current and
 	 *           timeline values, no change is made before the first frame.
 	 * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
-	 *           <code>fromSetup</code>).
+	 *           `fromSetup`).
 	 * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
 	 *           transitions.
-	 * @param appliedPose True to modify {@link Posed#appliedPose}, else {@link Posed#pose} is modified. */
+	 * @param appliedPose True to modify {@link Posed.appliedPose}, else {@link Posed.pose} is modified. */
 	abstract apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event> | null, alpha: number,
 		fromSetup: boolean, add: boolean, out: boolean, appliedPose: boolean): void;
 
 	/** Linear search using the specified stride (default 1).
-	 * @param time Must be >= the first value in <code>frames</code>.
-	 * @return The index of the first value <= <code>time</code>. */
+	 * @param time Must be >= the first value in `frames`.
+	 * @return The index of the first value <= `time`. */
 	static search (frames: NumberArrayLike, time: number, step = 1) {
 		const n = frames.length;
 		for (let i = step; i < n; i += step)
@@ -286,7 +293,7 @@ export abstract class CurveTimeline extends Timeline {
 		this.curves[frame] = 1/*STEPPED*/;
 	}
 
-	/** Shrinks the storage for Bezier curves, for use when <code>bezierCount</code> (specified in the constructor) was larger
+	/** Shrinks the storage for Bezier curves, for use when `bezierCount` (specified in the constructor) was larger
 	 * than the actual number of Bezier curves. */
 	shrink (bezierCount: number) {
 		const size = this.getFrameCount() + bezierCount * 18/*BEZIER_SIZE*/;
@@ -299,9 +306,9 @@ export abstract class CurveTimeline extends Timeline {
 
 	/** Stores the segments for the specified Bezier curve. For timelines that modify multiple values, there may be more than
 	 * one curve per frame.
-	 * @param bezier The ordinal of this Bezier curve for this timeline, between 0 and <code>bezierCount - 1</code> (specified
+	 * @param bezier The ordinal of this Bezier curve for this timeline, between 0 and `bezierCount - 1` (specified
 	 *           in the constructor), inclusive.
-	 * @param frame Between 0 and <code>frameCount - 1</code>, inclusive.
+	 * @param frame Between 0 and `frameCount - 1`, inclusive.
 	 * @param value The index of the value for this frame that this curve is used for.
 	 * @param time1 The time for the first key.
 	 * @param value1 The value for the first key.
@@ -334,9 +341,9 @@ export abstract class CurveTimeline extends Timeline {
 	}
 
 	/** Returns the Bezier interpolated value for the specified time.
-	 * @param frameIndex The index into {@link #frames} for the values of the frame before <code>time</code>.
-	 * @param valueOffset The offset from <code>frameIndex</code> to the value this curve is used for.
-	 * @param i The index of the Bezier segments. See {@link #getCurveType(int)}. */
+	 * @param frameIndex The index into {@link frames} for the values of the frame before `time`.
+	 * @param valueOffset The offset from `frameIndex` to the value this curve is used for.
+	 * @param i The index of the Bezier segments. See {@link getCurveType}. */
 	getBezierValue (time: number, frameIndex: number, valueOffset: number, i: number) {
 		const curves = this.curves;
 		if (curves[i] > time) {
@@ -367,7 +374,7 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 	}
 
 	/** Sets the time and value for the specified frame.
-	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param frame Between 0 and `frameCount`, inclusive.
 	 * @param time The frame time in seconds. */
 	setFrame (frame: number, time: number, value: number) {
 		frame <<= 1;
@@ -400,8 +407,8 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 
 	/** Returns the interpolated value for properties relative to the setup value. The timeline value is added to the setup
 	 * value, rather than replacing it.
-	 * <p>
-	 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+	 *
+	 * See {@link Timeline.apply}.
 	 * @param current The current value for the property.
 	 * @param setup The setup value for the property. */
 	getRelativeValue (time: number, alpha: number, fromSetup: boolean, add: boolean, current: number, setup: number) {
@@ -412,16 +419,16 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 
 	/** Returns the interpolated value for properties set as absolute values. The timeline value replaces the setup value,
 	 * rather than being relative to it.
-	 * <p>
-	 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+	 *
+	 * See {@link Timeline.apply}.
 	 * @param current The current value for the property.
 	 * @param setup The setup value for the property. */
 	getAbsoluteValue (time: number, alpha: number, fromSetup: boolean, add: boolean, current: number, setup: number): number;
 
 	/** Returns the interpolated value for properties set as absolute values, using the specified timeline value rather than
-	 * calling {@link #getCurveValue(float)}.
-	 * <p>
-	 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+	 * calling {@link getCurveValue}.
+	 *
+	 * See {@link Timeline.apply}.
 	 * @param current The current value for the property.
 	 * @param setup The setup value for the property.
 	 * @param value The timeline value to apply. */
@@ -447,7 +454,7 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 
 	/** Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.
 	 *
-	 * See {@link Timeline#apply(Skeleton, float, float, Array, float, boolean, boolean, boolean, boolean)}.
+	 * See {@link Timeline.apply}.
 	 * @param current The current value for the property.
 	 * @param setup The setup value for the property. */
 	getScaleValue (time: number, alpha: number, fromSetup: boolean, add: boolean, out: boolean, current: number, setup: number) {
@@ -497,7 +504,7 @@ export abstract class BoneTimeline1 extends CurveTimeline1 implements BoneTimeli
 export abstract class BoneTimeline2 extends CurveTimeline implements BoneTimeline {
 	readonly boneIndex;
 
-	/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
+	/** @param bezierCount The maximum number of Bezier curves. See {@link shrink}.
 	 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
 	constructor (frameCount: number, bezierCount: number, boneIndex: number, property1: Property, property2: Property) {
 		super(frameCount, bezierCount, `${property1}|${boneIndex}`, `${property2}|${boneIndex}`);
@@ -510,7 +517,7 @@ export abstract class BoneTimeline2 extends CurveTimeline implements BoneTimelin
 	}
 
 	/** Sets the time and values for the specified frame.
-	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param frame Between 0 and `frameCount`, inclusive.
 	 * @param time The frame time in seconds. */
 	setFrame (frame: number, time: number, value1: number, value2: number) {
 		frame *= 3/*ENTRIES*/;
@@ -530,7 +537,7 @@ export abstract class BoneTimeline2 extends CurveTimeline implements BoneTimelin
 		out: boolean,): void;
 }
 
-/** Changes {@link BonePose#rotation}. */
+/** Changes {@link BonePose.rotation}. */
 export class RotateTimeline extends BoneTimeline1 {
 	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, boneIndex, Property.rotate);
@@ -711,7 +718,7 @@ export class ScaleYTimeline extends BoneTimeline1 {
 	}
 }
 
-/** Changes {@link Bone#shearX} and {@link Bone#shearY}. */
+/** Changes {@link Bone.shearX} and {@link Bone.shearY}. */
 export class ShearTimeline extends BoneTimeline2 {
 	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, boneIndex, Property.shearX, Property.shearY);
@@ -762,7 +769,7 @@ export class ShearTimeline extends BoneTimeline2 {
 	}
 }
 
-/** Changes {@link Bone#shearX} and {@link Bone#shearY}. */
+/** Changes {@link Bone.shearX} and {@link Bone.shearY}. */
 export class ShearXTimeline extends BoneTimeline1 {
 	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, boneIndex, Property.shearX);
@@ -774,7 +781,7 @@ export class ShearXTimeline extends BoneTimeline1 {
 	}
 }
 
-/** Changes {@link Bone#shearX} and {@link Bone#shearY}. */
+/** Changes {@link Bone.shearX} and {@link Bone.shearY}. */
 export class ShearYTimeline extends BoneTimeline1 {
 	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, boneIndex, Property.shearY);
@@ -801,7 +808,7 @@ export class InheritTimeline extends Timeline implements BoneTimeline {
 	}
 
 	/** Sets the inherit transform mode for the specified frame.
-	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param frame Between 0 and `frameCount`, inclusive.
 	 * @param time The frame time in seconds. */
 	public setFrame (frame: number, time: number, inherit: Inherit) {
 		frame *= 2/*ENTRIES*/;
@@ -1295,7 +1302,7 @@ export class AttachmentTimeline extends Timeline implements SlotTimeline {
 export class DeformTimeline extends SlotCurveTimeline {
 	/** The attachment that will be deformed.
 	 *
-	 * See {@link VertexAttachment.getTimelineAttachment()}. */
+	 * See {@link VertexAttachment.getTimelineAttachment}. */
 	readonly attachment: VertexAttachment;
 
 	/** The vertices for each key frame. */
@@ -1313,7 +1320,7 @@ export class DeformTimeline extends SlotCurveTimeline {
 	}
 
 	/** Sets the time and vertices for the specified frame.
-	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param frame Between 0 and `frameCount`, inclusive.
 	 * @param time The frame time in seconds.
 	 * @param vertices Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights. */
 	setFrame (frame: number, time: number, vertices: NumberArrayLike) {
@@ -1493,7 +1500,7 @@ export class DeformTimeline extends SlotCurveTimeline {
 	}
 }
 
-/** Changes {@link Slot#getSequenceIndex()} for an attachment's {@link Sequence}. */
+/** Changes {@link Slot.getSequenceIndex} for an attachment's {@link Sequence}. */
 export class SequenceTimeline extends Timeline implements SlotTimeline {
 	static ENTRIES = 3;
 	static MODE = 1;
@@ -1518,15 +1525,15 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		return this.slotIndex;
 	}
 
-	/** The attachment for which the {@link SlotPose#getSequenceIndex()} will be set.
-	 * <p>
+	/** The attachment for which the {@link SlotPose.getSequenceIndex} will be set.
+	 *
 	 * See {@link VertexAttachment.timelineAttachment}. */
 	getAttachment () {
 		return this.attachment as unknown as Attachment;
 	}
 
 	/** Sets the time, mode, index, and frame time for the specified frame.
-	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param frame Between 0 and `frameCount`, inclusive.
 	 * @param time Seconds between frames. */
 	setFrame (frame: number, time: number, mode: SequenceMode, index: number, delay: number) {
 		const frames = this.frames;
@@ -1645,12 +1652,12 @@ export class EventTimeline extends Timeline {
 	}
 }
 
-/** Changes the {@link Skeleton#getDrawOrder()}. */
+/** Changes the {@link Skeleton.getDrawOrder}. */
 export class DrawOrderTimeline extends Timeline {
 	static readonly propertyID = `${Property.drawOrder}`;
 	static propertyIds = [DrawOrderTimeline.propertyID];
 
-	/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
+	/** The draw order for each key frame. See {@link setFrame}. */
 	private readonly drawOrders: Array<Array<number> | null>;
 
 	constructor (frameCount: number) {
@@ -1664,7 +1671,7 @@ export class DrawOrderTimeline extends Timeline {
 	}
 
 	/** Sets the time in seconds and the draw order for the specified key frame.
-	 * @param drawOrder Ordered {@link Skeleton#slots} indices, or null to use setup pose
+	 * @param drawOrder Ordered {@link Skeleton.slots} indices, or null to use setup pose
 	 *           draw order. */
 	setFrame (frame: number, time: number, drawOrder: Array<number> | null) {
 		this.frames[frame] = time;
@@ -1690,13 +1697,13 @@ export class DrawOrderTimeline extends Timeline {
 	}
 }
 
-/** Changes a subset of the {@link Skeleton#getDrawOrder() draw order}. */
+/** Changes a subset of the {@link Skeleton.getDrawOrder | draw order}. */
 export class DrawOrderFolderTimeline extends Timeline {
 	private readonly slots: number[];
 	private readonly inFolder: boolean[];
 	private readonly drawOrders: Array<Array<number> | null>;
 
-	/** @param slots {@link Skeleton#slots} indices controlled by this timeline, in setup order.
+	/** @param slots {@link Skeleton.slots} indices controlled by this timeline, in setup order.
 	 * @param slotCount The maximum number of slots in the skeleton. */
 	constructor (frameCount: number, slots: number[], slotCount: number) {
 		super(frameCount, ...DrawOrderFolderTimeline.propertyIds(slots));
@@ -1720,20 +1727,20 @@ export class DrawOrderFolderTimeline extends Timeline {
 		return this.frames.length;
 	}
 
-	/** The {@link Skeleton#getSlots()} indices that this timeline affects, in setup order. */
+	/** The {@link Skeleton.getSlots} indices that this timeline affects, in setup order. */
 	getSlots (): number[] {
 		return this.slots;
 	}
 
-	/** The draw order for each frame. See {@link #setFrame(int, float, int[])}. */
+	/** The draw order for each frame. See {@link setFrame}. */
 	getDrawOrders (): Array<Array<number> | null> {
 		return this.drawOrders;
 	}
 
 	/** Sets the time and draw order for the specified frame.
-	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param frame Between 0 and `frameCount`, inclusive.
 	 * @param time The frame time in seconds.
-	 * @param drawOrder Ordered {@link #getSlots()} indices, or null to use setup pose order. */
+	 * @param drawOrder Ordered {@link getSlots} indices, or null to use setup pose order. */
 	setFrame (frame: number, time: number, drawOrder: Array<number> | null): void {
 		this.frames[frame] = time;
 		this.drawOrders[frame] = drawOrder;
@@ -1774,7 +1781,7 @@ export class DrawOrderFolderTimeline extends Timeline {
 }
 
 export interface ConstraintTimeline {
-	/** The index of the constraint in {@link Skeleton#constraints} that will be changed when this timeline is applied, or -1 if
+	/** The index of the constraint in {@link Skeleton.constraints} that will be changed when this timeline is applied, or -1 if
 	 * a specific constraint will not be changed. */
 	readonly constraintIndex: number;
 }
@@ -1799,7 +1806,7 @@ export class IkConstraintTimeline extends CurveTimeline implements ConstraintTim
 	}
 
 	/** Sets the time, mix, softness, bend direction, compress, and stretch for the specified frame.
-	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param frame Between 0 and `frameCount`, inclusive.
 	 * @param time The frame time in seconds.
 	 * @param bendDirection 1 or -1. */
 	setFrame (frame: number, time: number, mix: number, softness: number, bendDirection: number, compress: boolean, stretch: boolean) {
@@ -1889,7 +1896,7 @@ export class TransformConstraintTimeline extends CurveTimeline implements Constr
 	}
 
 	/** Sets the time, rotate mix, translate mix, scale mix, and shear mix for the specified frame.
-	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param frame Between 0 and `frameCount`, inclusive.
 	 * @param time The frame time in seconds. */
 	setFrame (frame: number, time: number, mixRotate: number, mixX: number, mixY: number, mixScaleX: number, mixScaleY: number,
 		mixShearY: number) {
@@ -2028,8 +2035,8 @@ export class PathConstraintSpacingTimeline extends ConstraintTimeline1 {
 	}
 }
 
-/** Changes {@link PathConstraint.mixRotate()}, {@link PathConstraint.mixX()}, and
- * {@link PathConstraint.mixY()}. */
+/** Changes {@link PathConstraint.mixRotate}, {@link PathConstraint.mixX}, and
+ * {@link PathConstraint.mixY}. */
 export class PathConstraintMixTimeline extends CurveTimeline implements ConstraintTimeline {
 	readonly constraintIndex: number;
 
@@ -2044,7 +2051,7 @@ export class PathConstraintMixTimeline extends CurveTimeline implements Constrai
 	}
 
 	/** Sets the time and color for the specified frame.
-	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param frame Between 0 and `frameCount`, inclusive.
 	 * @param time The frame time in seconds. */
 	setFrame (frame: number, time: number, mixRotate: number, mixX: number, mixY: number) {
 		const frames = this.frames;
@@ -2302,12 +2309,12 @@ export class PhysicsConstraintResetTimeline extends Timeline implements Constrai
 	}
 
 	/** Sets the time for the specified frame.
-	 * @param frame Between 0 and <code>frameCount</code>, inclusive. */
+	 * @param frame Between 0 and `frameCount`, inclusive. */
 	setFrame (frame: number, time: number) {
 		this.frames[frame] = time;
 	}
 
-	/** Resets the physics constraint when frames > <code>lastTime</code> and <= <code>time</code>. */
+	/** Resets the physics constraint when frames > `lastTime` and <= `time`. */
 	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, fromSetup: boolean,
 		add: boolean, out: boolean, appliedPose: boolean) {
 
@@ -2338,7 +2345,7 @@ export class PhysicsConstraintResetTimeline extends Timeline implements Constrai
 	}
 }
 
-/** Changes {@link SliderPose.time()}. */
+/** Changes {@link SliderPose.time}. */
 export class SliderTimeline extends ConstraintTimeline1 {
 	constructor (frameCount: number, bezierCount: number, constraintIndex: number) {
 		super(frameCount, bezierCount, constraintIndex, Property.sliderTime);
@@ -2356,7 +2363,7 @@ export class SliderTimeline extends ConstraintTimeline1 {
 	}
 }
 
-/** Changes {@link SliderPose.mix()}. */
+/** Changes {@link SliderPose.mix}. */
 export class SliderMixTimeline extends ConstraintTimeline1 {
 	constructor (frameCount: number, bezierCount: number, constraintIndex: number) {
 		super(frameCount, bezierCount, constraintIndex, Property.sliderMix);

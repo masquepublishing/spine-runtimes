@@ -34,8 +34,8 @@ import type { SlotData } from "./SlotData.js";
 import { SlotPose } from "./SlotPose.js";
 import { Color } from "./Utils.js";
 
-/** Organizes attachments for {@link Skeleton#drawOrder} purposes and provide a place to store state for an attachment.
- * <p>
+/** Organizes attachments for {@link Skeleton.drawOrder} purposes and provide a place to store state for an attachment.
+ *
  * State cannot be stored in an attachment itself because attachments are stateless and may be shared across multiple
  * skeletons. */
 export class Slot extends Posed<SlotData, SlotPose> {

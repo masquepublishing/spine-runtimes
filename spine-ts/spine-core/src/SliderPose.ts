@@ -28,11 +28,12 @@
  *****************************************************************************/
 
 import type { Pose } from "./Pose.js";
+import type { SliderData } from "./SliderData.js";
 
 /** Stores a pose for a slider. */
 export class SliderPose implements Pose<SliderPose> {
 
-	/** The time in the {@link SliderData#animation} to apply the animation. */
+	/** The time in the {@link SliderData.animation} to apply the animation. */
 	time = 0;
 
 	/** A percentage that controls the mix between the constrained and unconstrained poses. */

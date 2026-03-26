@@ -35,13 +35,13 @@ import type { Skeleton } from "./Skeleton.js";
 import type { SliderData } from "./SliderData.js";
 import { SliderPose } from "./SliderPose.js";
 
-/** Applies an animation based on either the slider's {@link SliderPose#time} or a bone's transform property.
- * <p>
+/** Applies an animation based on either the slider's {@link SliderPose.time} or a bone's transform property.
+ *
  * See <a href="https://esotericsoftware.com/spine-sliders">Sliders</a> in the Spine User Guide. */
 export class Slider extends Constraint<Slider, SliderData, SliderPose> {
 	private static readonly offsets = [0, 0, 0, 0, 0, 0];
 
-	/** When set, the bone's transform property is used to set the slider's {@link SliderPose#time}. */
+	/** When set, the bone's transform property is used to set the slider's {@link SliderPose.time}. */
 	bone: Bone | null = null;
 
 	constructor (data: SliderData, skeleton: Skeleton) {

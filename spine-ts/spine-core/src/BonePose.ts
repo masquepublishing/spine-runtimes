@@ -35,14 +35,14 @@ import type { Skeleton } from "./Skeleton.js";
 import type { Update } from "./Update.js";
 import { MathUtils, type Vector2 } from "./Utils.js";
 
-/** The applied local pose and world transform for a bone. This is the {@link Bone#getPose()} with constraints applied and the
- * world transform computed by {@link Skeleton#updateWorldTransform(Physics)} and {@link #updateWorldTransform(Skeleton)}.
- * <p>
- * If the world transform is changed, call {@link #updateLocalTransform(Skeleton)} before using the local transform. The local
+/** The applied local pose and world transform for a bone. This is the {@link Bone.getPose} with constraints applied and the
+ * world transform computed by {@link Skeleton.updateWorldTransform} and {@link updateWorldTransform}.
+ *
+ * If the world transform is changed, call {@link updateLocalTransform} before using the local transform. The local
  * transform may be needed by other code (eg to apply another constraint).
- * <p>
- * After changing the world transform, call {@link #updateWorldTransform(Skeleton)} on every descendant bone. It may be more
- * convenient to modify the local transform instead, then call {@link Skeleton#updateWorldTransform(Physics)} to update the world
+ *
+ * After changing the world transform, call {@link updateWorldTransform} on every descendant bone. It may be more
+ * convenient to modify the local transform instead, then call {@link Skeleton.updateWorldTransform} to update the world
  * transforms for all bones and apply constraints. */
 export class BonePose implements Pose<BonePose>, Update {
 	bone!: Bone;
@@ -70,22 +70,22 @@ export class BonePose implements Pose<BonePose>, Update {
 
 	inherit = Inherit.Normal;
 
-	/** The world transform <code>[a b][c d]</code> x-axis x component. */
+	/** The world transform `[a b][c d]` x-axis x component. */
 	a = 0;
 
-	/** The world transform <code>[a b][c d]</code> y-axis x component. */
+	/** The world transform `[a b][c d]` y-axis x component. */
 	b = 0;
 
-	/** The world transform <code>[a b][c d]</code> x-axis y component. */
+	/** The world transform `[a b][c d]` x-axis y component. */
 	c = 0;
 
-	/** The world transform <code>[a b][c d]</code> y-axis y component. */
+	/** The world transform `[a b][c d]` y-axis y component. */
 	d = 0;
 
-	/** The world X position. If changed, {@link updateLocalTransform()} should be called. */
+	/** The world X position. If changed, {@link updateLocalTransform} should be called. */
 	worldY = 0;
 
-	/** The world Y position. If changed, {@link updateLocalTransform()} should be called. */
+	/** The world Y position. If changed, {@link updateLocalTransform} should be called. */
 	worldX = 0;
 
 	world = 0;
@@ -125,7 +125,7 @@ export class BonePose implements Pose<BonePose>, Update {
 		this.inherit = inherit;
 	}
 
-	/** Called by {@link Skeleton#updateCache()} to compute the world transform, if needed. */
+	/** Called by {@link Skeleton.updateCache} to compute the world transform, if needed. */
 	public update (skeleton: Skeleton, physics: Physics): void {
 		if (this.world !== skeleton._update) this.updateWorldTransform(skeleton);
 	}
@@ -249,11 +249,11 @@ export class BonePose implements Pose<BonePose>, Update {
 	}
 
 	/** Computes the local transform values from the world transform.
-	 * <p>
-	 * If the world transform is modified (by a constraint, {@link #rotateWorld(float)}, etc) then this method should be called so
+	 *
+	 * If the world transform is modified (by a constraint, {@link rotateWorld}, etc) then this method should be called so
 	 * the local transform matches the world transform. The local transform may be needed by other code (eg to apply another
 	 * constraint).
-	 * <p>
+	 *
 	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The local transform after
 	 * calling this method is equivalent to the local transform used to compute the world transform, but may not be identical. */
 	public updateLocalTransform (skeleton: Skeleton): void {
@@ -340,7 +340,7 @@ export class BonePose implements Pose<BonePose>, Update {
 	}
 
 	/** If the world transform has been modified by constraints and the local transform no longer matches,
-	 * {@link #updateLocalTransform(Skeleton)} is called. Call this after {@link Skeleton#updateWorldTransform(Physics)} before
+	 * {@link updateLocalTransform} is called. Call this after {@link Skeleton.updateWorldTransform} before
 	 * using the applied local transform. */
 	public validateLocalTransform (skeleton: Skeleton): void {
 		if (this.local === skeleton._update) this.updateLocalTransform(skeleton);
@@ -370,7 +370,7 @@ export class BonePose implements Pose<BonePose>, Update {
 		}
 	}
 
-	/** The world rotation for the X axis, calculated using {@link #a} and {@link #c}. This is the direction the bone is
+	/** The world rotation for the X axis, calculated using {@link a} and {@link c}. This is the direction the bone is
 	 * pointing. */
 	public getWorldRotationX (): number {
 		return MathUtils.atan2Deg(this.c, this.a);

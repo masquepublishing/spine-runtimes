@@ -35,7 +35,7 @@ import { Slider } from "./Slider.js";
 import { SliderPose } from "./SliderPose.js";
 import type { FromProperty } from "./TransformConstraintData.js";
 
-/** Stores the setup pose for a {@link SliderConstraint}.
+/** Stores the setup pose for a {@link Slider}.
  *
  * See <a href="https://esotericsoftware.com/spine-slider-constraints">Slider constraints</a> in the Spine User Guide. */
 export class SliderData extends ConstraintData<Slider, SliderPose> {
@@ -49,13 +49,13 @@ export class SliderData extends ConstraintData<Slider, SliderPose> {
 	/** When true, the animation repeats after its duration, otherwise the last frame is used. */
 	loop = false;
 
-	/** When set, the bone's transform property is used to set the slider's {@link SliderPose#time}. */
+	/** When set, the bone's transform property is used to set the slider's {@link SliderPose.time}. */
 	bone: BoneData | null = null;
 
-	/** When a bone is set, the specified transform property is used to set the slider's {@link SliderPose#time}. */
+	/** When a bone is set, the specified transform property is used to set the slider's {@link SliderPose.time}. */
 	property!: FromProperty;
 
-	/** When a bone is set, this is the scale of the {@link #property} value in relation to the slider time. */
+	/** When a bone is set, this is the scale of the {@link property} value in relation to the slider time. */
 	scale = 0;
 
 	/** When a bone is set, the offset is added to the property. */

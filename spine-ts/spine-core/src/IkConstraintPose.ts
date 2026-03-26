@@ -38,8 +38,8 @@ export class IkConstraintPose implements Pose<IkConstraintPose> {
 	compress = false;
 
 	/** When true and the target is out of range, the parent bone is scaled to reach it.
-	 * <p>
-	 * For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if {@link #softness} is > 0,
+	 *
+	 * For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if {@link softness} is > 0,
 	 * and 3) if the parent bone has local nonuniform scale, stretch is not applied. */
 	stretch = false;
 

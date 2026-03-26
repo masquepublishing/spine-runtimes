@@ -28,14 +28,14 @@
  *****************************************************************************/
 
 
-import type { Timeline } from "./Animation.js";
+import type { EventTimeline, Timeline } from "./Animation.js";
 import type { AnimationStateListener } from "./AnimationState.js";
 import type { EventData } from "./EventData.js";
 
 /** Fired by {@link EventTimeline} when specific animation times are reached.
  *
- * See Timeline {@link Timeline.apply()},
- * AnimationStateListener {@link AnimationStateListener.event()}, and
+ * See Timeline {@link Timeline.apply},
+ * AnimationStateListener {@link AnimationStateListener.event}, and
  * [Events](http://esotericsoftware.com/spine-events) in the Spine User Guide. */
 export class Event {
 

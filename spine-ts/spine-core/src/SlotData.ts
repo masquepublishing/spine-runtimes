@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 import type { BoneData } from "./BoneData.js";
+import type { Slot } from "./Slot.js";
 import { PosedData } from "./PosedData.js";
 import type { Skeleton } from "./Skeleton.js";
 import { SlotPose } from "./SlotPose.js";

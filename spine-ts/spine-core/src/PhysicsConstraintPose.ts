@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 import type { Pose } from "./Pose"
+import type { Skeleton } from "./Skeleton.js";
 
 /** Stores a pose for a physics constraint. */
 export class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
@@ -44,10 +45,10 @@ export class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
 	/** Determines susceptibility to acceleration. */
 	massInverse = 0;
 
-	/** Applies a constant force along the {@link Skeleton#windX}, {@link Skeleton#windY} vector. */
+	/** Applies a constant force along the {@link Skeleton.windX}, {@link Skeleton.windY} vector. */
 	wind = 0;
 
-	/** Applies a constant force along the {@link Skeleton#gravityX}, {@link Skeleton#gravityY} vector. */
+	/** Applies a constant force along the {@link Skeleton.gravityX}, {@link Skeleton.gravityY} vector. */
 	gravity = 0;
 
 	/** A percentage (0+) that controls the mix between the constrained and unconstrained poses. */

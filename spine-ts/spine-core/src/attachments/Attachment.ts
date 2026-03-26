@@ -29,6 +29,7 @@
 
 import type { Skeleton } from "src/Skeleton.js";
 import type { Slot } from "../Slot.js";
+import type { SlotPose } from "../SlotPose.js";
 import { type NumberArrayLike, Utils } from "../Utils.js";
 
 /** The base class for all attachments. Multiple {@link Skeleton} instances, slots, or skins can use the same attachments. */
@@ -56,8 +57,8 @@ export abstract class VertexAttachment extends Attachment {
 	/** The unique ID for this attachment. */
 	id = VertexAttachment.nextID++;
 
-	/** The bones that affect the {@link #vertices}. The entries are, for each vertex, the number of bones affecting the vertex
-	 * followed by that many bone indices, which is {@link Skeleton#getBones()} index. Null if this attachment has no weights. */
+	/** The bones that affect the {@link vertices}. The entries are, for each vertex, the number of bones affecting the vertex
+	 * followed by that many bone indices, which is {@link Skeleton.getBones} index. Null if this attachment has no weights. */
 	bones: Array<number> | null = null;
 
 	/** The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are `x,y`
@@ -73,17 +74,17 @@ export abstract class VertexAttachment extends Attachment {
 		super(name);
 	}
 
-	/** Transforms the attachment's local {@link #vertices} to world coordinates. If {@link SlotPose#getDeform()} is not empty, it
+	/** Transforms the attachment's local {@link vertices} to world coordinates. If {@link SlotPose.getDeform} is not empty, it
 	 * is used to deform the vertices.
-	 * <p>
+	 *
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
-	 * @param start The index of the first {@link #vertices} value to transform. Each vertex has 2 values, x and y.
-	 * @param count The number of world vertex values to output. Must be <= {@link #worldVerticesLength} - <code>start</code>.
-	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + <code>count</code> *
-	 *           <code>stride</code> / 2.
-	 * @param offset The <code>worldVertices</code> index to begin writing values.
-	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
+	 * @param start The index of the first {@link vertices} value to transform. Each vertex has 2 values, x and y.
+	 * @param count The number of world vertex values to output. Must be <= {@link worldVerticesLength} - `start`.
+	 * @param worldVertices The output world vertices. Must have a length >= `offset` + `count` *
+	 *           `stride` / 2.
+	 * @param offset The `worldVertices` index to begin writing values.
+	 * @param stride The number of `worldVertices` entries between the value pairs written. */
 	computeWorldVertices (skeleton: Skeleton, slot: Slot, start: number, count: number, worldVertices: NumberArrayLike, offset: number,
 		stride: number) {
 

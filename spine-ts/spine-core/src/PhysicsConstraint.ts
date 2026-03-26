@@ -37,7 +37,7 @@ import { MathUtils } from "./Utils.js";
 
 
 /** Applies physics to a bone.
- * <p>
+ *
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 export class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsConstraintData, PhysicsConstraintPose> {
 	bone: BonePose;
@@ -97,7 +97,7 @@ export class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		this.scaleVelocity = 0;
 	}
 
-	/** Translates the physics constraint so the next {@link #update(Skeleton, Physics)} forces are applied as if the bone moved an
+	/** Translates the physics constraint so the next {@link update} forces are applied as if the bone moved an
 	 * additional amount in world space. */
 	translate (x: number, y: number) {
 		this.ux -= x;
@@ -106,7 +106,7 @@ export class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		this.cy -= y;
 	}
 
-	/** Rotates the physics constraint so the next {@link #update(Skeleton, Physics)} forces are applied as if the bone rotated
+	/** Rotates the physics constraint so the next {@link update} forces are applied as if the bone rotated
 	 * around the specified point in world space. */
 	rotate (x: number, y: number, degrees: number) {
 		const r = degrees * MathUtils.degRad, cos = Math.cos(r), sin = Math.sin(r);

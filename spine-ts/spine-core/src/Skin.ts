@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 import type { Attachment } from "./attachments/Attachment.js";
+import type { SkeletonData } from "./SkeletonData.js";
 import { MeshAttachment } from "./attachments/MeshAttachment.js";
 import type { BoneData } from "./BoneData.js";
 import type { ConstraintData } from "./ConstraintData.js";
@@ -37,7 +38,7 @@ import { Color, type StringMap } from "./Utils.js";
 /** Stores an entry in the skin consisting of the slot index, name, and attachment **/
 export class SkinEntry {
 
-	/** The {@link Skeleton#slots} index. */
+	/** The {@link Skeleton.slots} index. */
 	slotIndex: number = 0;
 
 	placeholderName: string;
@@ -54,12 +55,12 @@ export class SkinEntry {
 
 /** Stores attachments by slot index and placeholder name. Multiple {@link Skeleton} instances can use the same skins.
  *
- * See {@link SkeletonData#defaultSkin}, {@link Skeleton#skin}, and
+ * See {@link SkeletonData.defaultSkin}, {@link Skeleton.skin}, and
  * [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide. */
 export class Skin {
 	/** The skin's name, unique across all skins in the skeleton.
-	 * <p>
-	 * See {@link SkeletonData#findSkin(String)}. */
+	 *
+	 * See {@link SkeletonData.findSkin}. */
 	name: string;
 
 	attachments = [] as StringMap<Attachment>[];

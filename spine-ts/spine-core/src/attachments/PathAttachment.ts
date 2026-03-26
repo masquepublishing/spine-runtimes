@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import type { PathConstraint } from "../PathConstraint.js";
 import { Color, Utils } from "../Utils.js";
 import { type Attachment, VertexAttachment } from "./Attachment.js";
 

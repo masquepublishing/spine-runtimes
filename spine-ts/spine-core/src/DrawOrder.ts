@@ -38,8 +38,8 @@ export class DrawOrder {
 	readonly pose: Slot[];
 	readonly constrainedPose: Slot[];
 
-	/** The constrained draw order for rendering. If no constraints modify the draw order, this is the same as {@link #pose}.
-	 * Otherwise it is a copy of {@link #pose} modified by constraints. */
+	/** The constrained draw order for rendering. If no constraints modify the draw order, this is the same as {@link pose}.
+	 * Otherwise it is a copy of {@link pose} modified by constraints. */
 	appliedPose: Slot[];
 
 	constructor (setupPose: Slot[]) {

@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import type { AnimationState } from "./AnimationState.js";
 import type { Attachment } from "./attachments/Attachment.js";
 import { ClippingAttachment } from "./attachments/ClippingAttachment.js";
 import { MeshAttachment } from "./attachments/MeshAttachment.js";
@@ -35,6 +36,7 @@ import { Bone } from "./Bone.js";
 import type { Constraint } from "./Constraint.js";
 import { DrawOrder } from "./DrawOrder.js";
 import type { Physics } from "./Physics.js";
+import type { PhysicsConstraintPose } from "./PhysicsConstraintPose.js";
 import { PhysicsConstraint } from "./PhysicsConstraint.js";
 import type { Posed } from "./Posed.js";
 import type { SkeletonClipping } from "./SkeletonClipping.js";
@@ -46,7 +48,7 @@ import { Color, type NumberArrayLike, Utils, Vector2 } from "./Utils.js";
 /** Stores bones and slots to be posed by animations and application code. Multiple skeleton instances can share the same
  * {@link SkeletonData}, including animations, attachments, and skins.
  *
- * After posing, call {@link #updateWorldTransform(Physics)} to apply constraints and compute world transforms for rendering.
+ * After posing, call {@link updateWorldTransform} to apply constraints and compute world transforms for rendering.
  *
  * See [Instance objects](http://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine Runtimes Guide. */
 export class Skeleton {
@@ -62,10 +64,10 @@ export class Skeleton {
 	/** The skeleton's bones, sorted parent first. The root bone is always the first bone. */
 	readonly bones: Array<Bone>;
 
-	/** The skeleton's slots. To add a slot, also add it to {@link DrawOrder#pose}. */
+	/** The skeleton's slots. To add a slot, also add it to {@link DrawOrder.pose}. */
 	readonly slots: Array<Slot>;
 
-	/** The skeleton's draw order. Use {@link DrawOrder#appliedPose} for rendering and {@link DrawOrder#pose} for changing the draw
+	/** The skeleton's draw order. Use {@link DrawOrder.appliedPose} for rendering and {@link DrawOrder.pose} for changing the draw
 	 * order. */
 	readonly drawOrder: DrawOrder;
 
@@ -76,7 +78,7 @@ export class Skeleton {
 	/** The skeleton's physics constraints. */
 	readonly physics: Array<PhysicsConstraint>;
 
-	/** The list of bones and constraints, sorted in the order they should be updated, as computed by {@link updateCache()}. */
+	/** The list of bones and constraints, sorted in the order they should be updated, as computed by {@link updateCache}. */
 	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
 	readonly _updateCache = [] as any[];
 
@@ -119,19 +121,19 @@ export class Skeleton {
 
 	/** Returns the skeleton's time, is used for time-based manipulations, such as {@link PhysicsConstraint}.
 	 *
-	 * See {@link _update()}. */
+	 * See {@link _update}. */
 	time = 0;
 
-	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose#wind} is applied. */
+	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose.wind} is applied. */
 	windX = 1;
 
-	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose#wind} is applied. */
+	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose.wind} is applied. */
 	windY = 0;
 
-	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose#gravity} is applied. */
+	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose.gravity} is applied. */
 	gravityX = 0;
 
-	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose#gravity} is applied. */
+	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose.gravity} is applied. */
 	gravityY = 1;
 
 	_update = 0;
@@ -173,7 +175,7 @@ export class Skeleton {
 		this.updateCache();
 	}
 
-	/** Caches information about bones and constraints. Must be called if the {@link #skin} is modified or if bones, constraints,
+	/** Caches information about bones and constraints. Must be called if the {@link skin} is modified or if bones, constraints,
 	 * or weighted path attachments are added or removed. */
 	updateCache () {
 		this._updateCache.length = 0;
@@ -254,7 +256,7 @@ export class Skeleton {
 	}
 
 	/** Updates the world transform for each bone and applies all constraints.
-	 * <p>
+	 *
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
 	updateWorldTransform (physics: Physics): void {
@@ -323,17 +325,17 @@ export class Skeleton {
 
 	/** Sets a skin by name.
 	 *
-	 * See {@link setSkin()}. */
+	 * See {@link setSkin}. */
 	setSkin (skinName: string): void;
 
-	/** Sets the skin used to look up attachments before looking in {@link SkeletonData#defaultSkin}. If the skin is changed,
-	 * {@link #updateCache()} is called.
-	 * <p>
+	/** Sets the skin used to look up attachments before looking in {@link SkeletonData.defaultSkin}. If the skin is changed,
+	 * {@link updateCache} is called.
+	 *
 	 * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
 	 * old skin, each slot's setup mode attachment is attached from the new skin.
-	 * <p>
+	 *
 	 * After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
-	 * {@link #setupPoseSlots()}. Also, often {@link AnimationState#apply(Skeleton)} is called before the next time the skeleton is
+	 * {@link setupPoseSlots}. Also, often {@link AnimationState.apply} is called before the next time the skeleton is
 	 * rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin. */
 	setSkin (newSkin: Skin | null): void;
 
@@ -374,7 +376,7 @@ export class Skeleton {
 	/** Finds an attachment by looking in the {@link skin} and {@link SkeletonData.defaultSkin} using the slot name and attachment
 	 * name.
 	 *
-	 * See {@link getAttachment(number, string)}. */
+	 * See {@link getAttachment}. */
 	getAttachment (slotName: string, placeholderName: string): Attachment | null;
 
 	/** Finds an attachment by looking in the {@link skin} and {@link SkeletonData.defaultSkin} using the slot index and
@@ -389,10 +391,10 @@ export class Skeleton {
 		return this.getAttachmentByIndex(slotNameOrIndex, placeholderName);
 	}
 
-	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot name and attachment
+	/** Finds an attachment by looking in the {@link skin} and {@link SkeletonData.defaultSkin} using the slot name and attachment
 	 * name.
 	 *
-	 * See {@link #getAttachment()}.
+	 * See {@link getAttachment}.
 	 * @returns May be null. */
 	private getAttachmentByName (slotName: string, placeholderName: string): Attachment | null {
 		const slot = this.data.findSlot(slotName);
@@ -400,7 +402,7 @@ export class Skeleton {
 		return this.getAttachment(slot.index, placeholderName);
 	}
 
-	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and
+	/** Finds an attachment by looking in the {@link skin} and {@link SkeletonData.defaultSkin} using the slot index and
 	 * attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
 	 *
 	 * See [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide.
@@ -415,8 +417,8 @@ export class Skeleton {
 		return null;
 	}
 
-	/** A convenience method to set an attachment by finding the slot with {@link findSlot()}, finding the attachment with
-	 * {@link getAttachment()}, then setting the slot's {@link Slot.attachment}.
+	/** A convenience method to set an attachment by finding the slot with {@link findSlot}, finding the attachment with
+	 * {@link getAttachment}, then setting the slot's {@link Slot.attachment}.
 	 * @param attachmentName May be null to clear the slot's attachment. */
 	setAttachment (slotName: string, attachmentName: string | null) {
 		if (!slotName) throw new Error("slotName cannot be null.");
@@ -461,7 +463,7 @@ export class Skeleton {
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size An output value, the width and height of the AABB.
 	 * @param temp Working memory to temporarily store attachments' computed world vertices.
-	 * @param clipper {@link SkeletonClipping} to use. If <code>null</code>, no clipping is applied. */
+	 * @param clipper {@link SkeletonClipping} to use. If `null`, no clipping is applied. */
 	getBounds (offset: Vector2, size: Vector2, temp: Array<number> = new Array<number>(2), clipper: SkeletonClipping | null = null) {
 		if (!offset) throw new Error("offset cannot be null.");
 		if (!size) throw new Error("size cannot be null.");
@@ -528,7 +530,7 @@ export class Skeleton {
 		this.y = y;
 	}
 
-	/** Increments the skeleton's {@link #time}. */
+	/** Increments the skeleton's {@link time}. */
 	update (delta: number) {
 		this.time += delta;
 	}

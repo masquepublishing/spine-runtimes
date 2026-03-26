@@ -90,12 +90,12 @@ export class RegionAttachment extends Attachment implements HasSequence {
 	}
 
 	/** Transforms the attachment's four vertices to world coordinates.
-	 * <p>
+	 *
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
-	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + 8.
-	 * @param offset The <code>worldVertices</code> index to begin writing values.
-	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
+	 * @param worldVertices The output world vertices. Must have a length >= `offset` + 8.
+	 * @param offset The `worldVertices` index to begin writing values.
+	 * @param stride The number of `worldVertices` entries between the value pairs written. */
 	computeWorldVertices (slot: Slot, vertexOffsets: NumberArrayLike, worldVertices: NumberArrayLike, offset: number, stride: number) {
 
 		const bone = slot.bone.appliedPose;
@@ -135,7 +135,7 @@ export class RegionAttachment extends Attachment implements HasSequence {
 		this.sequence.update(this);
 	}
 
-	/** Computes {@link Sequence#getUVs(int) UVs} and {@link Sequence#getOffsets(int) offsets} for a region attachment.
+	/** Computes {@link Sequence.getUVs | UVs} and {@link Sequence.getOffsets | offsets} for a region attachment.
 	 * @param uvs Output array for the computed UVs, length of 8.
 	 * @param offset Output array for the computed vertex offsets, length of 8. */
 	static computeUVs (region: TextureRegion | null, x: number, y: number, scaleX: number, scaleY: number, rotation: number, width: number,

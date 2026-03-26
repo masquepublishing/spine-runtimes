@@ -32,6 +32,7 @@ import { Posed } from "./Posed.js";
 import type { PosedData } from "./PosedData.js";
 
 import type { Skeleton } from "./Skeleton";
+import type { Skin } from "./Skin.js";
 
 /** A posed object that may be active or inactive. */
 export abstract class PosedActive<
@@ -47,9 +48,9 @@ export abstract class PosedActive<
 	}
 
 	/** Returns false when this constraint won't be updated by
-	 * {@link Skeleton#updateWorldTransform(com.esotericsoftware.spine.Physics)} because a skin is required and the
-	 * {@link Skeleton#skin active skin} does not contain this item. See {@link Skin#bones}, {@link Skin#constraints},
-	 * {@link PosedData#skinRequired}, and {@link Skeleton#updateCache()}. */
+	 * {@link Skeleton.updateWorldTransform} because a skin is required and the
+	 * {@link Skeleton.skin active skin} does not contain this item. See {@link Skin.bones}, {@link Skin.constraints},
+	 * {@link PosedData.skinRequired}, and {@link Skeleton.updateCache}. */
 	public isActive (): boolean {
 		return this.active;
 	}

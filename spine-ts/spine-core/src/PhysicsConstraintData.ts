@@ -35,7 +35,7 @@ import type { Skeleton } from "./Skeleton.js";
 
 
 /** Stores the setup pose for a {@link PhysicsConstraint}.
- * <p>
+ *
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 export class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, PhysicsConstraintPose> {
 	/** The bone constrained by this physics constraint. */

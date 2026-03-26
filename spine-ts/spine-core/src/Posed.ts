@@ -31,11 +31,9 @@ import type { Pose } from "./Pose.js";
 import type { PosedData } from "./PosedData.js";
 
 /** The base class for an object with a number of poses:
- * <ul>
- * <li>{@link #data}: The setup pose.
- * <li>{@link #pose}: The unconstrained pose. Set by animations and application code.
- * <li>{@link #appliedPose}: The pose to use for rendering. Possibly modified by constraints.
- * </ul>
+ * - {@link data}: The setup pose.
+ * - {@link pose}: The unconstrained pose. Set by animations and application code.
+ * - {@link appliedPose}: The pose to use for rendering. Possibly modified by constraints.
  */
 export abstract class Posed<
 	D extends PosedData<P>,
@@ -70,8 +68,8 @@ export abstract class Posed<
 		return this.pose;
 	}
 
-	/** The pose to use for rendering. If no constraints modify this pose, this is the same as {@link #pose}. Otherwise it is a
-	 * copy of {@link #pose} modified by constraints. */
+	/** The pose to use for rendering. If no constraints modify this pose, this is the same as {@link pose}. Otherwise it is a
+	 * copy of {@link pose} modified by constraints. */
 	public getAppliedPose (): P {
 		return this.appliedPose;
 	}

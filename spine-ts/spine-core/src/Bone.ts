@@ -30,16 +30,15 @@
 import type { BoneData } from "./BoneData.js";
 import { BonePose } from "./BonePose.js";
 import { PosedActive } from "./PosedActive.js";
+import type { Skeleton } from "./Skeleton.js";
 
 /** A node in a skeleton's hierarchy with a transform that affects its children and their attachments. A bone has a number of
  * poses:
- * <ul>
- * <li>{@link #data}: The setup pose.
- * <li>{@link #pose}: The unconstrained local pose. Set by animations and application code.
- * <li>{@link #appliedPose}: The local pose to use for rendering. Possibly modified by constraints.
- * <li>World transform: the local pose combined with the parent world transform. Computed on a pose by
- * {@link BonePose#updateWorldTransform(Skeleton)} and {@link Skeleton#updateWorldTransform(Physics)}.
- * </ul>
+ * - {@link data}: The setup pose.
+ * - {@link pose}: The unconstrained local pose. Set by animations and application code.
+ * - {@link appliedPose}: The local pose to use for rendering. Possibly modified by constraints.
+ * - World transform: the local pose combined with the parent world transform. Computed on a pose by
+ * {@link BonePose.updateWorldTransform} and {@link Skeleton.updateWorldTransform}.
  */
 export class Bone extends PosedActive<BoneData, BonePose> {
 	/** The parent bone, or null if this is the root bone. */
@@ -57,7 +56,7 @@ export class Bone extends PosedActive<BoneData, BonePose> {
 		this.constrainedPose.bone = this;
 	}
 
-	/** Copy constructor. Does not copy the {@link #children} bones. */
+	/** Copy constructor. Does not copy the {@link children} bones. */
 	copy (parent: Bone | null): Bone {
 		const copy = new Bone(this.data, parent);
 		copy.pose.set(this.pose);
