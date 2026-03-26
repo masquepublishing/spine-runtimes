@@ -230,7 +230,7 @@ export class Skeleton {
 	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
 	constrained (object: Posed<any, any>) {
 		if (object.pose === object.appliedPose) {
-			object.useConstrained();
+			object.constrained();
 			this.resetCache.push(object);
 		}
 	}

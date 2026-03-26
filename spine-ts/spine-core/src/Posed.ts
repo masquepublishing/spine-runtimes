@@ -82,7 +82,7 @@ export abstract class Posed<
 	}
 
 	/** Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints. */
-	useConstrained () {
+	constrained () {
 		this.appliedPose = this.constrainedPose;
 	}
 

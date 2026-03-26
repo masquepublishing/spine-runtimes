@@ -106,7 +106,7 @@ export class Slider extends Constraint<Slider, SliderData, SliderPose> {
 			if (isSlotTimeline(t))
 				skeleton.constrained(slots[t.slotIndex]);
 			else if (t instanceof DrawOrderTimeline || t instanceof DrawOrderFolderTimeline)
-				skeleton.drawOrder.useConstrained();
+				skeleton.drawOrder.constrained();
 			else if (t instanceof PhysicsConstraintTimeline) {
 				if (t.constraintIndex === -1) {
 					for (let ii = 0; ii < physicsCount; ii++)
