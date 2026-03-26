@@ -37,9 +37,9 @@ import com.badlogic.gdx.utils.Null;
  * <ul>
  * <li>{@link #data}: The setup pose.
  * <li>{@link #pose}: The unconstrained local pose. Set by animations and application code.
- * <li>{@link #appliedPose}: The constrained local pose. The {@link #pose} with modifications by constraints.
- * <li>World transform (on the applied pose): the {@link #appliedPose} combined with the parent world transform. Computed by
- * {@link Skeleton#updateWorldTransform(Physics)} and {@link BonePose#updateWorldTransform(Skeleton)}.
+ * <li>{@link #appliedPose}: The local pose to use for rendering. Possibly modified by constraints.
+ * <li>World transform: the local pose combined with the parent world transform. Computed on a pose by
+ * {@link BonePose#updateWorldTransform(Skeleton)} and {@link Skeleton#updateWorldTransform(Physics)}.
  * </ul>
  */
 public class Bone extends PosedActive<BoneData, BonePose> {

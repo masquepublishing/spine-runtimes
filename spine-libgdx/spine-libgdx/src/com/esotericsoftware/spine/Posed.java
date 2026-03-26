@@ -5,7 +5,7 @@ package com.esotericsoftware.spine;
  * <ul>
  * <li>{@link #data}: The setup pose.
  * <li>{@link #pose}: The unconstrained pose. Set by animations and application code.
- * <li>{@link #appliedPose}: The constrained pose. The {@link #pose} with modifications by constraints.
+ * <li>{@link #appliedPose}: The pose to use for rendering. Possibly modified by constraints.
  * </ul>
  */
 abstract public class Posed< //
@@ -13,8 +13,7 @@ abstract public class Posed< //
 	P extends Pose> {
 
 	final D data;
-	final P pose;
-	final P constrainedPose;
+	final P pose, constrainedPose;
 	P appliedPose;
 
 	protected Posed (D data, P pose, P constrainedPose) {
@@ -40,19 +39,19 @@ abstract public class Posed< //
 		return pose;
 	}
 
-	/** If no constraints modify this object, the applied pose is the same as the {@link #pose}. Otherwise it is a copy of the
-	 * {@link #pose} modified by constraints. */
+	/** The pose to use for rendering. If no constraints modify this pose, this is the same as {@link #pose}. Otherwise it is a
+	 * copy of {@link #pose} modified by constraints. */
 	public P getAppliedPose () {
 		return appliedPose;
 	}
 
 	/** Sets the applied pose to the unconstrained pose, for when no constraints will modify the pose. */
-	void pose () { // Port: usePose
+	void pose () {
 		appliedPose = pose;
 	}
 
 	/** Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints. */
-	void constrained () { // Port: useConstrained
+	void constrained () {
 		appliedPose = constrainedPose;
 	}
 

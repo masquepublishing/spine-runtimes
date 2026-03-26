@@ -37,7 +37,7 @@ import com.badlogic.gdx.utils.OrderedSet;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 
-/** Stores attachments by slot index and placeholder name.
+/** Stores attachments by slot index and placeholder name. Multiple {@link Skeleton} instances can use the same skins.
  * <p>
  * See {@link SkeletonData#defaultSkin}, {@link Skeleton#skin}, and
  * <a href="https://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */

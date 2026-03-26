@@ -43,7 +43,10 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.utils.SkeletonClipping;
 
-/** Stores the current pose for a skeleton.
+/** Stores bones and slots to be posed by animations and application code. Multiple skeleton instances can share the same
+ * {@link SkeletonData}, including animations, attachments, and skins.
+ * <p>
+ * After posing, call {@link #updateWorldTransform(Physics)} to apply constraints and compute world transforms for rendering.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</a> in the Spine
  * Runtimes Guide. */
@@ -463,7 +466,7 @@ public class Skeleton {
 		return null;
 	}
 
-	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
+	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the applied pose.
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size An output value, the width and height of the AABB.
 	 * @param temp Working memory to temporarily store attachments' computed world vertices. */
@@ -471,7 +474,7 @@ public class Skeleton {
 		getBounds(offset, size, temp, null);
 	}
 
-	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose. Optionally applies
+	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the applied pose. Optionally applies
 	 * clipping.
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size An output value, the width and height of the AABB.

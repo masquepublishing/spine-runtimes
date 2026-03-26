@@ -1702,7 +1702,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes {@link Skeleton#drawOrder}. */
+	/** Changes the {@link Skeleton#getDrawOrder()}. */
 	static public class DrawOrderTimeline extends Timeline {
 		static final long propertyID = Property.drawOrder.ordinal();
 		static private final long[] propertyIds = {propertyID};
@@ -1752,7 +1752,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a subset of {@link Skeleton#drawOrder}. */
+	/** Changes a subset of the {@link Skeleton#getDrawOrder() draw order}. */
 	static public class DrawOrderFolderTimeline extends Timeline {
 		private final int[] slots;
 		private final boolean[] inFolder;
