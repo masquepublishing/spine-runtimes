@@ -246,6 +246,9 @@
   - Added `SpineSlider` and `SpineSliderData` classes for slider constraints
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
+- **Bug fixes**
+  - Fixed Godot 4.6 GDExtension builds with the latest `godot-cpp` by including the required `Ref` support header in `SpineCommon.h`, updated `SpineEventData` for the `EventData.setupPose` API change, and refreshed vendored `spine-cpp` sources during clean setup.
+
 - **Breaking changes (since previous 4.3 beta)**
   - `SpineTrackEntry.get_hold_previous()` / `set_hold_previous()` removed.
   - `SpineTrackEntry.get_mix_blend()` / `set_mix_blend()` removed. Use `get_additive()` / `set_additive()` for additive blending.

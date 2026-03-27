@@ -15,6 +15,22 @@
 - Use `- **Additions**` for new features, `- **Breaking changes**` for API changes, `- **Bug fixes**` for fixes.
 - Add entries for every runtime affected, including downstream runtimes that get regenerated bindings (C, Flutter, iOS, Godot).
 
+## spine-godot clean builds
+- For a clean Godot 4.x module build against the latest local `spine-cpp`, use the setup script before building so the vendored `spine-godot/spine_godot/spine-cpp` copy is refreshed from repo root:
+  ```bash
+  cd spine-godot/build
+  ./setup.sh 4.6.1-stable false false
+  ./build-v4.sh false
+  ```
+- For a clean Godot 4.x GDExtension build against the latest local `spine-cpp`, use:
+  ```bash
+  cd spine-godot/build
+  ./setup-extension.sh 4.6.1-stable false
+  ./build-extension.sh macos
+  ```
+- `setup.sh` and `setup-extension.sh` must remove `spine-godot/spine_godot/spine-cpp` before copying `../spine-cpp`, otherwise stale vendored files can survive across builds.
+- When reproducing CI failures for Godot 4.x, match the current workflows' Godot tag first. At the time of writing, that is `4.6.1-stable`.
+
 ## Git commit subject prefix (required)
 Every commit subject must start with a runtime prefix.
 
