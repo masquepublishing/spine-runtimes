@@ -46,7 +46,7 @@ abstract public class Posed< //
 	}
 
 	/** Sets the applied pose to the unconstrained pose, for when no constraints will modify the pose. */
-	void pose () {
+	void unconstrained () {
 		appliedPose = pose;
 	}
 

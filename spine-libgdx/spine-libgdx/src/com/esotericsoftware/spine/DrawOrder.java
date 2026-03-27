@@ -62,7 +62,7 @@ public class DrawOrder {
 	}
 
 	/** Sets the applied pose to the unconstrained pose, for when no constraints will modify the draw order. */
-	void pose () {
+	void unconstrained () {
 		appliedPose = pose;
 	}
 

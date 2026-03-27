@@ -155,10 +155,10 @@ public class Skeleton {
 		updateCache.clear();
 		resetCache.clear();
 
-		drawOrder.pose();
+		drawOrder.unconstrained();
 		Slot[] slots = this.slots.items;
 		for (int i = 0, n = this.slots.size; i < n; i++)
-			slots[i].pose();
+			slots[i].unconstrained();
 
 		int boneCount = bones.size;
 		Bone[] bones = this.bones.items;
@@ -166,7 +166,7 @@ public class Skeleton {
 			Bone bone = bones[i];
 			bone.sorted = bone.data.skinRequired;
 			bone.active = !bone.sorted;
-			bone.pose();
+			bone.unconstrained();
 		}
 		if (skin != null) {
 			BoneData[] skinBones = skin.bones.items;
@@ -183,7 +183,7 @@ public class Skeleton {
 		Constraint[] constraints = this.constraints.items;
 		int n = this.constraints.size;
 		for (int i = 0; i < n; i++)
-			constraints[i].pose();
+			constraints[i].unconstrained();
 		for (int i = 0; i < n; i++) {
 			Constraint<?, ?, ?> constraint = constraints[i];
 			constraint.active = constraint.isSourceActive()
@@ -338,7 +338,8 @@ public class Skeleton {
 		return null;
 	}
 
-	/** The skeleton's slots. To add a slot, also add it to {@link DrawOrder#pose}. */
+	/** The skeleton's slots in setup pose order. To change the order use {@link DrawOrder#getPose()}. For rendering use
+	 * {@link DrawOrder#getAppliedPose()}. */
 	public Array<Slot> getSlots () {
 		return slots;
 	}
