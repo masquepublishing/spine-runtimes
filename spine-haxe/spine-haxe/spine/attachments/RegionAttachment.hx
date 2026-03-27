@@ -109,7 +109,7 @@ class RegionAttachment extends Attachment implements HasSequence {
 	 * @param offset The worldVertices index to begin writing values.
 	 * @param stride The number of worldVertices entries between the value pairs written. */
 	public function computeWorldVertices(slot:Slot, vertexOffsets:Array<Float>, worldVertices:Array<Float>, offset:Int, stride:Int):Void {
-		var bone = slot.bone.applied;
+		var bone = slot.bone.appliedPose;
 		var x = bone.worldX, y = bone.worldY;
 		var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 

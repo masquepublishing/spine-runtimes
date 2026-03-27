@@ -87,25 +87,25 @@ class DrawOrderFolderTimeline extends Timeline {
 		drawOrders[frame] = drawOrder;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
-		if (direction == MixDirection.mixOut) {
-			if (blend == MixBlend.setup)
-				setupApply(skeleton);
+		if (out) {
+			if (fromSetup)
+				setupApply(skeleton, appliedPose);
 		} else if (time < frames[0]) {
-			if (blend == MixBlend.setup || blend == MixBlend.first)
-				setupApply(skeleton);
+			if (fromSetup)
+				setupApply(skeleton, appliedPose);
 		} else {
 			var order = drawOrders[Timeline.search1(frames, time)];
 			if (order == null)
-				setupApply(skeleton);
+				setupApply(skeleton, appliedPose);
 			else
-				orderApply(skeleton, order);
+				orderApply(skeleton, order, appliedPose);
 		}
 	}
 
-	private function setupApply(skeleton:Skeleton):Void {
-		var drawOrder = skeleton.drawOrder;
+	private function setupApply(skeleton:Skeleton, appliedPose:Bool):Void {
+		var drawOrder = appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose;
 		var allSlots = skeleton.slots;
 		var found = 0, done = slots.length;
 		var i = 0;
@@ -120,8 +120,8 @@ class DrawOrderFolderTimeline extends Timeline {
 		}
 	}
 
-	private function orderApply(skeleton:Skeleton, order:Array<Int>):Void {
-		var drawOrder = skeleton.drawOrder;
+	private function orderApply(skeleton:Skeleton, order:Array<Int>, appliedPose:Bool):Void {
+		var drawOrder = appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose;
 		var allSlots = skeleton.slots;
 		var found = 0, done = slots.length;
 		var i = 0;
