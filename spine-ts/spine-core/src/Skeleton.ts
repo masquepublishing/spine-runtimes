@@ -181,10 +181,10 @@ export class Skeleton {
 		this._updateCache.length = 0;
 		this.resetCache.length = 0;
 
-		this.drawOrder.usePose();
+		this.drawOrder.unconstrained();
 		const slots = this.slots;
 		for (let i = 0, n = slots.length; i < n; i++)
-			slots[i].usePose();
+			slots[i].unconstrained();
 
 		const bones = this.bones;
 		const boneCount = bones.length;
@@ -192,7 +192,7 @@ export class Skeleton {
 			const bone = bones[i];
 			bone.sorted = bone.data.skinRequired;
 			bone.active = !bone.sorted;
-			bone.usePose();
+			bone.unconstrained();
 		}
 		if (this.skin) {
 			const skinBones = this.skin.bones;
@@ -209,7 +209,7 @@ export class Skeleton {
 		const constraints = this.constraints;
 		let n = this.constraints.length;
 		for (let i = 0; i < n; i++)
-			constraints[i].usePose();
+			constraints[i].unconstrained();
 		for (let i = 0; i < n; i++) {
 			const constraint = constraints[i];
 			constraint.active = constraint.isSourceActive()
@@ -291,7 +291,7 @@ export class Skeleton {
 
 	/** Sets the slots and draw order to their setup pose values. */
 	setupPoseSlots () {
-		this.drawOrder.useSetupPose();
+		this.drawOrder.setupPose();
 		const slots = this.slots;
 		for (let i = 0, n = slots.length; i < n; i++)
 			slots[i].setupPose();

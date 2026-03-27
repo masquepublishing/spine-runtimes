@@ -75,7 +75,7 @@ export abstract class Posed<
 	}
 
 	/** Sets the applied pose to the unconstrained pose, for when no constraints will modify the pose. */
-	usePose () {
+	unconstrained () {
 		this.appliedPose = this.pose;
 	}
 
