@@ -912,7 +912,7 @@ public class SkeletonJson extends SkeletonLoader {
 
 		// Bone timelines.
 		JsonValue boneMap = map.getChild("bones");
-		var bones = new IntArray(boneMap.size);
+		var bones = new IntArray(boneMap == null ? 0 : boneMap.size);
 		for (; boneMap != null; boneMap = boneMap.next) {
 			BoneData bone = skeletonData.findBone(boneMap.name);
 			if (bone == null) throw new SerializationException("Bone not found: " + boneMap.name);
