@@ -127,8 +127,11 @@ class RGBA2Timeline extends SlotCurveTimeline {
 			} else if (fromSetup) {
 				var setupPose = slot.data.setupPose;
 				var setup = setupPose.color;
-				light.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
-					setup.a + (a - setup.a) * alpha);
+				light.set(setup.r
+					+ (r - setup.r) * alpha, setup.g
+					+ (g - setup.g) * alpha, setup.b
+					+ (b - setup.b) * alpha, setup.a
+					+ (a - setup.a) * alpha);
 				setup = setupPose.darkColor;
 				r2 = setup.r + (r2 - setup.r) * alpha;
 				g2 = setup.g + (g2 - setup.g) * alpha;

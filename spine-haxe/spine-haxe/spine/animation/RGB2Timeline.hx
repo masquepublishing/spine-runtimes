@@ -67,7 +67,8 @@ class RGB2Timeline extends SlotCurveTimeline {
 		if (time < frames[0]) {
 			if (fromSetup) {
 				var setupPose = slot.data.setupPose;
-				var setupLight:Color = setupPose.color, setupDark:Color = setupPose.darkColor;
+				var setupLight:Color = setupPose.color,
+					setupDark:Color = setupPose.darkColor;
 				light.r = setupLight.r;
 				light.g = setupLight.g;
 				light.b = setupLight.b;

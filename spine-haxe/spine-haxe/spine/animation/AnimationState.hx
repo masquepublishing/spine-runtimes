@@ -234,7 +234,8 @@ class AnimationState {
 			} else {
 				var timelineMode:Array<Int> = current.timelineMode;
 				var attachments:Bool = alpha >= current.alphaAttachmentThreshold;
-				var add = current.additive, shortestRotation = add || current.shortestRotation;
+				var add = current.additive,
+					shortestRotation = add || current.shortestRotation;
 				var firstFrame:Bool = !shortestRotation && current.timelinesRotation.length != timelineCount << 1;
 				if (firstFrame)
 					current.timelinesRotation.resize(timelineCount << 1);
@@ -243,8 +244,8 @@ class AnimationState {
 					var timeline:Timeline = timelines[ii];
 					var fromSetup = (timelineMode[ii] & FIRST) != 0;
 					if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
-						applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, current.timelinesRotation,
-							ii << 1, firstFrame);
+						applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, current.timelinesRotation, ii << 1,
+							firstFrame);
 					} else if (Std.isOfType(timeline, AttachmentTimeline)) {
 						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, fromSetup, false, attachments);
 					} else {
@@ -280,15 +281,18 @@ class AnimationState {
 		var mix:Float = to.mixDuration == 0 ? 1 : Math.min(1, to.mixTime / to.mixDuration);
 
 		var a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
-		var alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
+		var alphaMix = a * (1 - mix),
+			alphaHold = keep > 0 ? alphaMix / keep : a;
 
 		var timelines:Array<Timeline> = from.animation.timelines;
 		var timelineCount:Int = timelines.length;
 		var timelineMode:Array<Int> = from.timelineMode;
 		var timelineHoldMix:Array<TrackEntry> = from.timelineHoldMix;
 
-		var attachments:Bool = mix < from.mixAttachmentThreshold, drawOrder:Bool = mix < from.mixDrawOrderThreshold;
-		var add = from.additive, shortestRotation = add || from.shortestRotation;
+		var attachments:Bool = mix < from.mixAttachmentThreshold,
+			drawOrder:Bool = mix < from.mixDrawOrderThreshold;
+		var add = from.additive,
+			shortestRotation = add || from.shortestRotation;
 		var firstFrame:Bool = !shortestRotation && from.timelinesRotation.length != timelineCount << 1;
 		if (firstFrame)
 			from.timelinesRotation.resize(timelineCount << 1);
