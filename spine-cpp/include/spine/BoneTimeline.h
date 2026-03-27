@@ -37,7 +37,7 @@
 namespace spine {
 	class Skeleton;
 	class Event;
-	class BoneLocal;
+	class BonePose;
 
 	/// An interface for timelines which change the property of a bone.
 	class SP_API BoneTimeline {
@@ -49,7 +49,7 @@ namespace spine {
 		virtual ~BoneTimeline() {
 		}
 
-		/// The index of the bone in Skeleton::getBones() that will be changed when this timeline is applied.
+		/// The Skeleton::getBones() index of the bone that will be changed when this timeline is applied.
 		virtual int getBoneIndex() const = 0;
 
 		virtual void setBoneIndex(int inValue) = 0;
@@ -79,7 +79,7 @@ namespace spine {
 
 	protected:
 		/// Applies changes to the pose based on the timeline values.
-		virtual void _apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) = 0;
+		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) = 0;
 
 		int _boneIndex;
 	};
@@ -110,7 +110,7 @@ namespace spine {
 
 	protected:
 		/// Applies changes to the pose based on the timeline values.
-		virtual void _apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) = 0;
+		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) = 0;
 
 		int _boneIndex;
 

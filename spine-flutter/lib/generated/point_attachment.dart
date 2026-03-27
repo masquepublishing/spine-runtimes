@@ -63,7 +63,7 @@ class PointAttachment extends Attachment {
     SpineBindings.bindings.spine_point_attachment_dispose(_ptr);
   }
 
-  /// The local X position.
+  /// The local x position.
   double get x {
     final result = SpineBindings.bindings.spine_point_attachment_get_x(_ptr);
     return result;
@@ -73,7 +73,7 @@ class PointAttachment extends Attachment {
     SpineBindings.bindings.spine_point_attachment_set_x(_ptr, value);
   }
 
-  /// The local Y position.
+  /// The local y position.
   double get y {
     final result = SpineBindings.bindings.spine_point_attachment_get_y(_ptr);
     return result;

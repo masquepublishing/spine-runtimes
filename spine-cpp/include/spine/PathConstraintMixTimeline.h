@@ -35,8 +35,7 @@
 
 namespace spine {
 
-	/// Changes PathConstraintPose::getMixRotate(), PathConstraintPose::getMixX(), and
-	/// PathConstraintPose::getMixY().
+	/// Changes a path constraint's rotate, x, and y mix values.
 	class SP_API PathConstraintMixTimeline : public CurveTimeline, public ConstraintTimeline {
 		friend class SkeletonBinary;
 

@@ -33,7 +33,7 @@
 #include <spine/dll.h>
 
 namespace spine {
-	/// Simple mixin class that adds active state tracking
+	/// A posed object that may be active or inactive.
 	class SP_API PosedActive {
 	protected:
 		bool _active;

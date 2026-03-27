@@ -23,7 +23,7 @@ SPINE_C_API size_t spine_draw_order_timeline_get_frame_count(spine_draw_order_ti
  *
  * @param frame Between 0 and frameCount, inclusive.
  * @param time The frame time in seconds.
- * @param drawOrder For each slot in Skeleton::slots, the index of the slot in the new draw order. May be null to use setup pose draw order.
+ * @param drawOrder For each slot in Skeleton::getSlots(), the index of the slot in the new draw order. May be null to use setup pose draw order.
  */
 SPINE_C_API void spine_draw_order_timeline_set_frame(spine_draw_order_timeline self, size_t frame, float time, /*@null*/ spine_array_int drawOrder);
 /**

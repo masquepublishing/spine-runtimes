@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes PhysicsConstraintPose::getMassInverse(). The timeline values are not inverted.
+/// Changes a physics constraint's mass inverse. The timeline values are not inverted.
 @objc(SpinePhysicsConstraintMassTimeline)
 @objcMembers
 public class PhysicsConstraintMassTimeline: PhysicsConstraintTimeline {

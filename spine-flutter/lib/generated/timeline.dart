@@ -36,7 +36,9 @@ import 'rtti.dart';
 import 'arrays.dart';
 import 'skeleton.dart';
 
-/// Timeline wrapper
+/// The base class for all timelines.
+///
+/// See Applying Animations in the Spine Runtimes Guide.
 abstract class Timeline {
   final Pointer<spine_timeline_wrapper> _ptr;
 
@@ -52,6 +54,8 @@ abstract class Timeline {
 
   /// Applies this timeline to the skeleton.
   ///
+  /// See Applying Animations in the Spine Runtimes Guide.
+  ///
   /// [skeleton] The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
   /// [lastTime] The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
   /// [time] The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
@@ -60,7 +64,7 @@ abstract class Timeline {
   /// [fromSetup] If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
   /// [add] If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
   /// [out] True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
-  /// [appliedPose] True to modify the applied pose, else the pose is modified.
+  /// [appliedPose] True to modify getAppliedPose(), else getPose() is modified.
   void apply(Skeleton skeleton, double lastTime, double time, ArrayEvent? events, double alpha, bool fromSetup,
       bool add, bool out, bool appliedPose) {
     SpineBindings.bindings.spine_timeline_apply(_ptr, skeleton.nativePtr.cast(), lastTime, time,

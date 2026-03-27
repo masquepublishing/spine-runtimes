@@ -33,7 +33,7 @@
 #include <spine/ConstraintTimeline1.h>
 
 namespace spine {
-	/// Changes PathConstraintPose::getSpacing().
+	/// Changes a path constraint's spacing.
 	class SP_API PathConstraintSpacingTimeline : public ConstraintTimeline1 {
 		friend class SkeletonBinary;
 

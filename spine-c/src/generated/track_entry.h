@@ -46,17 +46,17 @@ SPINE_C_API bool spine_track_entry_get_shortest_rotation(spine_track_entry self)
 SPINE_C_API void spine_track_entry_set_shortest_rotation(spine_track_entry self, bool inValue);
 /**
  * Seconds to postpone playing the animation. Must be >= 0. When this track
- * entry is the current track entry, delay postpones incrementing the
- * getTrackTime(). When this track entry is queued, delay is the time from the
- * start of the previous animation to when this track entry will become the
- * current track entry (ie when the previous track entry getTrackTime() >= this
- * track entry's delay).
+ * entry is the current track entry, delay postpones incrementing the track
+ * time. When this track entry is queued, delay is the time from the start of
+ * the previous animation to when this track entry will become the current track
+ * entry (ie when the previous track entry's track time >= this track entry's
+ * delay).
  *
- * getTimeScale() affects the delay.
+ * Time scale affects the delay.
  *
  * When passing delay < = 0 to AnimationState::addAnimation(int, Animation,
- * bool, float) this delay is set using a mix duration from AnimationStateData.
- * To change the getMixDuration() afterward, use setMixDuration(float, float) so
+ * bool, float), this delay is set using a mix duration from AnimationStateData.
+ * To change the mix duration afterward, use setMixDuration(float, float) so
  * this delay is adjusted.
  */
 SPINE_C_API float spine_track_entry_get_delay(spine_track_entry self);
@@ -108,31 +108,29 @@ SPINE_C_API void spine_track_entry_set_animation_end(spine_track_entry self, flo
 SPINE_C_API float spine_track_entry_get_animation_last(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_animation_last(spine_track_entry self, float inValue);
 /**
- * Uses getTrackTime() to compute the animationTime. When the trackTime is 0,
- * the animationTime is equal to the animationStart time.
+ * Uses the track time to compute animationTime. When trackTime is 0,
+ * animationTime is equal to animationStart.
  *
- * The animationTime is between getAnimationStart() and getAnimationEnd(),
- * except if this track entry is non-looping and getAnimationEnd() is >= to the
- * animation duration, then animationTime continues to increase past
- * getAnimationEnd().
+ * animationTime is between animationStart and animationEnd, except if this
+ * track entry is non-looping and animationEnd is >= the animation duration,
+ * then animationTime continues to increase past animationEnd.
  */
 SPINE_C_API float spine_track_entry_get_animation_time(spine_track_entry self);
 /**
  * Multiplier for the delta time when this track entry is updated, causing time
  * for this animation to pass slower or faster. Defaults to 1.
  *
- * Values < 0 are not supported. To play an animation in reverse, use
- * getReverse().
+ * Values < 0 are not supported. To play an animation in reverse, use reverse.
  *
- * getMixTime() is not affected by track entry time scale, so getMixDuration()
- * may need to be adjusted to match the animation speed.
+ * mixTime is not affected by track entry time scale, so mixDuration may need to
+ * be adjusted to match the animation speed.
  *
  * When using AnimationState::addAnimation(int, Animation, bool, float) with a
- * delay < = 0, the getDelay() is set using the mix duration from the
- * AnimationStateData, assuming time scale to be 1. If the time scale is not 1,
- * the delay may need to be adjusted.
+ * delay < = 0, delay is set using the mix duration from AnimationStateData,
+ * assuming time scale to be 1. If the time scale is not 1, the delay may need
+ * to be adjusted.
  *
- * See AnimationState getTimeScale() for affecting all animations.
+ * See AnimationState::getTimeScale() for affecting all animations.
  */
 SPINE_C_API float spine_track_entry_get_time_scale(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_time_scale(spine_track_entry self, float inValue);
@@ -163,9 +161,8 @@ SPINE_C_API void spine_track_entry_set_event_threshold(spine_track_entry self, f
 SPINE_C_API float spine_track_entry_get_mix_attachment_threshold(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_mix_attachment_threshold(spine_track_entry self, float inValue);
 /**
- * When getAlpha() is greater than alphaAttachmentThreshold, attachment
- * timelines are applied. Defaults to 0, so attachment timelines are always
- * applied.
+ * When alpha is greater than alphaAttachmentThreshold, attachment timelines are
+ * applied. Defaults to 0, so attachment timelines are always applied.
  */
 SPINE_C_API float spine_track_entry_get_alpha_attachment_threshold(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_alpha_attachment_threshold(spine_track_entry self, float inValue);
@@ -187,8 +184,8 @@ SPINE_C_API /*@null*/ spine_track_entry spine_track_entry_get_next(spine_track_e
 SPINE_C_API bool spine_track_entry_is_complete(spine_track_entry self);
 /**
  * Seconds from 0 to the mix duration when mixing from the previous animation to
- * this animation. May be slightly more than TrackEntry.MixDuration when the mix
- * is complete.
+ * this animation. May be slightly more than mixDuration when the mix is
+ * complete.
  */
 SPINE_C_API float spine_track_entry_get_mix_time(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_mix_time(spine_track_entry self, float inValue);
@@ -208,9 +205,9 @@ SPINE_C_API void spine_track_entry_set_mix_time(spine_track_entry self, float in
 SPINE_C_API float spine_track_entry_get_mix_duration(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_mix_duration_1(spine_track_entry self, float inValue);
 /**
- * Sets both getMixDuration() and getDelay().
+ * Sets both mixDuration and delay.
  *
- * @param delay If > 0, sets TrackEntry::getDelay(). If < = 0, the delay set is the duration of the previous track entry minus the specified mix duration plus the specified delay (ie the mix ends at (delay = 0) or before (delay < 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
+ * @param delay If > 0, sets delay. If < = 0, the delay set is the duration of the previous track entry minus the specified mix duration plus the specified delay (ie the mix ends at (delay = 0) or before (delay < 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
  */
 SPINE_C_API void spine_track_entry_set_mix_duration_2(spine_track_entry self, float mixDuration, float delay);
 /**
@@ -250,7 +247,7 @@ SPINE_C_API bool spine_track_entry_is_empty_animation(spine_track_entry self);
  */
 SPINE_C_API bool spine_track_entry_was_applied(spine_track_entry self);
 /**
- * Returns true if there is a getNext() track entry that is ready to become the
+ * Returns true if there is a next track entry that is ready to become the
  * current track entry during the next AnimationState::update(float)}
  */
 SPINE_C_API bool spine_track_entry_is_next_ready(spine_track_entry self);

@@ -47,6 +47,9 @@ namespace spine {
 	class AnimationState;
 
 	/// Stores a list of timelines to animate a skeleton's pose over time.
+	///
+	/// See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
+	/// Runtimes Guide.
 	class SP_API Animation : public SpineObject {
 		friend class AnimationState;
 
@@ -99,14 +102,19 @@ namespace spine {
 		friend class Slider;
 
 	public:
-		Animation(const String &name, Array<Timeline *> &timelines, float duration);
+		/// Creates a new animation. The timelines must be set before use.
+		Animation(const String &name);
 
 		~Animation();
 
-		/// If the returned array or the timelines it contains are modified, setTimelines() must be called.
+		/// If this list or the timelines it contains are modified, the timelines and bones must be set again to recompute the
+		/// animation's bone indices and timeline property IDs.
+		///
+		/// See setTimelines().
 		Array<Timeline *> &getTimelines();
 
-		void setTimelines(Array<Timeline *> &timelines);
+		/// Sets the timelines and bone indices.
+		void setTimelines(Array<Timeline *> &timelines, Array<int> &bones);
 
 		/// Returns true if this animation contains a timeline with any of the specified property IDs.
 		bool hasTimeline(Array<PropertyId> &ids);
@@ -119,7 +127,9 @@ namespace spine {
 
 		/// Applies the animation's timelines to the specified skeleton.
 		///
-		/// See Timeline::apply().
+		/// See Timeline::apply() and
+		/// <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
+		/// Runtimes Guide.
 		/// @param skeleton The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton
 		///           components the timelines may change.
 		/// @param lastTime The last time in seconds this animation was applied. Some timelines trigger only at discrete times, in
@@ -127,7 +137,7 @@ namespace spine {
 		///           animation is applied to ensure frame 0 is triggered.
 		/// @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and
 		///           interpolate between the frame values.
-		/// @param loop True if time beyond the getDuration() repeats the animation, else the last frame is used.
+		/// @param loop True if time beyond the animation duration repeats the animation, else the last frame is used.
 		/// @param events If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines
 		///           fire events.
 		/// @param alpha 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values
@@ -139,14 +149,16 @@ namespace spine {
 		///           fromSetup).
 		/// @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
 		///           transitions.
-		/// @param appliedPose True to modify the applied pose, else the pose is modified.
+		/// @param appliedPose True to modify getAppliedPose(), else the unconstrained pose is modified.
 		void apply(Skeleton &skeleton, float lastTime, float time, bool loop, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
 				   bool appliedPose);
 
 		/// The animation's name, which is unique across all animations in the skeleton.
 		const String &getName();
 
-		/// The bone indices affected by this animation.
+		/// The Skeleton::getBones() indices affected by this animation.
+		///
+		/// See setTimelines() and BoneTimeline::getBoneIndex().
 		const Array<int> &getBones();
 
 		/// @param target After the first and before the last entry.

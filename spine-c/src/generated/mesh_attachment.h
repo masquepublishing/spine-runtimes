@@ -63,8 +63,7 @@ SPINE_C_API int spine_mesh_attachment_get_id(spine_mesh_attachment self);
 /**
  * The bones that affect the vertices. The entries are, for each vertex, the
  * number of bones affecting the vertex followed by that many bone indices,
- * which is the Skeleton::getBones() index. Empty if this attachment has no
- * weights.
+ * which is Skeleton::getBones() index. Empty if this attachment has no weights.
  */
 SPINE_C_API spine_array_int spine_mesh_attachment_get_bones(spine_mesh_attachment self);
 SPINE_C_API void spine_mesh_attachment_set_bones(spine_mesh_attachment self, spine_array_int bones);

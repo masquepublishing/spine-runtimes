@@ -810,7 +810,13 @@ void AnimationState::disposeTrackEntry(TrackEntry *entry) {
 
 Animation *AnimationState::getEmptyAnimation() {
 	static Array<Timeline *> timelines;
-	static Animation ret(String("<empty>"), timelines, 0);
+	static Array<int> bones;
+	static Animation ret(String("<empty>"));
+	static bool initialized = false;
+	if (!initialized) {
+		ret.setTimelines(timelines, bones);
+		initialized = true;
+	}
 	return &ret;
 }
 
@@ -842,8 +848,8 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 
 	Bone *bone = skeleton._bones[rotateTimeline->_boneIndex];
 	if (!bone->isActive()) return;
-	BoneLocal &pose = bone->_pose;
-	BoneLocal &setup = bone->_data._setup;
+	BonePose &pose = bone->_pose;
+	BonePose &setup = bone->_data._setupPose;
 	Array<float> &frames = rotateTimeline->_frames;
 	if (time < frames[0]) {
 		if (fromSetup) pose._rotation = setup._rotation;

@@ -33,18 +33,18 @@
 #include <spine/Posed.h>
 #include <spine/PosedActive.h>
 #include <spine/BoneData.h>
-#include <spine/BoneLocal.h>
 #include <spine/BonePose.h>
 #include <spine/Array.h>
 
 namespace spine {
-	/// A bone has a number of poses:
-	/// - BoneData::getSetupPose(): The setup pose.
-	/// - getPose(): The local pose. Set by animations and app code.
-	/// - getAppliedPose(): The applied local pose. This is the local pose modified by constraints and app code.
-	/// - The world transform on the applied pose, computed by Skeleton::updateWorldTransform(Physics) and
-	///   BonePose::updateWorldTransform(Skeleton).
-	class SP_API Bone : public PosedGeneric<BoneData, BoneLocal, BonePose>, public PosedActive, public Update {
+	/// A node in a skeleton's hierarchy with a transform that affects its children and their attachments. A bone has a number of
+	/// poses:
+	/// - getData(): The setup pose data.
+	/// - getPose(): The unconstrained local pose. Set by animations and application code.
+	/// - getAppliedPose(): The local pose to use for rendering. Possibly modified by constraints.
+	/// - World transform: the local pose combined with the parent world transform. Computed on a pose by
+	///   BonePose::updateWorldTransform(Skeleton) and Skeleton::updateWorldTransform(Physics).
+	class SP_API Bone : public PosedGeneric<BoneData, BonePose, BonePose>, public PosedActive, public Update {
 		friend class AnimationState;
 		friend class RotateTimeline;
 		friend class IkConstraint;
@@ -79,7 +79,7 @@ namespace spine {
 		/// @param parent May be NULL.
 		Bone(BoneData &data, Bone *parent);
 
-		/// Copy constructor. Does not copy the children bones.
+		/// Copy constructor. Does not copy the child bones.
 		Bone(Bone &bone, Bone *parent);
 
 		/// The parent bone, or null if this is the root bone.

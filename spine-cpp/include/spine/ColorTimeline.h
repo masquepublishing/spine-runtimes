@@ -34,7 +34,7 @@
 #include <spine/SlotTimeline.h>
 
 namespace spine {
-	/// Changes SlotPose::getColor().
+	/// Changes a slot's color.
 	class SP_API RGBATimeline : public SlotCurveTimeline {
 		friend class SkeletonBinary;
 
@@ -62,7 +62,7 @@ namespace spine {
 		static const int A = 4;
 	};
 
-	/// Changes RGB for a slot's SlotPose::getColor().
+	/// Changes RGB for a slot's color.
 	class SP_API RGBTimeline : public SlotCurveTimeline {
 		friend class SkeletonBinary;
 
@@ -112,7 +112,7 @@ namespace spine {
 		int _slotIndex;
 	};
 
-	/// Changes SlotPose::getColor() and SlotPose::getDarkColor() for two color tinting.
+	/// Changes a slot's light and dark colors for two color tinting.
 	class SP_API RGBA2Timeline : public SlotCurveTimeline {
 		friend class SkeletonBinary;
 
@@ -143,7 +143,7 @@ namespace spine {
 		static const int B2 = 7;
 	};
 
-	/// Changes RGB for a slot's SlotPose::getColor() and SlotPose::getDarkColor() for two color tinting.
+	/// Changes RGB for a slot's light and dark colors for two color tinting.
 	class SP_API RGB2Timeline : public SlotCurveTimeline {
 		friend class SkeletonBinary;
 

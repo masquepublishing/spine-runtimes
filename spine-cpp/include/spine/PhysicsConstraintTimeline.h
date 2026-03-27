@@ -69,7 +69,7 @@ namespace spine {
 		int _constraintIndex;
 	};
 
-	/// Changes PhysicsConstraintPose::getInertia().
+	/// Changes a physics constraint's inertia.
 	class SP_API PhysicsConstraintInertiaTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -95,7 +95,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes PhysicsConstraintPose::getStrength().
+	/// Changes a physics constraint's strength.
 	class SP_API PhysicsConstraintStrengthTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -121,7 +121,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes PhysicsConstraintPose::getDamping().
+	/// Changes a physics constraint's damping.
 	class SP_API PhysicsConstraintDampingTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -147,7 +147,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes PhysicsConstraintPose::getMassInverse(). The timeline values are not inverted.
+	/// Changes a physics constraint's mass inverse. The timeline values are not inverted.
 	class SP_API PhysicsConstraintMassTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -173,7 +173,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes PhysicsConstraintPose::getWind().
+	/// Changes a physics constraint's wind.
 	class SP_API PhysicsConstraintWindTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -201,7 +201,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes PhysicsConstraintPose::getGravity().
+	/// Changes a physics constraint's gravity.
 	class SP_API PhysicsConstraintGravityTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -229,7 +229,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes PhysicsConstraintPose::getMix().
+	/// Changes a physics constraint's mix.
 	class SP_API PhysicsConstraintMixTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 

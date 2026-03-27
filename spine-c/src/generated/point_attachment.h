@@ -15,12 +15,12 @@ SPINE_C_API void spine_point_attachment_dispose(spine_point_attachment self);
 
 SPINE_C_API spine_rtti spine_point_attachment_get_rtti(spine_point_attachment self);
 /**
- * The local X position.
+ * The local x position.
  */
 SPINE_C_API float spine_point_attachment_get_x(spine_point_attachment self);
 SPINE_C_API void spine_point_attachment_set_x(spine_point_attachment self, float inValue);
 /**
- * The local Y position.
+ * The local y position.
  */
 SPINE_C_API float spine_point_attachment_get_y(spine_point_attachment self);
 SPINE_C_API void spine_point_attachment_set_y(spine_point_attachment self, float inValue);

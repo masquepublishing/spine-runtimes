@@ -46,7 +46,7 @@ public class BoneData: PosedData {
         self.init(fromPointer: ptr!)
     }
 
-    /// The Skeleton::getBones() index.
+    /// The Skeleton::getBones() index for this bone.
     public var index: Int32 {
         let result = spine_bone_data_get_index(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
         return result
@@ -94,9 +94,10 @@ public class BoneData: PosedData {
         }
     }
 
-    public var setupPose: BoneLocal {
+    /// The setup pose that most animations are relative to.
+    public var setupPose: BonePose {
         let result = spine_bone_data_get_setup_pose(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
-        return BoneLocal(fromPointer: result!)
+        return BonePose(fromPointer: result!)
     }
 
     public override func dispose() {

@@ -62,16 +62,17 @@ void DrawOrderFolderTimeline::apply(Skeleton &skeleton, float lastTime, float ti
 	SP_UNUSED(events);
 	SP_UNUSED(alpha);
 	SP_UNUSED(add);
-	SP_UNUSED(appliedPose);
+	Array<Slot *> &pose = appliedPose ? skeleton._drawOrder.getAppliedPose() : skeleton._drawOrder.getPose();
+	Array<Slot *> &setupPose = skeleton._slots;
 
 	if (out || time < _frames[0]) {
-		if (fromSetup) setup(skeleton);
+		if (fromSetup) setup(pose, setupPose);
 	} else {
 		Array<int> &drawOrder = _drawOrders[Animation::search(_frames, time)];
 		if (drawOrder.size() == 0)
-			setup(skeleton);
+			setup(pose, setupPose);
 		else
-			apply(skeleton, drawOrder);
+			apply(pose, setupPose, drawOrder);
 	}
 }
 
@@ -93,23 +94,19 @@ void DrawOrderFolderTimeline::setFrame(size_t frame, float time, Array<int> *dra
 	if (drawOrder != NULL) _drawOrders[frame].addAll(*drawOrder);
 }
 
-void DrawOrderFolderTimeline::setup(Skeleton &skeleton) {
-	Array<Slot *> &drawOrder = skeleton._drawOrder;
-	Array<Slot *> &allSlots = skeleton._slots;
+void DrawOrderFolderTimeline::setup(Array<Slot *> &pose, Array<Slot *> &setupPose) {
 	for (size_t i = 0, found = 0, done = _slots.size();; ++i) {
-		if (_inFolder[drawOrder[i]->getData().getIndex()]) {
-			drawOrder[i] = allSlots[_slots[found]];
+		if (_inFolder[pose[i]->getData().getIndex()]) {
+			pose[i] = setupPose[_slots[found]];
 			if (++found == done) break;
 		}
 	}
 }
 
-void DrawOrderFolderTimeline::apply(Skeleton &skeleton, Array<int> &drawOrderIndices) {
-	Array<Slot *> &drawOrder = skeleton._drawOrder;
-	Array<Slot *> &allSlots = skeleton._slots;
+void DrawOrderFolderTimeline::apply(Array<Slot *> &pose, Array<Slot *> &setupPose, Array<int> &drawOrderIndices) {
 	for (size_t i = 0, found = 0, done = _slots.size();; ++i) {
-		if (_inFolder[drawOrder[i]->getData().getIndex()]) {
-			drawOrder[i] = allSlots[_slots[drawOrderIndices[found]]];
+		if (_inFolder[pose[i]->getData().getIndex()]) {
+			pose[i] = setupPose[_slots[drawOrderIndices[found]]];
 			if (++found == done) break;
 		}
 	}

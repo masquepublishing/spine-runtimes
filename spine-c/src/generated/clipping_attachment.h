@@ -23,7 +23,7 @@ SPINE_C_API void spine_clipping_attachment_set_end_slot(spine_clipping_attachmen
 SPINE_C_API spine_color spine_clipping_attachment_get_color(spine_clipping_attachment self);
 SPINE_C_API spine_attachment spine_clipping_attachment_copy(spine_clipping_attachment self);
 /**
- * Transforms the attachment's local vertices to world coordinates. If the
+ * Transforms the attachment's local vertices to world coordinates. If
  * SlotPose::getDeform() is not empty, it is used to deform the vertices.
  *
  * See https://esotericsoftware.com/spine-runtime-skeletons#World-transforms
@@ -48,8 +48,7 @@ SPINE_C_API int spine_clipping_attachment_get_id(spine_clipping_attachment self)
 /**
  * The bones that affect the vertices. The entries are, for each vertex, the
  * number of bones affecting the vertex followed by that many bone indices,
- * which is the Skeleton::getBones() index. Empty if this attachment has no
- * weights.
+ * which is Skeleton::getBones() index. Empty if this attachment has no weights.
  */
 SPINE_C_API spine_array_int spine_clipping_attachment_get_bones(spine_clipping_attachment self);
 SPINE_C_API void spine_clipping_attachment_set_bones(spine_clipping_attachment self, spine_array_int bones);

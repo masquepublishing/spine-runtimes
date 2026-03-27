@@ -55,8 +55,8 @@ namespace spine {
 		virtual ~VertexAttachment();
 
 
-		/// Transforms the attachment's local vertices to world coordinates. If the SlotPose::getDeform() is not
-		/// empty, it is used to deform the vertices.
+		/// Transforms the attachment's local vertices to world coordinates. If SlotPose::getDeform() is not empty,
+		/// it is used to deform the vertices.
 		///
 		/// See https://esotericsoftware.com/spine-runtime-skeletons#World-transforms World transforms in the Spine
 		/// Runtimes Guide.
@@ -75,7 +75,7 @@ namespace spine {
 		int getId();
 
 		/// The bones that affect the vertices. The entries are, for each vertex, the number of bones affecting the
-		/// vertex followed by that many bone indices, which is the Skeleton::getBones() index. Empty if this attachment
+		/// vertex followed by that many bone indices, which is Skeleton::getBones() index. Empty if this attachment
 		/// has no weights.
 		Array<int> &getBones();
 

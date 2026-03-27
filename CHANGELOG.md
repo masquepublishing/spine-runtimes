@@ -23,10 +23,13 @@
   - All types, functions, and headers have been restructured
   - The new runtime provides full feature parity with C++ through automatic code generation, has nullability annotations and documentation, and supports lightweight RTTI, allowing language specific wrappers to be built around it that expose the full type hierarchy idiomatically. See spine-ios and spine-flutter for examples.
   - Sequence attachments now follow the spine-cpp sequence refactor. Region and mesh attachments no longer use the old mutable region/UV update path.
+  - Bone setup and unconstrained pose APIs now use `spine_bone_pose` instead of `spine_bone_local`. Generated bindings such as `spine_bone_data_get_setup_pose()` and `spine_bone_get_pose()` now return `spine_bone_pose`.
   - Renamed setup pose functions:
     - `spSkeleton_setToSetupPose()` → `spine_skeleton_setup_pose()`
     - `spSkeleton_setBonesToSetupPose()` → `spine_skeleton_setup_pose_bones()`
     - `spSkeleton_setSlotsToSetupPose()` → `spine_skeleton_setup_pose_slots()`
+  - `spine_event_data` no longer stores event payload values directly. Use `spine_event_data_get_setup_pose()` and the returned `spine_event` for setup int, float, string, volume, and balance values.
+  - `spine_animation_create()` now takes only the animation name. `spine_animation_set_timelines()` now also requires the animation's bone indices.
 
 ### SFML
 
@@ -104,6 +107,7 @@
   - `Skin::AttachmentMap::Entry::_name` renamed to `_placeholderName`. All `Skin` methods use `placeholderName` parameter names instead of `name`/`attachmentName`.
   - `AnimationState` hold constants changed: `HoldSubsequent` and `HoldMix` removed, replaced with bitmask system (`Subsequent=0, First=1, Hold=2, HoldFirst=3`).
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
+  - `BoneData::getSetupPose()` and `Bone::getPose()` now use `BonePose` instead of `BoneLocal`. Bone timelines and parser setup pose data were updated to match the spine-libgdx `BoneLocal` removal.
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
   - Changed timeline class hierarchy with new base classes `BoneTimeline`, `SlotCurveTimeline`, and `ConstraintTimeline`
   - Sequence attachments now use the new non-null `Sequence` model. `RegionAttachment` and `MeshAttachment` were refactored to match spine-libgdx and no longer use the old lazy mutable region update path.
@@ -116,6 +120,8 @@
     | Bone::setToSetupPose()                |→| Bone::setupPose() |
     | Slot::setToSetupPose()                |→| Slot::setupPose() |
     | IkConstraint::setToSetupPose()        |→| IkConstraint::setupPose() |
+  - `EventData` now stores shared payload defaults in `EventData::getSetupPose()` instead of directly on `EventData`. Use the returned `Event` for setup int, float, string, volume, and balance values.
+  - `Animation` now constructs with only a name. Call `setTimelines(timelines, bones)` and `setDuration()` after loading timelines.
     | TransformConstraint::setToSetupPose() |→| TransformConstraint::setupPose() |
     | PathConstraint::setToSetupPose()      |→| PathConstraint::setupPose() |
     | PhysicsConstraint::setToSetupPose()   |→| PhysicsConstraint::setupPose() |
@@ -252,6 +258,7 @@
 
 - **Breaking changes**
   - Updated to use new C++ pose system internally
+  - `SpineBone.get_pose()` and `SpineBoneData.get_setup_pose()` now return `SpineBonePose` to match the updated spine-cpp bone pose API.
   - Removed from `SpineBone`: `update_world_transform()`, `set_to_setup_pose()`, `get_world_to_local_rotation_x()`, `get_world_to_local_rotation_y()`
   - Removed direct property access from `SpineBone`: `get_x()`, `set_x()`, `get_y()`, `set_y()`, `get_rotation()`, `set_rotation()`, etc. - use pose objects instead
   - `SpineAnimation.apply()` now takes an additional `appliedPose` parameter
@@ -459,6 +466,7 @@
     - `Skeleton.setBonesToSetupPose()` → `Skeleton.setupPoseBones()`
     - `Skeleton.setSlotsToSetupPose()` → `Skeleton.setupPoseSlots()`
   - Timeline `apply()` methods now take an additional `appliedPose` parameter
+  - `EventData` setup payload access moved to `data.setupPose`
 
 ### Flutter
 
@@ -468,6 +476,9 @@
 
 - **Breaking changes**
   - Updated to use the new auto-generated Dart runtime with all the Dart API changes above
+  - Generated Flutter bindings now use `BonePose` for bone setup and unconstrained pose accessors to match spine-cpp.
+  - Generated Flutter bindings now expose event setup payloads via `EventData.setupPose` instead of directly on `EventData`.
+  - Generated Flutter bindings now construct `Animation` with only a name, and setting timelines also requires the animation's bone indices.
 
 ## Haxe
 
@@ -790,6 +801,9 @@
 - **Breaking changes**
   - Updated to use new pose system from Java runtime
 
+- **Bug fixes**
+  - Gradle builds now delete stale Eclipse `bin/` output before compiling so removed classes don't linger on Java headless test classpaths.
+
 ### Android
 
 - **Breaking changes**
@@ -806,6 +820,7 @@
 - **Breaking changes**
   - The Swift runtime is now fully auto-generated from the C runtime, maintaining the full C++ type hierarchy with proper nullability annotations
   - All properties are now exposed as getters and setters instead of methods
+  - Event setup payloads now live on `EventData.setupPose` instead of directly on `EventData`
   - API changes to match C++ naming conventions:
     - `AnimationState.setAnimationByName()` → `AnimationState.setAnimation()`
     - `AnimationState.addAnimationByName()` → `AnimationState.addAnimation()`
@@ -820,6 +835,9 @@
 
 - **Breaking changes**
   - Updated to use the new auto-generated Swift runtime with all the Swift API changes above
+  - Generated Swift bindings now use `BonePose` for bone setup and unconstrained pose accessors to match spine-cpp.
+  - Generated Swift bindings now expose event setup payloads via `EventData.setupPose` instead of directly on `EventData`.
+  - Generated Swift bindings now construct `Animation` with only a name, and setting timelines also requires the animation's bone indices.
 
 ## TypeScript/JavaScript
 

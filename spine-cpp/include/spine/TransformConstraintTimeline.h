@@ -35,9 +35,7 @@
 
 namespace spine {
 
-	/// Changes TransformConstraintPose::getMixRotate(), TransformConstraintPose::getMixX(),
-	/// TransformConstraintPose::getMixY(), TransformConstraintPose::getMixScaleX(),
-	/// TransformConstraintPose::getMixScaleY(), and TransformConstraintPose::getMixShearY().
+	/// Changes a transform constraint's rotate, x, y, scaleX, scaleY, and shearY mix values.
 	class SP_API TransformConstraintTimeline : public CurveTimeline, public ConstraintTimeline {
 		friend class SkeletonBinary;
 

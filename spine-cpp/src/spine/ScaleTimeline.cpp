@@ -46,7 +46,7 @@ ScaleTimeline::ScaleTimeline(size_t frameCount, size_t bezierCount, int boneInde
 	: BoneTimeline2(frameCount, bezierCount, boneIndex, Property_ScaleX, Property_ScaleY) {
 }
 
-void ScaleTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void ScaleTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
 	if (time < _frames[0]) {
 		if (fromSetup) {
 			pose._scaleX = setup._scaleX;
@@ -114,7 +114,7 @@ ScaleXTimeline::ScaleXTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_ScaleX) {
 }
 
-void ScaleXTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void ScaleXTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
 	pose._scaleX = getScaleValue(time, alpha, fromSetup, add, out, pose._scaleX, setup._scaleX);
 }
 
@@ -124,6 +124,6 @@ ScaleYTimeline::ScaleYTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_ScaleY) {
 }
 
-void ScaleYTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void ScaleYTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
 	pose._scaleY = getScaleValue(time, alpha, fromSetup, add, out, pose._scaleY, setup._scaleY);
 }

@@ -31,7 +31,7 @@ SPINE_C_API void spine_path_attachment_set_constant_speed(spine_path_attachment 
 SPINE_C_API spine_color spine_path_attachment_get_color(spine_path_attachment self);
 SPINE_C_API spine_attachment spine_path_attachment_copy(spine_path_attachment self);
 /**
- * Transforms the attachment's local vertices to world coordinates. If the
+ * Transforms the attachment's local vertices to world coordinates. If
  * SlotPose::getDeform() is not empty, it is used to deform the vertices.
  *
  * See https://esotericsoftware.com/spine-runtime-skeletons#World-transforms
@@ -54,8 +54,7 @@ SPINE_C_API int spine_path_attachment_get_id(spine_path_attachment self);
 /**
  * The bones that affect the vertices. The entries are, for each vertex, the
  * number of bones affecting the vertex followed by that many bone indices,
- * which is the Skeleton::getBones() index. Empty if this attachment has no
- * weights.
+ * which is Skeleton::getBones() index. Empty if this attachment has no weights.
  */
 SPINE_C_API spine_array_int spine_path_attachment_get_bones(spine_path_attachment self);
 SPINE_C_API void spine_path_attachment_set_bones(spine_path_attachment self, spine_array_int bones);

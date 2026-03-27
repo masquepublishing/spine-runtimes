@@ -35,7 +35,7 @@
 namespace spine {
 	class VertexAttachment;
 
-	/// Changes SlotPose::getDeform() to deform a VertexAttachment.
+	/// Changes a slot's deform to deform a VertexAttachment.
 	class SP_API DeformTimeline : public SlotCurveTimeline {
 		friend class SkeletonBinary;
 
@@ -52,7 +52,7 @@ namespace spine {
 		/// The vertices for each frame.
 		Array<Array<float>> &getVertices();
 
-		/// The attachment that will be deformed.
+		/// The attachment whose vertices will be deformed.
 		VertexAttachment &getAttachment();
 
 		void setAttachment(VertexAttachment &inValue);

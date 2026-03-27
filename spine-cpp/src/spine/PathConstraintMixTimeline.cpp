@@ -62,11 +62,11 @@ void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float 
 
 	PathConstraint *constraint = (PathConstraint *) skeleton._constraints[_constraintIndex];
 	if (!constraint->isActive()) return;
-	PathConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
+	PathConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 
 	if (time < _frames[0]) {
 		if (fromSetup) {
-			PathConstraintPose &setup = constraint->_data._setup;
+			PathConstraintPose &setup = constraint->_data._setupPose;
 			pose._mixRotate = setup._mixRotate;
 			pose._mixX = setup._mixX;
 			pose._mixY = setup._mixY;
@@ -102,7 +102,7 @@ void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float 
 		}
 	}
 
-	PathConstraintPose &base = fromSetup ? constraint->_data._setup : pose;
+	PathConstraintPose &base = fromSetup ? constraint->_data._setupPose : pose;
 	if (add) {
 		pose._mixRotate = base._mixRotate + rotate * alpha;
 		pose._mixX = base._mixX + x * alpha;

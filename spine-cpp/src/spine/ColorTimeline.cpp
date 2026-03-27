@@ -63,7 +63,7 @@ void RGBATimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, b
 	SP_UNUSED(add);
 	Color &color = pose._color;
 	if (time < _frames[0]) {
-		if (fromSetup) color.set(slot._data._setup._color);
+		if (fromSetup) color.set(slot._data._setupPose._color);
 		return;
 	}
 
@@ -104,7 +104,7 @@ void RGBATimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, b
 		color.set(r, g, b, a);
 	else {
 		if (fromSetup) {
-			Color &setup = slot._data._setup._color;
+			Color &setup = slot._data._setupPose._color;
 			color.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
 					  setup.a + (a - setup.a) * alpha);
 		} else
@@ -136,7 +136,7 @@ void RGBTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, bo
 	float r, g, b;
 	if (time < _frames[0]) {
 		if (fromSetup) {
-			Color &setup = slot._data._setup._color;
+			Color &setup = slot._data._setupPose._color;
 			color.r = setup.r;
 			color.g = setup.g;
 			color.b = setup.b;
@@ -174,7 +174,7 @@ void RGBTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, bo
 
 	if (alpha != 1) {
 		if (fromSetup) {
-			Color &setup = slot._data._setup._color;
+			Color &setup = slot._data._setupPose._color;
 			r = setup.r + (r - setup.r) * alpha;
 			g = setup.g + (g - setup.g) * alpha;
 			b = setup.b + (b - setup.b) * alpha;
@@ -218,16 +218,16 @@ void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<
 	Slot *slot = skeleton._slots[_slotIndex];
 	if (!slot->_bone._active) return;
 
-	Color &color = (appliedPose ? *slot->_applied : slot->_pose)._color;
+	Color &color = (appliedPose ? *slot->_appliedPose : slot->_pose)._color;
 	if (time < _frames[0]) {
-		if (fromSetup) color.a = slot->_data._setup._color.a;
+		if (fromSetup) color.a = slot->_data._setupPose._color.a;
 		return;
 	}
 
 	float a = getCurveValue(time);
 	if (alpha != 1) {
 		if (fromSetup) {
-			Color &setup = slot->_data._setup._color;
+			Color &setup = slot->_data._setupPose._color;
 			a = setup.a + (a - setup.a) * alpha;
 		} else
 			a = color.a + (a - color.a) * alpha;
@@ -265,7 +265,7 @@ void RGBA2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, 
 	float r2, g2, b2;
 	if (time < _frames[0]) {
 		if (fromSetup) {
-			SlotPose &setup = slot._data._setup;
+			SlotPose &setup = slot._data._setupPose;
 			light.set(setup._color);
 			Color &setupDark = setup._darkColor;
 			dark.r = setupDark.r;
@@ -323,7 +323,7 @@ void RGBA2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, 
 	if (alpha == 1)
 		light.set(r, g, b, a);
 	else if (fromSetup) {
-		SlotPose &setup = slot._data._setup;
+		SlotPose &setup = slot._data._setupPose;
 		Color &setupLight = setup._color;
 		light.set(setupLight.r + (r - setupLight.r) * alpha, setupLight.g + (g - setupLight.g) * alpha, setupLight.b + (b - setupLight.b) * alpha,
 				  setupLight.a + (a - setupLight.a) * alpha);
@@ -371,7 +371,7 @@ void RGB2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, b
 	float r, g, b, r2, g2, b2;
 	if (time < _frames[0]) {
 		if (fromSetup) {
-			SlotPose &setup = slot._data._setup;
+			SlotPose &setup = slot._data._setupPose;
 			Color &setupLight = setup._color;
 			Color &setupDark = setup._darkColor;
 			light.r = setupLight.r;
@@ -426,7 +426,7 @@ void RGB2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, b
 
 	if (alpha != 1) {
 		if (fromSetup) {
-			SlotPose &setup = slot._data._setup;
+			SlotPose &setup = slot._data._setupPose;
 			Color &setupLight = setup._color;
 			r = setupLight.r + (r - setupLight.r) * alpha;
 			g = setupLight.g + (g - setupLight.g) * alpha;

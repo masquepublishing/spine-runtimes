@@ -59,8 +59,8 @@ void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, f
 
 	PathConstraint *constraint = (PathConstraint *) skeleton._constraints[_constraintIndex];
 	if (constraint->isActive()) {
-		PathConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
+		PathConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 		PathConstraintData &data = constraint->_data;
-		pose._position = getAbsoluteValue(time, alpha, fromSetup, add, pose._position, data._setup._position);
+		pose._position = getAbsoluteValue(time, alpha, fromSetup, add, pose._position, data._setupPose._position);
 	}
 }

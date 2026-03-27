@@ -33,7 +33,7 @@
 #include <spine/ConstraintTimeline1.h>
 
 namespace spine {
-	/// Changes SliderPose::getMix().
+	/// Changes a slider's mix.
 	class SP_API SliderMixTimeline : public ConstraintTimeline1 {
 		friend class SkeletonBinary;
 		friend class SkeletonJson;

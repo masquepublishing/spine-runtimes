@@ -1965,7 +1965,7 @@ namespace spine {
 			writeBoneData(obj->getData());
 
 			_json.writeName("pose");
-			writeBoneLocal(obj->getPose());
+			writeBonePose(obj->getPose());
 
 			_json.writeName("appliedPose");
 			writeBonePose(obj->getAppliedPose());
@@ -2019,7 +2019,7 @@ namespace spine {
 			_json.writeValue(obj->getName());
 
 			_json.writeName("setupPose");
-			writeBoneLocal(obj->getSetupPose());
+			writeBonePose(obj->getSetupPose());
 
 			_json.writeName("skinRequired");
 			_json.writeValue(obj->getSkinRequired());
@@ -2388,23 +2388,24 @@ namespace spine {
 			_json.writeName("type");
 			_json.writeValue("EventData");
 
+			Event &setup = obj->getSetupPose();
 			_json.writeName("int");
-			_json.writeValue(obj->getInt());
+			_json.writeValue(setup.getInt());
 
 			_json.writeName("float");
-			_json.writeValue(obj->getFloat());
+			_json.writeValue(setup.getFloat());
 
 			_json.writeName("string");
-			_json.writeValue(obj->getString());
+			_json.writeValue(setup.getString());
 
 			_json.writeName("audioPath");
 			_json.writeValue(obj->getAudioPath());
 
 			_json.writeName("volume");
-			_json.writeValue(obj->getVolume());
+			_json.writeValue(setup.getVolume());
 
 			_json.writeName("balance");
-			_json.writeValue(obj->getBalance());
+			_json.writeValue(setup.getBalance());
 
 			_json.writeName("name");
 			_json.writeValue(obj->getName());
@@ -3210,10 +3211,17 @@ namespace spine {
 			}
 			_json.writeArrayEnd();
 
-			_json.writeName("drawOrder");
+			_json.writeName("drawOrderPose");
 			_json.writeArrayStart();
-			for (size_t i = 0; i < obj->getDrawOrder().size(); i++) {
-				writeSlot(obj->getDrawOrder()[i]);
+			for (size_t i = 0; i < obj->getDrawOrder().getPose().size(); i++) {
+				writeSlot(obj->getDrawOrder().getPose()[i]);
+			}
+			_json.writeArrayEnd();
+
+			_json.writeName("drawOrderApplied");
+			_json.writeArrayStart();
+			for (size_t i = 0; i < obj->getDrawOrder().getAppliedPose().size(); i++) {
+				writeSlot(obj->getDrawOrder().getAppliedPose()[i]);
 			}
 			_json.writeArrayEnd();
 

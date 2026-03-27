@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a subset of Skeleton::getDrawOrder().
+/// Changes a subset of the Skeleton::getDrawOrder() draw order.
 @objc(SpineDrawOrderFolderTimeline)
 @objcMembers
 public class DrawOrderFolderTimeline: Timeline {

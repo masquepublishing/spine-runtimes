@@ -20,7 +20,7 @@ SPINE_C_API spine_rtti spine_deform_timeline_get_rtti(spine_deform_timeline self
  */
 SPINE_C_API void spine_deform_timeline_set_frame(spine_deform_timeline self, int frameIndex, float time, spine_array_float vertices);
 /**
- * The attachment that will be deformed.
+ * The attachment whose vertices will be deformed.
  */
 SPINE_C_API spine_vertex_attachment spine_deform_timeline_get_attachment(spine_deform_timeline self);
 SPINE_C_API void spine_deform_timeline_set_attachment(spine_deform_timeline self, spine_vertex_attachment inValue);

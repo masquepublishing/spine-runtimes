@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes PhysicsConstraintPose::getStrength().
+/// Changes a physics constraint's strength.
 @objc(SpinePhysicsConstraintStrengthTimeline)
 @objcMembers
 public class PhysicsConstraintStrengthTimeline: PhysicsConstraintTimeline {

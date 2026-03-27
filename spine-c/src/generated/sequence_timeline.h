@@ -24,6 +24,11 @@ SPINE_C_API void spine_sequence_timeline_apply(spine_sequence_timeline self, spi
  */
 SPINE_C_API void spine_sequence_timeline_set_frame(spine_sequence_timeline self, int frame, float time, spine_sequence_mode mode, int index,
 												   float delay);
+/**
+ * The attachment for which the sequence index will be set.
+ *
+ * See Attachment::getTimelineAttachment().
+ */
 SPINE_C_API spine_attachment spine_sequence_timeline_get_attachment(spine_sequence_timeline self);
 SPINE_C_API int spine_sequence_timeline_get_slot_index(spine_sequence_timeline self);
 SPINE_C_API void spine_sequence_timeline_set_slot_index(spine_sequence_timeline self, int inValue);

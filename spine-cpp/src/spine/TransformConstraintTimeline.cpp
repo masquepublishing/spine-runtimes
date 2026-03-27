@@ -62,11 +62,11 @@ void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, floa
 
 	TransformConstraint *constraint = (TransformConstraint *) skeleton._constraints[_constraintIndex];
 	if (!constraint->isActive()) return;
-	TransformConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
+	TransformConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 
 	if (time < _frames[0]) {
 		if (fromSetup) {
-			TransformConstraintPose &setup = constraint->_data._setup;
+			TransformConstraintPose &setup = constraint->_data._setupPose;
 			pose._mixRotate = setup._mixRotate;
 			pose._mixX = setup._mixX;
 			pose._mixY = setup._mixY;
@@ -117,7 +117,7 @@ void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, floa
 		}
 	}
 
-	TransformConstraintPose &base = fromSetup ? constraint->_data._setup : pose;
+	TransformConstraintPose &base = fromSetup ? constraint->_data._setupPose : pose;
 	if (add) {
 		pose._mixRotate = base._mixRotate + rotate * alpha;
 		pose._mixX = base._mixX + x * alpha;

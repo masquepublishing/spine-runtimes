@@ -38,7 +38,7 @@
 
 namespace spine {
 
-	/// Changes a bone's BoneLocal::getInherit().
+	/// Changes a bone's inherit mode.
 	class SP_API InheritTimeline : public Timeline, public BoneTimeline {
 		friend class SkeletonBinary;
 

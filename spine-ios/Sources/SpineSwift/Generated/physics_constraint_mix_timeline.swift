@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes PhysicsConstraintPose::getMix().
+/// Changes a physics constraint's mix.
 @objc(SpinePhysicsConstraintMixTimeline)
 @objcMembers
 public class PhysicsConstraintMixTimeline: PhysicsConstraintTimeline {

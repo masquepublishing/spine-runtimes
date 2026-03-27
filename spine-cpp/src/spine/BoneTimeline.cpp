@@ -33,7 +33,7 @@
 #include <spine/Skeleton.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
-#include <spine/BoneLocal.h>
+#include <spine/BonePose.h>
 #include <spine/Property.h>
 
 using namespace spine;
@@ -61,7 +61,7 @@ void BoneTimeline1::apply(Skeleton &skeleton, float lastTime, float time, Array<
 
 	Bone *bone = skeleton._bones[_boneIndex];
 	if (bone->isActive()) {
-		_apply(appliedPose ? *bone->_applied : bone->_pose, bone->_data._setup, time, alpha, fromSetup, add, out);
+		_apply(appliedPose ? *bone->_appliedPose : bone->_pose, bone->_data._setupPose, time, alpha, fromSetup, add, out);
 	}
 }
 
@@ -81,7 +81,7 @@ void BoneTimeline2::apply(Skeleton &skeleton, float lastTime, float time, Array<
 
 	Bone *bone = skeleton._bones[_boneIndex];
 	if (bone->isActive()) {
-		_apply(appliedPose ? *bone->_applied : bone->_pose, bone->_data._setup, time, alpha, fromSetup, add, out);
+		_apply(appliedPose ? *bone->_appliedPose : bone->_pose, bone->_data._setupPose, time, alpha, fromSetup, add, out);
 	}
 }
 

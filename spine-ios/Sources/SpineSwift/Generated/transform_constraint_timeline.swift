@@ -32,9 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes TransformConstraintPose::getMixRotate(), TransformConstraintPose::getMixX(),
-/// TransformConstraintPose::getMixY(), TransformConstraintPose::getMixScaleX(),
-/// TransformConstraintPose::getMixScaleY(), and TransformConstraintPose::getMixShearY().
+/// Changes a transform constraint's rotate, x, y, scaleX, scaleY, and shearY mix values.
 @objc(SpineTransformConstraintTimeline)
 @objcMembers
 public class TransformConstraintTimeline: CurveTimeline, ConstraintTimeline {

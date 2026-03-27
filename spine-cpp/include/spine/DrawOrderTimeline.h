@@ -33,7 +33,7 @@
 #include <spine/Timeline.h>
 
 namespace spine {
-	/// Changes Skeleton::getDrawOrder().
+	/// Changes the Skeleton::getDrawOrder().
 	class SP_API DrawOrderTimeline : public Timeline {
 		friend class SkeletonBinary;
 
@@ -57,7 +57,8 @@ namespace spine {
 		/// Sets the time and draw order for the specified frame.
 		/// @param frame Between 0 and frameCount, inclusive.
 		/// @param time The frame time in seconds.
-		/// @param drawOrder For each slot in Skeleton::slots, the index of the slot in the new draw order. May be null to use setup pose draw order.
+		/// @param drawOrder For each slot in Skeleton::getSlots(), the index of the slot in the new draw order. May be null to use
+		///           setup pose draw order.
 		void setFrame(size_t frame, float time, Array<int> *drawOrder);
 
 	private:

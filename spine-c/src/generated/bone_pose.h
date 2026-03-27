@@ -45,22 +45,22 @@ SPINE_C_API void spine_bone_pose_modify_local(spine_bone_pose self, spine_skelet
 SPINE_C_API void spine_bone_pose_modify_world(spine_bone_pose self, int update);
 SPINE_C_API void spine_bone_pose_reset_world(spine_bone_pose self, int update);
 /**
- * Part of the world transform matrix for the X axis.
+ * The world transform [a b][c d] x-axis x component.
  */
 SPINE_C_API float spine_bone_pose_get_a(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_a(spine_bone_pose self, float a);
 /**
- * Part of the world transform matrix for the Y axis.
+ * The world transform [a b][c d] y-axis x component.
  */
 SPINE_C_API float spine_bone_pose_get_b(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_b(spine_bone_pose self, float b);
 /**
- * Part of the world transform matrix for the X axis.
+ * The world transform [a b][c d] x-axis y component.
  */
 SPINE_C_API float spine_bone_pose_get_c(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_c(spine_bone_pose self, float c);
 /**
- * Part of the world transform matrix for the Y axis.
+ * The world transform [a b][c d] y-axis y component.
  */
 SPINE_C_API float spine_bone_pose_get_d(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_d(spine_bone_pose self, float d);
@@ -75,7 +75,8 @@ SPINE_C_API void spine_bone_pose_set_world_x(spine_bone_pose self, float worldX)
 SPINE_C_API float spine_bone_pose_get_world_y(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_world_y(spine_bone_pose self, float worldY);
 /**
- * The world rotation for the X axis, calculated using a and c.
+ * The world rotation for the X axis, calculated using a and c. This is the
+ * direction the bone is pointing.
  */
 SPINE_C_API float spine_bone_pose_get_world_rotation_x(spine_bone_pose self);
 /**
@@ -132,6 +133,9 @@ SPINE_C_API void spine_bone_pose_set_x(spine_bone_pose self, float x);
  */
 SPINE_C_API float spine_bone_pose_get_y(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_y(spine_bone_pose self, float y);
+/**
+ * Sets local x and y translation.
+ */
 SPINE_C_API void spine_bone_pose_set_position(spine_bone_pose self, float x, float y);
 /**
  * The local rotation in degrees, counter clockwise.
@@ -148,7 +152,13 @@ SPINE_C_API void spine_bone_pose_set_scale_x(spine_bone_pose self, float scaleX)
  */
 SPINE_C_API float spine_bone_pose_get_scale_y(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_scale_y(spine_bone_pose self, float scaleY);
+/**
+ * Sets local scaleX and scaleY.
+ */
 SPINE_C_API void spine_bone_pose_set_scale_1(spine_bone_pose self, float scaleX, float scaleY);
+/**
+ * Sets local scaleX and scaleY to the same value.
+ */
 SPINE_C_API void spine_bone_pose_set_scale_2(spine_bone_pose self, float scale);
 /**
  * The local shearX.

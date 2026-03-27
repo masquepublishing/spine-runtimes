@@ -58,8 +58,8 @@ void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, fl
 
 	PathConstraint *constraint = (PathConstraint *) skeleton._constraints[_constraintIndex];
 	if (constraint->isActive()) {
-		PathConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
+		PathConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 		PathConstraintData &data = constraint->_data;
-		pose._spacing = getAbsoluteValue(time, alpha, fromSetup, false, pose._spacing, data._setup._spacing);
+		pose._spacing = getAbsoluteValue(time, alpha, fromSetup, false, pose._spacing, data._setupPose._spacing);
 	}
 }

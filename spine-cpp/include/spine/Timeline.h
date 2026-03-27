@@ -40,6 +40,10 @@ namespace spine {
 
 	class Event;
 
+	/// The base class for all timelines.
+	///
+	/// See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
+	/// Runtimes Guide.
 	class SP_API Timeline : public SpineObject {
 		RTTI_DECL_NOPARENT
 
@@ -49,6 +53,9 @@ namespace spine {
 		virtual ~Timeline();
 
 		/// Applies this timeline to the skeleton.
+		///
+		/// See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
+		/// Runtimes Guide.
 		/// @param skeleton The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton
 		///           components the timelines may change.
 		/// @param lastTime The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in
@@ -67,7 +74,7 @@ namespace spine {
 		///           fromSetup).
 		/// @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
 		///           transitions.
-		/// @param appliedPose True to modify the applied pose, else the pose is modified.
+		/// @param appliedPose True to modify getAppliedPose(), else getPose() is modified.
 		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
 						   bool appliedPose) = 0;
 

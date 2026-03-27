@@ -34,7 +34,7 @@
 
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
-#include <spine/BoneLocal.h>
+#include <spine/BonePose.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
@@ -66,13 +66,13 @@ void InheritTimeline::apply(Skeleton &skeleton, float lastTime, float time, Arra
 
 	Bone *bone = skeleton._bones[_boneIndex];
 	if (!bone->isActive()) return;
-	BoneLocal &pose = appliedPose ? *bone->_applied : bone->_pose;
+	BonePose &pose = appliedPose ? *bone->_appliedPose : bone->_pose;
 
 	if (out) {
-		if (fromSetup) pose._inherit = bone->_data._setup._inherit;
+		if (fromSetup) pose._inherit = bone->_data._setupPose._inherit;
 	} else {
 		if (time < _frames[0]) {
-			if (fromSetup) pose._inherit = bone->_data._setup._inherit;
+			if (fromSetup) pose._inherit = bone->_data._setupPose._inherit;
 		} else {
 			int idx = Animation::search(_frames, time, ENTRIES) + INHERIT;
 			pose._inherit = static_cast<Inherit>((int) _frames[idx]);

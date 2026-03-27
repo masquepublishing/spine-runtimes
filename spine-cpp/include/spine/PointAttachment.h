@@ -53,12 +53,12 @@ namespace spine {
 	public:
 		explicit PointAttachment(const String &name);
 
-		/// The local X position.
+		/// The local x position.
 		float getX();
 
 		void setX(float inValue);
 
-		/// The local Y position.
+		/// The local y position.
 		float getY();
 
 		void setY(float inValue);

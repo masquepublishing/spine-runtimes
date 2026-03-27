@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes PhysicsConstraintPose::getDamping().
+/// Changes a physics constraint's damping.
 @objc(SpinePhysicsConstraintDampingTimeline)
 @objcMembers
 public class PhysicsConstraintDampingTimeline: PhysicsConstraintTimeline {

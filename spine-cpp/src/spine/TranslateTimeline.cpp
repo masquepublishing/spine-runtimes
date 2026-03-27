@@ -46,7 +46,7 @@ TranslateTimeline::TranslateTimeline(size_t frameCount, size_t bezierCount, int 
 	: BoneTimeline2(frameCount, bezierCount, boneIndex, Property_X, Property_Y) {
 }
 
-void TranslateTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void TranslateTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
 	SP_UNUSED(out);
 	if (time < _frames[0]) {
 		if (fromSetup) {
@@ -98,7 +98,7 @@ TranslateXTimeline::TranslateXTimeline(size_t frameCount, size_t bezierCount, in
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_X) {
 }
 
-void TranslateXTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void TranslateXTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
 	SP_UNUSED(out);
 	pose._x = getRelativeValue(time, alpha, fromSetup, add, pose._x, setup._x);
 }
@@ -109,7 +109,7 @@ TranslateYTimeline::TranslateYTimeline(size_t frameCount, size_t bezierCount, in
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_Y) {
 }
 
-void TranslateYTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void TranslateYTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
 	SP_UNUSED(out);
 	pose._y = getRelativeValue(time, alpha, fromSetup, add, pose._y, setup._y);
 }

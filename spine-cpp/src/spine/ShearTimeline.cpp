@@ -46,7 +46,7 @@ ShearTimeline::ShearTimeline(size_t frameCount, size_t bezierCount, int boneInde
 	: BoneTimeline2(frameCount, bezierCount, boneIndex, Property_ShearX, Property_ShearY) {
 }
 
-void ShearTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void ShearTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
 	SP_UNUSED(out);
 	if (time < _frames[0]) {
 		if (fromSetup) {
@@ -98,7 +98,7 @@ ShearXTimeline::ShearXTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_ShearX) {
 }
 
-void ShearXTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void ShearXTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
 	SP_UNUSED(out);
 	pose._shearX = getRelativeValue(time, alpha, fromSetup, add, pose._shearX, setup._shearX);
 }
@@ -109,7 +109,7 @@ ShearYTimeline::ShearYTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_ShearY) {
 }
 
-void ShearYTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void ShearYTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
 	SP_UNUSED(out);
 	pose._shearY = getRelativeValue(time, alpha, fromSetup, add, pose._shearY, setup._shearY);
 }

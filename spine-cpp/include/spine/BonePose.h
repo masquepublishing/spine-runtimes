@@ -38,8 +38,8 @@ namespace spine {
 	class Bone;
 	class Skeleton;
 
-	/// The applied local pose and world transform for a bone. This is the Bone::getPose() with constraints applied and the
-	/// world transform computed by Skeleton::updateWorldTransform(Physics) and updateWorldTransform(Skeleton).
+	/// The applied local pose and world transform for a bone. This is the bone's unconstrained pose with constraints applied and
+	/// the world transform computed by Skeleton::updateWorldTransform(Physics) and updateWorldTransform(Skeleton).
 	///
 	/// If the world transform is changed, call updateLocalTransform(Skeleton) before using the local transform. The local
 	/// transform may be needed by other code (eg to apply another constraint).
@@ -101,19 +101,19 @@ namespace spine {
 		void modifyWorld(int update);
 		void resetWorld(int update);
 
-		/// Part of the world transform matrix for the X axis.
+		/// The world transform <code>[a b][c d]</code> x-axis x component.
 		float getA();
 		void setA(float a);
 
-		/// Part of the world transform matrix for the Y axis.
+		/// The world transform <code>[a b][c d]</code> y-axis x component.
 		float getB();
 		void setB(float b);
 
-		/// Part of the world transform matrix for the X axis.
+		/// The world transform <code>[a b][c d]</code> x-axis y component.
 		float getC();
 		void setC(float c);
 
-		/// Part of the world transform matrix for the Y axis.
+		/// The world transform <code>[a b][c d]</code> y-axis y component.
 		float getD();
 		void setD(float d);
 
@@ -125,7 +125,7 @@ namespace spine {
 		float getWorldY();
 		void setWorldY(float worldY);
 
-		/// The world rotation for the X axis, calculated using a and c.
+		/// The world rotation for the X axis, calculated using a and c. This is the direction the bone is pointing.
 		float getWorldRotationX();
 
 		/// The world rotation for the Y axis, calculated using b and d.

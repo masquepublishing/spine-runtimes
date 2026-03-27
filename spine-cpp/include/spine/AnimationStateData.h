@@ -64,7 +64,7 @@ namespace spine {
 		void setMix(Animation &from, Animation &to, float duration);
 
 		/// Returns the mix duration to use when changing from the specified animation to the other on the same track,
-		/// or the DefaultMix if no mix duration has been set.
+		/// or the default mix if no mix duration has been set.
 		float getMix(Animation &from, Animation &to);
 
 		/// Removes all mixes and sets the default mix to 0.

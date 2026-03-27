@@ -61,11 +61,11 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 
 	IkConstraint *constraint = (IkConstraint *) skeleton._constraints[_constraintIndex];
 	if (!constraint->isActive()) return;
-	IkConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
+	IkConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 
 	if (time < _frames[0]) {
 		if (fromSetup) {
-			IkConstraintPose &setup = constraint->_data._setup;
+			IkConstraintPose &setup = constraint->_data._setupPose;
 			pose._mix = setup._mix;
 			pose._softness = setup._softness;
 			pose._bendDirection = setup._bendDirection;
@@ -99,7 +99,7 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 		}
 	}
 
-	IkConstraintPose &base = fromSetup ? constraint->_data._setup : pose;
+	IkConstraintPose &base = fromSetup ? constraint->_data._setupPose : pose;
 	pose._mix = base._mix + (mix - base._mix) * alpha;
 	pose._softness = base._softness + (softness - base._softness) * alpha;
 	if (out) {

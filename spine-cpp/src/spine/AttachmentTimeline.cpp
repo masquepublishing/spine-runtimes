@@ -70,7 +70,7 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, A
 
 	Slot *slot = skeleton._slots[_slotIndex];
 	if (!slot->_bone.isActive()) return;
-	SlotPose &pose = appliedPose ? *slot->_applied : slot->_pose;
+	SlotPose &pose = appliedPose ? *slot->_appliedPose : slot->_pose;
 
 	if (out || time < _frames[0]) {
 		if (fromSetup) setAttachment(skeleton, pose, &slot->_data._attachmentName);

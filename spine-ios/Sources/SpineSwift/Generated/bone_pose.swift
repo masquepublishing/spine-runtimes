@@ -32,9 +32,9 @@
 import Foundation
 import SpineC
 
-/// The applied local pose and world transform for a bone. This is the Bone::getPose() with
-/// constraints applied and the world transform computed by Skeleton::updateWorldTransform(Physics)
-/// and updateWorldTransform(Skeleton).
+/// The applied local pose and world transform for a bone. This is the bone's unconstrained pose
+/// with constraints applied and the world transform computed by
+/// Skeleton::updateWorldTransform(Physics) and updateWorldTransform(Skeleton).
 ///
 /// If the world transform is changed, call updateLocalTransform(Skeleton) before using the local
 /// transform. The local transform may be needed by other code (eg to apply another constraint).
@@ -61,7 +61,7 @@ public class BonePose: BoneLocal, Update {
         return Rtti(fromPointer: result!)
     }
 
-    /// Part of the world transform matrix for the X axis.
+    /// The world transform [a b][c d] x-axis x component.
     public var a: Float {
         get {
             let result = spine_bone_pose_get_a(_ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
@@ -72,7 +72,7 @@ public class BonePose: BoneLocal, Update {
         }
     }
 
-    /// Part of the world transform matrix for the Y axis.
+    /// The world transform [a b][c d] y-axis x component.
     public var b: Float {
         get {
             let result = spine_bone_pose_get_b(_ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
@@ -83,7 +83,7 @@ public class BonePose: BoneLocal, Update {
         }
     }
 
-    /// Part of the world transform matrix for the X axis.
+    /// The world transform [a b][c d] x-axis y component.
     public var c: Float {
         get {
             let result = spine_bone_pose_get_c(_ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
@@ -94,7 +94,7 @@ public class BonePose: BoneLocal, Update {
         }
     }
 
-    /// Part of the world transform matrix for the Y axis.
+    /// The world transform [a b][c d] y-axis y component.
     public var d: Float {
         get {
             let result = spine_bone_pose_get_d(_ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
@@ -127,7 +127,8 @@ public class BonePose: BoneLocal, Update {
         }
     }
 
-    /// The world rotation for the X axis, calculated using a and c.
+    /// The world rotation for the X axis, calculated using a and c. This is the direction the bone
+    /// is pointing.
     public var worldRotationX: Float {
         let result = spine_bone_pose_get_world_rotation_x(_ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
         return result

@@ -57,7 +57,7 @@ abstract class VertexAttachment extends Attachment {
 
   /// The bones that affect the vertices. The entries are, for each vertex, the
   /// number of bones affecting the vertex followed by that many bone indices,
-  /// which is the Skeleton::getBones() index. Empty if this attachment has no
+  /// which is Skeleton::getBones() index. Empty if this attachment has no
   /// weights.
   ArrayInt get bones {
     final result = SpineBindings.bindings.spine_vertex_attachment_get_bones(_ptr);

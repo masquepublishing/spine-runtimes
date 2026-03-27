@@ -73,7 +73,7 @@ class AnimationStateData {
   }
 
   /// Returns the mix duration to use when changing from the specified animation
-  /// to the other on the same track, or the DefaultMix if no mix duration has
+  /// to the other on the same track, or the default mix if no mix duration has
   /// been set.
   double getMix(Animation from, Animation to) {
     final result =

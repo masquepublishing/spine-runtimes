@@ -49,7 +49,7 @@ open class VertexAttachment: Attachment {
     }
 
     /// The bones that affect the vertices. The entries are, for each vertex, the number of bones
-    /// affecting the vertex followed by that many bone indices, which is the Skeleton::getBones()
+    /// affecting the vertex followed by that many bone indices, which is Skeleton::getBones()
     /// index. Empty if this attachment has no weights.
     public var bones: ArrayInt {
         get {

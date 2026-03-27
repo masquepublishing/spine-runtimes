@@ -50,7 +50,7 @@ public class PointAttachment: Attachment {
         self.init(fromPointer: ptr!)
     }
 
-    /// The local X position.
+    /// The local x position.
     public var x: Float {
         get {
             let result = spine_point_attachment_get_x(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self))
@@ -61,7 +61,7 @@ public class PointAttachment: Attachment {
         }
     }
 
-    /// The local Y position.
+    /// The local y position.
     public var y: Float {
         get {
             let result = spine_point_attachment_get_y(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self))

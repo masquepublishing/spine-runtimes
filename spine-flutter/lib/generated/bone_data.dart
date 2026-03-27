@@ -33,7 +33,7 @@ import 'package:universal_ffi/ffi.dart';
 import 'package:universal_ffi/ffi_utils.dart';
 import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
-import 'bone_local.dart';
+import 'bone_pose.dart';
 import 'color.dart';
 import 'posed_data.dart';
 
@@ -58,7 +58,7 @@ class BoneData extends PosedData {
     SpineBindings.bindings.spine_bone_data_dispose(_ptr);
   }
 
-  /// The Skeleton::getBones() index.
+  /// The Skeleton::getBones() index for this bone.
   int get index {
     final result = SpineBindings.bindings.spine_bone_data_get_index(_ptr);
     return result;
@@ -104,8 +104,9 @@ class BoneData extends PosedData {
     SpineBindings.bindings.spine_bone_data_set_visible(_ptr, value);
   }
 
-  BoneLocal get setupPose {
+  /// The setup pose that most animations are relative to.
+  BonePose get setupPose {
     final result = SpineBindings.bindings.spine_bone_data_get_setup_pose(_ptr);
-    return BoneLocal.fromPointer(result);
+    return BonePose.fromPointer(result);
   }
 }

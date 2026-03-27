@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Simple mixin class that adds active state tracking
+/// A posed object that may be active or inactive.
 @objc(SpinePosedActive)
 @objcMembers
 open class PosedActive: NSObject {

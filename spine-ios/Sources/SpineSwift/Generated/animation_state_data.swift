@@ -68,7 +68,7 @@ public class AnimationStateData: NSObject {
     }
 
     /// Returns the mix duration to use when changing from the specified animation to the other on
-    /// the same track, or the DefaultMix if no mix duration has been set.
+    /// the same track, or the default mix if no mix duration has been set.
     public func getMix(_ from: Animation, _ to: Animation) -> Float {
         let result = spine_animation_state_data_get_mix(
             _ptr.assumingMemoryBound(to: spine_animation_state_data_wrapper.self), from._ptr.assumingMemoryBound(to: spine_animation_wrapper.self),

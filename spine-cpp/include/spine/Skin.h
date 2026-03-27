@@ -43,7 +43,7 @@ namespace spine {
 
 	class ConstraintData;
 
-	/// Stores attachments by slot index and placeholder name.
+	/// Stores attachments by slot index and placeholder name. Multiple Skeleton instances can use the same skins.
 	/// See SkeletonData::getDefaultSkin, Skeleton::getSkin, and
 	/// http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes Guide.
 	class SP_API Skin : public SpineObject {

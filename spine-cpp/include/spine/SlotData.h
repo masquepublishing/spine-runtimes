@@ -67,7 +67,7 @@ namespace spine {
 	public:
 		SlotData(int index, const String &name, BoneData &boneData);
 
-		/// The Skeleton::getSlots() index.
+		/// The Skeleton::getSlots() index for this slot.
 		int getIndex();
 
 		/// The bone this slot belongs to.

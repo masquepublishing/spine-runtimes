@@ -13,7 +13,7 @@ SPINE_C_API void spine_vertex_attachment_dispose(spine_vertex_attachment self);
 
 SPINE_C_API spine_rtti spine_vertex_attachment_get_rtti(spine_vertex_attachment self);
 /**
- * Transforms the attachment's local vertices to world coordinates. If the
+ * Transforms the attachment's local vertices to world coordinates. If
  * SlotPose::getDeform() is not empty, it is used to deform the vertices.
  *
  * See https://esotericsoftware.com/spine-runtime-skeletons#World-transforms
@@ -38,8 +38,7 @@ SPINE_C_API int spine_vertex_attachment_get_id(spine_vertex_attachment self);
 /**
  * The bones that affect the vertices. The entries are, for each vertex, the
  * number of bones affecting the vertex followed by that many bone indices,
- * which is the Skeleton::getBones() index. Empty if this attachment has no
- * weights.
+ * which is Skeleton::getBones() index. Empty if this attachment has no weights.
  */
 SPINE_C_API spine_array_int spine_vertex_attachment_get_bones(spine_vertex_attachment self);
 SPINE_C_API void spine_vertex_attachment_set_bones(spine_vertex_attachment self, spine_array_int bones);

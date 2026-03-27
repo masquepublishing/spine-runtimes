@@ -14,7 +14,7 @@ SPINE_C_API spine_bone_data spine_bone_data_create(int index, const char *name, 
 SPINE_C_API void spine_bone_data_dispose(spine_bone_data self);
 
 /**
- * The Skeleton::getBones() index.
+ * The Skeleton::getBones() index for this bone.
  */
 SPINE_C_API int spine_bone_data_get_index(spine_bone_data self);
 /**
@@ -32,7 +32,10 @@ SPINE_C_API const char *spine_bone_data_get_icon(spine_bone_data self);
 SPINE_C_API void spine_bone_data_set_icon(spine_bone_data self, const char *icon);
 SPINE_C_API bool spine_bone_data_get_visible(spine_bone_data self);
 SPINE_C_API void spine_bone_data_set_visible(spine_bone_data self, bool inValue);
-SPINE_C_API spine_bone_local spine_bone_data_get_setup_pose(spine_bone_data self);
+/**
+ * The setup pose that most animations are relative to.
+ */
+SPINE_C_API spine_bone_pose spine_bone_data_get_setup_pose(spine_bone_data self);
 SPINE_C_API const char *spine_bone_data_get_name(spine_bone_data self);
 /**
  * When true, Skeleton::updateWorldTransform(Physics) only updates this

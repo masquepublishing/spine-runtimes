@@ -32,9 +32,9 @@
 import Foundation
 import SpineC
 
-/// Stores attachments by slot index and placeholder name. See SkeletonData::getDefaultSkin,
-/// Skeleton::getSkin, and http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes
-/// Guide.
+/// Stores attachments by slot index and placeholder name. Multiple Skeleton instances can use the
+/// same skins. See SkeletonData::getDefaultSkin, Skeleton::getSkin, and
+/// http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes Guide.
 @objc(SpineSkin)
 @objcMembers
 public class Skin: NSObject {

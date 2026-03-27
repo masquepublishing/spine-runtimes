@@ -43,9 +43,10 @@ import 'path_attachment.dart';
 import 'point_attachment.dart';
 import 'region_attachment.dart';
 
-/// Stores attachments by slot index and placeholder name. See
-/// SkeletonData::getDefaultSkin, Skeleton::getSkin, and
-/// http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes Guide.
+/// Stores attachments by slot index and placeholder name. Multiple Skeleton
+/// instances can use the same skins. See SkeletonData::getDefaultSkin,
+/// Skeleton::getSkin, and http://esotericsoftware.com/spine-runtime-skins in
+/// the Spine Runtimes Guide.
 class Skin {
   final Pointer<spine_skin_wrapper> _ptr;
 

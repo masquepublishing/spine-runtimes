@@ -60,8 +60,8 @@ void SliderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array
 
 	Slider *constraint = (Slider *) skeleton._constraints[_constraintIndex];
 	if (constraint->isActive()) {
-		SliderPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
+		SliderPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 		SliderData &data = constraint->_data;
-		pose._time = getAbsoluteValue(time, alpha, fromSetup, add, pose._time, data._setup._time);
+		pose._time = getAbsoluteValue(time, alpha, fromSetup, add, pose._time, data._setupPose._time);
 	}
 }
