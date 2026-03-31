@@ -72,8 +72,8 @@ export interface SpinePlayerConfig {
 	/* Optional: Whether to show the loading animation. Default: true */
 	showLoading?: boolean
 
-	/* Optional: Which debugging visualizations are shown. Default: none */
-	debug?: {
+	/* Optional: Which debugging visualizations are shown. Set to true/false to enable/disable all, or an object to enable specific visualizations. Default: none */
+	debug?: boolean | {
 		bones: boolean
 		regions: boolean
 		meshes: boolean
@@ -311,16 +311,10 @@ export class SpinePlayer implements Disposable {
 		if (config.preserveDrawingBuffer === void 0) config.preserveDrawingBuffer = false;
 		if (config.mipmaps === void 0) config.mipmaps = true;
 		if (config.interactive === void 0) config.interactive = true;
-		if (!config.debug) config.debug = {
-			bones: false,
-			clipping: false,
-			bounds: false,
-			hulls: false,
-			meshes: false,
-			paths: false,
-			points: false,
-			regions: false
-		};
+		if (typeof config.debug !== "object") {
+			const d = !!config.debug;
+			config.debug = { bones: d, regions: d, meshes: d, bounds: d, paths: d, clipping: d, points: d, hulls: d };
+		}
 		if (config.animations && config.animation && config.animations.indexOf(config.animation) < 0)
 			throw new Error(`Animation '${config.animation}' is not in the config animation list: ${print(config.animations)}`);
 		if (config.skins && config.skin && config.skins.indexOf(config.skin) < 0)
@@ -340,7 +334,7 @@ export class SpinePlayer implements Disposable {
 
 		if (!config.alpha) { // Prevents a flash before the first frame is drawn.
 			const hex = config.backgroundColor!;
-			this.dom.style.backgroundColor = (hex.charAt(0) === '#' ? hex : `#${hex}`).substr(0, 7);
+			this.dom.style.backgroundColor = (hex.charAt(0) === '#' ? hex : `#${hex}`).substring(0, 7);
 		}
 
 		try {
@@ -788,7 +782,7 @@ export class SpinePlayer implements Disposable {
 
 	private percentageToWorldUnit (size: number, percentageOrAbsolute: string | number): number {
 		if (typeof percentageOrAbsolute === "string")
-			return size * parseFloat(percentageOrAbsolute.substr(0, percentageOrAbsolute.length - 1)) / 100;
+			return size * parseFloat(percentageOrAbsolute.slice(0, -1)) / 100;
 		return percentageOrAbsolute;
 	}
 
@@ -916,13 +910,13 @@ export class SpinePlayer implements Disposable {
 
 				// Draw the skeleton and debug output.
 				renderer.drawSkeleton(skeleton);
-				if (Number(renderer.skeletonDebugRenderer.drawBones = config.debug!.bones! ?? false)
-					+ Number(renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug!.bounds! ?? false)
-					+ Number(renderer.skeletonDebugRenderer.drawClipping = config.debug!.clipping! ?? false)
-					+ Number(renderer.skeletonDebugRenderer.drawMeshHull = config.debug!.hulls! ?? false)
-					+ Number(renderer.skeletonDebugRenderer.drawPaths = config.debug!.paths! ?? false)
-					+ Number(renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug!.regions! ?? false)
-					+ Number(renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug!.meshes! ?? false) > 0
+				if (Number(renderer.skeletonDebugRenderer.drawBones = config.debug!.bones)
+					+ Number(renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug!.bounds)
+					+ Number(renderer.skeletonDebugRenderer.drawClipping = config.debug!.clipping)
+					+ Number(renderer.skeletonDebugRenderer.drawMeshHull = config.debug!.hulls)
+					+ Number(renderer.skeletonDebugRenderer.drawPaths = config.debug!.paths)
+					+ Number(renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug!.regions)
+					+ Number(renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug!.meshes) > 0
 				) {
 					renderer.drawSkeletonDebug(skeleton);
 				}
@@ -1062,7 +1056,7 @@ export class SpinePlayer implements Disposable {
 		if (this.hidePopup(id)) return;
 		if (!this.skeleton || !this.skeleton.data.animations.length) return;
 
-		const popup = new Popup(id, settingsButton, this, this.playerControls!, /*html*/`<div class="spine-player-popup-title">Debug</div><hr><ul class="spine-player-list"></li>`);
+		const popup = new Popup(id, settingsButton, this, this.playerControls!, /*html*/`<div class="spine-player-popup-title">Debug</div><hr><ul class="spine-player-list"></ul>`);
 
 		const rows = findWithClass(popup.dom, "spine-player-list");
 		const makeItem = (label: string, name: string) => {
