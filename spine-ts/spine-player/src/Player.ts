@@ -1048,6 +1048,7 @@ export class SpinePlayer implements Disposable {
 				this.config.skin = skin.name;
 				this.skeleton!.setSkin(this.config.skin);
 				this.skeleton!.setupPose();
+				this.skeleton!.updateWorldTransform(Physics.pose);
 			}
 		});
 		popup.show();
