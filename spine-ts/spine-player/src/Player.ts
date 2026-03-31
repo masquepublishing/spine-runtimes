@@ -74,6 +74,7 @@ export interface SpinePlayerConfig {
 
 	/* Optional: Which debugging visualizations are shown. Set to true/false to enable/disable all, or an object to enable specific visualizations. Default: none */
 	debug?: boolean | {
+		[key: string]: boolean
 		bones: boolean
 		regions: boolean
 		meshes: boolean
@@ -910,13 +911,14 @@ export class SpinePlayer implements Disposable {
 
 				// Draw the skeleton and debug output.
 				renderer.drawSkeleton(skeleton);
-				if (Number(renderer.skeletonDebugRenderer.drawBones = config.debug!.bones)
-					+ Number(renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug!.bounds)
-					+ Number(renderer.skeletonDebugRenderer.drawClipping = config.debug!.clipping)
-					+ Number(renderer.skeletonDebugRenderer.drawMeshHull = config.debug!.hulls)
-					+ Number(renderer.skeletonDebugRenderer.drawPaths = config.debug!.paths)
-					+ Number(renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug!.regions)
-					+ Number(renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug!.meshes) > 0
+				const debug = config.debug as any;
+				if (Number(renderer.skeletonDebugRenderer.drawBones = debug.bones)
+					+ Number(renderer.skeletonDebugRenderer.drawBoundingBoxes = debug.bounds)
+					+ Number(renderer.skeletonDebugRenderer.drawClipping = debug.clipping)
+					+ Number(renderer.skeletonDebugRenderer.drawMeshHull = debug.hulls)
+					+ Number(renderer.skeletonDebugRenderer.drawPaths = debug.paths)
+					+ Number(renderer.skeletonDebugRenderer.drawRegionAttachments = debug.regions)
+					+ Number(renderer.skeletonDebugRenderer.drawMeshTriangles = debug.meshes) > 0
 				) {
 					renderer.drawSkeletonDebug(skeleton);
 				}
