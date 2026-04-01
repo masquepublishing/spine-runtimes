@@ -211,6 +211,13 @@
 	opacity: 0;
 	transition: opacity 0.4s;
 }
+.spine-player-controls .spine-player-timeline {
+	opacity: 0;
+	transition: opacity 0.3s;
+}
+.spine-player-controls:hover .spine-player-timeline {
+	opacity: 1;
+}
 
 /** Player buttons **/
 .spine-player-buttons {
