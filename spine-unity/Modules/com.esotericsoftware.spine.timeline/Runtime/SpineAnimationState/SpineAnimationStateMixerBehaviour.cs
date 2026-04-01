@@ -353,7 +353,7 @@ namespace Spine.Unity.Playables {
 					dummyAnimationState.Event -= EditorEvent;
 				} else {
 					if (toAnimation != null) {
-						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, editorAnimationEvents, clipData.alpha, MixBlend.Setup, MixDirection.In, false);
+						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, editorAnimationEvents, clipData.alpha, true, false, false, false);
 						if (EditorEvent != null) {
 							foreach (Spine.Event e in editorAnimationEvents) {
 								EditorEvent(null, e);

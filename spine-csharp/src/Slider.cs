@@ -71,8 +71,7 @@ namespace Spine {
 			for (int i = 0, n = animation.bones.Count; i < n; i++)
 				bones[indices[i]].applied.ModifyLocal(skeleton);
 
-			animation.Apply(skeleton, p.time, p.time, data.loop, null, p.mix, data.additive ? MixBlend.Add : MixBlend.Replace,
-				MixDirection.In, true);
+			animation.Apply(skeleton, p.time, p.time, data.loop, null, p.mix, false, data.additive, false, true);
 		}
 
 		override public void Sort (Skeleton skeleton) {
