@@ -50,7 +50,6 @@ namespace Spine {
 			this.setup = setup;
 		}
 
-		///<summary>The constraint's name, which is unique across all constraints in the skeleton of the same type.</summary>
 		public string Name { get { return name; } }
 
 		public P GetSetupPose () {

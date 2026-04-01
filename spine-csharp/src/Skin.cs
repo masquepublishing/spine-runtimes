@@ -33,7 +33,7 @@ using System.Collections.Generic;
 
 namespace Spine {
 	/// <summary>Stores attachments by slot index and placeholder name.
-	/// <para>See SkeletonData <see cref="Spine.SkeletonData.DefaultSkin"/>, Skeleton <see cref="Spine.Skeleton.Skin"/>, and
+	/// <para>See <see cref="Spine.SkeletonData.DefaultSkin"/>, <see cref="Spine.Skeleton.Skin"/>, and
 	/// <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.</para>
 	/// </summary>
 	public class Skin {
@@ -44,6 +44,8 @@ namespace Spine {
 		internal readonly ExposedList<BoneData> bones = new ExposedList<BoneData>();
 		internal readonly ExposedList<IConstraintData> constraints = new ExposedList<IConstraintData>();
 
+		/// <summary>The skin's name, unique across all skins in the skeleton.
+		/// <para>See <see cref="SkeletonData.FindSkin(string)"/>.</para></summary>
 		public string Name { get { return name; } }
 		/// <summary>Returns all attachments contained in this skin.</summary>
 		public ICollection<SkinEntry> Attachments { get { return attachments.Values; } }

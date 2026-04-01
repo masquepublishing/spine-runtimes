@@ -31,9 +31,15 @@ using System;
 
 namespace Spine {
 
-	/// <summary>
-	/// The applied pose for a bone. This is the <see cref="Bone"/> pose with constraints applied and the world transform computed by
-	/// <see cref="Skeleton.UpdateWorldTransform(Physics)"/>.
+	/// <summary>The applied local pose and world transform for a bone. This is the <see cref="Bone.Pose"/> with constraints applied and the
+	/// world transform computed by <see cref="Skeleton.UpdateWorldTransform(Physics)"/> and <see cref="UpdateWorldTransform(Skeleton)"/>.
+	/// <para>
+	/// If the world transform is changed, call <see cref="UpdateLocalTransform(Skeleton)"/> before using the local transform. The local
+	/// transform may be needed by other code (eg to apply another constraint).</para>
+	/// <para>
+	/// After changing the world transform, call <see cref="UpdateWorldTransform(Skeleton)"/> on every descendant bone. It may be more
+	/// convenient to modify the local transform instead, then call <see cref="Skeleton.UpdateWorldTransform(Physics)"/> to update the world
+	/// transforms for all bones and apply constraints.</para>
 	/// </summary>
 	public class BonePose : BoneLocal, IUpdate {
 		public Bone bone;
@@ -48,7 +54,8 @@ namespace Spine {
 			if (world != skeleton.update) UpdateWorldTransform(skeleton);
 		}
 
-		/// <summary>Computes the world transform using the parent bone's applied pose and this pose. Child bones are not updated.
+		/// <summary>Computes the world transform using the parent bone's world transform and this applied local pose. Child bones are not
+		/// updated.
 		/// <para>
 		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 		/// Runtimes Guide.</para></summary>
@@ -162,11 +169,7 @@ namespace Spine {
 		/// <summary>
 		/// Computes the local transform values from the world transform.
 		/// <para>
-		/// If the world transform is modified (by a constraint, <see cref="RotateWorld(float)"/>, etc) then this method should be called so
-		/// the local transform matches the world transform. The local transform may be needed by other code (eg to apply another
-		/// constraint). </para>
-		/// <para>
-		/// Some information is ambiguous in the world transform, such as - 1,-1 scale versus 180 rotation.The local transform after
+		/// Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The local transform after
 		/// calling this method is equivalent to the local transform used to compute the world transform, but may not be identical.
 		/// </para></summary>
 		public void UpdateLocalTransform (Skeleton skeleton) {
@@ -254,8 +257,9 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// If the world transform has been modified and the local transform no longer matches, <see cref="UpdateLocalTransform(Skeleton)"/>
-		/// is called.
+		/// If the world transform has been modified by constraints and the local transform no longer matches,
+		/// <see cref="UpdateLocalTransform(Skeleton)"/> is called. Call this after <see cref="Skeleton.UpdateWorldTransform(Physics)"/> before
+		/// using the applied local transform.
 		/// </summary>
 		public void ValidateLocalTransform (Skeleton skeleton) {
 			if (local == skeleton.update) UpdateLocalTransform(skeleton);
@@ -285,18 +289,18 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>Part of the world transform matrix for the X axis. If changed, <see cref="UpdateLocalTransform(Skeleton)"/> should be called.</summary>
+		/// <summary>Part of the world transform matrix for the X axis.</summary>
 		public float A { get { return a; } set { a = value; } }
-		/// <summary>Part of the world transform matrix for the Y axis. If changed, <see cref="UpdateLocalTransform(Skeleton)"/> should be called.</summary>
+		/// <summary>Part of the world transform matrix for the Y axis.</summary>
 		public float B { get { return b; } set { b = value; } }
-		/// <summary>Part of the world transform matrix for the X axis. If changed, <see cref="UpdateLocalTransform(Skeleton)"/> should be called.</summary>
+		/// <summary>Part of the world transform matrix for the X axis.</summary>
 		public float C { get { return c; } set { c = value; } }
-		/// <summary>Part of the world transform matrix for the Y axis. If changed, <see cref="UpdateLocalTransform(Skeleton)"/> should be called.</summary>
+		/// <summary>Part of the world transform matrix for the Y axis.</summary>
 		public float D { get { return d; } set { d = value; } }
 
-		/// <summary>The world X position. If changed, <see cref="UpdateLocalTransform(Skeleton)"/> should be called.</summary>
+		/// <summary>The world X position.</summary>
 		public float WorldX { get { return worldX; } set { worldX = value; } }
-		/// <summary>The world Y position. If changed, <see cref="UpdateLocalTransform(Skeleton)"/> should be called.</summary>
+		/// <summary>The world Y position.</summary>
 		public float WorldY { get { return worldY; } set { worldY = value; } }
 		/// <summary>The world rotation for the X axis, calculated using <see cref="a"/> and <see cref="c"/>.</summary>
 		public float WorldRotationX { get { return MathUtils.Atan2Deg(c, a); } }
@@ -357,12 +361,7 @@ namespace Spine {
 			return MathUtils.Atan2Deg(cos * c + sin * d, cos * a + sin * b);
 		}
 
-		/// <summary>
-		/// Rotates the world transform the specified amount.
-		/// <para>
-		/// After changes are made to the world transform, <see cref="UpdateLocalTransform(Skeleton)"/> should be called on this bone and any
-		/// child bones, recursively.
-		/// </para></summary>
+		/// <summary>Rotates the world transform the specified amount.</summary>
 		public void RotateWorld (float degrees) {
 			degrees *= MathUtils.DegRad;
 			float sin = (float)Math.Sin(degrees), cos = (float)Math.Cos(degrees);

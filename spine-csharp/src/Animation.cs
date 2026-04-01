@@ -94,15 +94,16 @@ namespace Spine {
 			bones.TrimExcess();
 		}
 
-		/// <summary>Returns true if this animation contains a timeline with any of the specified property IDs.</summary>
+		/// <summary>Returns true if this animation contains a timeline with any of the specified property IDs.
+		/// <para>See <see cref="Timeline.PropertyIds"/>.</para></summary>
 		public bool HasTimeline (string[] propertyIds) {
 			foreach (string id in propertyIds)
 				if (timelineIds.Contains(id)) return true;
 			return false;
 		}
 
-		/// <summary>The duration of the animation in seconds, which is usually the highest time of all frames in the timeline. The duration is
-		/// used to know when it has completed and when it should loop back to the start.</summary>
+		/// <summary>The duration of the animation in seconds, which is usually the highest time of all frames in the timelines. The duration is
+		/// used to know when the animation has completed and, for animations that repeat, when it should loop back to the start.</summary>
 		public float Duration { get { return duration; } set { duration = value; } }
 
 
@@ -127,7 +128,7 @@ namespace Spine {
 		/// <param name="add">If true, for timelines that support it, their values are added to the setup or current values (depending on
 		/// 				<c>fromSetup</c>).</param>
 		/// <param name="mixOut">True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.</param>
-		/// <param name="appliedPose">True to modify the <see cref="Posed.AppliedPose"/>, else modify the <see cref="Posed.Pose"/>.</param>
+		/// <param name="appliedPose">True to modify the <see cref="Posed.AppliedPose"/>, else the <see cref="Posed.Pose"/> is modified.</param>
 		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events, float alpha,
 							bool fromSetup, bool add, bool mixOut, bool appliedPose) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
@@ -142,7 +143,8 @@ namespace Spine {
 				timelines[i].Apply(skeleton, lastTime, time, events, alpha, fromSetup, add, mixOut, appliedPose);
 		}
 
-		/// <summary>The animation's name, which is unique across all animations in the skeleton.</summary>
+		/// <summary>The animation's name, unique across all animations in the skeleton.
+		/// <para>See <see cref="SkeletonData.FindAnimation(string)"/>.</para></summary>
 		public string Name { get { return name; } }
 
 		override public string ToString () {
@@ -187,16 +189,17 @@ namespace Spine {
 			get { return frames; }
 		}
 
-		/// <summary>The number of entries stored per frame.</summary>
+		/// <summary>The number of values stored per frame.</summary>
 		public virtual int FrameEntries {
 			get { return 1; }
 		}
 
-		/// <summary>The number of frames for this timeline.</summary>
+		/// <summary>The number of frames in this timeline.</summary>
 		public virtual int FrameCount {
 			get { return frames.Length / FrameEntries; }
 		}
 
+		/// <summary>The duration of the timeline in seconds, which is usually the highest time of all frames in the timeline.</summary>
 		public float Duration {
 			get {
 				return frames[frames.Length - FrameEntries];
@@ -220,7 +223,7 @@ namespace Spine {
 		/// <summary>Applies this timeline to the skeleton.</summary>
 		/// <param name="skeleton">The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton
 		/// 				components the timelines may change.</param>
-		/// <param name="lastTime">The last time in seconds this timline was applied. Some timelines trigger only at discrete times, in
+		/// <param name="lastTime">The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in
 		/// 				which case all keys are triggered between<c> lastTime</c> (exclusive) and <c>time</c> (inclusive).
 		/// 				Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
 		/// <param name="time">The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and
@@ -238,8 +241,9 @@ namespace Spine {
 		///                   timeline values, no change is made before the first frame.</param>
 		/// <param name="add">If true, for timelines that support it, their values are added to the setup or current values (depending on
 		///                   <c>fromSetup</c>).</param>
-		/// <param name="mixOut">True when the animation is mixing out, else it is mixing in.</param>
-		/// <param name="appliedPose">True to modify the <see cref="Posed.AppliedPose"/>, else modify the <see cref="Posed.Pose"/>.</param>
+		/// <param name="mixOut">True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
+		///                   transitions.</param>
+		/// <param name="appliedPose">True to modify the <see cref="Posed.AppliedPose"/>, else the <see cref="Posed.Pose"/> is modified.</param>
 		public abstract void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha,
 			bool fromSetup, bool add, bool mixOut, bool appliedPose);
 
@@ -264,7 +268,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>An interface for timelines that change the property of a slot.</summary>
+	/// <summary>An interface for timelines that change a slot's properties.</summary>
 	public interface ISlotTimeline {
 		/// <summary>The index of the slot in <see cref="Skeleton.Slots"/> that will be changed when this timeline is applied.</summary>
 		int SlotIndex { get; }
@@ -272,7 +276,9 @@ namespace Spine {
 
 	/// <summary>The base class for timelines that interpolate between frame values using stepped, linear, or a Bezier curve.</summary>
 	public abstract class CurveTimeline : Timeline {
-		public const int LINEAR = 0, STEPPED = 1, BEZIER = 2, BEZIER_SIZE = 18;
+		public const int LINEAR = 0, STEPPED = 1, BEZIER = 2;
+		/// <summary>The number of values stored for each 10 segment Bezier curve.</summary>
+		public const int BEZIER_SIZE = 18;
 
 		internal float[] curves;
 		/// <summary>The number of key frames for this timeline.</summary>
@@ -379,7 +385,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>The base class for a <see cref="CurveTimeline"/> that sets one property.</summary>
+	/// <summary>The base class for a <see cref="CurveTimeline"/> that sets one property with a curve.</summary>
 	public abstract class CurveTimeline1 : CurveTimeline {
 		public const int ENTRIES = 2;
 		internal const int VALUE = 1;
@@ -425,24 +431,44 @@ namespace Spine {
 			return GetBezierValue(time, i, VALUE, curveType - BEZIER);
 		}
 
+		/// <summary>Returns the interpolated value for properties relative to the setup value. The timeline value is added to the setup
+		/// value, rather than replacing it.</summary>
+		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, bool, bool, bool, bool)"/>
+		/// <param name="current">The current value for the property.</param>
+		/// <param name="setup">The setup value for the property.</param>
 		public float GetRelativeValue (float time, float alpha, bool fromSetup, bool add, float current, float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = GetCurveValue(time);
 			return fromSetup ? setup + value * alpha : current + (add ? value : value + setup - current) * alpha;
 		}
 
+		/// <summary>Returns the interpolated value for properties set as absolute values. The timeline value replaces the setup value,
+		/// rather than being relative to it.</summary>
+		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, bool, bool, bool, bool)"/>
+		/// <param name="current">The current value for the property.</param>
+		/// <param name="setup">The setup value for the property.</param>
 		public float GetAbsoluteValue (float time, float alpha, bool fromSetup, bool add, float current, float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = GetCurveValue(time);
 			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
+		/// <summary>Returns the interpolated value for properties set as absolute values, using the specified timeline value rather than
+		/// calling <see cref="GetCurveValue(float)"/>.</summary>
+		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, bool, bool, bool, bool)"/>
+		/// <param name="current">The current value for the property.</param>
+		/// <param name="setup">The setup value for the property.</param>
+		/// <param name="value">The timeline value to apply.</param>
 		public float GetAbsoluteValue (float time, float alpha, bool fromSetup, bool add, float current, float setup,
 			float value) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
+		/// <summary>Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.</summary>
+		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, bool, bool, bool, bool)"/>
+		/// <param name="current">The current value for the property.</param>
+		/// <param name="setup">The setup value for the property.</param>
 		public float GetScaleValue (float time, float alpha, bool fromSetup, bool add, bool mixOut, float current,
 			float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
@@ -456,12 +482,13 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>An interface for timelines that change the property of a bone.</summary>
+	/// <summary>An interface for timelines that change a bone's properties.</summary>
 	public interface IBoneTimeline {
-		/// <summary>The index of the bone in <see cref="Skeleton.Bones"/> that will be changed when this timeline is applied.</summary>
+		/// <summary>The index of the bone in <see cref="Skeleton.Bones"/> that is changed by this timeline.</summary>
 		int BoneIndex { get; }
 	}
 
+	/// <summary>The base class for timelines that change 1 bone property with a curve.</summary>
 	public abstract class BoneTimeline1 : CurveTimeline1, IBoneTimeline {
 		readonly int boneIndex;
 
@@ -489,7 +516,7 @@ namespace Spine {
 			bool mixOut);
 	}
 
-	/// <summary>The base class for a <see cref="CurveTimeline"/> that is a <see cref="BoneTimeline"/> and sets two properties.</summary>
+	/// <summary>The base class for timelines that change two bone properties with a curve.</summary>
 	public abstract class BoneTimeline2 : CurveTimeline, IBoneTimeline {
 		public const int ENTRIES = 3;
 		internal const int VALUE1 = 1, VALUE2 = 2;
@@ -535,7 +562,7 @@ namespace Spine {
 			bool mixOut);
 	}
 
-	/// <summary>Changes a bone's local <see cref="BoneLocal.Rotation"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.Rotation"/>.</summary>
 	public class RotateTimeline : BoneTimeline1, IBoneTimeline {
 		public RotateTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.Rotate) {
@@ -547,7 +574,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref"BoneLocal.X"/> and <see cref"BonePose.Y"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.X"/> and <see cref="BoneLocal.Y"/>.</summary>
 	public class TranslateTimeline : BoneTimeline2 {
 		public TranslateTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.X, Property.Y) {
@@ -602,7 +629,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref"BoneLocal.X"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.X"/>.</summary>
 	public class TranslateXTimeline : BoneTimeline1 {
 		public TranslateXTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.X) {
@@ -613,7 +640,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref"BoneLocal.Y"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.Y"/>.</summary>
 	public class TranslateYTimeline : BoneTimeline1 {
 		public TranslateYTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.Y) {
@@ -624,7 +651,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref="BoneLocal.ScaleX"/> and <see cref="BoneLocal.ScaleY"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.ScaleX"/> and <see cref="BoneLocal.ScaleY"/>.</summary>
 	public class ScaleTimeline : BoneTimeline2 {
 
 		public ScaleTimeline (int frameCount, int bezierCount, int boneIndex)
@@ -692,7 +719,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref="BoneLocal.ScaleX"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.ScaleX"/>.</summary>
 	public class ScaleXTimeline : BoneTimeline1 {
 		public ScaleXTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ScaleX) {
@@ -704,7 +731,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref="BoneLocal.ScaleY"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.ScaleY"/>.</summary>
 	public class ScaleYTimeline : BoneTimeline1 {
 		public ScaleYTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ScaleY) {
@@ -716,7 +743,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref="BoneLocal.ShearX"/> and <see cref="BoneLocal.ShearY"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.ShearX"/> and <see cref="BoneLocal.ShearY"/>.</summary>
 	public class ShearTimeline : BoneTimeline2 {
 		public ShearTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ShearX, Property.ShearY) {
@@ -766,7 +793,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref="BoneLocal.ShearX"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.ShearX"/>.</summary>
 	public class ShearXTimeline : BoneTimeline1 {
 		public ShearXTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ShearX) {
@@ -778,7 +805,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's local <see cref="BoneLocal.ShearY"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.ShearY"/>.</summary>
 	public class ShearYTimeline : BoneTimeline1 {
 		public ShearYTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ShearY) {
@@ -790,7 +817,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a bone's <see cref="BoneLocal.Inherit"/>.</summary>
+	/// <summary>Changes <see cref="BoneLocal.Inherit"/>.</summary>
 	public class InheritTimeline : Timeline, IBoneTimeline {
 		public const int ENTRIES = 2;
 		private const int INHERIT = 1;
@@ -842,6 +869,7 @@ namespace Spine {
 		}
 	}
 
+	/// <summary>The base class for timelines that change any number of slot properties with a curve.</summary>
 	public abstract class SlotCurveTimeline : CurveTimeline, ISlotTimeline {
 		readonly int slotIndex;
 
@@ -867,7 +895,7 @@ namespace Spine {
 		abstract protected void Apply (Slot slot, SlotPose pose, float time, float alpha, bool fromSetup, bool add);
 	}
 
-	/// <summary>Changes a slot's <see cref="SlotPose.GetColor"/>.</summary>
+	/// <summary>Changes <see cref="SlotPose.GetColor"/>.</summary>
 	public class RGBATimeline : SlotCurveTimeline {
 		public const int ENTRIES = 5;
 		private const int R = 1, G = 2, B = 3, A = 4;
@@ -948,7 +976,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes the RGB for a slot's <see cref="SlotPose.GetColor"/>.</summary>
+	/// <summary>Changes RGB for a slot's <see cref="SlotPose.GetColor"/>.</summary>
 	public class RGBTimeline : SlotCurveTimeline {
 		public const int ENTRIES = 4;
 		private const int R = 1, G = 2, B = 3;
@@ -1033,7 +1061,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes the alpha for a slot's <see cref="SlotPose.GetColor"/>.</summary>
+	/// <summary>Changes alpha for a slot's <see cref="SlotPose.GetColor"/>.</summary>
 	public class AlphaTimeline : CurveTimeline1, ISlotTimeline {
 		readonly int slotIndex;
 
@@ -1080,7 +1108,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a slot's <see cref="SlotPose.Color"/> and <see cref="SlotPose.DarkColor"/> for two color tinting.</summary>
+	/// <summary>Changes <see cref="SlotPose.Color"/> and <see cref="SlotPose.DarkColor"/> for two color tinting.</summary>
 	public class RGBA2Timeline : SlotCurveTimeline {
 		public const int ENTRIES = 8;
 		protected const int R = 1, G = 2, B = 3, A = 4, R2 = 5, G2 = 6, B2 = 7;
@@ -1202,7 +1230,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes the RGB for a slot's <see cref="SlotPose.Color"/> and <see cref="SlotPose.DarkColor"/> for two color tinting.</summary>
+	/// <summary>Changes RGB for a slot's <see cref="SlotPose.Color"/> and <see cref="SlotPose.DarkColor"/> for two color tinting.</summary>
 	public class RGB2Timeline : SlotCurveTimeline {
 		public const int ENTRIES = 7;
 		protected const int R = 1, G = 2, B = 3, R2 = 4, G2 = 5, B2 = 6;
@@ -1330,7 +1358,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a slot's <see cref="SlotPose.Attachment"/>.</summary>
+	/// <summary>Changes <see cref="SlotPose.Attachment"/>.</summary>
 	public class AttachmentTimeline : Timeline, ISlotTimeline {
 		readonly int slotIndex;
 		readonly string[] attachmentNames;
@@ -1384,7 +1412,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a slot's <see cref="SlotPose.Deform"/> to deform a <see cref="VertexAttachment"/>.</summary>
+	/// <summary>Changes <see cref="SlotPose.Deform"/> to deform a <see cref="VertexAttachment"/>.</summary>
 	public class DeformTimeline : SlotCurveTimeline {
 		readonly VertexAttachment attachment;
 		internal float[][] vertices;
@@ -1604,7 +1632,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a slot's <see cref="SlotPose.SequenceIndex"/> for an attachment's <see cref="Sequence"/>.</summary>
+	/// <summary>Changes <see cref="SlotPose.SequenceIndex"/> for an attachment's <see cref="Sequence"/>.</summary>
 	public class SequenceTimeline : Timeline, ISlotTimeline {
 		public const int ENTRIES = 3;
 		private const int MODE = 1, DELAY = 2;
@@ -1770,7 +1798,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a skeleton's <see cref="Skeleton.DrawOrder"/>.</summary>
+	/// <summary>Changes <see cref="Skeleton.DrawOrder"/>.</summary>
 	public class DrawOrderTimeline : Timeline {
 		internal static readonly string propertyID = ((int)Property.DrawOrder).ToString();
 		internal static readonly string[] propertyIds = { propertyID };
@@ -1824,7 +1852,7 @@ namespace Spine {
 	}
 
 
-	/// <summary>Changes a subset of a skeleton's <see cref="Skeleton.DrawOrder"/>.</summary>
+	/// <summary>Changes a subset of <see cref="Skeleton.DrawOrder"/>.</summary>
 	public class DrawOrderFolderTimeline : Timeline {
 		private readonly int[] slots;
 		private readonly bool[] inFolder;
@@ -1920,7 +1948,7 @@ namespace Spine {
 		int ConstraintIndex { get; }
 	}
 
-	/// <summary>Changes an IK constraint's <see cref="IkConstraintPose.Mix"/>, <see cref="IkConstraintPose.Softness"/>,
+	/// <summary>Changes <see cref="IkConstraintPose.Mix"/>, <see cref="IkConstraintPose.Softness"/>,
 	/// <see cref="IkConstraintPose.BendDirection"/>, <see cref="IkConstraintPose.Stretch"/>, and
 	/// <see cref="IkConstraintPose.Compress"/>.</summary>
 	public class IkConstraintTimeline : CurveTimeline, IConstraintTimeline {
@@ -2020,7 +2048,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a transform constraint's <see cref="TransformConstraintPose.MixRotate"/>, <see cref="TransformConstraintPose.MixX"/>,
+	/// <summary>Changes <see cref="TransformConstraintPose.MixRotate"/>, <see cref="TransformConstraintPose.MixX"/>,
 	/// <see cref="TransformConstraintPose.MixY"/>, <see cref="TransformConstraintPose.MixScaleX"/>,
 	/// <see cref="TransformConstraintPose.MixScaleY"/>, and <see cref="TransformConstraintPose.MixShearY"/></summary>
 	public class TransformConstraintTimeline : CurveTimeline, IConstraintTimeline {
@@ -2147,6 +2175,7 @@ namespace Spine {
 		}
 	}
 
+	/// <summary>The base class for timelines that change 1 constraint property with a curve.</summary>
 	abstract public class ConstraintTimeline1 : CurveTimeline1, IConstraintTimeline {
 		internal readonly int constraintIndex;
 
@@ -2162,7 +2191,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a path constraint's <see cref="PathConstraintPose.Position"/>.</summary>
+	/// <summary>Changes <see cref="PathConstraintPose.Position"/>.</summary>
 	public class PathConstraintPositionTimeline : ConstraintTimeline1 {
 
 		public PathConstraintPositionTimeline (int frameCount, int bezierCount, int constraintIndex)
@@ -2181,7 +2210,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a path constraint's <see cref="PathConstraintPose.Spacing"/>.</summary>
+	/// <summary>Changes <see cref="PathConstraintPose.Spacing"/>.</summary>
 	public class PathConstraintSpacingTimeline : ConstraintTimeline1 {
 
 		public PathConstraintSpacingTimeline (int frameCount, int bezierCount, int constraintIndex)
@@ -2200,7 +2229,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a path constraint's <see cref="PathConstraintPose.MixRotate"/>, <see cref="PathConstraintPose.MixX"/>, and
+	/// <summary>Changes <see cref="PathConstraintPose.MixRotate"/>, <see cref="PathConstraintPose.MixX"/>, and
 	/// <see cref="PathConstraintPose.MixY"/>.</summary>
 	public class PathConstraintMixTimeline : CurveTimeline, IConstraintTimeline {
 		public const int ENTRIES = 4;
@@ -2328,7 +2357,7 @@ namespace Spine {
 		abstract protected bool Global (PhysicsConstraintData constraint);
 	}
 
-	/// <summary>Changes a physics constraint's <see cref="PhysicsConstraintPose.Inertia"/>.</summary>
+	/// <summary>Changes <see cref="PhysicsConstraintPose.Inertia"/>.</summary>
 	public class PhysicsConstraintInertiaTimeline : PhysicsConstraintTimeline {
 		public PhysicsConstraintInertiaTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.PhysicsConstraintInertia) {
@@ -2347,7 +2376,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a physics constraint's <see cref="PhysicsConstraintPose.Strength"/>.</summary>
+	/// <summary>Changes <see cref="PhysicsConstraintPose.Strength"/>.</summary>
 	public class PhysicsConstraintStrengthTimeline : PhysicsConstraintTimeline {
 		public PhysicsConstraintStrengthTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.PhysicsConstraintStrength) {
@@ -2366,7 +2395,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a physics constraint's <see cref="PhysicsConstraintPose.Damping"/>.</summary>
+	/// <summary>Changes <see cref="PhysicsConstraintPose.Damping"/>.</summary>
 	public class PhysicsConstraintDampingTimeline : PhysicsConstraintTimeline {
 		public PhysicsConstraintDampingTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.PhysicsConstraintDamping) {
@@ -2385,7 +2414,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a physics constraint's <see cref="PhysicsConstraintPose.MassInverse"/>. The timeline values are not inverted.</summary>
+	/// <summary>Changes <see cref="PhysicsConstraintPose.MassInverse"/>. The timeline values are not inverted.</summary>
 	public class PhysicsConstraintMassTimeline : PhysicsConstraintTimeline {
 		public PhysicsConstraintMassTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.PhysicsConstraintMass) {
@@ -2404,7 +2433,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a physics constraint's <see cref="PhysicsConstraintPose.Wind"/>.</summary>
+	/// <summary>Changes <see cref="PhysicsConstraintPose.Wind"/>.</summary>
 	public class PhysicsConstraintWindTimeline : PhysicsConstraintTimeline {
 		public PhysicsConstraintWindTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.PhysicsConstraintWind) {
@@ -2424,7 +2453,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a physics constraint's <see cref="PhysicsConstraintPose.Gravity"/>.</summary>
+	/// <summary>Changes <see cref="PhysicsConstraintPose.Gravity"/>.</summary>
 	public class PhysicsConstraintGravityTimeline : PhysicsConstraintTimeline {
 		public PhysicsConstraintGravityTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.PhysicsConstraintGravity) {
@@ -2444,7 +2473,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a physics constraint's <see cref="PhysicsConstraintPose.Mix"/>.</summary>
+	/// <summary>Changes <see cref="PhysicsConstraintPose.Mix"/>.</summary>
 	public class PhysicsConstraintMixTimeline : PhysicsConstraintTimeline {
 		public PhysicsConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.PhysicsConstraintMix) {
@@ -2528,7 +2557,7 @@ namespace Spine {
 	}
 
 	/// <summary>
-	/// Changes a slider's <see cref="SliderPose.Time"/>.
+	/// Changes <see cref="SliderPose.Time"/>.
 	/// </summary>
 	public class SliderTimeline : ConstraintTimeline1 {
 		public SliderTimeline (int frameCount, int bezierCount, int constraintIndex)
@@ -2549,7 +2578,7 @@ namespace Spine {
 	}
 
 	/// <summary>
-	/// Changes a slider's <see cref="SliderPose.Mix"/>.
+	/// Changes <see cref="SliderPose.Mix"/>.
 	/// </summary>
 	public class SliderMixTimeline : ConstraintTimeline1 {
 		public SliderMixTimeline (int frameCount, int bezierCount, int constraintIndex)

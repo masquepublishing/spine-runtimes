@@ -370,9 +370,8 @@ namespace Spine {
 			ExposedList<Event> events = null;
 			if (from.reverse)
 				applyTime = from.animation.duration - applyTime;
-			else {
-				if (mix < from.eventThreshold) events = this.events;
-			}
+			else if (mix < from.eventThreshold)
+				events = this.events;
 
 			int[] timelineMode = from.timelineMode.Items;
 			TrackEntry[] timelineHoldMix = from.timelineHoldMix.Items;
@@ -593,8 +592,8 @@ namespace Spine {
 		/// <summary>
 		/// <para>Removes all animations from all tracks, leaving skeletons in their current pose.</para>
 		/// <para>
-		/// It may be desired to use <see cref="AnimationState.SetEmptyAnimations(float)"/> to mix the skeletons back to the setup pose,
-		/// rather than leaving them in their current pose.</para>
+		/// Usually you want to use <see cref="SetEmptyAnimations(float)"/> to mix the skeletons back to the setup pose, rather than leaving
+		/// them in their current pose.</para>
 		/// </summary>
 		public void ClearTracks () {
 			bool oldDrainDisabled = queue.drainDisabled;
@@ -610,8 +609,8 @@ namespace Spine {
 		/// <summary>
 		/// <para>Removes all animations from the track, leaving skeletons in their current pose.</para>
 		/// <para>
-		/// It may be desired to use <see cref="AnimationState.SetEmptyAnimation(int, float)"/> to mix the skeletons back to the setup pose,
-		/// rather than leaving them in their current pose.</para>
+		/// Usually you want to use <see cref="SetEmptyAnimation(int, float)"/> to mix the skeletons back to the setup pose, rather than
+		/// leaving them in their current pose.</para>
 		/// </summary>
 		public void ClearTrack (int trackIndex) {
 			if (trackIndex >= tracks.Count) return;
@@ -710,8 +709,8 @@ namespace Spine {
 		/// equivalent to calling <see cref="SetAnimation(int, Animation, bool)"/>.</summary>
 		/// <param name="delay">
 		/// If &gt; 0, sets <see cref="TrackEntry.Delay"/>. If &lt;= 0, the delay set is the duration of the previous track entry
-		/// minus any mix duration (from the <see cref="AnimationStateData"/> plus the specified <c>Delay</c> (ie the mix
-		/// ends at (<c>Delay</c> = 0) or before (<c>Delay</c> &lt; 0) the previous track entry duration). If the
+		/// minus any mix duration (from <see cref="Data"/>) plus the specified <c>Delay</c> (ie the mix ends at (when
+		/// <c>Delay</c> = 0) or before (when <c>Delay</c> &lt; 0) the previous track entry duration). If the
 		/// previous entry is looping, its next loop completion is used instead of its duration.
 		/// </param>
 		/// <returns>A track entry to allow further customization of animation playback. References to the track entry must not be kept
@@ -749,7 +748,7 @@ namespace Spine {
 		/// <see cref="AnimationState.SetEmptyAnimations(float)"/>, or <see cref="AnimationState.AddEmptyAnimation(int, float, float)"/>. Mixing to an empty animation causes
 		/// the previous animation to be applied less and less over the mix duration. Properties keyed in the previous animation
 		/// transition to the value from lower tracks or to the setup pose value if no lower tracks key the property. A mix duration of
-		/// 0 still mixes out over one frame.</para>
+		/// 0 still needs to be applied one more time to mix out, so the properties it was animating are reverted.</para>
 		/// <para>
 		/// Mixing in is done by first setting an empty animation, then adding an animation using
 		/// <see cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with the desired delay (an empty animation has a duration of 0) and on
@@ -774,9 +773,9 @@ namespace Spine {
 		/// <param name="trackIndex">Track number.</param>
 		/// <param name="mixDuration">Mix duration.</param>
 		/// <param name="delay">If &gt; 0, sets <see cref="TrackEntry.Delay"/>. If &lt;= 0, the delay set is the duration of the previous track entry
-		/// minus any mix duration plus the specified <c>Delay</c> (ie the mix ends at (<c>Delay</c> = 0) or
-		/// before (<c>Delay</c> &lt; 0) the previous track entry duration). If the previous entry is looping, its next
-		/// loop completion is used instead of its duration.</param>
+		/// minus any mix duration plus the specified <c>Delay</c> (ie the mix ends at (when <c>Delay</c> = 0) or
+		/// before (when <c>Delay</c> &lt; 0) the previous track entry duration). If the previous entry is looping, its
+		/// next loop completion is used instead of its duration.</param>
 		/// <returns> A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		/// after the <see cref="AnimationState.Dispose"/> event occurs.
 		/// </returns>
@@ -942,7 +941,7 @@ namespace Spine {
 		/// <para>Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower
 		/// or faster. Defaults to 1.</para>
 		/// <para>
-		/// See TrackEntry <see cref="TrackEntry.TimeScale"/> for affecting a single animation.</para>
+		/// See <see cref="TrackEntry.TimeScale"/> to affect a single animation.</para>
 		/// </summary>
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
@@ -957,7 +956,7 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>A list of tracks that have animations, which may contain nulls.</summary>
+		/// <summary>The list of tracks that have had animations. May contain null entries for tracks that currently have no animation.</summary>
 		public ExposedList<TrackEntry> Tracks { get { return tracks; } }
 
 		override public string ToString () {
@@ -1045,7 +1044,7 @@ namespace Spine {
 		/// Seconds to postpone playing the animation. Must be >= 0. When this track entry is the current track entry,
 		/// <c>Delay</c> postpones incrementing the <see cref="TrackEntry.TrackTime"/>. When this track entry is queued,
 		/// <c>Delay</c> is the time from the start of the previous animation to when this track entry will become the current
-		/// track entry (ie when the previous track entry <see cref="TrackEntry.TrackTime"/> &gt;= this track entry's
+		/// track entry (ie when the previous track entry <see cref="TrackTime"/> &gt;= this track entry's
 		/// <c>Delay</c>).</para>
 		/// <para>
 		/// <see cref="TrackEntry.TimeScale"/> affects the delay.</para>
@@ -1074,15 +1073,16 @@ namespace Spine {
 		/// is reached, no other animations are queued for playback, and mixing from any previous animations is complete, then the
 		/// properties keyed by the animation are set to the setup pose and the track is cleared.</para>
 		/// <para>
-		/// It may be desired to use <see cref="AnimationState.AddEmptyAnimation(int, float, float)"/>  rather than have the animation
+		/// Usually you want to use <see cref="AnimationState.AddEmptyAnimation(int, float, float)"/> rather than have the animation
 		/// abruptly cease being applied.</para>
 		/// </summary>
 		public float TrackEnd { get { return trackEnd; } set { trackEnd = value; } }
 
 		/// <summary>
-		/// If this track entry is non-looping, the track time in seconds when <see cref="AnimationEnd"/> is reached, or the current
-		/// <see cref="TrackTime"/> if it has already been reached. If this track entry is looping, the track time when this
-		/// animation will reach its next <see cref="AnimationEnd"/> (the next loop completion).</summary>
+		/// <para>If this track entry is non-looping, this is the track time in seconds when <see cref="AnimationEnd"/> is reached, or the
+		/// current <see cref="TrackTime"/> if it has already been reached.</para>
+		/// <para>If this track entry is looping, this is the track time when this animation will reach its next
+		/// <see cref="AnimationEnd"/> (the next loop completion).</para></summary>
 		public float TrackComplete {
 			get {
 				float duration = animationEnd - animationStart;
@@ -1127,7 +1127,7 @@ namespace Spine {
 		/// <c>AnimationTime</c> is equal to the <c>AnimationStart</c> time.
 		/// <para>
 		/// The <c>animationTime</c> is between <see cref="AnimationStart"/> and <see cref="AnimationEnd"/>, except if this
-		/// track entry is non-looping and <see cref="AnimationEnd"/> is >= to the animation <see cref="Animation.Duration"/>, then
+		/// track entry is non-looping and <see cref="AnimationEnd"/> is >= to the <see cref="Animation.Duration"/>, then
 		/// <c>animationTime</c> continues to increase past <see cref="AnimationEnd"/>.</para>
 		/// </summary>
 		public float AnimationTime {
@@ -1153,22 +1153,22 @@ namespace Spine {
 		/// match the animation speed.</para>
 		/// <para>
 		/// When using <see cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with a <c>Delay</c> &lt;= 0, the
-		/// <see cref="TrackEntry.Delay"/> is set using the mix duration from the <see cref="AnimationStateData"/>, assuming time scale to be 1. If
-		/// the time scale is not 1, the delay may need to be adjusted.</para>
+		/// <see cref="TrackEntry.Delay"/> is set using the mix duration from <see cref="AnimationState.Data"/>, assuming time scale to be 1. If the
+		/// time scale is not 1, the delay may need to be adjusted.</para>
 		/// <para>
-		/// See AnimationState <see cref="AnimationState.TimeScale"/> for affecting all animations.</para>
+		/// See <see cref="AnimationState.TimeScale"/> to affect all animations.</para>
 		/// </summary>
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
 		/// <summary>
 		/// <para>
-		/// Values &lt; 1 mix this animation with the skeleton's current pose (usually the pose resulting from lower tracks). Defaults
-		/// to 1, which overwrites the skeleton's current pose with this animation.</para>
+		/// Values &lt; 1 mix this animation with the skeleton's current pose (either the setup pose or the pose from lower tracks).
+		/// Defaults to 1, which overwrites the skeleton's current pose with this animation.</para>
 		/// <para>
-		/// Typically track 0 is used to completely pose the skeleton, then alpha is used on higher tracks. It doesn't make sense to
-		/// use alpha on track 0 if the skeleton pose is from the last frame render.</para>
+		/// Alpha should be 1 on track 0.</para>
+		/// <para>
+		/// See <see cref="AlphaAttachmentThreshold"/>.</para>
 		/// </summary>
-		/// <seealso cref="AlphaAttachmentThreshold"/>
 		public float Alpha { get { return alpha; } set { alpha = value; } }
 
 		public float InterruptAlpha { get { return interruptAlpha; } }
@@ -1181,8 +1181,9 @@ namespace Spine {
 		public float EventThreshold { get { return eventThreshold; } set { eventThreshold = value; } }
 
 		/// <summary>
-		/// When <see cref="Alpha"/> is greater than <c>AlphaAttachmentThreshold</c>, attachment timelines are applied.
-		/// Defaults to 0, so attachment timelines are always applied.
+		/// When the computed alpha is greater than <c>AlphaAttachmentThreshold</c>, attachment timelines are applied. The
+		/// computed alpha includes <see cref="Alpha"/> and the mix percentage. Defaults to 0, so attachment timelines are always
+		/// applied.
 		/// </summary>
 		public float AlphaAttachmentThreshold { get { return alphaAttachmentThreshold; } set { alphaAttachmentThreshold = value; } }
 
@@ -1233,33 +1234,39 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Seconds from 0 to the <see cref="TrackEntry.MixDuration"/> when mixing from the previous animation to this animation. May be
-		/// slightly more than <c>MixDuration</c> when the mix is complete.</summary>
+		/// Seconds elapsed from 0 to the <see cref="TrackEntry.MixDuration"/> when mixing from the previous animation to this animation. May
+		/// be slightly more than <c>MixDuration</c> when the mix is complete.</summary>
 		public float MixTime { get { return mixTime; } set { mixTime = value; } }
 
 		/// <summary>
 		/// <para>
-		/// Seconds for mixing from the previous animation to this animation. Defaults to the value provided by AnimationStateData
+		/// Seconds for mixing from the previous animation to this animation. Defaults to the value provided by
 		/// <see cref="AnimationStateData.GetMix(Animation, Animation)"/> based on the animation before this animation (if any).</para>
+		/// <para>
+		/// A mix duration of 0 still needs to be applied one more time to mix out, so the properties it was animating are
+		/// reverted. A mix duration of 0 can be set at any time to end the mix on the next <see cref="AnimationState.Update(float)"/>.</para>
 		/// <para>
 		/// The <c>MixDuration</c> can be set manually rather than use the value from
 		/// <see cref="AnimationStateData.GetMix(Animation, Animation)"/>. In that case, the <c>MixDuration</c> can be set for a new
 		/// track entry only before <see cref="AnimationState.Update(float)"/> is next called.</para>
 		/// <para>
 		/// When using <seealso cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with a <c>Delay</c> &lt;= 0, the
-		/// <see cref="TrackEntry.Delay"/> is set using the mix duration from the <see cref=" AnimationStateData"/>. If <c>mixDuration</c> is set
-		/// afterward, the delay may need to be adjusted. For example:</para>
-		/// <para><c>entry.Delay = entry.previous.TrackComplete - entry.MixDuration;</c></para>
-		/// <para>Alternatively, <see cref="SetMixDuration(float, float)"/> can be used to recompute the delay:</para>
-		/// <para><c>entry.SetMixDuration(0.25f, 0);</c></para>
+		/// <see cref="TrackEntry.Delay"/> is set using the mix duration from <see cref="AnimationState.Data"/>. If <c>MixDuration</c> is set
+		/// afterward, the delay needs to be adjusted:</para>
+		/// <code>
+		/// entry.MixDuration = 0.25f;
+		/// entry.Delay = entry.Previous.TrackComplete - entry.MixDuration + 0;
+		/// </code>
+		/// <para>Alternatively, use <see cref="SetMixDuration(float, float)"/> to set both the mix duration and recompute the delay:</para>
+		/// <code>entry.SetMixDuration(0.25f, 0); // mixDuration, delay</code>
 		/// </summary>
 		public float MixDuration { get { return mixDuration; } set { mixDuration = value; } }
 
 		/// <summary>Sets both <see cref="MixDuration"/> and <see cref="Delay"/>.</summary>
-		/// <param name="delay">If > 0, sets <see cref="TrackEntry.Delay"/>. If &lt;= 0, the delay set is the duration of the previous track
-		///		entry minus the specified mix duration plus the specified<c> delay</c> (ie the mix ends at
-		///		(<c>delay</c> = 0) or before (<c>delay</c> &lt; 0) the previous track entry duration). If the previous
-		///		entry is looping, its next loop completion is used instead of its duration.</param>
+		/// <param name="delay">If > 0, sets <see cref="Delay"/>. If &lt;= 0, the delay set is the duration of the previous track
+		///		entry minus the specified mix duration plus the specified <c>delay</c> (ie the mix ends at (when <c>delay</c>
+		///		= 0) or before (when <c>delay</c> &lt; 0) the previous track entry duration). If the previous entry is
+		///		looping, its next loop completion is used instead of its duration.</param>
 		public void SetMixDuration (float mixDuration, float delay) {
 			this.mixDuration = mixDuration;
 			if (delay <= 0) delay = previous == null ? 0 : Math.Max(delay + previous.TrackComplete - mixDuration, 0);
@@ -1267,19 +1274,20 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// When true, timelines in this animation that support additive are added to the setup or current pose. Additive can be set
-		/// for a new track entry only before <see cref="AnimationState.Apply(Skeleton)"/> is next called.
+		/// When true, timelines in this animation that support additive have their values added to the setup or current pose values
+		/// instead of replacing them. Additive can be set for a new track entry only before <see cref="AnimationState.Apply(Skeleton)"/>
+		/// is next called.
 		/// </summary>
 		public bool Additive { get { return additive; } set { additive = value; } }
 
 		/// <summary>
-		/// The track entry for the previous animation when mixing from the previous animation to this animation, or null if no
-		/// mixing is currently occurring. When mixing from multiple animations, <c>MixingFrom</c> makes up a linked list.</summary>
+		/// The track entry for the previous animation when mixing to this animation, or null if no mixing is currently occurring.
+		/// When mixing from multiple animations, <c>MixingFrom</c> makes up a doubly linked list.</summary>
 		public TrackEntry MixingFrom { get { return mixingFrom; } }
 
 		/// <summary>
-		/// The track entry for the next animation when mixing from this animation to the next animation, or null if no mixing is
-		/// currently occurring. When mixing to multiple animations, <c>MixingTo</c> makes up a linked list.</summary>
+		/// The track entry for the next animation when mixing from this animation, or null if no mixing is currently occurring.
+		/// When mixing to multiple animations, <c>MixingTo</c> makes up a doubly linked list.</summary>
 		public TrackEntry MixingTo { get { return mixingTo; } }
 
 		/// <summary>
@@ -1299,7 +1307,7 @@ namespace Spine {
 		public bool HoldPrevious { get { return holdPrevious; } set { holdPrevious = value; } }
 
 		/// <summary>
-		/// If true, the animation will be applied in reverse. Events are not fired when an animation is applied in reverse.</summary>
+		/// If true, the animation will be applied in reverse and events will not be fired.</summary>
 		public bool Reverse { get { return reverse; } set { reverse = value; } }
 
 		/// <summary><para>
@@ -1307,7 +1315,8 @@ namespace Spine {
 		/// shortest rotation direction may change during the mix.
 		/// </para><para>
 		/// If false, the shortest rotation direction is remembered when the mix starts and the same direction is used for the rest
-		/// of the mix. Defaults to false.</para></summary>
+		/// of the mix. Defaults to false.</para>
+		/// <para>See <see cref="ResetRotationDirections"/>.</para></summary>
 		public bool ShortestRotation { get { return shortestRotation; } set { shortestRotation = value; } }
 
 		/// <summary>Returns true if this entry is for the empty animation. See <see cref="AnimationState.SetEmptyAnimation(int, float)"/>,
@@ -1317,13 +1326,14 @@ namespace Spine {
 
 		/// <summary>
 		/// <para>
-		/// Resets the rotation directions for mixing this entry's rotate timelines. This can be useful to avoid bones rotating the
-		/// long way around when using <see cref="alpha"/> and starting animations on other tracks.</para>
+		/// When <see cref="ShortestRotation"/> is false, this clears the directions for mixing this entry's rotation. This can be useful
+		/// to avoid bones rotating the long way around when using <see cref="Alpha"/> and starting animations on other tracks.</para>
 		/// <para>
-		/// Mixing involves finding a rotation between two others, which has two possible solutions: the short way or the long way
-		/// around.The two rotations likely change over time, so which direction is the short or long way also changes.If the short
-		/// way was always chosen, bones would flip to the other side when that direction became the long way. TrackEntry chooses the
-		/// short way the first time it is applied and remembers that direction.</para>
+		/// Mixing involves finding a rotation between two others. There are two possible solutions: the short or the long way
+		/// around. When the two rotations change over time, which direction is the short or long way can also change. If the short
+		/// way was always chosen, bones flip to the other side when that direction became the long way. TrackEntry chooses the short
+		/// way the first time it is applied and remembers that direction. Resetting that direction makes it choose a new short way
+		/// on the next apply.</para>
 		/// </summary>
 		public void ResetRotationDirections () {
 			timelinesRotation.Clear();

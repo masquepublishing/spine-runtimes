@@ -57,7 +57,7 @@ namespace Spine {
 			setup.Set(data.setup);
 		}
 
-		/// <summary>The index of the bone in Skeleton.Bones</summary>
+		/// <summary>The <see cref="Skeleton.Bones"/> index.</summary>
 		public int Index { get { return index; } }
 
 		/// <summary>May be null.</summary>

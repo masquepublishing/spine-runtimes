@@ -30,7 +30,9 @@
 using System;
 
 namespace Spine {
-	/// <summary>Stores the current pose values for an Event.</summary>
+	/// <summary>Stores the current pose values for an <see cref="EventData"/>.
+	/// <para>See <see cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, bool, bool, bool, bool)"/> and
+	/// <a href="https://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide.</para></summary>
 	public class Event {
 		internal readonly EventData data;
 		internal readonly float time;

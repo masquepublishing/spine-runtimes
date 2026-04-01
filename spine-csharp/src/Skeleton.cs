@@ -317,7 +317,7 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order.
+		/// The skeleton's slots in the order they should be drawn. The returned list may be modified to change the draw order.
 		/// </summary>
 		public ExposedList<Slot> DrawOrder {
 			get { return drawOrder; }
@@ -581,7 +581,7 @@ namespace Spine {
 				physicsConstraints[i].Rotate(x, y, degrees);
 		}
 
-		/// <summary>Returns the skeleton's time. This is used for time-based manipulations, such as <see cref="PhysicsConstraint"/>.</summary>
+		/// <summary>Returns the skeleton's time, used for time-based manipulations, such as <see cref="PhysicsConstraint"/>.</summary>
 		/// <seealso cref="Update(float)"/>
 		public float Time { get { return time; } set { time = value; } }
 

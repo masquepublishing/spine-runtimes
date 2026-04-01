@@ -48,11 +48,8 @@ namespace Spine {
 
 		/// <summary>Returns false when this constraint won't be updated by
 		/// <see cref="Skeleton.UpdateWorldTransform(Physics)"/> because a skin is required and the
-		/// <see cref="Skeleton.Skin">active skin</see> does not contain this item.</summary>
-		/// <seealso cref="Skin.Bones"/>
-		/// <seealso cref="Skin.Constraints"/>
-		/// <seealso cref="PosedData.SkinRequired"/>
-		/// <seealso cref="Skeleton.UpdateCache()"/>
+		/// <see cref="Skeleton.Skin">active skin</see> does not contain this item. See <see cref="Skin.Bones"/>,
+		/// <see cref="Skin.Constraints"/>, <see cref="PosedData{P}.SkinRequired"/>, and <see cref="Skeleton.UpdateCache()"/>.</summary>
 		public bool Active { get { return active; } set { active = value; } }
 	}
 }
