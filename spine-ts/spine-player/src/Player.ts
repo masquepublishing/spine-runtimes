@@ -1211,24 +1211,36 @@ class Slider {
 		// this.knob = findWithClass(this.slider, "spine-player-slider-knob");
 		this.setValue(0);
 
-		let dragging = false;
-		new Input(this.slider).addListener({
-			down: (x, y) => {
-				dragging = true;
-				this.value?.classList.add("hovering");
-			},
-			up: (x, y) => {
-				dragging = false;
-				if (this.change) this.change(this.setValue(x / this.slider!.clientWidth));
-				this.value?.classList.remove("hovering");
-			},
-			moved: (x, y) => {
-				if (dragging && this.change) this.change(this.setValue(x / this.slider!.clientWidth));
-			},
-			dragged: (x, y) => {
-				if (this.change) this.change(this.setValue(x / this.slider!.clientWidth));
-			}
-		});
+		let rect: DOMRect;
+
+		const update = (ev: MouseEvent | TouchEvent) => {
+			const clientX = ev instanceof MouseEvent ? ev.clientX : ev.changedTouches[0].clientX;
+			if (this.change) this.change(this.setValue((clientX - rect.left) / rect.width));
+		};
+
+		const onEnd = (ev: MouseEvent | TouchEvent) => {
+			update(ev);
+			this.value?.classList.remove("hovering");
+			this.slider?.parentElement?.classList.remove("dragging");
+			document.removeEventListener("mousemove", update, true);
+			document.removeEventListener("mouseup", onEnd, true);
+			document.removeEventListener("touchmove", update, true);
+			document.removeEventListener("touchend", onEnd, true);
+		};
+
+		const onStart = (ev: MouseEvent | TouchEvent) => {
+			rect = this.slider!.getBoundingClientRect();
+			this.value?.classList.add("hovering");
+			this.slider?.parentElement?.classList.add("dragging");
+			update(ev);
+			document.addEventListener("mousemove", update, true);
+			document.addEventListener("mouseup", onEnd, true);
+			document.addEventListener("touchmove", update, true);
+			document.addEventListener("touchend", onEnd, true);
+		};
+
+		this.slider.addEventListener("mousedown", onStart, true);
+		this.slider.addEventListener("touchstart", onStart, true);
 
 		return this.slider;
 	}

@@ -215,7 +215,8 @@
 	opacity: 0;
 	transition: opacity 0.3s;
 }
-.spine-player-controls:hover .spine-player-timeline {
+.spine-player-controls:hover .spine-player-timeline,
+.spine-player-controls .spine-player-timeline.dragging {
 	opacity: 1;
 }
 
