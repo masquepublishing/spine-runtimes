@@ -1282,8 +1282,8 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 			skeleton.updateWorldTransform(Physics.update);
 			skeleton.getBounds(offset, size, tempArray, renderer.skeletonRenderer.getSkeletonClipping());
 
-			if (!Number.isNaN(offset.x) && !Number.isNaN(offset.y) && !Number.isNaN(size.x) && !Number.isNaN(size.y) &&
-				!Number.isNaN(minX) && !Number.isNaN(minY) && !Number.isNaN(maxX) && !Number.isNaN(maxY)) {
+			if (Number.isFinite(offset.x) && Number.isFinite(offset.y) && Number.isFinite(size.x) && Number.isFinite(size.y) &&
+				Number.isFinite(minX) && Number.isFinite(minY) && Number.isFinite(maxX) && Number.isFinite(maxY)) {
 				minX = Math.min(offset.x, minX);
 				maxX = Math.max(offset.x + size.x, maxX);
 				minY = Math.min(offset.y, minY);
