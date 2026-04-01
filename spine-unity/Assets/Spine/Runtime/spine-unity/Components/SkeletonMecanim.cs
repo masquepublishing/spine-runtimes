@@ -377,7 +377,7 @@ namespace Spine.Unity {
 					GetStateUpdatesFromAnimator(layer);
 				}
 			}
-			
+
 			public void Apply (Skeleton skeleton) {
 				// Clear Previous
 				if (autoReset) {
@@ -698,7 +698,7 @@ namespace Spine.Unity {
 
 				// Note: Animator.GetLayerWeight always returns 0 on the first layer. Should be interpreted as 1.
 				layerInfos.layerWeight = (layer == 0) ? 1 : animator.GetLayerWeight(layer);
-				
+
 				int clipInfoCount = animator.GetCurrentAnimatorClipInfoCount(layer);
 				int nextClipInfoCount = animator.GetNextAnimatorClipInfoCount(layer);
 
@@ -723,7 +723,7 @@ namespace Spine.Unity {
 					if (!layerInfos.isLastFrameOfInterruption) {
 						List<AnimatorClipInfo> tempInterruptingClipInfos = new List<AnimatorClipInfo>();
 						animator.GetNextAnimatorClipInfo(layer, tempInterruptingClipInfos);
-						
+
 						interruptingClipInfos.Clear();
 						for (int i = 0; i < tempInterruptingClipInfos.Count; i++) {
 							AnimatorClipInfo animatorInfo = tempInterruptingClipInfos[i];
@@ -734,7 +734,7 @@ namespace Spine.Unity {
 							info.isLooping = animatorInfo.clip.isLooping;
 							interruptingClipInfos.Add(info);
 						}
-						
+
 						layerInfos.interruptingClipInfoCount = interruptingClipInfos.Count;
 						float oldTime = layerInfos.interruptingStateInfo.normalizedTime;
 						float newTime = interruptingStateInfo.normalizedTime;

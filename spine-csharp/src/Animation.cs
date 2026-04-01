@@ -1258,7 +1258,7 @@ namespace Spine {
 				}
 				return;
 			}
-			
+
 			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
 			case LINEAR:

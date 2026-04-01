@@ -243,7 +243,7 @@ namespace Spine {
 					alpha *= ApplyMixingFrom(current, skeleton);
 				else if (current.trackTime >= current.trackEnd && current.next == null) //
 					alpha = 0; // Set to setup pose the last time the entry will be applied.
-				
+
 				// Apply current entry.
 				float animationLast = current.animationLast, animationTime = current.AnimationTime, applyTime = animationTime;
 				ExposedList<Event> applyEvents = events;
