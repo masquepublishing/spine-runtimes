@@ -166,7 +166,7 @@ namespace Spine.Unity {
 			skeletonRenderer.singleSubmesh = this.singleSubmeshDeprecated;
 			skeletonRenderer.MaskInteraction = this.maskInteractionDeprecated;
 
-			translator.MigrateLayerBlendModes();
+			translator.TransferDeprecatedFields();
 		}
 
 		[SerializeField] protected bool wasDeprecatedTransferred = false;
@@ -670,6 +670,11 @@ namespace Spine.Unity {
 				}
 			}
 
+#if UNITY_EDITOR
+			public void TransferDeprecatedFields () {
+				MigrateLayerBlendModes();
+			}
+#endif
 			void MigrateLayerBlendModes () {
 				if (layerIsAdditive.Length == 0 && layerBlendModesDeprecated.Length > 0) {
 					layerIsAdditive = new bool[layerBlendModesDeprecated.Length];
