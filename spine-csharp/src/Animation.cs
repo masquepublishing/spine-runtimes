@@ -447,7 +447,7 @@ namespace Spine {
 			float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = GetCurveValue(time) * setup;
-			if (alpha == 1) return value;
+			if (alpha == 1 && !add) return value;
 			float baseValue = fromSetup ? setup : current;
 			if (add) return baseValue + (value - setup) * alpha;
 			if (mixOut) return baseValue + (Math.Abs(value) * Math.Sign(baseValue) - baseValue) * alpha;
@@ -664,7 +664,7 @@ namespace Spine {
 			x *= setup.scaleX;
 			y *= setup.scaleY;
 
-			if (!add && alpha == 1) {
+			if (alpha == 1 && !add) {
 				pose.scaleX = x;
 				pose.scaleY = y;
 			} else {
@@ -2279,9 +2279,15 @@ namespace Spine {
 			}
 
 			PathConstraintPose basePose = fromSetup ? constraint.data.setup : pose;
-			pose.mixRotate = basePose.mixRotate + (rotate - basePose.mixRotate) * alpha;
-			pose.mixX = basePose.mixX + (x - basePose.mixX) * alpha;
-			pose.mixY = basePose.mixY + (y - basePose.mixY) * alpha;
+			if (add) {
+				pose.mixRotate = basePose.mixRotate + rotate * alpha;
+				pose.mixX = basePose.mixX + x * alpha;
+				pose.mixY = basePose.mixY + y * alpha;
+			} else {
+				pose.mixRotate = basePose.mixRotate + (rotate - basePose.mixRotate) * alpha;
+				pose.mixX = basePose.mixX + (x - basePose.mixX) * alpha;
+				pose.mixY = basePose.mixY + (y - basePose.mixY) * alpha;
+			}
 		}
 	}
 
