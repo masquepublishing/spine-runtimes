@@ -52,17 +52,16 @@ namespace Spine {
 	/// <item><see cref="AppliedPose"/>: The constrained pose. The <see cref="Pose"/> with modifications by constraints.</item>
 	/// </list>
 	/// </summary>
-	public class Posed<D, P, A> : IPosed, IPosedInternal
+	public class Posed<D, P> : IPosed, IPosedInternal
 		where D : PosedData<P>
-		where P : IPose<P>
-		where A : P {
+		where P : IPose<P> {
 
 		internal readonly D data;
-		internal readonly A pose;
-		internal readonly A constrained;
-		internal A applied;
+		internal readonly P pose;
+		internal readonly P constrained;
+		internal P applied;
 
-		public Posed (D data, A pose, A constrained) {
+		protected Posed (D data, P pose, P constrained) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			this.data = data;
 			this.pose = pose;
@@ -99,7 +98,7 @@ namespace Spine {
 
 		/// <summary>If no constraints modify this object, the applied pose is the same as the <see cref="Pose"/>. Otherwise it is a
 		/// copy of the <see cref="Pose"/> modified by constraints.</summary>
-		public A AppliedPose { get { return applied; } }
+		public P AppliedPose { get { return applied; } }
 
 		override public string ToString () {
 			return data.name;

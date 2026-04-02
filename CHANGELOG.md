@@ -272,7 +272,7 @@
 - **Additions**
   - Added `Slider` and `SliderData` classes for slider constraints
   - Added `SliderTimeline` and `SliderMixTimeline` for animating sliders
-  - Added new pose system with `BoneLocal`, `BonePose`, and related classes
+  - Added new pose system with `BonePose` and related classes
   - Added `IPose`, `Posed`, and `PosedActive` base classes for unified pose management
   - Added `IConstraintTimeline` interface for unified constraint timeline indexing
   - Added `Animation.Bones` property to get bone indices used by an animation
@@ -389,6 +389,7 @@
   - Removed `AtlasAttachmentLoader` method `AtlasRegion FindRegion(string name)` from public interface. Added `protected AtlasRegion FindRegion(string name, string path)` instead which may be overridden instead when deriving your own subclass.
   - Renamed `Skin.SkinEntry.Name` to `Skin.SkinEntry.PlaceholderName` to better match Spine editor terminology.
   - Removed `TrackEntry.HoldPrevious` and `TrackEntry.InterruptAlpha`. New `AnimationState` hold system automatically calculates the required state values.
+  - Removed `BoneLocal` class. `BonePose` now directly implements `IPose<BonePose>` and contains all local pose fields. Replace any use of `BoneLocal` → `BonePose`.
 
 ### Unity
 

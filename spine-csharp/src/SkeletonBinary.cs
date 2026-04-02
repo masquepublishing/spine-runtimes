@@ -197,7 +197,7 @@ namespace Spine {
 					string name = input.ReadString();
 					BoneData parent = i == 0 ? null : bones[input.ReadInt(true)];
 					var data = new BoneData(i, name, parent);
-					BoneLocal setup = data.setup;
+					BonePose setup = data.setup;
 					setup.rotation = input.ReadFloat();
 					setup.x = input.ReadFloat() * scale;
 					setup.y = input.ReadFloat() * scale;

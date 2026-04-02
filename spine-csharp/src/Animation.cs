@@ -522,7 +522,7 @@ namespace Spine {
 			if (bone.active) Apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, fromSetup, add, mixOut);
 		}
 
-		abstract protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add,
+		abstract protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
 			bool mixOut);
 	}
 
@@ -568,29 +568,29 @@ namespace Spine {
 			if (bone.active) Apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, fromSetup, add, mixOut);
 		}
 
-		abstract protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add,
+		abstract protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
 			bool mixOut);
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.Rotation"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.Rotation"/>.</summary>
 	public class RotateTimeline : BoneTimeline1, IBoneTimeline {
 		public RotateTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.Rotate) {
 		}
 
-		override protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add,
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
 			bool mixOut) {
 			pose.rotation = GetRelativeValue(time, alpha, fromSetup, add, pose.rotation, setup.rotation);
 		}
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.X"/> and <see cref="BoneLocal.Y"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.X"/> and <see cref="BonePose.Y"/>.</summary>
 	public class TranslateTimeline : BoneTimeline2 {
 		public TranslateTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.X, Property.Y) {
 		}
 
-		override protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
@@ -639,36 +639,36 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.X"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.X"/>.</summary>
 	public class TranslateXTimeline : BoneTimeline1 {
 		public TranslateXTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.X) {
 		}
 
-		override protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
 			pose.x = GetRelativeValue(time, alpha, fromSetup, add, pose.x, setup.x);
 		}
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.Y"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.Y"/>.</summary>
 	public class TranslateYTimeline : BoneTimeline1 {
 		public TranslateYTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.Y) {
 		}
 
-		override protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
 			pose.y = GetRelativeValue(time, alpha, fromSetup, add, pose.y, setup.y);
 		}
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.ScaleX"/> and <see cref="BoneLocal.ScaleY"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.ScaleX"/> and <see cref="BonePose.ScaleY"/>.</summary>
 	public class ScaleTimeline : BoneTimeline2 {
 
 		public ScaleTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ScaleX, Property.ScaleY) {
 		}
 
-		override protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
@@ -729,37 +729,37 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.ScaleX"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.ScaleX"/>.</summary>
 	public class ScaleXTimeline : BoneTimeline1 {
 		public ScaleXTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ScaleX) {
 		}
 
-		override protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add,
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
 			bool mixOut) {
 			pose.scaleX = GetScaleValue(time, alpha, fromSetup, add, mixOut, pose.scaleX, setup.scaleX);
 		}
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.ScaleY"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.ScaleY"/>.</summary>
 	public class ScaleYTimeline : BoneTimeline1 {
 		public ScaleYTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ScaleY) {
 		}
 
-		override protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add,
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
 			bool mixOut) {
 			pose.scaleY = GetScaleValue(time, alpha, fromSetup, add, mixOut, pose.scaleY, setup.scaleY);
 		}
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.ShearX"/> and <see cref="BoneLocal.ShearY"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.ShearX"/> and <see cref="BonePose.ShearY"/>.</summary>
 	public class ShearTimeline : BoneTimeline2 {
 		public ShearTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ShearX, Property.ShearY) {
 		}
 
-		override protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
@@ -803,31 +803,31 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.ShearX"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.ShearX"/>.</summary>
 	public class ShearXTimeline : BoneTimeline1 {
 		public ShearXTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ShearX) {
 		}
 
-		override protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add,
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
 			bool mixOut) {
 			pose.shearX = GetRelativeValue(time, alpha, fromSetup, add, pose.shearX, setup.shearX);
 		}
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.ShearY"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.ShearY"/>.</summary>
 	public class ShearYTimeline : BoneTimeline1 {
 		public ShearYTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, boneIndex, Property.ShearY) {
 		}
 
-		override protected void Apply (BoneLocal pose, BoneLocal setup, float time, float alpha, bool fromSetup, bool add,
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
 			bool mixOut) {
 			pose.shearY = GetRelativeValue(time, alpha, fromSetup, add, pose.shearY, setup.shearY);
 		}
 	}
 
-	/// <summary>Changes <see cref="BoneLocal.Inherit"/>.</summary>
+	/// <summary>Changes <see cref="BonePose.Inherit"/>.</summary>
 	public class InheritTimeline : Timeline, IBoneTimeline {
 		public const int ENTRIES = 2;
 		private const int INHERIT = 1;
@@ -865,7 +865,7 @@ namespace Spine {
 
 			Bone bone = skeleton.bones.Items[boneIndex];
 			if (!bone.active) return;
-			BoneLocal pose = appliedPose ? bone.applied : bone.pose;
+			BonePose pose = appliedPose ? bone.applied : bone.pose;
 
 			if (mixOut) {
 				if (fromSetup) pose.inherit = bone.data.setup.inherit;

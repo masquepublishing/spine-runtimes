@@ -35,14 +35,13 @@ namespace Spine {
 	}
 
 	/// <summary>A posed object that may be active or inactive.</summary>
-	public class PosedActive<D, P, A> : Posed<D, P, A>, IPosedActive
+	public class PosedActive<D, P> : Posed<D, P>, IPosedActive
 		where D : PosedData<P>
-		where P : IPose<P>
-		where A : P {
+		where P : IPose<P> {
 
 		internal bool active;
 
-		public PosedActive (D data, A pose, A constrained)
+		protected PosedActive (D data, P pose, P constrained)
 			: base(data, pose, constrained) {
 			SetupPose();
 		}

@@ -42,7 +42,7 @@ namespace Spine {
 		internal readonly P setup;
 		internal bool skinRequired;
 
-		public PosedData (string name, P setup) {
+		protected PosedData (string name, P setup) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
 			this.setup = setup;

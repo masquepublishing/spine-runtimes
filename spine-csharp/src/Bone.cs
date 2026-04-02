@@ -42,7 +42,7 @@ namespace Spine {
 	/// <see cref="BonePose.UpdateWorldTransform(Skeleton)"/>.</item>
 	/// </list>
 	/// </summary>
-	public class Bone : PosedActive<BoneData, BoneLocal, BonePose> {
+	public class Bone : PosedActive<BoneData, BonePose> {
 		static public bool yDown;
 
 		internal Bone parent;

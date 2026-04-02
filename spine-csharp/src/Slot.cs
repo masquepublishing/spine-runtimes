@@ -43,7 +43,7 @@ namespace Spine {
 	/// state for an attachment.State cannot be stored in an attachment itself because attachments are stateless and may be shared
 	/// across multiple skeletons.
 	/// </summary>
-	public class Slot : Posed<SlotData, SlotPose, SlotPose> {
+	public class Slot : Posed<SlotData, SlotPose> {
 		internal readonly Skeleton skeleton;
 		internal readonly Bone bone;
 		internal int attachmentState;

@@ -41,11 +41,68 @@ namespace Spine {
 	/// convenient to modify the local transform instead, then call <see cref="Skeleton.UpdateWorldTransform(Physics)"/> to update the world
 	/// transforms for all bones and apply constraints.</para>
 	/// </summary>
-	public class BonePose : BoneLocal, IUpdate {
+	public class BonePose : IPose<BonePose>, IUpdate {
 		public Bone bone;
+
+		internal float x, y, rotation, scaleX, scaleY, shearX, shearY;
+		internal Inherit inherit;
+
 		internal float a, b, worldX;
 		internal float c, d, worldY;
 		internal int world, local;
+
+		public void Set (BonePose pose) {
+			if (pose == null) throw new ArgumentNullException("pose", "pose cannot be null.");
+			x = pose.x;
+			y = pose.y;
+			rotation = pose.rotation;
+			scaleX = pose.scaleX;
+			scaleY = pose.scaleY;
+			shearX = pose.shearX;
+			shearY = pose.shearY;
+			inherit = pose.inherit;
+		}
+
+		/// <summary>The local X translation.</summary>
+		public float X { get { return x; } set { x = value; } }
+		/// <summary>The local Y translation.</summary>
+		public float Y { get { return y; } set { y = value; } }
+
+		/// <summary>Sets local x and y translation.</summary>
+		public void SetPosition (float x, float y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		/// <summary>The local rotation.</summary>
+		public float Rotation { get { return rotation; } set { rotation = value; } }
+
+		/// <summary>The local scaleX.</summary>
+		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
+
+		/// <summary>The local scaleY.</summary>
+		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+
+		/// <summary>Sets local x and y scale.</summary>
+		public void SetScale (float scaleX, float scaleY) {
+			this.scaleX = scaleX;
+			this.scaleY = scaleY;
+		}
+
+		/// <summary>Sets local x and y scale to the same value.</summary>
+		public void SetScale (float scale) {
+			scaleX = scale;
+			scaleY = scale;
+		}
+
+		/// <summary>The local shearX.</summary>
+		public float ShearX { get { return shearX; } set { shearX = value; } }
+
+		/// <summary>The local shearY.</summary>
+		public float ShearY { get { return shearY; } set { shearY = value; } }
+
+		/// <summary>Determines how parent world transforms affect this bone.</summary>
+		public Inherit Inherit { get { return inherit; } set { inherit = value; } }
 
 		/// <summary>
 		/// Called by <see cref="Skeleton.UpdateCache()"/> to compute the world transform, if needed.

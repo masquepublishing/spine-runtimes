@@ -144,7 +144,7 @@ namespace Spine {
 						}
 						var data = new BoneData(skeletonData.Bones.Count, (string)boneMap["name"], parent);
 						data.length = GetFloat(boneMap, "length", 0) * scale;
-						BoneLocal setup = data.setup;
+						BonePose setup = data.setup;
 						setup.x = GetFloat(boneMap, "x", 0) * scale;
 						setup.y = GetFloat(boneMap, "y", 0) * scale;
 						setup.rotation = GetFloat(boneMap, "rotation", 0);
