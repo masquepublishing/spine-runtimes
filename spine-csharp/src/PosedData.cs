@@ -50,6 +50,7 @@ namespace Spine {
 
 		public string Name { get { return name; } }
 
+		/// <summary>The setup pose that most animations are relative to.</summary>
 		public P GetSetupPose () {
 			return setup;
 		}

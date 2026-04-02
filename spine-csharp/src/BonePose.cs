@@ -83,13 +83,13 @@ namespace Spine {
 		/// <summary>The local scaleY.</summary>
 		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
 
-		/// <summary>Sets local x and y scale.</summary>
+		/// <summary>Sets local scaleX and scaleY.</summary>
 		public void SetScale (float scaleX, float scaleY) {
 			this.scaleX = scaleX;
 			this.scaleY = scaleY;
 		}
 
-		/// <summary>Sets local x and y scale to the same value.</summary>
+		/// <summary>Sets local scaleX and scaleY to the same value.</summary>
 		public void SetScale (float scale) {
 			scaleX = scale;
 			scaleY = scale;

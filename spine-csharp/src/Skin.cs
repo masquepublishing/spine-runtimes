@@ -156,6 +156,7 @@ namespace Spine {
 				this.attachment = attachment;
 			}
 
+			/// <summary>The <see cref="Skeleton.Slots"/> index.</summary>
 			public int SlotIndex {
 				get {
 					return slotIndex;
@@ -169,6 +170,7 @@ namespace Spine {
 				}
 			}
 
+			/// <summary>The attachment for this skin entry.</summary>
 			public Attachment Attachment {
 				get {
 					return attachment;

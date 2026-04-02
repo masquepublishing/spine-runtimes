@@ -379,40 +379,40 @@ namespace Spine {
 		/// name.</summary>
 		/// <returns>May be null.</returns>
 		/// <seealso cref="GetAttachment(int, string)"/>
-		public Attachment GetAttachment (string slotName, string attachmentName) {
+		public Attachment GetAttachment (string slotName, string placeholderName) {
 			SlotData slot = data.FindSlot(slotName);
 			if (slot == null) throw new ArgumentException("Slot not found: " + slotName, "slotName");
-			return GetAttachment(slot.index, attachmentName);
+			return GetAttachment(slot.index, placeholderName);
 		}
 
-		/// <summary>Finds an attachment by looking in the skin and skeletonData.defaultSkin using the slot index and
-		/// attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.</summary>
+		/// <summary>Finds an attachment by looking in the skin and skeletonData.defaultSkin using the slot index and skin
+		/// placeholder name. First the skin is checked and if the attachment was not found, the default skin is checked.</summary>
 		/// <para>
 		/// See <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.</para>
 		/// <returns>May be null.</returns>
-		public Attachment GetAttachment (int slotIndex, string attachmentName) {
-			if (attachmentName == null) throw new ArgumentNullException("attachmentName", "attachmentName cannot be null.");
+		public Attachment GetAttachment (int slotIndex, string placeholderName) {
+			if (placeholderName == null) throw new ArgumentNullException("placeholderName", "placeholderName cannot be null.");
 			if (skin != null) {
-				Attachment attachment = skin.GetAttachment(slotIndex, attachmentName);
+				Attachment attachment = skin.GetAttachment(slotIndex, placeholderName);
 				if (attachment != null) return attachment;
 			}
-			if (data.defaultSkin != null) return data.defaultSkin.GetAttachment(slotIndex, attachmentName);
+			if (data.defaultSkin != null) return data.defaultSkin.GetAttachment(slotIndex, placeholderName);
 			return null;
 		}
 
 		/// <summary>A convenience method to set an attachment by finding the slot with <see cref="FindSlot(string)"/>, finding the attachment with
 		/// <see cref="GetAttachment(int, string)"/>, then setting the slot's <see cref="SlotPose.Attachment"/>.</summary>
-		/// <param name="attachmentName">May be null to clear the slot's attachment.</param>
-		public void SetAttachment (string slotName, string attachmentName) {
+		/// <param name="placeholderName">May be null to clear the slot's attachment.</param>
+		public void SetAttachment (string slotName, string placeholderName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 
 			Slot slot = FindSlot(slotName);
 			if (slot == null) throw new ArgumentException("Slot not found: " + slotName, "slotName");
 			Attachment attachment = null;
-			if (attachmentName != null) {
-				attachment = GetAttachment(slot.data.index, attachmentName);
+			if (placeholderName != null) {
+				attachment = GetAttachment(slot.data.index, placeholderName);
 				if (attachment == null)
-					throw new ArgumentException("Attachment not found: " + attachmentName + ", for slot: " + slotName, "attachmentName");
+					throw new ArgumentException("Attachment not found: " + placeholderName + ", for slot: " + slotName, "placeholderName");
 			}
 			slot.pose.Attachment = attachment;
 		}
@@ -422,6 +422,8 @@ namespace Spine {
 		/// <summary>The skeleton's physics constraints.</summary>
 		public ExposedList<PhysicsConstraint> PhysicsConstraints { get { return physics; } }
 
+		/// <summary>Finds a constraint of the specified type by comparing each constraint's name. It is more efficient to cache the
+		/// results of this method than to call it multiple times.</summary>
 		/// <returns>May be null.</returns>
 		public T FindConstraint<T> (string constraintName) where T : class, IConstraint {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
@@ -558,9 +560,13 @@ namespace Spine {
 			this.y = y;
 		}
 
+		/// <summary>The x component of a vector that defines the direction <see cref="PhysicsConstraintPose.Wind"/> is applied.</summary>
 		public float WindX { get { return windX; } set { windX = value; } }
+		/// <summary>The y component of a vector that defines the direction <see cref="PhysicsConstraintPose.Wind"/> is applied.</summary>
 		public float WindY { get { return windY; } set { windY = value; } }
+		/// <summary>The x component of a vector that defines the direction <see cref="PhysicsConstraintPose.Gravity"/> is applied.</summary>
 		public float GravityX { get { return gravityX; } set { gravityX = value; } }
+		/// <summary>The y component of a vector that defines the direction <see cref="PhysicsConstraintPose.Gravity"/> is applied.</summary>
 		public float GravityY { get { return gravityY; } set { gravityY = value; } }
 
 		/// <summary>

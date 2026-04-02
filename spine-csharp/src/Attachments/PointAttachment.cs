@@ -39,9 +39,9 @@ namespace Spine {
 	/// </summary>
 	public class PointAttachment : Attachment {
 		internal float x, y, rotation;
-		/// <summary>The local X position.</summary>
+		/// <summary>The local x position.</summary>
 		public float X { get { return x; } set { x = value; } }
-		/// <summary>The local Y position.</summary>
+		/// <summary>The local y position.</summary>
 		public float Y { get { return y; } set { y = value; } }
 		/// <summary>The local rotation in degrees, counter clockwise.</summary>
 		public float Rotation { get { return rotation; } set { rotation = value; } }

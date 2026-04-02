@@ -30,9 +30,9 @@
 using System;
 
 namespace Spine {
-	/// <summary>
-	/// Stores the current pose for a slider. 
-	/// </summary>
+	/// <summary>Applies an animation based on either the slider's <see cref="SliderPose.Time"/> or a bone's transform property.
+	/// <para>
+	/// See <a href="https://esotericsoftware.com/spine-sliders">Sliders</a> in the Spine User Guide.</para></summary>
 	public class Slider : Constraint<Slider, SliderData, SliderPose> {
 		static private readonly float[] offsets = new float[6];
 		internal Bone bone;
@@ -109,6 +109,7 @@ namespace Spine {
 			}
 		}
 
+		/// <summary>When set, the bone's transform property is used to set the slider's <see cref="SliderPose.Time"/>.</summary>
 		public Bone Bone { get { return bone; } set { bone = value; } }
 	}
 }

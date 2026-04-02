@@ -38,11 +38,11 @@ namespace Spine {
 	using Color32F = UnityEngine.Color;
 #endif
 
-	/// <summary>
-	/// Stores a slot's current pose. Slots organize attachments for <see cref="Skeleton.DrawOrder"/> purposes and provide a place to store
-	/// state for an attachment.State cannot be stored in an attachment itself because attachments are stateless and may be shared
-	/// across multiple skeletons.
-	/// </summary>
+	/// <summary>Organizes attachments for <see cref="Skeleton.DrawOrder"/> purposes and provides a place to store state for an
+	/// attachment.
+	/// <para>
+	/// State cannot be stored in an attachment itself because attachments are stateless and may be shared across multiple
+	/// skeletons.</para></summary>
 	public class Slot : Posed<SlotData, SlotPose> {
 		internal readonly Skeleton skeleton;
 		internal readonly Bone bone;

@@ -41,8 +41,11 @@ namespace Spine {
 		public float Float { get; set; }
 		public string @String { get; set; }
 
+		/// <summary>Path to an audio file relative to the audio path in the Spine project.</summary>
 		public string AudioPath { get; set; }
+		/// <summary>If an audio path is set, the volume for the audio.</summary>
 		public float Volume { get; set; }
+		/// <summary>If an audio path is set, the left/right balance for the audio.</summary>
 		public float Balance { get; set; }
 
 		public EventData (string name) {

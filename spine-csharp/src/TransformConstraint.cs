@@ -35,8 +35,7 @@ namespace Spine {
 
 	/// <summary>
 	/// <para>
-	/// Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained
-	/// bones to match that of the source bone.</para>
+	/// Adjusts the world transform of the constrained bones to match that of the source bone.</para>
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide.</para>
 	/// </summary>
