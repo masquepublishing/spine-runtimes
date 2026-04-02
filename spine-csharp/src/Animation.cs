@@ -40,7 +40,10 @@ namespace Spine {
 #endif
 
 	/// <summary>
-	/// Stores a list of timelines to animate a skeleton's pose over time.</summary>
+	/// Stores a list of timelines to animate a skeleton's pose over time.
+	/// <para>
+	/// See <see href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</see> in the Spine
+	/// Runtimes Guide.</para></summary>
 	public class Animation {
 		internal string name;
 		internal float duration;
@@ -109,6 +112,8 @@ namespace Spine {
 
 		/// <summary>Applies the animation's timelines to the specified skeleton.</summary>
 		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, bool, bool, bool, bool)"/>
+		/// <seealso href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations in the Spine
+		/// Runtimes Guide.</seealso>
 		/// <param name="skeleton">The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton
 		///					components the timelines may change.</param>
 		/// <param name="lastTime">The last time in seconds this animation was applied. Some timelines trigger only at discrete times, in which
@@ -128,7 +133,7 @@ namespace Spine {
 		/// <param name="add">If true, for timelines that support it, their values are added to the setup or current values (depending on
 		/// 				<c>fromSetup</c>).</param>
 		/// <param name="mixOut">True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.</param>
-		/// <param name="appliedPose">True to modify the <see cref="Posed.AppliedPose"/>, else the <see cref="Posed.Pose"/> is modified.</param>
+		/// <param name="appliedPose">True to modify <see cref="Posed.AppliedPose"/>, else <see cref="Posed.Pose"/> is modified.</param>
 		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events, float alpha,
 							bool fromSetup, bool add, bool mixOut, bool appliedPose) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
@@ -166,7 +171,10 @@ namespace Spine {
 	}
 
 	/// <summary>
-	/// The base class for all timelines.</summary>
+	/// The base class for all timelines.
+	/// <para>
+	/// See <see href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</see> in the Spine
+	/// Runtimes Guide.</para></summary>
 	public abstract class Timeline {
 		internal readonly string[] propertyIds;
 		internal readonly float[] frames;
@@ -221,6 +229,8 @@ namespace Spine {
 		}
 
 		/// <summary>Applies this timeline to the skeleton.</summary>
+		/// <seealso href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations in the Spine
+		/// Runtimes Guide.</seealso>
 		/// <param name="skeleton">The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton
 		/// 				components the timelines may change.</param>
 		/// <param name="lastTime">The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in
@@ -243,7 +253,7 @@ namespace Spine {
 		///                   <c>fromSetup</c>).</param>
 		/// <param name="mixOut">True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
 		///                   transitions.</param>
-		/// <param name="appliedPose">True to modify the <see cref="Posed.AppliedPose"/>, else the <see cref="Posed.Pose"/> is modified.</param>
+		/// <param name="appliedPose">True to modify <see cref="Posed.AppliedPose"/>, else <see cref="Posed.Pose"/> is modified.</param>
 		public abstract void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha,
 			bool fromSetup, bool add, bool mixOut, bool appliedPose);
 
@@ -1657,7 +1667,7 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>The attachment for which the <see cref="SlotPose.SequenceIndex"/> will be set.</summary>
+		/// <summary>The attachment for which <see cref="SlotPose.SequenceIndex"/> will be set.</summary>
 		/// <seealso cref="Attachment.TimelineAttachment"/>.
 		public Attachment Attachment {
 			get {

@@ -34,9 +34,7 @@ namespace Spine {
 		bool SkinRequired { get; }
 	}
 
-	/// <summary>
-	/// The base class for all constrained datas.
-	/// </summary>
+	/// <summary>The base class for storing setup data for a posed object. May be shared with multiple instances.</summary>
 	public class PosedData<P> : IPosedData
 		where P : IPose<P> {
 

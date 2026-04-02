@@ -31,12 +31,14 @@ using System;
 
 namespace Spine {
 
-	/// <summary>A bone has a number of poses:
+	/// <summary>A node in a skeleton's hierarchy with a transform that affects its children and their attachments. A bone has a
+	/// number of poses:
 	/// <list type="bullet">
-	/// <item><see cref="BoneData.SetupPose"/>: The setup pose.</item>
-	/// <item><see cref="Pose"/>: The local pose. Set by animations and app code.</item>
-	/// <item><see cref="AppliedPose"/>: The applied local pose. This is the local pose modified by constraints and app code.</item>
-	/// <item>The world transform on the applied pose, computed by <see cref="Skeleton.UpdateWorldTransform(Physics)"/> and
+	/// <item><see cref="Data"/>: The setup pose.</item>
+	/// <item><see cref="Pose"/>: The unconstrained local pose. Set by animations and application code.</item>
+	/// <item><see cref="AppliedPose"/>: The constrained local pose. The <see cref="Pose"/> with modifications by constraints.</item>
+	/// <item>World transform (on the applied pose): the <see cref="AppliedPose"/> combined with the parent world transform.
+	/// Computed by <see cref="Skeleton.UpdateWorldTransform(Physics)"/> and
 	/// <see cref="BonePose.UpdateWorldTransform(Skeleton)"/>.</item>
 	/// </list>
 	/// </summary>

@@ -53,6 +53,13 @@ namespace Spine {
 		public float X { get { return x; } set { x = value; } }
 		/// <summary>The local Y translation.</summary>
 		public float Y { get { return y; } set { y = value; } }
+
+		/// <summary>Sets local x and y translation.</summary>
+		public void SetPosition (float x, float y) {
+			this.x = x;
+			this.y = y;
+		}
+
 		/// <summary>The local rotation.</summary>
 		public float Rotation { get { return rotation; } set { rotation = value; } }
 
@@ -61,6 +68,18 @@ namespace Spine {
 
 		/// <summary>The local scaleY.</summary>
 		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+
+		/// <summary>Sets local x and y scale.</summary>
+		public void SetScale (float scaleX, float scaleY) {
+			this.scaleX = scaleX;
+			this.scaleY = scaleY;
+		}
+
+		/// <summary>Sets local x and y scale to the same value.</summary>
+		public void SetScale (float scale) {
+			scaleX = scale;
+			scaleY = scale;
+		}
 
 		/// <summary>The local shearX.</summary>
 		public float ShearX { get { return shearX; } set { shearX = value; } }

@@ -34,6 +34,7 @@ namespace Spine {
 		bool Active { get; set; }
 	}
 
+	/// <summary>A posed object that may be active or inactive.</summary>
 	public class PosedActive<D, P, A> : Posed<D, P, A>, IPosedActive
 		where D : PosedData<P>
 		where P : IPose<P>

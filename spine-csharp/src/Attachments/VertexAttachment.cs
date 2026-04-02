@@ -44,7 +44,7 @@ namespace Spine {
 		/// <summary>Gets a unique ID for this attachment.</summary>
 		public int Id { get { return id; } }
 		/// <summary>The bones that affect the <see cref="Vertices"/>. The entries are, for each vertex, the number of bones affecting the
-		/// vertex followed by that many bone indices, which is the <see cref="Skeleton.Bones"/> index. Null if this attachment has no
+		/// vertex followed by that many bone indices, which is <see cref="Skeleton.Bones"/> index. Null if this attachment has no
 		/// weights.</summary>
 		public int[] Bones { get { return bones; } set { bones = value; } }
 		/// <summary>The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are <c>x,y</c> pairs
@@ -89,7 +89,7 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Transforms the attachment's local <see cref="Vertices"/> to world coordinates. If the <see cref="SlotPose.Deform"/>
+		/// Transforms the attachment's local <see cref="Vertices"/> to world coordinates. If <see cref="SlotPose.Deform"/>
 		/// is not empty, it is used to deform the vertices.
 		/// <para />
 		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine

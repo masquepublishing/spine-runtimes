@@ -37,7 +37,8 @@ namespace Spine {
 	/// Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
 	/// multiple animations on top of each other (layering).</para>
 	/// <para>
-	/// See <see href='https://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide.</para>
+	/// See <see href='https://esotericsoftware.com/spine-applying-animations#AnimationState-API'>Applying Animations</see> in the Spine
+	/// Runtimes Guide.</para>
 	/// </summary>
 	public class AnimationState {
 		internal static readonly Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
@@ -692,11 +693,11 @@ namespace Spine {
 		/// <para>
 		/// Mixing in is done by first setting an empty animation, then adding an animation using
 		/// <see cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with the desired delay (an empty animation has a duration of 0) and on
-		/// the returned track entry, set the <see cref="TrackEntry.SetMixDuration(float)"/>. Mixing from an empty animation causes the new
+		/// the returned track entry set <see cref="TrackEntry.MixDuration"/>. Mixing from an empty animation causes the new
 		/// animation to be applied more and more over the mix duration. Properties keyed in the new animation transition from the value
 		/// from lower tracks or from the setup pose value if no lower tracks key the property to the value keyed in the new animation.</para>
 		/// <para>
-		/// See  <see href='https://esotericsoftware.com/spine-applying-animations/#Empty-animations'>Empty animations</a> in the Spine
+		/// See <see href='https://esotericsoftware.com/spine-applying-animations#Empty-animations'>Empty animations</see> in the Spine
 		/// Runtimes Guide.</para></summary>
 		public TrackEntry SetEmptyAnimation (int trackIndex, float mixDuration) {
 			TrackEntry entry = SetAnimation(trackIndex, AnimationState.EmptyAnimation, false);
@@ -786,7 +787,7 @@ namespace Spine {
 			return entry;
 		}
 
-		/// <summary>Removes the <see cref="TrackEntry.Next">next entry</see> and all entries after it for the specified entry.</summary>
+		/// <summary>Removes <see cref="TrackEntry.Next"/> and all entries after it for the specified entry.</summary>
 		public void ClearNext (TrackEntry entry) {
 			TrackEntry next = entry.next;
 			while (next != null) {

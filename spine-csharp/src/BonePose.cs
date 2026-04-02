@@ -289,20 +289,21 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>Part of the world transform matrix for the X axis.</summary>
+		/// <summary>The world transform <c>[a b][c d]</c> x-axis x component.</summary>
 		public float A { get { return a; } set { a = value; } }
-		/// <summary>Part of the world transform matrix for the Y axis.</summary>
+		/// <summary>The world transform <c>[a b][c d]</c> y-axis x component.</summary>
 		public float B { get { return b; } set { b = value; } }
-		/// <summary>Part of the world transform matrix for the X axis.</summary>
+		/// <summary>The world transform <c>[a b][c d]</c> x-axis y component.</summary>
 		public float C { get { return c; } set { c = value; } }
-		/// <summary>Part of the world transform matrix for the Y axis.</summary>
+		/// <summary>The world transform <c>[a b][c d]</c> y-axis y component.</summary>
 		public float D { get { return d; } set { d = value; } }
 
 		/// <summary>The world X position.</summary>
 		public float WorldX { get { return worldX; } set { worldX = value; } }
 		/// <summary>The world Y position.</summary>
 		public float WorldY { get { return worldY; } set { worldY = value; } }
-		/// <summary>The world rotation for the X axis, calculated using <see cref="a"/> and <see cref="c"/>.</summary>
+		/// <summary>The world rotation for the X axis, calculated using <see cref="a"/> and <see cref="c"/>. This is the direction the
+		/// bone is pointing.</summary>
 		public float WorldRotationX { get { return MathUtils.Atan2Deg(c, a); } }
 		/// <summary>The world rotation for the Y axis, calculated using <see cref="b"/> and <see cref="d"/>.</summary>
 		public float WorldRotationY { get { return MathUtils.Atan2Deg(d, b); } }

@@ -45,6 +45,13 @@ namespace Spine {
 		void SetupPose ();
 	}
 
+	/// <summary>The base class for an object with a number of poses:
+	/// <list type="bullet">
+	/// <item><see cref="Data"/>: The setup pose.</item>
+	/// <item><see cref="Pose"/>: The unconstrained pose. Set by animations and application code.</item>
+	/// <item><see cref="AppliedPose"/>: The constrained pose. The <see cref="Pose"/> with modifications by constraints.</item>
+	/// </list>
+	/// </summary>
 	public class Posed<D, P, A> : IPosed, IPosedInternal
 		where D : PosedData<P>
 		where P : IPose<P>
@@ -63,6 +70,7 @@ namespace Spine {
 			applied = pose;
 		}
 
+		/// <summary>Sets the unconstrained pose to the setup pose.</summary>
 		public virtual void SetupPose () {
 			pose.Set(data.setup);
 		}
@@ -83,11 +91,14 @@ namespace Spine {
 			applied.Set(pose);
 		}
 
-		/// <summary>The constraint's setup pose data.</summary>
+		/// <summary>The setup pose data. May be shared with multiple instances.</summary>
 		public D Data { get { return data; } }
 
+		/// <summary>The unconstrained pose for this object, set by animations and application code.</summary>
 		public P Pose { get { return pose; } }
 
+		/// <summary>If no constraints modify this object, the applied pose is the same as the <see cref="Pose"/>. Otherwise it is a
+		/// copy of the <see cref="Pose"/> modified by constraints.</summary>
 		public A AppliedPose { get { return applied; } }
 
 		override public string ToString () {
