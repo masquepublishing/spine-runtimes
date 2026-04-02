@@ -42,38 +42,7 @@ namespace Spine {
 	public class AnimationState {
 		internal static readonly Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
 
-		/// 1) A previously applied timeline has set this property.<para />
-		/// Result: Mix from the current pose to the timeline pose.
-		internal const int Subsequent = 0;
-		/// 1) This is the first timeline to set this property.<para />
-		/// 2) The next track entry applied after this one does not have a timeline to set this property.<para />
-		/// Result: Mix from the setup pose to the timeline pose.
-		internal const int First = 1;
-		/// 1) A previously applied timeline has set this property.<para />
-		/// 2) The next track entry to be applied does have a timeline to set this property.<para />
-		/// 3) The next track entry after that one does not have a timeline to set this property.<para />
-		/// Result: Mix from the current pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading
-		/// animations that key the same property. A subsequent timeline will set this property using a mix.
-		internal const int HoldSubsequent = 2;
-		/// 1) This is the first timeline to set this property.<para />
-		/// 2) The next track entry to be applied does have a timeline to set this property.<para />
-		/// 3) The next track entry after that one does not have a timeline to set this property.<para />
-		/// Result: Mix from the setup pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading animations
-		/// that key the same property. A subsequent timeline will set this property using a mix.
-		internal const int HoldFirst = 3;
-		/// 1) This is the first timeline to set this property.<para />
-		/// 2) The next track entry to be applied does have a timeline to set this property.<para />
-		/// 3) The next track entry after that one does have a timeline to set this property.<para />
-		/// 4) timelineHoldMix stores the first subsequent track entry that does not have a timeline to set this property.<para />
-		/// Result: The same as HOLD except the mix percentage from the timelineHoldMix track entry is used. This handles when more than
-		/// 2 track entries in a row have a timeline that sets the same property.<para />
-		/// Eg, A -> B -> C -> D where A, B, and C have a timeline setting same property, but D does not. When A is applied, to avoid
-		/// "dipping" A is not mixed out, however D (the first entry that doesn't set the property) mixing in is used to mix out A
-		/// (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap to the mixed
-		/// out position.
-		internal const int HoldMix = 4;
-
-		internal const int Setup = 1, Current = 2;
+		internal const int Subsequent = 0, First = 1, Hold = 2, HoldFirst = 3, Setup = 1, Current = 2;
 
 		protected AnimationStateData data;
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
@@ -210,7 +179,10 @@ namespace Spine {
 				if (from.totalAlpha == 0 || to.mixDuration == 0) {
 					to.mixingFrom = from.mixingFrom;
 					if (from.mixingFrom != null) from.mixingFrom.mixingTo = to;
-					to.interruptAlpha = from.interruptAlpha;
+					if (from.totalAlpha == 0) {
+						for (TrackEntry next = to; next.mixingTo != null; next = next.mixingTo)
+							next.keepHold = true;
+					}
 					queue.End(from);
 				}
 				return finished;
@@ -274,7 +246,7 @@ namespace Spine {
 
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelines[ii];
-						bool fromSetup = timelineMode[ii] == AnimationState.First;
+						bool fromSetup = (timelineMode[ii] & AnimationState.First) != 0;
 						RotateTimeline rotateTimeline = timeline as RotateTimeline;
 						if (!shortestRotation && rotateTimeline != null)
 							ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation,
@@ -352,20 +324,12 @@ namespace Spine {
 
 		private float ApplyMixingFrom (TrackEntry to, Skeleton skeleton) {
 			TrackEntry from = to.mixingFrom;
-			if (from.mixingFrom != null) ApplyMixingFrom(from, skeleton);
-
-			float mix;
-			if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
-				mix = 1;
-			else {
-				mix = to.mixTime / to.mixDuration;
-				if (mix > 1) mix = 1;
-			}
-
+			float fromMix = from.mixingFrom != null ? ApplyMixingFrom(from, skeleton) : 1;
+			float mix = to.mixDuration == 0 ? 1 : Math.Min(1, to.mixTime / to.mixDuration);
 			bool attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 			int timelineCount = from.animation.timelines.Count;
 			Timeline[] timelines = from.animation.timelines.Items;
-			float alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
+			float alphaMix = from.alpha * fromMix * (1 - mix), keep = 1 - mix * to.alpha, alphaHold = keep > 0 ? alphaMix / keep : 0;
 			float animationLast = from.animationLast, animationTime = from.AnimationTime, applyTime = animationTime;
 			ExposedList<Event> events = null;
 			if (from.reverse)
@@ -384,33 +348,18 @@ namespace Spine {
 			from.totalAlpha = 0;
 			for (int i = 0; i < timelineCount; i++) {
 				Timeline timeline = timelines[i];
-				bool fromSetup;
+				int mode = timelineMode[i];
 				float alpha;
-				switch (timelineMode[i]) {
-				case AnimationState.Subsequent:
-					if (!drawOrder && timeline is DrawOrderTimeline) continue;
-					fromSetup = false;
-					alpha = alphaMix;
-					break;
-				case AnimationState.First:
-					fromSetup = true;
-					alpha = alphaMix;
-					break;
-				case AnimationState.HoldSubsequent:
-					fromSetup = false;
-					alpha = alphaHold;
-					break;
-				case AnimationState.HoldFirst:
-					fromSetup = true;
-					alpha = alphaHold;
-					break;
-				default: // HoldMix
-					fromSetup = true;
+				if ((mode & AnimationState.Hold) != 0) {
 					TrackEntry holdMix = timelineHoldMix[i];
-					alpha = alphaHold * Math.Max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
-					break;
+					alpha = holdMix == null ? alphaHold : alphaHold * Math.Max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+				} else {
+					if (!drawOrder && timeline is DrawOrderTimeline) continue;
+					alpha = alphaMix;
 				}
+
 				from.totalAlpha += alpha;
+				bool fromSetup = (mode & AnimationState.First) != 0;
 				RotateTimeline rotateTimeline = timeline as RotateTimeline;
 				if (!shortestRotation && rotateTimeline != null) {
 					ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1,
@@ -440,14 +389,7 @@ namespace Spine {
 			TrackEntry from = to.mixingFrom;
 			if (from.mixingFrom != null) ApplyMixingFromEventTimelinesOnly(from, skeleton, issueEvents);
 
-
-			float mix;
-			if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
-				mix = 1;
-			} else {
-				mix = to.mixTime / to.mixDuration;
-				if (mix > 1) mix = 1;
-			}
+			float mix = to.mixDuration == 0 ? 1 : Math.Min(1, to.mixTime / to.mixDuration);
 
 			ExposedList<Event> eventBuffer = mix < from.eventThreshold ? this.events : null;
 			if (eventBuffer == null) return mix;
@@ -647,11 +589,6 @@ namespace Spine {
 				current.mixingFrom = from;
 				from.mixingTo = current;
 				current.mixTime = 0;
-
-				// Store the interrupted mix percentage.
-				if (from.mixingFrom != null && from.mixDuration > 0)
-					current.interruptAlpha *= Math.Min(1, from.mixTime / from.mixDuration);
-
 				from.timelinesRotation.Clear(); // Reset rotation for mixing out, in case entry was mixed in.
 			}
 
@@ -815,7 +752,6 @@ namespace Spine {
 			entry.trackIndex = trackIndex;
 			entry.animation = animation;
 			entry.loop = loop;
-			entry.holdPrevious = false;
 
 			entry.additive = false;
 			entry.reverse = false;
@@ -842,8 +778,8 @@ namespace Spine {
 			entry.mixTime = 0;
 			entry.mixDuration = last == null ? 0 : data.GetMix(last.animation, animation);
 
-			entry.interruptAlpha = 1;
 			entry.totalAlpha = 0;
+			entry.keepHold = false;
 			return entry;
 		}
 
@@ -884,14 +820,8 @@ namespace Spine {
 			TrackEntry[] timelineHoldMix = entry.timelineHoldMix.Resize(timelinesCount).Items;
 			HashSet<string> propertyIds = this.propertyIds;
 
-			bool holdPrevious = false, add = entry.additive;
+			bool add = entry.additive, keepHold = entry.keepHold;
 			TrackEntry to = entry.mixingTo;
-			if (to != null) {
-				if (to.additive)
-					to = null;
-				else
-					holdPrevious = to.holdPrevious;
-			}
 
 			// outer:
 			for (int i = 0; i < timelinesCount; i++) {
@@ -899,26 +829,35 @@ namespace Spine {
 				string[] ids = timeline.propertyIds;
 				bool first = propertyIds.AddAll(ids)
 						&& !(timeline is DrawOrderFolderTimeline && propertyIds.Contains(DrawOrderTimeline.propertyID));
-				if (add && timeline.additive)
+				if (add && timeline.additive) {
 					timelineMode[i] = first ? AnimationState.First : AnimationState.Subsequent;
-				else if (!first)
-					timelineMode[i] = holdPrevious ? AnimationState.HoldSubsequent : AnimationState.Subsequent;
-				else if (holdPrevious)
-					timelineMode[i] = AnimationState.HoldFirst;
-				else if (to == null || timeline.instant || !to.animation.HasTimeline(ids))
-					timelineMode[i] = AnimationState.First;
-				else {
-					for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
-						if (next.animation.HasTimeline(ids)) continue;
-						if (next.mixDuration > 0) {
-							timelineMode[i] = AnimationState.HoldMix;
-							timelineHoldMix[i] = next;
-							goto continue_outer; // continue outer;
-						}
-						break;
-					}
-					timelineMode[i] = AnimationState.HoldFirst;
+					continue;
 				}
+
+				for (TrackEntry from = entry.mixingFrom; from != null; from = from.mixingFrom) {
+					if (from.animation.HasTimeline(ids)) {
+						// An earlier entry on this track keys this property, isolating it from lower tracks.
+						timelineMode[i] = AnimationState.Subsequent;
+						goto continue_outer; // continue outer;
+					}
+				}
+
+				// Hold if the next entry will overwrite this property.
+				int mode;
+				if (to == null || timeline.instant || (to.additive && timeline.additive) || !to.animation.HasTimeline(ids))
+					mode = first ? AnimationState.First : AnimationState.Subsequent;
+				else {
+					mode = first ? AnimationState.HoldFirst : AnimationState.Hold;
+					// Find next entry that doesn't overwrite this property. Its mix fades out the hold, instead of it ending abruptly.
+					for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
+						if ((next.additive && timeline.additive) || !next.animation.HasTimeline(ids)) {
+							if (next.mixDuration > 0) timelineHoldMix[i] = next;
+							break;
+						}
+					}
+				}
+				if (keepHold) mode = (mode & ~AnimationState.Hold) | (timelineMode[i] & AnimationState.Hold);
+				timelineMode[i] = mode;
 				continue_outer: { }
 			}
 		}
@@ -999,11 +938,20 @@ namespace Spine {
 
 		internal int trackIndex;
 
-		internal bool loop, holdPrevious, additive, reverse, shortestRotation;
+		internal bool loop, additive, reverse, shortestRotation, keepHold;
 		internal float eventThreshold, mixAttachmentThreshold, alphaAttachmentThreshold, mixDrawOrderThreshold;
 		internal float animationStart, animationEnd, animationLast, nextAnimationLast;
 		internal float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale = 1f;
-		internal float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
+		internal float alpha, mixTime, mixDuration, totalAlpha;
+		/// <summary>
+		/// For each timeline:
+		/// <list type="bullet">
+		/// <item>Bit 0, First: 0 = mix from current pose, 1 = mix from setup pose. Timeline is first to set the property.</item>
+		/// <item>Bit 1, Hold: 0 = mix out using alphaMix, 1 = apply full alpha to prevent dipping. Timeline is first on its track to
+		/// set the property and the next entry (mixingTo) also sets it. When held, timelineHoldMix's mix controls how the hold fades
+		/// out (for 3+ entry chains where the chain eventually stops setting the property).</item>
+		/// </list>
+		/// </summary>
 		internal readonly ExposedList<int> timelineMode = new ExposedList<int>();
 		internal readonly ExposedList<TrackEntry> timelineHoldMix = new ExposedList<TrackEntry>();
 		internal readonly ExposedList<float> timelinesRotation = new ExposedList<float>();
@@ -1171,8 +1119,6 @@ namespace Spine {
 		/// </summary>
 		public float Alpha { get { return alpha; } set { alpha = value; } }
 
-		public float InterruptAlpha { get { return interruptAlpha; } }
-
 		/// <summary>
 		/// When the mix percentage (<see cref="TrackEntry.MixTime"/> / <see cref="TrackEntry.MixDuration"/>) is less than the
 		/// <c>EventThreshold</c>, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
@@ -1241,18 +1187,19 @@ namespace Spine {
 		/// <summary>
 		/// <para>
 		/// Seconds for mixing from the previous animation to this animation. Defaults to the value provided by
-		/// <see cref="AnimationStateData.GetMix(Animation, Animation)"/> based on the animation before this animation (if any).</para>
-		/// <para>
-		/// A mix duration of 0 still needs to be applied one more time to mix out, so the properties it was animating are
-		/// reverted. A mix duration of 0 can be set at any time to end the mix on the next <see cref="AnimationState.Update(float)"/>.</para>
-		/// <para>
+		/// <see cref="AnimationStateData.GetMix(Animation, Animation)"/> based on the animation before this animation (if any).
+		/// </para><para>
+		/// A mix duration of 0 still needs to be applied one more time to mix out, so the properties it was animating are reverted.
+		/// A mix duration of 0 can be set at any time to end the mix on the next <see cref="AnimationState.Update(float)">update</see>.
+		/// </para><para>
 		/// The <c>MixDuration</c> can be set manually rather than use the value from
 		/// <see cref="AnimationStateData.GetMix(Animation, Animation)"/>. In that case, the <c>MixDuration</c> can be set for a new
-		/// track entry only before <see cref="AnimationState.Update(float)"/> is next called.</para>
-		/// <para>
+		/// track entry only before <see cref="AnimationState.Update(float)"/> is next called.
+		/// </para><para>
 		/// When using <seealso cref="AnimationState.AddAnimation(int, Animation, bool, float)"/> with a <c>Delay</c> &lt;= 0, the
 		/// <see cref="TrackEntry.Delay"/> is set using the mix duration from <see cref="AnimationState.Data"/>. If <c>MixDuration</c> is set
-		/// afterward, the delay needs to be adjusted:</para>
+		/// afterward, the delay needs to be adjusted:
+		/// </para>
 		/// <code>
 		/// entry.MixDuration = 0.25f;
 		/// entry.Delay = entry.Previous.TrackComplete - entry.MixDuration + 0;
@@ -1289,22 +1236,6 @@ namespace Spine {
 		/// The track entry for the next animation when mixing from this animation, or null if no mixing is currently occurring.
 		/// When mixing to multiple animations, <c>MixingTo</c> makes up a doubly linked list.</summary>
 		public TrackEntry MixingTo { get { return mixingTo; } }
-
-		/// <summary>
-		/// <para>
-		/// If true, when mixing from the previous animation to this animation, the previous animation is applied as normal instead
-		/// of being mixed out.</para>
-		/// <para>
-		/// When mixing between animations that key the same property, if a lower track also keys that property then the value will
-		/// briefly dip toward the lower track value during the mix. This happens because the first animation mixes from 100% to 0%
-		/// while the second animation mixes from 0% to 100%. Setting <c>HoldPrevious</c> to true applies the first animation
-		/// at 100% during the mix so the lower track value is overwritten. Such dipping does not occur on the lowest track which
-		/// keys the property, only when a higher track also keys the property.</para>
-		/// <para>
-		/// Snapping will occur if <c>HoldPrevious</c> is true and this animation does not key all the same properties as the
-		/// previous animation.</para>
-		/// </summary>
-		public bool HoldPrevious { get { return holdPrevious; } set { holdPrevious = value; } }
 
 		/// <summary>
 		/// If true, the animation will be applied in reverse and events will not be fired.</summary>

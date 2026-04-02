@@ -226,7 +226,6 @@ namespace Spine.Unity.Playables {
 #endif
 						trackEntry.TimeScale = clipSpeed * rootPlayableSpeed;
 						trackEntry.MixAttachmentThreshold = clipData.attachmentThreshold;
-						trackEntry.HoldPrevious = clipData.holdPrevious;
 						trackEntry.Alpha = clipData.alpha;
 
 						if (clipData.customDuration)
@@ -334,7 +333,6 @@ namespace Spine.Unity.Playables {
 						fromEntry.AllowImmediateQueue();
 						if (toAnimation != null) {
 							toEntry = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
-							toEntry.HoldPrevious = clipData.holdPrevious;
 							toEntry.Alpha = clipData.alpha;
 						}
 					}

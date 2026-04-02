@@ -388,6 +388,7 @@
   - Reorganized timeline class hierarchy with new base classes
   - Removed `AtlasAttachmentLoader` method `AtlasRegion FindRegion(string name)` from public interface. Added `protected AtlasRegion FindRegion(string name, string path)` instead which may be overridden instead when deriving your own subclass.
   - Renamed `Skin.SkinEntry.Name` to `Skin.SkinEntry.PlaceholderName` to better match Spine editor terminology.
+  - Removed `TrackEntry.HoldPrevious` and `TrackEntry.InterruptAlpha`. New `AnimationState` hold system automatically calculates the required state values.
 
 ### Unity
 
@@ -410,6 +411,7 @@
   - Renamed `ToAtlasRegionPMAClone` to `ToAtlasRegionWithNewPMATexture`.
   - Renamed `ToRegionAttachmentPMAClone` to `ToRegionAttachmentWithNewPMATexture`.
   - Removed support for long abandoned thirdparty asset "2D Toolkit" (TK2D) by Unikron Software.
+  - Removed Spine Timeline `Spine Animation State Clip` property `Hold Previous`. New `AnimationState` hold system automatically calculates the required state values.
   
 - **Changes of default values**
   - Changed default atlas texture workflow from PMA to straight alpha textures. This move was done because straight alpha textures are compatible with both Gamma and Linear color space, with the latter being the default for quite some time now in Unity. Note that `PMA Vertex Color` is unaffected and shall be enabled as usual to allow for single-pass additive rendering.
