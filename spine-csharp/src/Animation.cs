@@ -905,7 +905,7 @@ namespace Spine {
 		abstract protected void Apply (Slot slot, SlotPose pose, float time, float alpha, bool fromSetup, bool add);
 	}
 
-	/// <summary>Changes <see cref="SlotPose.GetColor"/>.</summary>
+	/// <summary>Changes a slot's <see cref="SlotPose.GetColor()">color</see>.</summary>
 	public class RGBATimeline : SlotCurveTimeline {
 		public const int ENTRIES = 5;
 		private const int R = 1, G = 2, B = 3, A = 4;
@@ -986,7 +986,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes RGB for a slot's <see cref="SlotPose.GetColor"/>.</summary>
+	/// <summary>Changes RGB for a slot's <see cref="SlotPose.GetColor()">color</see>.</summary>
 	public class RGBTimeline : SlotCurveTimeline {
 		public const int ENTRIES = 4;
 		private const int R = 1, G = 2, B = 3;
@@ -1071,7 +1071,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes alpha for a slot's <see cref="SlotPose.GetColor"/>.</summary>
+	/// <summary>Changes alpha for a slot's <see cref="SlotPose.GetColor()">color</see>.</summary>
 	public class AlphaTimeline : CurveTimeline1, ISlotTimeline {
 		readonly int slotIndex;
 
@@ -1118,7 +1118,8 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes <see cref="SlotPose.Color"/> and <see cref="SlotPose.DarkColor"/> for two color tinting.</summary>
+	/// <summary>Changes a slot's <see cref="SlotPose.GetColor()">color</see> and
+	/// <see cref="SlotPose.GetDarkColor()">dark color</see> for two color tinting.</summary>
 	public class RGBA2Timeline : SlotCurveTimeline {
 		public const int ENTRIES = 8;
 		protected const int R = 1, G = 2, B = 3, A = 4, R2 = 5, G2 = 6, B2 = 7;
@@ -1240,7 +1241,8 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes RGB for a slot's <see cref="SlotPose.Color"/> and <see cref="SlotPose.DarkColor"/> for two color tinting.</summary>
+	/// <summary>Changes RGB for a slot's <see cref="SlotPose.GetColor()">color</see> and
+	/// <see cref="SlotPose.GetDarkColor()">dark color</see> for two color tinting.</summary>
 	public class RGB2Timeline : SlotCurveTimeline {
 		public const int ENTRIES = 7;
 		protected const int R = 1, G = 2, B = 3, R2 = 4, G2 = 5, B2 = 6;
