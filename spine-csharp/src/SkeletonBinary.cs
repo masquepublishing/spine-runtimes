@@ -469,13 +469,14 @@ namespace Spine {
 				o = skeletonData.events.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++) {
 					var data = new EventData(input.ReadString());
-					data.Int = input.ReadInt(false);
-					data.Float = input.ReadFloat();
-					data.String = input.ReadString();
+					Event setup = data.setupPose;
+					setup.intValue = input.ReadInt(false);
+					setup.floatValue = input.ReadFloat();
+					setup.stringValue = input.ReadString();
 					data.AudioPath = input.ReadString();
 					if (data.AudioPath != null) {
-						data.Volume = input.ReadFloat();
-						data.Balance = input.ReadFloat();
+						setup.volume = input.ReadFloat();
+						setup.balance = input.ReadFloat();
 					}
 					o[i] = data;
 				}
@@ -1250,7 +1251,7 @@ namespace Spine {
 					e.intValue = input.ReadInt(false);
 					e.floatValue = input.ReadFloat();
 					e.stringValue = input.ReadString();
-					if (e.stringValue == null) e.stringValue = eventData.String;
+					if (e.stringValue == null) e.stringValue = eventData.setupPose.stringValue;
 					if (e.data.AudioPath != null) {
 						e.volume = input.ReadFloat();
 						e.balance = input.ReadFloat();

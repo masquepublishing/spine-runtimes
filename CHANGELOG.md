@@ -390,6 +390,14 @@
   - Renamed `Skin.SkinEntry.Name` to `Skin.SkinEntry.PlaceholderName` to better match Spine editor terminology.
   - Removed `TrackEntry.HoldPrevious` and `TrackEntry.InterruptAlpha`. New `AnimationState` hold system automatically calculates the required state values.
   - Removed `BoneLocal` class. `BonePose` now directly implements `IPose<BonePose>` and contains all local pose fields. Replace any use of `BoneLocal` → `BonePose`.
+  - `EventData` no longer stores `Int`, `Float`, `String`, `Volume`, and `Balance` properties directly. Use `EventData.SetupPose` to access the setup pose `Event` which provides these properties instead.
+    ||||
+    |-----|-|-----|
+    | `EventData.Int`     |→| `EventData.SetupPose.Int` |
+    | `EventData.Float`   |→| `EventData.SetupPose.Float` |
+    | `EventData.String`  |→| `EventData.SetupPose.String` |
+    | `EventData.Volume`  |→| `EventData.SetupPose.Volume` |
+    | `EventData.Balance` |→| `EventData.SetupPose.Balance` |
 
 ### Unity
 

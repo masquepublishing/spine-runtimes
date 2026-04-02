@@ -33,23 +33,20 @@ namespace Spine {
 	/// <summary>Stores the setup pose values for an Event.</summary>
 	public class EventData {
 		internal string name;
+		internal readonly Event setupPose;
+
+		/// <summary>The setup values that are shared by all events with this data.</summary>
+		public Event SetupPose { get { return setupPose; } }
 
 		/// <summary>The name of the event, unique across all events in the skeleton.
 		/// <para>See <see cref="SkeletonData.FindEvent(string)"/>.</para></summary>
 		public string Name { get { return name; } }
-		public int Int { get; set; }
-		public float Float { get; set; }
-		public string @String { get; set; }
 
-		/// <summary>Path to an audio file relative to the audio path in the Spine project.</summary>
+		/// <summary>Path to an audio file relative to the audio folder as defined in Spine.</summary>
 		public string AudioPath { get; set; }
-		/// <summary>If an audio path is set, the volume for the audio.</summary>
-		public float Volume { get; set; }
-		/// <summary>If an audio path is set, the left/right balance for the audio.</summary>
-		public float Balance { get; set; }
 
 		public EventData (string name) {
-			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
+			setupPose = new Event(-1, this);
 			this.name = name;
 		}
 

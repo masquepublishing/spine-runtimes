@@ -505,13 +505,14 @@ namespace Spine {
 					foreach (KeyValuePair<string, Object> entry in (Dictionary<string, Object>)root["events"]) {
 						Dictionary<string, object> entryMap = (Dictionary<string, Object>)entry.Value;
 						var data = new EventData(entry.Key);
-						data.Int = GetInt(entryMap, "int", 0);
-						data.Float = GetFloat(entryMap, "float", 0);
-						data.String = GetString(entryMap, "string", string.Empty);
+						Event setup = data.setupPose;
+						setup.intValue = GetInt(entryMap, "int", 0);
+						setup.floatValue = GetFloat(entryMap, "float", 0);
+						setup.stringValue = GetString(entryMap, "string", string.Empty);
 						data.AudioPath = GetString(entryMap, "audio", null);
 						if (data.AudioPath != null) {
-							data.Volume = GetFloat(entryMap, "volume", 1);
-							data.Balance = GetFloat(entryMap, "balance", 0);
+							setup.volume = GetFloat(entryMap, "volume", 1);
+							setup.balance = GetFloat(entryMap, "balance", 0);
 						}
 						skeletonData.events.Add(data);
 					}
@@ -1397,16 +1398,17 @@ namespace Spine {
 				var timeline = new EventTimeline(eventsMap.Count);
 				int frame = 0;
 				foreach (Dictionary<string, Object> keyMap in eventsMap) {
-					EventData eventData = skeletonData.FindEvent((string)keyMap["name"]);
-					if (eventData == null) throw new Exception("Event not found: " + keyMap["name"]);
-					var e = new Event(GetFloat(keyMap, "time", 0), eventData) {
-						intValue = GetInt(keyMap, "int", eventData.Int),
-						floatValue = GetFloat(keyMap, "float", eventData.Float),
-						stringValue = GetString(keyMap, "string", eventData.String)
+					EventData data = skeletonData.FindEvent((string)keyMap["name"]);
+					if (data == null) throw new Exception("Event not found: " + keyMap["name"]);
+					Event setup = data.setupPose;
+					var e = new Event(GetFloat(keyMap, "time", 0), data) {
+						intValue = GetInt(keyMap, "int", setup.intValue),
+						floatValue = GetFloat(keyMap, "float", setup.floatValue),
+						stringValue = GetString(keyMap, "string", setup.stringValue)
 					};
 					if (e.data.AudioPath != null) {
-						e.volume = GetFloat(keyMap, "volume", eventData.Volume);
-						e.balance = GetFloat(keyMap, "balance", eventData.Balance);
+						e.volume = GetFloat(keyMap, "volume", setup.volume);
+						e.balance = GetFloat(keyMap, "balance", setup.balance);
 					}
 					timeline.SetFrame(frame, e);
 					++frame;
