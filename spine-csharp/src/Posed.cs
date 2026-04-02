@@ -31,13 +31,13 @@ using System;
 
 namespace Spine {
 	internal interface IPosedInternal {
-		// replaces "object.pose == object.applied" of reference implementation.
+		// replaces "object.pose == object.appliedPose" of reference implementation.
 		bool PoseEqualsApplied { get; }
-		// replaces "object.applied = object.pose" of reference implementation.
+		// replaces "object.appliedPose = object.pose" of reference implementation.
 		void UsePose ();
-		// replaces "object.applied = object.constrained" of reference implementation.
+		// replaces "object.appliedPose = object.constrainedPose" of reference implementation.
 		void UseConstrained ();
-		// replaces "object.applied.Set(object.pose)" of reference implementation.
+		// replaces "object.appliedPose.Set(object.pose)" of reference implementation.
 		void ResetConstrained ();
 	}
 
@@ -58,36 +58,36 @@ namespace Spine {
 
 		internal readonly D data;
 		internal readonly P pose;
-		internal readonly P constrained;
-		internal P applied;
+		internal readonly P constrainedPose;
+		internal P appliedPose;
 
-		protected Posed (D data, P pose, P constrained) {
+		protected Posed (D data, P pose, P constrainedPose) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			this.data = data;
 			this.pose = pose;
-			this.constrained = constrained;
-			applied = pose;
+			this.constrainedPose = constrainedPose;
+			appliedPose = pose;
 		}
 
 		/// <summary>Sets the unconstrained pose to the setup pose.</summary>
 		public virtual void SetupPose () {
-			pose.Set(data.setup);
+			pose.Set(data.setupPose);
 		}
 
 		bool IPosedInternal.PoseEqualsApplied {
-			get { return (object)pose == (object)applied; }
+			get { return (object)pose == (object)appliedPose; }
 		}
 
 		void IPosedInternal.UsePose () {
-			applied = pose;
+			appliedPose = pose;
 		}
 
 		void IPosedInternal.UseConstrained () {
-			applied = constrained;
+			appliedPose = constrainedPose;
 		}
 
 		void IPosedInternal.ResetConstrained () {
-			applied.Set(pose);
+			appliedPose.Set(pose);
 		}
 
 		/// <summary>The setup pose data. May be shared with multiple instances.</summary>
@@ -98,7 +98,7 @@ namespace Spine {
 
 		/// <summary>If no constraints modify this object, the applied pose is the same as the <see cref="Pose"/>. Otherwise it is a
 		/// copy of the <see cref="Pose"/> modified by constraints.</summary>
-		public P AppliedPose { get { return applied; } }
+		public P AppliedPose { get { return appliedPose; } }
 
 		override public string ToString () {
 			return data.name;

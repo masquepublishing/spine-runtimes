@@ -39,20 +39,20 @@ namespace Spine {
 		where P : IPose<P> {
 
 		internal readonly string name;
-		internal readonly P setup;
+		internal readonly P setupPose;
 		internal bool skinRequired;
 
-		protected PosedData (string name, P setup) {
+		protected PosedData (string name, P setupPose) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
-			this.setup = setup;
+			this.setupPose = setupPose;
 		}
 
 		public string Name { get { return name; } }
 
 		/// <summary>The setup pose that most animations are relative to.</summary>
 		public P GetSetupPose () {
-			return setup;
+			return setupPose;
 		}
 
 		/// <summary>

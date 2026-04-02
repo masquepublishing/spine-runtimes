@@ -519,7 +519,7 @@ namespace Spine {
 			bool add, bool mixOut, bool appliedPose) {
 
 			Bone bone = skeleton.bones.Items[boneIndex];
-			if (bone.active) Apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, fromSetup, add, mixOut);
+			if (bone.active) Apply(appliedPose ? bone.appliedPose : bone.pose, bone.data.setupPose, time, alpha, fromSetup, add, mixOut);
 		}
 
 		abstract protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
@@ -565,7 +565,7 @@ namespace Spine {
 			bool mixOut, bool appliedPose) {
 
 			Bone bone = skeleton.bones.Items[boneIndex];
-			if (bone.active) Apply(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, fromSetup, add, mixOut);
+			if (bone.active) Apply(appliedPose ? bone.appliedPose : bone.pose, bone.data.setupPose, time, alpha, fromSetup, add, mixOut);
 		}
 
 		abstract protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
@@ -865,14 +865,14 @@ namespace Spine {
 
 			Bone bone = skeleton.bones.Items[boneIndex];
 			if (!bone.active) return;
-			BonePose pose = appliedPose ? bone.applied : bone.pose;
+			BonePose pose = appliedPose ? bone.appliedPose : bone.pose;
 
 			if (mixOut) {
-				if (fromSetup) pose.inherit = bone.data.setup.inherit;
+				if (fromSetup) pose.inherit = bone.data.setupPose.inherit;
 			} else {
 				float[] frames = this.frames;
 				if (time < frames[0]) {
-					if (fromSetup) pose.inherit = bone.data.setup.inherit;
+					if (fromSetup) pose.inherit = bone.data.setupPose.inherit;
 				} else
 					pose.inherit = InheritEnum.Values[(int)frames[Search(frames, time, ENTRIES) + INHERIT]];
 			}
@@ -899,7 +899,7 @@ namespace Spine {
 			bool mixOut, bool appliedPose) {
 
 			Slot slot = skeleton.slots.Items[slotIndex];
-			if (slot.bone.active) Apply(slot, appliedPose ? slot.applied : slot.pose, time, alpha, fromSetup, add);
+			if (slot.bone.active) Apply(slot, appliedPose ? slot.appliedPose : slot.pose, time, alpha, fromSetup, add);
 		}
 
 		abstract protected void Apply (Slot slot, SlotPose pose, float time, float alpha, bool fromSetup, bool add);
@@ -936,7 +936,7 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					color = slot.data.setup.GetColor();
+					color = slot.data.setupPose.GetColor();
 					pose.SetColor(color); // required due to Color being a struct
 				}
 				return;
@@ -975,7 +975,7 @@ namespace Spine {
 				color = new Color32F(r, g, b, a);
 			} else {
 				if (fromSetup) {
-					Color32F setup = slot.data.setup.GetColor();
+					Color32F setup = slot.data.setupPose.GetColor();
 					color = new Color32F(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
 						setup.a + (a - setup.a) * alpha);
 				} else
@@ -1016,7 +1016,7 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					Color32F setup = slot.data.setup.GetColor();
+					Color32F setup = slot.data.setupPose.GetColor();
 					color.r = setup.r;
 					color.g = setup.g;
 					color.b = setup.b;
@@ -1051,7 +1051,7 @@ namespace Spine {
 
 			if (alpha != 1) {
 				if (fromSetup) {
-					Color32F setup = slot.data.setup.GetColor();
+					Color32F setup = slot.data.setupPose.GetColor();
 					r = setup.r + (r - setup.r) * alpha;
 					g = setup.g + (g - setup.g) * alpha;
 					b = setup.b + (b - setup.b) * alpha;
@@ -1092,12 +1092,12 @@ namespace Spine {
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
 
-			SlotPose pose = (appliedPose ? slot.applied : slot.pose);
+			SlotPose pose = (appliedPose ? slot.appliedPose : slot.pose);
 			Color32F color = pose.GetColor();
 			float a;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				Color32F setup = slot.data.setup.GetColor();
+				Color32F setup = slot.data.setupPose.GetColor();
 				if (fromSetup) {
 					color.a = setup.a;
 					pose.SetColor(color); // required due to Color being a struct
@@ -1108,7 +1108,7 @@ namespace Spine {
 			a = GetCurveValue(time);
 			if (alpha != 1) {
 				if (fromSetup) {
-					Color32F setup = slot.data.setup.GetColor();
+					Color32F setup = slot.data.setupPose.GetColor();
 					a = setup.a + (a - setup.a) * alpha;
 				} else
 					a = color.a + (a - color.a) * alpha;
@@ -1159,7 +1159,7 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					SlotPose setup = slot.data.setup;
+					SlotPose setup = slot.data.setupPose;
 					Color32F setupLight = setup.GetColor();
 					Color32F? setupDarkOptional = setup.GetDarkColor();
 					pose.SetColor(setupLight); // required due to Color being a struct
@@ -1214,7 +1214,7 @@ namespace Spine {
 				light.Clamp();
 				pose.SetColor(light); // required due to Color being a struct
 			} else if (fromSetup) {
-				SlotPose setupPose = slot.data.setup;
+				SlotPose setupPose = slot.data.setupPose;
 				Color32F setup = setupPose.GetColor();
 				light = new Color32F(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
 					setup.a + (a - setup.a) * alpha);
@@ -1280,7 +1280,7 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					SlotPose setup = slot.data.setup;
+					SlotPose setup = slot.data.setupPose;
 					Color32F setupLight = setup.GetColor();
 					Color32F? setupDarkOptional = setup.GetDarkColor();
 					Color32F dark = darkOptional.Value;
@@ -1338,7 +1338,7 @@ namespace Spine {
 			if (alpha != 1) {
 				Color32F dark = darkOptional.Value;
 				if (fromSetup) {
-					SlotPose setupPose = slot.data.setup;
+					SlotPose setupPose = slot.data.setupPose;
 					Color32F setup = setupPose.GetColor();
 					r = setup.r + (r - setup.r) * alpha;
 					g = setup.g + (g - setup.g) * alpha;
@@ -1411,7 +1411,7 @@ namespace Spine {
 							bool mixOut, bool appliedPose) {
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
-			SlotPose pose = appliedPose ? slot.applied : slot.pose;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
 
 			if (mixOut || time < this.frames[0]) {
 				if (fromSetup) SetAttachment(skeleton, pose, slot.data.attachmentName);
@@ -1692,7 +1692,7 @@ namespace Spine {
 
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
-			SlotPose pose = appliedPose ? slot.applied : slot.pose;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
 
 			Attachment slotAttachment = pose.attachment;
 			IHasSequence hasSequence = slotAttachment as IHasSequence;
@@ -2006,12 +2006,12 @@ namespace Spine {
 									bool mixOut, bool appliedPose) {
 			var constraint = (IkConstraint)skeleton.constraints.Items[constraintIndex];
 			if (!constraint.active) return;
-			IkConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
+			IkConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					IkConstraintPose setup = constraint.data.setup;
+					IkConstraintPose setup = constraint.data.setupPose;
 					pose.mix = setup.mix;
 					pose.softness = setup.softness;
 					pose.bendDirection = setup.bendDirection;
@@ -2042,7 +2042,7 @@ namespace Spine {
 				break;
 			}
 
-			IkConstraintPose basePose = fromSetup ? constraint.data.setup : pose;
+			IkConstraintPose basePose = fromSetup ? constraint.data.setupPose : pose;
 			pose.mix = basePose.mix + (mix - basePose.mix) * alpha;
 			pose.softness = basePose.softness + (softness - basePose.softness) * alpha;
 			if (mixOut) {
@@ -2107,12 +2107,12 @@ namespace Spine {
 									bool mixOut, bool appliedPose) {
 			var constraint = (TransformConstraint)skeleton.constraints.Items[constraintIndex];
 			if (!constraint.active) return;
-			TransformConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
+			TransformConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					TransformConstraintPose setup = constraint.data.setup;
+					TransformConstraintPose setup = constraint.data.setupPose;
 					pose.mixRotate = setup.mixRotate;
 					pose.mixX = setup.mixX;
 					pose.mixY = setup.mixY;
@@ -2127,7 +2127,7 @@ namespace Spine {
 			float rotate, x, y, scaleX, scaleY, shearY;
 			GetCurveValue(out rotate, out x, out y, out scaleX, out scaleY, out shearY, time);
 
-			TransformConstraintPose basePose = fromSetup ? constraint.data.setup : pose;
+			TransformConstraintPose basePose = fromSetup ? constraint.data.setupPose : pose;
 			if (add) {
 				pose.mixRotate = basePose.mixRotate + rotate * alpha;
 				pose.mixX = basePose.mixX + x * alpha;
@@ -2216,8 +2216,8 @@ namespace Spine {
 			bool add, bool mixOut, bool appliedPose) {
 			var constraint = (PathConstraint)skeleton.constraints.Items[constraintIndex];
 			if (constraint.active) {
-				PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.position = GetAbsoluteValue(time, alpha, fromSetup, add, pose.position, constraint.data.setup.position);
+				PathConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+				pose.position = GetAbsoluteValue(time, alpha, fromSetup, add, pose.position, constraint.data.setupPose.position);
 			}
 		}
 	}
@@ -2235,8 +2235,8 @@ namespace Spine {
 
 			var constraint = (PathConstraint)skeleton.constraints.Items[constraintIndex];
 			if (constraint.active) {
-				PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.spacing = GetAbsoluteValue(time, alpha, fromSetup, false, pose.spacing, constraint.data.setup.spacing);
+				PathConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+				pose.spacing = GetAbsoluteValue(time, alpha, fromSetup, false, pose.spacing, constraint.data.setupPose.spacing);
 			}
 		}
 	}
@@ -2281,12 +2281,12 @@ namespace Spine {
 			bool add, bool mixOut, bool appliedPose) {
 			var constraint = (PathConstraint)skeleton.constraints.Items[constraintIndex];
 			if (!constraint.active) return;
-			PathConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
+			PathConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (fromSetup) {
-					PathConstraintPose setup = constraint.data.setup;
+					PathConstraintPose setup = constraint.data.setupPose;
 					pose.mixRotate = setup.mixRotate;
 					pose.mixX = setup.mixX;
 					pose.mixY = setup.mixY;
@@ -2319,7 +2319,7 @@ namespace Spine {
 				break;
 			}
 
-			PathConstraintPose basePose = fromSetup ? constraint.data.setup : pose;
+			PathConstraintPose basePose = fromSetup ? constraint.data.setupPose : pose;
 			if (add) {
 				pose.mixRotate = basePose.mixRotate + rotate * alpha;
 				pose.mixX = basePose.mixX + x * alpha;
@@ -2349,15 +2349,15 @@ namespace Spine {
 				for (int i = 0, n = skeleton.physics.Count; i < n; i++) {
 					PhysicsConstraint constraint = constraints[i];
 					if (constraint.active && Global(constraint.data)) {
-						PhysicsConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-						Set(pose, GetAbsoluteValue(time, alpha, fromSetup, add, Get(pose), Get(constraint.data.setup), value));
+						PhysicsConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+						Set(pose, GetAbsoluteValue(time, alpha, fromSetup, add, Get(pose), Get(constraint.data.setupPose), value));
 					}
 				}
 			} else {
 				var constraint = (PhysicsConstraint)skeleton.constraints.Items[constraintIndex];
 				if (constraint.active) {
-					PhysicsConstraintPose pose = appliedPose ? constraint.applied : constraint.pose;
-					Set(pose, GetAbsoluteValue(time, alpha, fromSetup, add, Get(pose), Get(constraint.data.setup)));
+					PhysicsConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+					Set(pose, GetAbsoluteValue(time, alpha, fromSetup, add, Get(pose), Get(constraint.data.setupPose)));
 				}
 			}
 		}
@@ -2583,8 +2583,8 @@ namespace Spine {
 
 			var constraint = (Slider)skeleton.constraints.Items[constraintIndex];
 			if (constraint.active) {
-				SliderPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.time = GetAbsoluteValue(time, alpha, fromSetup, add, pose.time, constraint.data.setup.time);
+				SliderPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+				pose.time = GetAbsoluteValue(time, alpha, fromSetup, add, pose.time, constraint.data.setupPose.time);
 			}
 		}
 	}
@@ -2604,8 +2604,8 @@ namespace Spine {
 
 			var constraint = (Slider)skeleton.constraints.Items[constraintIndex];
 			if (constraint.active) {
-				SliderPose pose = appliedPose ? constraint.applied : constraint.pose;
-				pose.mix = GetAbsoluteValue(time, alpha, fromSetup, add, pose.mix, constraint.data.setup.mix);
+				SliderPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
+				pose.mix = GetAbsoluteValue(time, alpha, fromSetup, add, pose.mix, constraint.data.setupPose.mix);
 			}
 		}
 	}

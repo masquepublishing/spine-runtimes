@@ -457,7 +457,7 @@ namespace Spine {
 
 			Bone bone = skeleton.bones.Items[timeline.BoneIndex];
 			if (!bone.active) return;
-			BonePose pose = bone.pose, setup = bone.data.setup;
+			BonePose pose = bone.pose, setup = bone.data.setupPose;
 			float[] frames = timeline.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				if (fromSetup) pose.rotation = setup.rotation;

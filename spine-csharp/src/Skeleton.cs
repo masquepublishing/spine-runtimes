@@ -198,13 +198,13 @@ namespace Spine {
 				n = this.updateCache.Count;
 				for (int i = 0; i < n; i++) {
 					Bone bone = updateCache[i] as Bone;
-					if (bone != null) updateCache[i] = bone.applied;
+					if (bone != null) updateCache[i] = bone.appliedPose;
 				}
 			}
 		}
 
 		internal void Constrained (IPosedInternal obj) {
-			if (obj.PoseEqualsApplied) { // if (obj.pose == obj.applied) {
+			if (obj.PoseEqualsApplied) { // if (obj.pose == obj.appliedPose) {
 				obj.UseConstrained();
 				resetCache.Add(obj);
 			}
@@ -461,7 +461,7 @@ namespace Spine {
 					verticesLength = 8;
 					vertices = temp;
 					if (vertices.Length < 8) vertices = temp = new float[8];
-					region.ComputeWorldVertices(slot, region.GetOffsets(slot.applied), vertices, 0, 2);
+					region.ComputeWorldVertices(slot, region.GetOffsets(slot.appliedPose), vertices, 0, 2);
 					triangles = quadTriangles;
 				} else {
 					MeshAttachment mesh = attachment as MeshAttachment;

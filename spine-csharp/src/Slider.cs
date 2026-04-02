@@ -51,15 +51,15 @@ namespace Spine {
 		}
 
 		override public void Update (Skeleton skeleton, Physics physics) {
-			SliderPose p = applied;
+			SliderPose p = appliedPose;
 			if (p.mix == 0) return;
 
 			Animation animation = data.animation;
 			if (bone != null) {
 				if (!bone.active) return;
-				if (data.local) bone.applied.ValidateLocalTransform(skeleton);
+				if (data.local) bone.appliedPose.ValidateLocalTransform(skeleton);
 				p.time = data.offset
-					+ (data.property.Value(skeleton, bone.applied, data.local, offsets) - data.property.offset) * data.scale;
+					+ (data.property.Value(skeleton, bone.appliedPose, data.local, offsets) - data.property.offset) * data.scale;
 				if (data.loop)
 					p.time = animation.duration + (p.time % animation.duration);
 				else
@@ -69,7 +69,7 @@ namespace Spine {
 			Bone[] bones = skeleton.bones.Items;
 			int[] indices = animation.bones.Items;
 			for (int i = 0, n = animation.bones.Count; i < n; i++)
-				bones[indices[i]].applied.ModifyLocal(skeleton);
+				bones[indices[i]].appliedPose.ModifyLocal(skeleton);
 
 			animation.Apply(skeleton, p.time, p.time, data.loop, null, p.mix, false, data.additive, false, true);
 		}

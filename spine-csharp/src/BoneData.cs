@@ -54,7 +54,7 @@ namespace Spine {
 		public BoneData (BoneData data, BoneData parent)
 			: this(data.index, data.name, parent) {
 			length = data.length;
-			setup.Set(data.setup);
+			setupPose.Set(data.setupPose);
 		}
 
 		/// <summary>The <see cref="Skeleton.Bones"/> index.</summary>

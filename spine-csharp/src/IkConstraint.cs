@@ -48,7 +48,7 @@ namespace Spine {
 
 			bones = new ExposedList<BonePose>(data.bones.Count);
 			foreach (BoneData boneData in data.bones)
-				bones.Add(skeleton.bones.Items[boneData.index].constrained);
+				bones.Add(skeleton.bones.Items[boneData.index].constrainedPose);
 
 			target = skeleton.bones.Items[data.target.index];
 		}
@@ -61,9 +61,9 @@ namespace Spine {
 
 		/// <summary>Applies the constraint to the constrained bones.</summary>
 		override public void Update (Skeleton skeleton, Physics physics) {
-			IkConstraintPose p = applied;
+			IkConstraintPose p = appliedPose;
 			if (p.mix == 0) return;
-			BonePose target = this.target.applied;
+			BonePose target = this.target.appliedPose;
 			BonePose[] bones = this.bones.Items;
 			switch (this.bones.Count) {
 			case 1:
@@ -105,7 +105,7 @@ namespace Spine {
 			bool uniform, float mix) {
 			if (bone == null) throw new ArgumentNullException("bone", "bone cannot be null.");
 			bone.ModifyLocal(skeleton);
-			BonePose p = bone.bone.parent.applied;
+			BonePose p = bone.bone.parent.appliedPose;
 
 			float pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 			float rotationIK = -bone.shearX - bone.rotation, tx, ty;
@@ -202,7 +202,7 @@ namespace Spine {
 				cwx = a * child.x + b * child.y + parent.worldX;
 				cwy = c * child.x + d * child.y + parent.worldY;
 			}
-			BonePose pp = parent.bone.parent.applied;
+			BonePose pp = parent.bone.parent.appliedPose;
 			a = pp.a;
 			b = pp.b;
 			c = pp.c;

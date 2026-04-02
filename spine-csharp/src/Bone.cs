@@ -53,8 +53,8 @@ namespace Spine {
 		public Bone (BoneData data, Bone parent)
 			: base(data, new BonePose(), new BonePose()) {
 			this.parent = parent;
-			applied.bone = this;
-			constrained.bone = this;
+			appliedPose.bone = this;
+			constrainedPose.bone = this;
 		}
 
 		/// <summary>

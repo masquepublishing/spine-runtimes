@@ -52,7 +52,7 @@ namespace Spine {
 			: base(data, new PhysicsConstraintPose(), new PhysicsConstraintPose()) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 
-			bone = skeleton.bones.Items[data.bone.index].constrained;
+			bone = skeleton.bones.Items[data.bone.index].constrainedPose;
 		}
 
 		override public IConstraint Copy (Skeleton skeleton) {
@@ -104,7 +104,7 @@ namespace Spine {
 
 		/// <summary>Applies the constraint to the constrained bones.</summary>
 		override public void Update (Skeleton skeleton, Physics physics) {
-			PhysicsConstraintPose p = applied;
+			PhysicsConstraintPose p = appliedPose;
 			float mix = p.mix;
 			if (mix == 0) return;
 

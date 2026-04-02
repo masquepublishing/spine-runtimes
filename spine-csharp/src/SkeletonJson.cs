@@ -144,7 +144,7 @@ namespace Spine {
 						}
 						var data = new BoneData(skeletonData.Bones.Count, (string)boneMap["name"], parent);
 						data.length = GetFloat(boneMap, "length", 0) * scale;
-						BonePose setup = data.setup;
+						BonePose setup = data.setupPose;
 						setup.x = GetFloat(boneMap, "x", 0) * scale;
 						setup.y = GetFloat(boneMap, "y", 0) * scale;
 						setup.rotation = GetFloat(boneMap, "rotation", 0);
@@ -171,12 +171,12 @@ namespace Spine {
 
 						if (slotMap.ContainsKey("color")) {
 							string color = (string)slotMap["color"];
-							data.setup.SetColor(ToColor32(color, 8));
+							data.setupPose.SetColor(ToColor32(color, 8));
 						}
 
 						if (slotMap.ContainsKey("dark")) {
 							string color2 = (string)slotMap["dark"];
-							data.setup.SetDarkColor(ToColor24(color2, 6)); // expectedLength = 6. ie. "RRGGBB"
+							data.setupPose.SetDarkColor(ToColor24(color2, 6)); // expectedLength = 6. ie. "RRGGBB"
 						}
 
 						data.attachmentName = GetString(slotMap, "attachment", null);
@@ -213,7 +213,7 @@ namespace Spine {
 							if (data.target == null) throw new Exception("IK target bone not found: " + targetName);
 
 							data.uniform = GetBoolean(constraintMap, "uniform", false);
-							IkConstraintPose setup = data.setup;
+							IkConstraintPose setup = data.setupPose;
 							setup.mix = GetFloat(constraintMap, "mix", 1);
 							setup.softness = GetFloat(constraintMap, "softness", 0) * scale;
 							setup.bendDirection = GetBoolean(constraintMap, "bendPositive", true) ? 1 : -1;
@@ -312,7 +312,7 @@ namespace Spine {
 							data.offsets[TransformConstraintData.SCALEY] = GetFloat(constraintMap, "scaleY", 0);
 							data.offsets[TransformConstraintData.SHEARY] = GetFloat(constraintMap, "shearY", 0);
 
-							TransformConstraintPose setup = data.setup;
+							TransformConstraintPose setup = data.setupPose;
 							if (rotate) setup.mixRotate = GetFloat(constraintMap, "mixRotate", 1);
 							if (x) setup.mixX = GetFloat(constraintMap, "mixX", 1);
 							if (y) setup.mixY = GetFloat(constraintMap, "mixY", setup.mixX);
@@ -343,7 +343,7 @@ namespace Spine {
 							data.spacingMode = (SpacingMode)Enum.Parse(typeof(SpacingMode), GetString(constraintMap, "spacingMode", "length"), true);
 							data.rotateMode = (RotateMode)Enum.Parse(typeof(RotateMode), GetString(constraintMap, "rotateMode", "tangent"), true);
 							data.offsetRotation = GetFloat(constraintMap, "rotation", 0);
-							PathConstraintPose setup = data.setup;
+							PathConstraintPose setup = data.setupPose;
 							setup.position = GetFloat(constraintMap, "position", 0);
 							if (data.positionMode == PositionMode.Fixed) setup.position *= scale;
 							setup.spacing = GetFloat(constraintMap, "spacing", 0);
@@ -370,7 +370,7 @@ namespace Spine {
 							data.shearX = GetFloat(constraintMap, "shearX", 0);
 							data.limit = GetFloat(constraintMap, "limit", 5000) * scale;
 							data.step = 1f / GetInt(constraintMap, "fps", 60);
-							PhysicsConstraintPose setup = data.setup;
+							PhysicsConstraintPose setup = data.setupPose;
 							setup.inertia = GetFloat(constraintMap, "inertia", 0.5f);
 							setup.strength = GetFloat(constraintMap, "strength", 100);
 							setup.damping = GetFloat(constraintMap, "damping", 0.85f);
@@ -395,8 +395,8 @@ namespace Spine {
 
 							data.additive = GetBoolean(constraintMap, "additive", false);
 							data.loop = GetBoolean(constraintMap, "loop", false);
-							data.setup.time = GetFloat(constraintMap, "time", 0);
-							data.setup.mix = GetFloat(constraintMap, "mix", 1);
+							data.setupPose.time = GetFloat(constraintMap, "time", 0);
+							data.setupPose.mix = GetFloat(constraintMap, "mix", 1);
 
 							string boneName = GetString(constraintMap, "bone", null);
 							if (boneName != null) {

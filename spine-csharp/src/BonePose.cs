@@ -135,7 +135,7 @@ namespace Spine {
 				return;
 			}
 
-			BonePose parent = bone.parent.applied;
+			BonePose parent = bone.parent.appliedPose;
 			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 			worldX = pa * x + pb * y + parent.worldX;
 			worldY = pc * x + pd * y + parent.worldY;
@@ -245,7 +245,7 @@ namespace Spine {
 				return;
 			}
 
-			BonePose parent = bone.parent.applied;
+			BonePose parent = bone.parent.appliedPose;
 			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 			float pid = 1 / (pa * pd - pb * pc);
 			float ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
@@ -337,7 +337,7 @@ namespace Spine {
 		internal void ResetWorld (int update) {
 			Bone[] children = bone.children.Items;
 			for (int i = 0, n = bone.children.Count; i < n; i++) {
-				BonePose child = children[i].applied;
+				BonePose child = children[i].appliedPose;
 				if (child.world == update) {
 					child.world = 0;
 					child.local = 0;
@@ -391,7 +391,7 @@ namespace Spine {
 				parentX = worldX;
 				parentY = worldY;
 			} else {
-				bone.parent.applied.WorldToLocal(worldX, worldY, out parentX, out parentY);
+				bone.parent.appliedPose.WorldToLocal(worldX, worldY, out parentX, out parentY);
 			}
 		}
 
@@ -401,7 +401,7 @@ namespace Spine {
 				worldX = parentX;
 				worldY = parentY;
 			} else {
-				bone.parent.applied.LocalToWorld(parentX, parentY, out worldX, out worldY);
+				bone.parent.appliedPose.LocalToWorld(parentX, parentY, out worldX, out worldY);
 			}
 		}
 
