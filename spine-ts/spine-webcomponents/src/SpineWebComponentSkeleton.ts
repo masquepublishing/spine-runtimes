@@ -222,6 +222,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 		return this._skin;
 	}
 	public set skin (value: string[] | undefined) {
+		if (value && value.length === 1 && value[0] === "") value = undefined;
 		this._skin = value;
 		this.initWidget();
 	}
