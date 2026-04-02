@@ -326,25 +326,27 @@ namespace Spine {
 			TrackEntry from = to.mixingFrom;
 			float fromMix = from.mixingFrom != null ? ApplyMixingFrom(from, skeleton) : 1;
 			float mix = to.mixDuration == 0 ? 1 : Math.Min(1, to.mixTime / to.mixDuration);
-			bool attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
-			int timelineCount = from.animation.timelines.Count;
-			Timeline[] timelines = from.animation.timelines.Items;
+
 			float a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
 			float alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
+
+			int timelineCount = from.animation.timelines.Count;
+			Timeline[] timelines = from.animation.timelines.Items;
+			int[] timelineMode = from.timelineMode.Items;
+			TrackEntry[] timelineHoldMix = from.timelineHoldMix.Items;
+
+			bool attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
+			bool add = from.additive, shortestRotation = add || from.shortestRotation;
+			bool firstFrame = !shortestRotation && from.timelinesRotation.Count != timelineCount << 1;
+			if (firstFrame) from.timelinesRotation.EnsureSize(timelineCount << 1);
+			float[] timelinesRotation = from.timelinesRotation.Items;
+
 			float animationLast = from.animationLast, animationTime = from.AnimationTime, applyTime = animationTime;
 			ExposedList<Event> events = null;
 			if (from.reverse)
 				applyTime = from.animation.duration - applyTime;
 			else if (mix < from.eventThreshold)
 				events = this.events;
-
-			int[] timelineMode = from.timelineMode.Items;
-			TrackEntry[] timelineHoldMix = from.timelineHoldMix.Items;
-
-			bool add = from.additive, shortestRotation = add || from.shortestRotation;
-			bool firstFrame = !shortestRotation && from.timelinesRotation.Count != timelineCount << 1;
-			if (firstFrame) from.timelinesRotation.EnsureSize(timelineCount << 1);
-			float[] timelinesRotation = from.timelinesRotation.Items;
 
 			from.totalAlpha = 0;
 			for (int i = 0; i < timelineCount; i++) {
@@ -373,8 +375,10 @@ namespace Spine {
 					timeline.Apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, mixOut, false);
 				}
 			}
+
 			if (to.mixDuration > 0) QueueEvents(from, animationTime);
 			this.events.Clear(false);
+
 			from.nextAnimationLast = animationTime;
 			from.nextTrackLast = from.trackTime;
 			return mix;
