@@ -329,7 +329,8 @@ namespace Spine {
 			bool attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 			int timelineCount = from.animation.timelines.Count;
 			Timeline[] timelines = from.animation.timelines.Items;
-			float alphaMix = from.alpha * fromMix * (1 - mix), keep = 1 - mix * to.alpha, alphaHold = keep > 0 ? alphaMix / keep : 0;
+			float a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
+			float alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
 			float animationLast = from.animationLast, animationTime = from.AnimationTime, applyTime = animationTime;
 			ExposedList<Event> events = null;
 			if (from.reverse)
@@ -372,12 +373,10 @@ namespace Spine {
 					timeline.Apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, mixOut, false);
 				}
 			}
-
 			if (to.mixDuration > 0) QueueEvents(from, animationTime);
 			this.events.Clear(false);
 			from.nextAnimationLast = animationTime;
 			from.nextTrackLast = from.trackTime;
-
 			return mix;
 		}
 
