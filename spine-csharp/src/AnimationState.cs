@@ -86,7 +86,7 @@ namespace Spine {
 
 		// end of difference
 		private readonly EventQueue queue; // Initialized by constructor.
-		private readonly HashSet<string> propertyIds = new HashSet<string>();
+		private readonly HashSet<ulong> propertyIds = new HashSet<ulong>();
 		private bool animationsChanged;
 		private float timeScale = 1;
 		private int unkeyedState;
@@ -822,7 +822,7 @@ namespace Spine {
 			int[] timelineMode = entry.timelineMode.EnsureSize(timelinesCount).Items;
 			entry.timelineHoldMix.Clear();
 			TrackEntry[] timelineHoldMix = entry.timelineHoldMix.Resize(timelinesCount).Items;
-			HashSet<string> propertyIds = this.propertyIds;
+			HashSet<ulong> propertyIds = this.propertyIds;
 
 			bool add = entry.additive, keepHold = entry.keepHold;
 			TrackEntry to = entry.mixingTo;
@@ -830,7 +830,7 @@ namespace Spine {
 			// outer:
 			for (int i = 0; i < timelinesCount; i++) {
 				Timeline timeline = timelines[i];
-				string[] ids = timeline.propertyIds;
+				ulong[] ids = timeline.propertyIds;
 				bool first = propertyIds.AddAll(ids)
 						&& !(timeline is DrawOrderFolderTimeline && propertyIds.Contains(DrawOrderTimeline.propertyID));
 				if (add && timeline.additive) {

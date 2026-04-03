@@ -48,7 +48,7 @@ namespace Spine {
 		internal string name;
 		internal float duration;
 		internal ExposedList<Timeline> timelines;
-		internal HashSet<string> timelineIds;
+		internal HashSet<ulong> timelineIds;
 		internal readonly ExposedList<int> bones;
 
 		public Animation (string name, ExposedList<Timeline> timelines, float duration) {
@@ -57,7 +57,7 @@ namespace Spine {
 			this.name = name;
 			this.duration = duration;
 			int n = timelines.Count << 1;
-			// note: not needed: timelineIds = new HashSet<string>(n);
+			// note: not needed: timelineIds = new HashSet<ulong>(n);
 			bones = new ExposedList<int>(n);
 			SetTimelines(timelines);
 		}
@@ -81,11 +81,11 @@ namespace Spine {
 			Timeline[] items = timelines.Items;
 			for (int i = 0; i < n; ++i)
 				idCount += items[i].propertyIds.Length;
-			var propertyIds = new string[idCount];
+			var propertyIds = new ulong[idCount];
 			int currentId = 0;
 			for (int i = 0; i < n; ++i) {
 				Timeline timeline = items[i];
-				string[] ids = items[i].propertyIds;
+				ulong[] ids = items[i].propertyIds;
 				for (int ii = 0, idsLength = ids.Length; ii < idsLength; ++ii)
 					propertyIds[currentId++] = ids[ii];
 
@@ -93,14 +93,14 @@ namespace Spine {
 				if (boneTimeline != null && boneSet.Add(boneTimeline.BoneIndex))
 					bones.Add(boneTimeline.BoneIndex);
 			}
-			this.timelineIds = new HashSet<string>(propertyIds);
+			this.timelineIds = new HashSet<ulong>(propertyIds);
 			bones.TrimExcess();
 		}
 
 		/// <summary>Returns true if this animation contains a timeline with any of the specified property IDs.
 		/// <para>See <see cref="Timeline.PropertyIds"/>.</para></summary>
-		public bool HasTimeline (string[] propertyIds) {
-			foreach (string id in propertyIds)
+		public bool HasTimeline (ulong[] propertyIds) {
+			foreach (ulong id in propertyIds)
 				if (timelineIds.Contains(id)) return true;
 			return false;
 		}
@@ -176,19 +176,19 @@ namespace Spine {
 	/// See <see href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</see> in the Spine
 	/// Runtimes Guide.</para></summary>
 	public abstract class Timeline {
-		internal readonly string[] propertyIds;
+		internal readonly ulong[] propertyIds;
 		internal readonly float[] frames;
 		internal bool additive, instant;
 
 		/// <param name="propertyIds">Unique identifiers for the properties the timeline modifies.</param>
-		public Timeline (int frameCount, params string[] propertyIds) {
+		public Timeline (int frameCount, params ulong[] propertyIds) {
 			if (propertyIds == null) throw new System.ArgumentNullException("propertyIds", "propertyIds cannot be null.");
 			this.propertyIds = propertyIds;
 			frames = new float[frameCount * FrameEntries];
 		}
 
 		/// <summary>Uniquely encodes both the type of this timeline and the skeleton properties that it affects.</summary>
-		public string[] PropertyIds {
+		public ulong[] PropertyIds {
 			get { return propertyIds; }
 		}
 
@@ -295,7 +295,7 @@ namespace Spine {
 
 		/// <param name="bezierCount">The maximum number of Bezier curves. See <see cref="Shrink(int)"/>.</param>
 		/// <param name="propertyIds">Unique identifiers for the properties the timeline modifies.</param>
-		public CurveTimeline (int frameCount, int bezierCount, params string[] propertyIds)
+		public CurveTimeline (int frameCount, int bezierCount, params ulong[] propertyIds)
 			: base(frameCount, propertyIds) {
 			curves = new float[frameCount + bezierCount * BEZIER_SIZE];
 			curves[frameCount - 1] = STEPPED;
@@ -402,7 +402,7 @@ namespace Spine {
 
 		/// <param name="bezierCount">The maximum number of Bezier curves. See <see cref="Shrink(int)"/>.</param>
 		/// <param name="propertyIds">Unique identifiers for the properties the timeline modifies.</param>
-		public CurveTimeline1 (int frameCount, int bezierCount, string propertyId)
+		public CurveTimeline1 (int frameCount, int bezierCount, ulong propertyId)
 			: base(frameCount, bezierCount, propertyId) {
 		}
 
@@ -503,7 +503,7 @@ namespace Spine {
 		readonly int boneIndex;
 
 		public BoneTimeline1 (int frameCount, int bezierCount, int boneIndex, Property property)
-			: base(frameCount, bezierCount, (int)property + "|" + boneIndex) {
+			: base(frameCount, bezierCount, (ulong)property << 53 | (uint)boneIndex) {
 			this.boneIndex = boneIndex;
 			additive = true;
 		}
@@ -535,7 +535,7 @@ namespace Spine {
 
 		/// <param name="bezierCount">The maximum number of Bezier curves. See <see cref="Shrink(int)"/>.</param>
 		public BoneTimeline2 (int frameCount, int bezierCount, int boneIndex, Property property1, Property property2)
-			: base(frameCount, bezierCount, (int)property1 + "|" + boneIndex, (int)property2 + "|" + boneIndex) {
+			: base(frameCount, bezierCount, (ulong)property1 << 53 | (uint)boneIndex, (ulong)property2 << 53 | (uint)boneIndex) {
 			this.boneIndex = boneIndex;
 			additive = true;
 		}
@@ -835,7 +835,7 @@ namespace Spine {
 		readonly int boneIndex;
 
 		public InheritTimeline (int frameCount, int boneIndex)
-			: base(frameCount, (int)Property.Inherit + "|" + boneIndex) {
+			: base(frameCount, (ulong)Property.Inherit << 53 | (uint)boneIndex) {
 			this.boneIndex = boneIndex;
 			instant = true;
 		}
@@ -883,7 +883,7 @@ namespace Spine {
 	public abstract class SlotCurveTimeline : CurveTimeline, ISlotTimeline {
 		readonly int slotIndex;
 
-		public SlotCurveTimeline (int frameCount, int bezierCount, int slotIndex, params string[] propertyIds)
+		public SlotCurveTimeline (int frameCount, int bezierCount, int slotIndex, params ulong[] propertyIds)
 			: base(frameCount, bezierCount, propertyIds) {
 			this.slotIndex = slotIndex;
 		}
@@ -912,8 +912,8 @@ namespace Spine {
 
 		public RGBATimeline (int frameCount, int bezierCount, int slotIndex)
 			: base(frameCount, bezierCount, slotIndex, //
-				(int)Property.RGB + "|" + slotIndex, //
-				(int)Property.Alpha + "|" + slotIndex) {
+				(ulong)Property.RGB << 53 | (uint)slotIndex, //
+				(ulong)Property.Alpha << 53 | (uint)slotIndex) {
 		}
 		public override int FrameEntries {
 			get { return ENTRIES; }
@@ -992,7 +992,7 @@ namespace Spine {
 		private const int R = 1, G = 2, B = 3;
 
 		public RGBTimeline (int frameCount, int bezierCount, int slotIndex)
-			: base(frameCount, bezierCount, slotIndex, (int)Property.RGB + "|" + slotIndex) {
+			: base(frameCount, bezierCount, slotIndex, (ulong)Property.RGB << 53 | (uint)slotIndex) {
 		}
 
 		public override int FrameEntries {
@@ -1076,7 +1076,7 @@ namespace Spine {
 		readonly int slotIndex;
 
 		public AlphaTimeline (int frameCount, int bezierCount, int slotIndex)
-			: base(frameCount, bezierCount, (int)Property.Alpha + "|" + slotIndex) {
+			: base(frameCount, bezierCount, (ulong)Property.Alpha << 53 | (uint)slotIndex) {
 			this.slotIndex = slotIndex;
 		}
 
@@ -1126,9 +1126,9 @@ namespace Spine {
 
 		public RGBA2Timeline (int frameCount, int bezierCount, int slotIndex)
 			: base(frameCount, bezierCount, slotIndex, //
-				(int)Property.RGB + "|" + slotIndex, //
-				(int)Property.Alpha + "|" + slotIndex, //
-				(int)Property.RGB2 + "|" + slotIndex) {
+				(ulong)Property.RGB << 53 | (uint)slotIndex, //
+				(ulong)Property.Alpha << 53 | (uint)slotIndex, //
+				(ulong)Property.RGB2 << 53 | (uint)slotIndex) {
 		}
 
 		public override int FrameEntries {
@@ -1249,8 +1249,8 @@ namespace Spine {
 
 		public RGB2Timeline (int frameCount, int bezierCount, int slotIndex)
 			: base(frameCount, bezierCount, slotIndex, //
-				(int)Property.RGB + "|" + slotIndex, //
-				(int)Property.RGB2 + "|" + slotIndex) {
+				(ulong)Property.RGB << 53 | (uint)slotIndex, //
+				(ulong)Property.RGB2 << 53 | (uint)slotIndex) {
 		}
 
 		public override int FrameEntries {
@@ -1376,7 +1376,7 @@ namespace Spine {
 		readonly string[] attachmentNames;
 
 		public AttachmentTimeline (int frameCount, int slotIndex)
-			: base(frameCount, (int)Property.Attachment + "|" + slotIndex) {
+			: base(frameCount, (ulong)Property.Attachment << 53 | (uint)slotIndex) {
 			this.slotIndex = slotIndex;
 			attachmentNames = new String[frameCount];
 			instant = true;
@@ -1430,7 +1430,8 @@ namespace Spine {
 		internal float[][] vertices;
 
 		public DeformTimeline (int frameCount, int bezierCount, int slotIndex, VertexAttachment attachment)
-			: base(frameCount, bezierCount, slotIndex, (int)Property.Deform + "|" + slotIndex + "|" + attachment.Id) {
+			: base(frameCount, bezierCount, slotIndex,
+				  (ulong)Property.Deform << 53 | (ulong)(uint)slotIndex << 32 | (uint)attachment.Id) {
 			this.attachment = attachment;
 			vertices = new float[frameCount][];
 			additive = true;
@@ -1653,7 +1654,8 @@ namespace Spine {
 		readonly IHasSequence attachment;
 
 		public SequenceTimeline (int frameCount, int slotIndex, Attachment attachment)
-			: base(frameCount, (int)Property.Sequence + "|" + slotIndex + "|" + ((IHasSequence)attachment).Sequence.Id) {
+			: base(frameCount, (ulong)Property.Sequence << 53 | (ulong)(uint)slotIndex << 32
+				  | (uint)((IHasSequence)attachment).Sequence.Id) {
 			this.slotIndex = slotIndex;
 			this.attachment = (IHasSequence)attachment;
 			instant = true;
@@ -1751,7 +1753,7 @@ namespace Spine {
 
 	/// <summary>Fires an <see cref="Event"/> when specific animation times are reached.</summary>
 	public class EventTimeline : Timeline {
-		readonly static string[] propertyIds = { ((int)Property.Event).ToString() };
+		new readonly static ulong[] propertyIds = { (ulong)Property.Event };
 		readonly Event[] events;
 
 		public EventTimeline (int frameCount)
@@ -1812,8 +1814,8 @@ namespace Spine {
 
 	/// <summary>Changes <see cref="Skeleton.DrawOrder"/>.</summary>
 	public class DrawOrderTimeline : Timeline {
-		internal static readonly string propertyID = ((int)Property.DrawOrder).ToString();
-		internal static readonly string[] propertyIds = { propertyID };
+		internal static readonly ulong propertyID = (ulong)Property.DrawOrder;
+		new internal static readonly ulong[] propertyIds = { propertyID };
 
 		readonly int[][] drawOrders;
 
@@ -1882,11 +1884,11 @@ namespace Spine {
 			instant = true;
 		}
 
-		static private string[] PropertyIdsFromSlots (int[] slots) {
+		static private ulong[] PropertyIdsFromSlots (int[] slots) {
 			int n = slots.Length;
-			string[] ids = new string[n];
+			var ids = new ulong[n];
 			for (int i = 0; i < n; i++)
-				ids[i] = "d" + slots[i];
+				ids[i] = (ulong)(uint)slots[i];
 			return ids;
 		}
 
@@ -1970,7 +1972,7 @@ namespace Spine {
 		readonly int constraintIndex;
 
 		public IkConstraintTimeline (int frameCount, int bezierCount, int constraintIndex)
-			: base(frameCount, bezierCount, (int)Property.IkConstraint + "|" + constraintIndex) {
+			: base(frameCount, bezierCount, (ulong)Property.IkConstraint << 53 | (uint)constraintIndex) {
 			this.constraintIndex = constraintIndex;
 		}
 
@@ -2070,7 +2072,7 @@ namespace Spine {
 		readonly int constraintIndex;
 
 		public TransformConstraintTimeline (int frameCount, int bezierCount, int constraintIndex)
-			: base(frameCount, bezierCount, (int)Property.TransformConstraint + "|" + constraintIndex) {
+			: base(frameCount, bezierCount, (ulong)Property.TransformConstraint << 53 | (uint)constraintIndex) {
 			this.constraintIndex = constraintIndex;
 			additive = true;
 		}
@@ -2192,7 +2194,7 @@ namespace Spine {
 		internal readonly int constraintIndex;
 
 		public ConstraintTimeline1 (int frameCount, int bezierCount, int constraintIndex, Property property)
-			: base(frameCount, bezierCount, (int)property + "|" + constraintIndex) {
+			: base(frameCount, bezierCount, (ulong)property << 53 | (uint)constraintIndex) {
 			this.constraintIndex = constraintIndex;
 		}
 
@@ -2250,7 +2252,7 @@ namespace Spine {
 		readonly int constraintIndex;
 
 		public PathConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex)
-			: base(frameCount, bezierCount, (int)Property.PathConstraintMix + "|" + constraintIndex) {
+			: base(frameCount, bezierCount, (ulong)Property.PathConstraintMix << 53 | (uint)constraintIndex) {
 			this.constraintIndex = constraintIndex;
 			additive = true;
 		}
@@ -2506,7 +2508,7 @@ namespace Spine {
 
 	/// <summary>Resets a physics constraint when specific animation times are reached.</summary>
 	public class PhysicsConstraintResetTimeline : Timeline, IConstraintTimeline {
-		static readonly string[] propertyIds = { ((int)Property.PhysicsConstraintReset).ToString() };
+		new internal static readonly ulong[] propertyIds = { (ulong)Property.PhysicsConstraintReset };
 
 		readonly int constraintIndex;
 

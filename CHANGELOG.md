@@ -398,6 +398,7 @@
     | `EventData.String`  |→| `EventData.SetupPose.String` |
     | `EventData.Volume`  |→| `EventData.SetupPose.Volume` |
     | `EventData.Balance` |→| `EventData.SetupPose.Balance` |
+  - `Timeline.PropertyIds` type changed from `string[]` to `ulong[]`. `Animation.HasTimeline()` parameter and Timeline constructors changed accordingly.
 
 ### Unity
 
