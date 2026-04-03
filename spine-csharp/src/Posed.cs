@@ -49,7 +49,7 @@ namespace Spine {
 	/// <list type="bullet">
 	/// <item><see cref="Data"/>: The setup pose.</item>
 	/// <item><see cref="Pose"/>: The unconstrained pose. Set by animations and application code.</item>
-	/// <item><see cref="AppliedPose"/>: The constrained pose. The <see cref="Pose"/> with modifications by constraints.</item>
+	/// <item><see cref="AppliedPose"/>: The pose to use for rendering. Possibly modified by constraints.</item>
 	/// </list>
 	/// </summary>
 	public class Posed<D, P> : IPosed, IPosedInternal
@@ -57,8 +57,7 @@ namespace Spine {
 		where P : IPose<P> {
 
 		internal readonly D data;
-		internal readonly P pose;
-		internal readonly P constrainedPose;
+		internal readonly P pose, constrainedPose;
 		internal P appliedPose;
 
 		protected Posed (D data, P pose, P constrainedPose) {
@@ -96,8 +95,8 @@ namespace Spine {
 		/// <summary>The unconstrained pose for this object, set by animations and application code.</summary>
 		public P Pose { get { return pose; } }
 
-		/// <summary>If no constraints modify this object, the applied pose is the same as the <see cref="Pose"/>. Otherwise it is a
-		/// copy of the <see cref="Pose"/> modified by constraints.</summary>
+		/// <summary>The pose to use for rendering. If no constraints modify this pose, this is the same as <see cref="Pose"/>. Otherwise it is a
+		/// copy of <see cref="Pose"/> modified by constraints.</summary>
 		public P AppliedPose { get { return appliedPose; } }
 
 		override public string ToString () {

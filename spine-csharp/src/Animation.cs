@@ -1824,7 +1824,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes <see cref="Skeleton.DrawOrder"/>.</summary>
+	/// <summary>Changes the <see cref="Skeleton.DrawOrder"/>.</summary>
 	public class DrawOrderTimeline : Timeline {
 		internal static readonly ulong propertyID = (ulong)Property.DrawOrder;
 		new internal static readonly ulong[] propertyIds = { propertyID };
@@ -1878,7 +1878,7 @@ namespace Spine {
 	}
 
 
-	/// <summary>Changes a subset of <see cref="Skeleton.DrawOrder"/>.</summary>
+	/// <summary>Changes a subset of the <see cref="Skeleton.DrawOrder">draw order</see>.</summary>
 	public class DrawOrderFolderTimeline : Timeline {
 		private readonly int[] slots;
 		private readonly bool[] inFolder;

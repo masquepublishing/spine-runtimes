@@ -37,6 +37,12 @@ namespace Spine {
 #if IS_UNITY
 	using Color32F = UnityEngine.Color;
 #endif
+	/// <summary>Stores bones and slots to be posed by animations and application code. Multiple skeleton instances can share the same
+	/// <see cref="SkeletonData"/>, including animations, attachments, and skins.
+	/// <para>After posing, call <see cref="UpdateWorldTransform(Physics)"/> to apply constraints and compute world transforms for
+	/// rendering.</para>
+	/// <para>See <see href="https://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</see> in the
+	/// Spine Runtimes Guide.</para></summary>
 	public class Skeleton {
 		static private readonly int[] quadTriangles = { 0, 1, 2, 2, 3, 0 };
 		internal SkeletonData data;
@@ -298,7 +304,7 @@ namespace Spine {
 			return null;
 		}
 
-		/// <summary>The skeleton's slots.</summary>
+		/// <summary>The skeleton's slots. To add a slot, also add it to <see cref="DrawOrder.Pose"/>.</summary>
 		public ExposedList<Slot> Slots { get { return slots; } }
 
 		/// <summary>Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
@@ -431,7 +437,7 @@ namespace Spine {
 			return null;
 		}
 
-		/// <summary>Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.</summary>
+		/// <summary>Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the applied pose.</summary>
 		/// <param name="x">The horizontal distance between the skeleton origin and the left side of the AABB.</param>
 		/// <param name="y">The vertical distance between the skeleton origin and the bottom side of the AABB.</param>
 		/// <param name="width">The width of the AABB</param>

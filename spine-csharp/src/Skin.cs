@@ -32,7 +32,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Spine {
-	/// <summary>Stores attachments by slot index and placeholder name.
+	/// <summary>Stores attachments by slot index and placeholder name. Multiple <see cref="Skeleton"/> instances can use the same skins.
 	/// <para>See <see cref="Spine.SkeletonData.DefaultSkin"/>, <see cref="Spine.Skeleton.Skin"/>, and
 	/// <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.</para>
 	/// </summary>

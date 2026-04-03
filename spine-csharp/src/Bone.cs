@@ -36,10 +36,9 @@ namespace Spine {
 	/// <list type="bullet">
 	/// <item><see cref="Data"/>: The setup pose.</item>
 	/// <item><see cref="Pose"/>: The unconstrained local pose. Set by animations and application code.</item>
-	/// <item><see cref="AppliedPose"/>: The constrained local pose. The <see cref="Pose"/> with modifications by constraints.</item>
-	/// <item>World transform (on the applied pose): the <see cref="AppliedPose"/> combined with the parent world transform.
-	/// Computed by <see cref="Skeleton.UpdateWorldTransform(Physics)"/> and
-	/// <see cref="BonePose.UpdateWorldTransform(Skeleton)"/>.</item>
+	/// <item><see cref="AppliedPose"/>: The local pose to use for rendering. Possibly modified by constraints.</item>
+	/// <item>World transform: the local pose combined with the parent world transform. Computed on a pose by
+	/// <see cref="BonePose.UpdateWorldTransform(Skeleton)"/> and <see cref="Skeleton.UpdateWorldTransform(Physics)"/>.</item>
 	/// </list>
 	/// </summary>
 	public class Bone : PosedActive<BoneData, BonePose> {
