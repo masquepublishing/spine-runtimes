@@ -41,7 +41,12 @@ namespace Spine {
 	/// Runtimes Guide.</para>
 	/// </summary>
 	public class AnimationState {
-		internal static readonly Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
+		internal static readonly Animation EmptyAnimation = CreateEmptyAnimation();
+		internal static Animation CreateEmptyAnimation () {
+			var empty = new Animation("<empty>");
+			empty.SetTimelines(new ExposedList<Timeline>(), new ExposedList<int>());
+			return empty;
+		}
 
 		internal const int Subsequent = 0, First = 1, Hold = 2, HoldFirst = 3, Setup = 1, Current = 2;
 

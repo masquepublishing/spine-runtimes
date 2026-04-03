@@ -928,8 +928,11 @@ namespace Spine {
 			}
 
 			// Bone timelines.
-			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
+			int boneCount = input.ReadInt(true);
+			var bones = new ExposedList<int>(boneCount);
+			for (int i = 0; i < boneCount; i++) {
 				int boneIndex = input.ReadInt(true);
+				bones.Add(boneIndex);
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
 					int type = input.ReadUByte(), frameCount = input.ReadInt(true);
 					if (type == BONE_INHERIT) {
@@ -1265,7 +1268,11 @@ namespace Spine {
 			Timeline[] items = timelines.Items;
 			for (int i = 0, n = timelines.Count; i < n; i++)
 				duration = Math.Max(duration, items[i].Duration);
-			return new Animation(name, timelines, duration);
+
+			Animation animation = new Animation(name);
+			animation.SetTimelines(timelines, bones);
+			animation.Duration = duration;
+			return animation;
 		}
 
 		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>

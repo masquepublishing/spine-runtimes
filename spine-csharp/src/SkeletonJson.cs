@@ -966,11 +966,17 @@ namespace Spine {
 			}
 
 			// Bone timelines.
-			if (map.ContainsKey("bones")) {
+			ExposedList<int> bones = null;
+			if (!map.ContainsKey("bones")) {
+				bones = new ExposedList<int>(0);
+			} else {
+				int bonesCount = ((Dictionary<string, Object>)map["bones"]).Count;
+				bones = new ExposedList<int>(bonesCount);
 				foreach (KeyValuePair<string, Object> entry in (Dictionary<string, Object>)map["bones"]) {
 					string boneName = entry.Key;
 					BoneData bone = skeletonData.FindBone(boneName);
 					if (bone == null) throw new Exception("Bone not found: " + boneName);
+					bones.Add(bone.index);
 					Dictionary<string, object> timelineMap = (Dictionary<string, Object>)entry.Value;
 					foreach (KeyValuePair<string, Object> timelineEntry in timelineMap) {
 						List<object> values = (List<Object>)timelineEntry.Value;
@@ -1420,7 +1426,11 @@ namespace Spine {
 			Timeline[] items = timelines.Items;
 			for (int i = 0, n = timelines.Count; i < n; i++)
 				duration = Math.Max(duration, items[i].Duration);
-			skeletonData.animations.Add(new Animation(name, timelines, duration));
+
+			Animation animation = new Animation(name);
+			animation.SetTimelines(timelines, bones);
+			animation.Duration = duration;
+			skeletonData.animations.Add(animation);
 		}
 
 		static void ReadTimeline (ref ExposedList<Timeline> timelines, ref List<object>.Enumerator keyMapEnumerator, CurveTimeline1 timeline, float defaultValue,

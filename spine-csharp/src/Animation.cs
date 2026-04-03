@@ -49,36 +49,45 @@ namespace Spine {
 		internal float duration;
 		internal ExposedList<Timeline> timelines;
 		internal HashSet<ulong> timelineIds;
-		internal readonly ExposedList<int> bones;
+		internal ExposedList<int> bones;
 
-		public Animation (string name, ExposedList<Timeline> timelines, float duration) {
+		/// <summary>Creates a new animation. <see cref="timelines"/> must be set before use.</summary>
+		public Animation (string name) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
-
 			this.name = name;
-			this.duration = duration;
-			int n = timelines.Count << 1;
-			// note: not needed: timelineIds = new HashSet<ulong>(n);
-			bones = new ExposedList<int>(n);
-			SetTimelines(timelines);
 		}
 
+		/// <summary>
+		/// If this list or the timelines it contains are modified, the timelines must be set again to recompute the animation's bone
+		/// indices and timeline property IDs.
+		/// </summary>
 		public ExposedList<Timeline> Timelines {
 			get { return timelines; }
-			set { SetTimelines(value); }
 		}
 
-		public void SetTimelines (ExposedList<Timeline> timelines) {
+		/// <summary>
+		/// Sets the <see cref="timelines"/> and <see cref="bones"/>. It can be more efficient to determine the unique bones externally.
+		/// </summary>
+		public void SetTimelines (ExposedList<Timeline> timelines, ExposedList<int> bones) {
 			if (timelines == null) throw new ArgumentNullException("timelines", "timelines cannot be null.");
+			if (bones == null) throw new ArgumentNullException("bones", "bones cannot be null.");
 			this.timelines = timelines;
+			this.bones = bones;
 
-			// Note: avoiding reallocations by adding all hash set entries at
-			// once (EnsureCapacity() is only available in newer .Net versions).
-			int idCount = 0;
 			int n = timelines.Count;
-			// not needed: timelineIds.Clear(n << 1);
-			bones.Clear();
-			var boneSet = new HashSet<int>();
+			// Note: Difference to libgdx reference implementation.
+			// Avoiding reallocations by adding all hash set entries at
+			// once (EnsureCapacity() is only available in newer .Net versions).
+			// Reference implementation:
+			// if (timelineIds == null)
+			//     timelineIds = new LongSet(n << 1);
+			// else
+			//     timelineIds.clear(n << 1);
+			// Timeline[] items = timelines.items;
+			// for (int i = 0; i < n; i++)
+			//     timelineIds.addAll(items[i].propertyIds);
 			Timeline[] items = timelines.Items;
+			int idCount = 0;
 			for (int i = 0; i < n; ++i)
 				idCount += items[i].propertyIds.Length;
 			var propertyIds = new ulong[idCount];
@@ -88,13 +97,9 @@ namespace Spine {
 				ulong[] ids = items[i].propertyIds;
 				for (int ii = 0, idsLength = ids.Length; ii < idsLength; ++ii)
 					propertyIds[currentId++] = ids[ii];
-
-				IBoneTimeline boneTimeline = timeline as IBoneTimeline;
-				if (boneTimeline != null && boneSet.Add(boneTimeline.BoneIndex))
-					bones.Add(boneTimeline.BoneIndex);
 			}
 			this.timelineIds = new HashSet<ulong>(propertyIds);
-			bones.TrimExcess();
+			// End of difference to reference implementation
 		}
 
 		/// <summary>Returns true if this animation contains a timeline with any of the specified property IDs.
