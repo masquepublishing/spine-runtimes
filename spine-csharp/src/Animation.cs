@@ -507,8 +507,8 @@ namespace Spine {
 	public abstract class BoneTimeline1 : CurveTimeline1, IBoneTimeline {
 		readonly int boneIndex;
 
-		public BoneTimeline1 (int frameCount, int bezierCount, int boneIndex, Property property)
-			: base(frameCount, bezierCount, (ulong)property << 53 | (uint)boneIndex) {
+		public BoneTimeline1 (int frameCount, int bezierCount, int boneIndex, ulong property)
+			: base(frameCount, bezierCount, property << 53 | (uint)boneIndex) {
 			this.boneIndex = boneIndex;
 			additive = true;
 		}
@@ -539,8 +539,8 @@ namespace Spine {
 		readonly int boneIndex;
 
 		/// <param name="bezierCount">The maximum number of Bezier curves. See <see cref="Shrink(int)"/>.</param>
-		public BoneTimeline2 (int frameCount, int bezierCount, int boneIndex, Property property1, Property property2)
-			: base(frameCount, bezierCount, (ulong)property1 << 53 | (uint)boneIndex, (ulong)property2 << 53 | (uint)boneIndex) {
+		public BoneTimeline2 (int frameCount, int bezierCount, int boneIndex, ulong property1, ulong property2)
+			: base(frameCount, bezierCount, property1 << 53 | (uint)boneIndex, property2 << 53 | (uint)boneIndex) {
 			this.boneIndex = boneIndex;
 			additive = true;
 		}
@@ -580,7 +580,7 @@ namespace Spine {
 	/// <summary>Changes <see cref="BonePose.Rotation"/>.</summary>
 	public class RotateTimeline : BoneTimeline1, IBoneTimeline {
 		public RotateTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, boneIndex, Property.Rotate) {
+			: base(frameCount, bezierCount, boneIndex, (ulong)Property.Rotate) {
 		}
 
 		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
@@ -592,7 +592,7 @@ namespace Spine {
 	/// <summary>Changes <see cref="BonePose.X"/> and <see cref="BonePose.Y"/>.</summary>
 	public class TranslateTimeline : BoneTimeline2 {
 		public TranslateTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, boneIndex, Property.X, Property.Y) {
+			: base(frameCount, bezierCount, boneIndex, (ulong)Property.X, (ulong)Property.Y) {
 		}
 
 		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
@@ -647,7 +647,7 @@ namespace Spine {
 	/// <summary>Changes <see cref="BonePose.X"/>.</summary>
 	public class TranslateXTimeline : BoneTimeline1 {
 		public TranslateXTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, boneIndex, Property.X) {
+			: base(frameCount, bezierCount, boneIndex, (ulong)Property.X) {
 		}
 
 		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
@@ -658,7 +658,7 @@ namespace Spine {
 	/// <summary>Changes <see cref="BonePose.Y"/>.</summary>
 	public class TranslateYTimeline : BoneTimeline1 {
 		public TranslateYTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, boneIndex, Property.Y) {
+			: base(frameCount, bezierCount, boneIndex, (ulong)Property.Y) {
 		}
 
 		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
@@ -670,7 +670,7 @@ namespace Spine {
 	public class ScaleTimeline : BoneTimeline2 {
 
 		public ScaleTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, boneIndex, Property.ScaleX, Property.ScaleY) {
+			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ScaleX, (ulong)Property.ScaleY) {
 		}
 
 		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
@@ -737,7 +737,7 @@ namespace Spine {
 	/// <summary>Changes <see cref="BonePose.ScaleX"/>.</summary>
 	public class ScaleXTimeline : BoneTimeline1 {
 		public ScaleXTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, boneIndex, Property.ScaleX) {
+			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ScaleX) {
 		}
 
 		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
@@ -749,7 +749,7 @@ namespace Spine {
 	/// <summary>Changes <see cref="BonePose.ScaleY"/>.</summary>
 	public class ScaleYTimeline : BoneTimeline1 {
 		public ScaleYTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, boneIndex, Property.ScaleY) {
+			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ScaleY) {
 		}
 
 		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
@@ -761,7 +761,7 @@ namespace Spine {
 	/// <summary>Changes <see cref="BonePose.ShearX"/> and <see cref="BonePose.ShearY"/>.</summary>
 	public class ShearTimeline : BoneTimeline2 {
 		public ShearTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, boneIndex, Property.ShearX, Property.ShearY) {
+			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ShearX, (ulong)Property.ShearY) {
 		}
 
 		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
@@ -811,7 +811,7 @@ namespace Spine {
 	/// <summary>Changes <see cref="BonePose.ShearX"/>.</summary>
 	public class ShearXTimeline : BoneTimeline1 {
 		public ShearXTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, boneIndex, Property.ShearX) {
+			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ShearX) {
 		}
 
 		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
@@ -823,7 +823,7 @@ namespace Spine {
 	/// <summary>Changes <see cref="BonePose.ShearY"/>.</summary>
 	public class ShearYTimeline : BoneTimeline1 {
 		public ShearYTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, boneIndex, Property.ShearY) {
+			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ShearY) {
 		}
 
 		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
