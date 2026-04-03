@@ -34,9 +34,9 @@ namespace Spine {
 		// replaces "object.pose == object.appliedPose" of reference implementation.
 		bool PoseEqualsApplied { get; }
 		// replaces "object.appliedPose = object.pose" of reference implementation.
-		void UsePose ();
+		void Unconstrained ();
 		// replaces "object.appliedPose = object.constrainedPose" of reference implementation.
-		void UseConstrained ();
+		void Constrained ();
 		// replaces "object.appliedPose.Set(object.pose)" of reference implementation.
 		void ResetConstrained ();
 	}
@@ -77,11 +77,11 @@ namespace Spine {
 			get { return (object)pose == (object)appliedPose; }
 		}
 
-		void IPosedInternal.UsePose () {
+		void IPosedInternal.Unconstrained () {
 			appliedPose = pose;
 		}
 
-		void IPosedInternal.UseConstrained () {
+		void IPosedInternal.Constrained () {
 			appliedPose = constrainedPose;
 		}
 

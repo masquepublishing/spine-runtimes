@@ -156,10 +156,10 @@ namespace Spine {
 			updateCache.Clear();
 			resetCache.Clear();
 
-			drawOrder.UsePose();
+			drawOrder.Unconstrained();
 			Slot[] slots = this.slots.Items;
 			for (int i = 0, n = this.slots.Count; i < n; i++) {
-				((IPosedInternal)slots[i]).UsePose();
+				((IPosedInternal)slots[i]).Unconstrained();
 			}
 
 			int boneCount = this.bones.Count;
@@ -168,7 +168,7 @@ namespace Spine {
 				Bone bone = bones[i];
 				bone.sorted = bone.data.skinRequired;
 				bone.active = !bone.sorted;
-				((IPosedInternal)bone).UsePose();
+				((IPosedInternal)bone).Unconstrained();
 			}
 			if (skin != null) {
 				BoneData[] skinBones = skin.bones.Items;
@@ -186,7 +186,7 @@ namespace Spine {
 			{ // scope added to prevent compile error of n already being declared in enclosing scope
 				int n = this.constraints.Count;
 				for (int i = 0; i < n; i++) {
-					((IPosedInternal)constraints[i]).UsePose();
+					((IPosedInternal)constraints[i]).Unconstrained();
 				}
 				for (int i = 0; i < n; i++) {
 					IConstraint constraint = constraints[i];
@@ -209,7 +209,7 @@ namespace Spine {
 
 		internal void Constrained (IPosedInternal obj) {
 			if (obj.PoseEqualsApplied) { // if (obj.pose == obj.appliedPose) {
-				obj.UseConstrained();
+				obj.Constrained();
 				resetCache.Add(obj);
 			}
 		}

@@ -72,7 +72,7 @@ namespace Spine {
 		/// <summary>
 		/// Sets the applied pose to the unconstrained pose, for when no constraints will modify the draw order.
 		/// </summary>
-		internal void UsePose () {
+		internal void Unconstrained () {
 			appliedPose = pose;
 		}
 
