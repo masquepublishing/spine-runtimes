@@ -60,13 +60,14 @@ namespace Spine {
 		/// <summary>
 		/// If this list or the timelines it contains are modified, the timelines must be set again to recompute the animation's bone
 		/// indices and timeline property IDs.
+		/// <para>See <see cref="SetTimelines(ExposedList{Timeline}, ExposedList{int})"/>.</para>
 		/// </summary>
 		public ExposedList<Timeline> Timelines {
 			get { return timelines; }
 		}
 
 		/// <summary>
-		/// Sets the <see cref="timelines"/> and <see cref="bones"/>. It can be more efficient to determine the unique bones externally.
+		/// Sets the <see cref="timelines"/> and <see cref="bones"/>.
 		/// </summary>
 		public void SetTimelines (ExposedList<Timeline> timelines, ExposedList<int> bones) {
 			if (timelines == null) throw new ArgumentNullException("timelines", "timelines cannot be null.");
@@ -114,6 +115,12 @@ namespace Spine {
 		/// used to know when the animation has completed and, for animations that repeat, when it should loop back to the start.</summary>
 		public float Duration { get { return duration; } set { duration = value; } }
 
+		/// <summary><see cref="Skeleton.Bones"/> indices that this animation's timelines modify.
+		/// <para>See <see cref="SetTimelines(ExposedList{Timeline}, ExposedList{int})"/> and <see cref="IBoneTimeline.BoneIndex"/>.</para>
+		/// </summary>
+		public ExposedList<int> Bones {
+			get { return bones; }
+		}
 
 		/// <summary>Applies the animation's timelines to the specified skeleton.</summary>
 		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, bool, bool, bool, bool)"/>
