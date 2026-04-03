@@ -92,10 +92,12 @@ namespace Spine {
 					bone.sorted = false;
 					skeleton.SortReset(bone.children);
 					skeleton.Constrained(bone);
-				} else if (t as ISlotTimeline != null) {
+				} else if (t is ISlotTimeline) {
 					ISlotTimeline timeline = (ISlotTimeline)t;
 					skeleton.Constrained(slots[timeline.SlotIndex]);
-				} else if (t as PhysicsConstraintTimeline != null) {
+				} else if (t is DrawOrderTimeline || t is DrawOrderFolderTimeline) {
+					skeleton.drawOrder.Constrained();
+				} else if (t is PhysicsConstraintTimeline) {
 					PhysicsConstraintTimeline timeline = (PhysicsConstraintTimeline)t;
 					if (timeline.constraintIndex == -1) {
 						for (int ii = 0; ii < physicsCount; ii++)

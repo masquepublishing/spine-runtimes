@@ -42,7 +42,7 @@ namespace Spine {
 		internal SkeletonData data;
 		internal ExposedList<Bone> bones;
 		internal ExposedList<Slot> slots;
-		internal ExposedList<Slot> drawOrder;
+		internal readonly DrawOrder drawOrder;
 		internal ExposedList<IConstraint> constraints;
 		internal ExposedList<PhysicsConstraint> physics;
 		internal ExposedList<object> updateCache = new ExposedList<object>();
@@ -77,12 +77,9 @@ namespace Spine {
 			}
 
 			slots = new ExposedList<Slot>(data.slots.Count);
-			drawOrder = new ExposedList<Slot>(data.slots.Count);
-			foreach (SlotData slotData in data.slots) {
-				Slot slot = new Slot(slotData, this);
-				slots.Add(slot);
-				drawOrder.Add(slot);
-			}
+			foreach (SlotData slotData in data.slots)
+				slots.Add(new Slot(slotData, this));
+			drawOrder = new DrawOrder(slots);
 
 			physics = new ExposedList<PhysicsConstraint>(8);
 			constraints = new ExposedList<IConstraint>(data.constraints.Count);
@@ -122,10 +119,10 @@ namespace Spine {
 			foreach (Slot slot in skeleton.slots)
 				slots.Add(new Slot(slot, bonesItems[slot.bone.data.index], this));
 
-			drawOrder = new ExposedList<Slot>(slots.Count);
-			Slot[] slotsItems = slots.Items;
-			foreach (Slot slot in skeleton.drawOrder)
-				drawOrder.Add(slotsItems[slot.data.index]);
+			drawOrder = new DrawOrder(slots);
+			drawOrder.pose.Clear();
+			foreach (Slot slot in skeleton.drawOrder.pose)
+				drawOrder.pose.Add(slots.Items[slot.data.index]);
 
 			physics = new ExposedList<PhysicsConstraint>(skeleton.physics.Count);
 			constraints = new ExposedList<IConstraint>(skeleton.constraints.Count);
@@ -153,6 +150,7 @@ namespace Spine {
 			updateCache.Clear();
 			resetCache.Clear();
 
+			drawOrder.UsePose();
 			Slot[] slots = this.slots.Items;
 			for (int i = 0, n = this.slots.Count; i < n; i++) {
 				((IPosedInternal)slots[i]).UsePose();
@@ -238,6 +236,7 @@ namespace Spine {
 		public void UpdateWorldTransform (Physics physics) {
 			update++;
 
+			drawOrder.ResetConstrained();
 			IPosedInternal[] resetCache = this.resetCache.Items;
 			for (int i = 0, n = this.resetCache.Count; i < n; i++) {
 				resetCache[i].ResetConstrained();
@@ -267,10 +266,9 @@ namespace Spine {
 
 		/// <summary>Sets the slots and draw order to their setup pose values.</summary>
 		public void SetupPoseSlots () {
+			drawOrder.SetupPose();
 			Slot[] slots = this.slots.Items;
-			int n = this.slots.Count;
-			Array.Copy(slots, 0, drawOrder.Items, 0, n);
-			for (int i = 0; i < n; i++)
+			for (int i = 0, n = this.slots.Count; i < n; i++)
 				slots[i].SetupPose();
 		}
 
@@ -317,14 +315,11 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// The skeleton's slots in the order they should be drawn. The returned list may be modified to change the draw order.
+		/// The skeleton's draw order. Use <see cref="DrawOrder.AppliedPose"/> for rendering and
+		/// <see cref="DrawOrder.Pose"/> for changing the draw order.
 		/// </summary>
-		public ExposedList<Slot> DrawOrder {
+		public DrawOrder DrawOrder {
 			get { return drawOrder; }
-			set {
-				if (value == null) throw new ArgumentNullException("drawOrder ", "drawOrder cannot be null.");
-				this.drawOrder = value;
-			}
 		}
 
 		/// <summary>The skeleton's current skin. May be null. See <see cref="SetSkin(Spine.Skin)"/></summary>
@@ -447,15 +442,16 @@ namespace Spine {
 
 			float[] temp = vertexBuffer;
 			temp = temp ?? new float[8];
-			Slot[] drawOrder = this.drawOrder.Items;
+			ExposedList<Slot> drawOrder = this.drawOrder.appliedPose;
+			Slot[] slots = drawOrder.Items;
 			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-			for (int i = 0, n = this.drawOrder.Count; i < n; i++) {
-				Slot slot = drawOrder[i];
+			for (int i = 0, n = drawOrder.Count; i < n; i++) {
+				Slot slot = slots[i];
 				if (!slot.bone.active) continue;
 				int verticesLength = 0;
 				float[] vertices = null;
 				int[] triangles = null;
-				Attachment attachment = slot.pose.attachment;
+				Attachment attachment = slot.appliedPose.attachment;
 				RegionAttachment region = attachment as RegionAttachment;
 				if (region != null) {
 					verticesLength = 8;

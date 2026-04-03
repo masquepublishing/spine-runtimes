@@ -1859,20 +1859,20 @@ namespace Spine {
 		/// <param name="events">May be null.</param>
 		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
 			bool add, bool mixOut, bool appliedPose) {
+			Slot[] pose = (appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose).Items;
+			Slot[] setup = skeleton.slots.Items;
 
 			if (mixOut || time < frames[0]) {
-				if (fromSetup) Array.Copy(skeleton.slots.Items, 0, skeleton.drawOrder.Items, 0, skeleton.slots.Count);
+				if (fromSetup) Array.Copy(setup, 0, pose, 0, skeleton.slots.Count);
 				return;
 			}
 
-			int[] drawOrderToSetupIndex = drawOrders[Search(frames, time)];
-			if (drawOrderToSetupIndex == null)
-				Array.Copy(skeleton.slots.Items, 0, skeleton.drawOrder.Items, 0, skeleton.slots.Count);
+			int[] order = drawOrders[Search(frames, time)];
+			if (order == null)
+				Array.Copy(setup, 0, pose, 0, skeleton.slots.Count);
 			else {
-				Slot[] slots = skeleton.slots.Items;
-				Slot[] drawOrder = skeleton.drawOrder.Items;
-				for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
-					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+				for (int i = 0, n = order.Length; i < n; i++)
+					pose[i] = setup[order[i]];
 			}
 		}
 	}
@@ -1930,37 +1930,34 @@ namespace Spine {
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
 			bool add, bool mixOut, bool appliedPose) {
+			Slot[] pose = (appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose).Items;
+			Slot[] setup = skeleton.slots.Items;
 
 			if (mixOut || time < frames[0]) {
-				if (fromSetup) Setup(skeleton);
+				if (fromSetup) Setup(pose, setup);
 			} else {
 				int[] order = drawOrders[Search(frames, time)];
 				if (order == null)
-					Setup(skeleton);
-				else
-					Apply(skeleton, order);
-			}
-		}
-
-		private void Setup (Skeleton skeleton) {
-			bool[] inFolder = this.inFolder;
-			Slot[] drawOrder = skeleton.drawOrder.Items, allSlots = skeleton.slots.Items;
-			int[] slots = this.slots;
-			for (int i = 0, found = 0, done = slots.Length; ; i++) {
-				if (inFolder[drawOrder[i].data.index]) {
-					drawOrder[i] = allSlots[slots[found]];
-					if (++found == done) break;
+					Setup(pose, setup);
+				else {
+					bool[] inFolder = this.inFolder;
+					int[] slots = this.slots;
+					for (int i = 0, found = 0, done = slots.Length; ; i++) {
+						if (inFolder[pose[i].data.index]) {
+							pose[i] = setup[slots[order[found]]];
+							if (++found == done) break;
+						}
+					}
 				}
 			}
 		}
 
-		private void Apply (Skeleton skeleton, int[] order) {
+		private void Setup (Slot[] pose, Slot[] setup) {
 			bool[] inFolder = this.inFolder;
-			Slot[] drawOrder = skeleton.drawOrder.Items, allSlots = skeleton.slots.Items;
 			int[] slots = this.slots;
 			for (int i = 0, found = 0, done = slots.Length; ; i++) {
-				if (inFolder[drawOrder[i].data.index]) {
-					drawOrder[i] = allSlots[slots[order[found]]];
+				if (inFolder[pose[i].data.index]) {
+					pose[i] = setup[slots[found]];
 					if (++found == done) break;
 				}
 			}
