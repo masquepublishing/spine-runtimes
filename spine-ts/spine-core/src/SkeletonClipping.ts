@@ -402,17 +402,22 @@ export class SkeletonClipping {
 		if (this.inverse) {
 			const polygon = this.clippingPolygons[0];
 			for (let i = 0; i < trianglesLength; i += 3) {
-				const t0 = triangles[i] << 1, t1 = triangles[i + 1] << 1, t2 = triangles[i + 2] << 1;
-				const x1 = vertices[vertexStart + t0], y1 = vertices[vertexStart + t0 + 1];
-				const x2 = vertices[vertexStart + t1], y2 = vertices[vertexStart + t1 + 1];
-				const x3 = vertices[vertexStart + t2], y3 = vertices[vertexStart + t2 + 1];
+				let v = triangles[i] * stride;
+				const x1 = vertices[vertexStart + v], y1 = vertices[vertexStart + v + 1];
+				let uv = triangles[i] << 1;
+				const u1 = uvs[uv], v1 = uvs[uv + 1];
+				v = triangles[i + 1] * stride;
+				const x2 = vertices[vertexStart + v], y2 = vertices[vertexStart + v + 1];
+				uv = triangles[i + 1] << 1;
+				const u2 = uvs[uv], v2 = uvs[uv + 1];
+				v = triangles[i + 2] * stride;
+				const x3 = vertices[vertexStart + v], y3 = vertices[vertexStart + v + 1];
+				uv = triangles[i + 2] << 1;
+				const u3 = uvs[uv], v3 = uvs[uv + 1];
 				this.clipInverse(x1, y1, x2, y2, x3, y3, polygon);
 				const nn = this.inverseVertices.length;
 				if (nn === 0) continue;
 
-				const u1 = uvs[t0], v1 = uvs[t0 + 1];
-				const u2 = uvs[t1], v2 = uvs[t1 + 1];
-				const u3 = uvs[t2], v3 = uvs[t2 + 1];
 				const d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1, d = 1 / (d0 * d2 + d1 * (y1 - y3));
 				const iv = this.inverseVertices;
 				for (let offset = 0; offset < nn;) {
@@ -420,27 +425,31 @@ export class SkeletonClipping {
 					const vertexCount = polygonSize >> 1;
 
 					let s = this.clippedVerticesLength;
-					const newLength = s + polygonSize;
+					const newLength = s + vertexCount * stride;
+					const newUVLength = this.clippedUVsLength + vertexCount * 2;
 					if (clippedVertices.length < newLength) {
 						this._clippedVerticesTyped = new Float32Array(newLength * 2);
 						this._clippedVerticesTyped.set(clippedVertices.subarray(0, s));
-						this._clippedUVsTyped = new Float32Array(newLength * 2);
-						this._clippedUVsTyped.set(clippedUVs.subarray(0, this.clippedUVsLength));
 						clippedVertices = this._clippedVerticesTyped;
+					}
+					if (clippedUVs.length < newUVLength) {
+						this._clippedUVsTyped = new Float32Array(newUVLength * 2);
+						this._clippedUVsTyped.set(clippedUVs.subarray(0, this.clippedUVsLength));
 						clippedUVs = this._clippedUVsTyped;
 					}
 					this.clippedVerticesLength = newLength;
-					this.clippedUVsLength = newLength;
+					this.clippedUVsLength = newUVLength;
 
 					const cv = this._clippedVerticesTyped;
 					const cu = this._clippedUVsTyped;
-					for (let ii = 0; ii < polygonSize; ii += 2, s += 2) {
+					let uvIndex = newUVLength - vertexCount * 2;
+					for (let ii = 0; ii < polygonSize; ii += 2, s += stride, uvIndex += 2) {
 						const x = iv[offset + ii], y = iv[offset + ii + 1];
 						cv[s] = x;
 						cv[s + 1] = y;
 						const c0 = x - x3, c1 = y - y3, a = (d0 * c0 + d1 * c1) * d, b = (d4 * c0 + d2 * c1) * d, c = 1 - a - b;
-						cu[s] = u1 * a + u2 * b + u3 * c;
-						cu[s + 1] = v1 * a + v2 * b + v3 * c;
+						cu[uvIndex] = u1 * a + u2 * b + u3 * c;
+						cu[uvIndex + 1] = v1 * a + v2 * b + v3 * c;
 					}
 
 					s = this.clippedTrianglesLength;
@@ -469,15 +478,21 @@ export class SkeletonClipping {
 		const polygonsCount = this.clippingPolygons.length;
 		let clipOutputItems = null;
 		for (let i = 0; i < trianglesLength; i += 3) {
-			let t = triangles[i] << 1;
-			const x1 = vertices[vertexStart + t], y1 = vertices[vertexStart + t + 1];
-			const u1 = uvs[t], v1 = uvs[t + 1];
-			t = triangles[i + 1] << 1;
-			const x2 = vertices[vertexStart + t], y2 = vertices[vertexStart + t + 1];
-			const u2 = uvs[t], v2 = uvs[t + 1];
-			t = triangles[i + 2] << 1;
-			const x3 = vertices[vertexStart + t], y3 = vertices[vertexStart + t + 1];
-			const u3 = uvs[t], v3 = uvs[t + 1];
+			let t = triangles[i];
+			let v = t * stride;
+			const x1 = vertices[vertexStart + v], y1 = vertices[vertexStart + v + 1];
+			let uv = t << 1;
+			const u1 = uvs[uv], v1 = uvs[uv + 1];
+			t = triangles[i + 1];
+			v = t * stride;
+			const x2 = vertices[vertexStart + v], y2 = vertices[vertexStart + v + 1];
+			uv = t << 1;
+			const u2 = uvs[uv], v2 = uvs[uv + 1];
+			t = triangles[i + 2];
+			v = t * stride;
+			const x3 = vertices[vertexStart + v], y3 = vertices[vertexStart + v + 1];
+			uv = t << 1;
+			const u3 = uvs[uv], v3 = uvs[uv + 1];
 			const d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1, d = 1 / (d0 * d2 + d1 * (y1 - y3));
 
 			for (let p = 0; p < polygonsCount; p++) {
