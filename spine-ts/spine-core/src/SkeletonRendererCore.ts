@@ -171,7 +171,7 @@ export class SkeletonRendererCore {
 			}
 
 			if (clipper.isClipping()) {
-				clipper.clipTrianglesUnpacked(vertices, indices, indicesCount, uvs, stride);
+				clipper.clipTrianglesUnpacked(vertices, 0, indices, indicesCount, uvs, stride);
 				vertices = clipper.clippedVerticesTyped;
 				verticesCount = clipper.clippedVerticesLength / stride;
 				uvs = clipper.clippedUVsTyped;
