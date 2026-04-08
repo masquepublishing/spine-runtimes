@@ -84,10 +84,12 @@ class Triangulator {
 							var vy:Float = vertices[v + 1];
 							if (positiveArea(p3x, p3y, p1x, p1y, vx, vy)
 								&& positiveArea(p1x, p1y, p2x, p2y, vx, vy)
-								&& positiveArea(p2x, p2y, p3x, p3y, vx, vy)) break;
+								&& positiveArea(p2x, p2y, p3x, p3y, vx, vy))
+								break;
 						}
 						ii++;
-						if (ii == vertexCount) ii = 0;
+						if (ii == vertexCount)
+							ii = 0;
 					}
 					break;
 				}
@@ -106,7 +108,8 @@ class Triangulator {
 				previous = i;
 				i = next;
 				next++;
-				if (next == vertexCount) next = 0;
+				if (next == vertexCount)
+					next = 0;
 			}
 
 			// Cut ear tip.

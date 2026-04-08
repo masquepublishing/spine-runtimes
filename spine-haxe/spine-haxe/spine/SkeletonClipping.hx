@@ -63,12 +63,14 @@ class SkeletonClipping {
 		var convex = makeClockwise(clippingPolygon);
 
 		if (convex || inverse || clip.convex) {
-			if (!convex) makeConvex(clippingPolygon);
+			if (!convex)
+				makeConvex(clippingPolygon);
 			clippingPolygon.push(clippingPolygon[0]);
 			clippingPolygon.push(clippingPolygon[1]);
 			clippingPolygons.push(clippingPolygon);
 		} else {
-			if (triangulator == null) triangulator = new Triangulator();
+			if (triangulator == null)
+				triangulator = new Triangulator();
 			var decomposed = triangulator.decompose(clippingPolygon, triangulator.triangulate(clippingPolygon));
 			for (polygon in decomposed) {
 				clippingPolygons.push(polygon);
@@ -238,7 +240,10 @@ class SkeletonClipping {
 					continue;
 				}
 
-				var d0:Float = y2 - y3, d1:Float = x3 - x2, d2:Float = x1 - x3, d4:Float = y3 - y1;
+				var d0:Float = y2 - y3,
+					d1:Float = x3 - x2,
+					d2:Float = x1 - x3,
+					d4:Float = y3 - y1;
 				var d:Float = 1 / (d0 * d2 + d1 * (y1 - y3));
 				var iv = inverseVertices;
 				var offset:Int = 0;
@@ -253,7 +258,8 @@ class SkeletonClipping {
 					clippedUvsItems.resize(s + polygonSize);
 					var ii:Int = 0;
 					while (ii < polygonSize) {
-						var x:Float = iv[offset + ii], y:Float = iv[offset + ii + 1];
+						var x:Float = iv[offset + ii],
+							y:Float = iv[offset + ii + 1];
 						clippedVerticesItems[s] = x;
 						clippedVerticesItems[s + 1] = y;
 						var c0:Float = x - x3, c1:Float = y - y3;
@@ -301,7 +307,10 @@ class SkeletonClipping {
 			var x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
 			var u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
 
-			var d0:Float = y2 - y3, d1:Float = x3 - x2, d2:Float = x1 - x3, d4:Float = y3 - y1;
+			var d0:Float = y2 - y3,
+				d1:Float = x3 - x2,
+				d2:Float = x1 - x3,
+				d4:Float = y3 - y1;
 			var d:Float = 1 / (d0 * d2 + d1 * (y1 - y3));
 
 			for (p in 0...polygonsCount) {
@@ -410,8 +419,7 @@ class SkeletonClipping {
 		var last:Int = polygon.length - 4;
 		var i:Int = 0;
 		while (true) {
-			var edgeX:Float = polygon[i],
-				edgeY:Float = polygon[i + 1];
+			var edgeX:Float = polygon[i], edgeY:Float = polygon[i + 1];
 			var ex:Float = edgeX - polygon[i + 2],
 				ey:Float = edgeY - polygon[i + 3];
 
@@ -525,7 +533,8 @@ class SkeletonClipping {
 		var i:Int = 0;
 		while (true) {
 			var edgeX:Float = polygon[i], edgeY:Float = polygon[i + 1];
-			var ex:Float = edgeX - polygon[i + 2], ey:Float = edgeY - polygon[i + 3];
+			var ex:Float = edgeX - polygon[i + 2],
+				ey:Float = edgeY - polygon[i + 3];
 			var outputStart:Int = output.length;
 			var fragmentStart:Int = inverseVertices.length;
 			inverseVertices.push(0); // placeholder for fragment size
@@ -591,12 +600,14 @@ class SkeletonClipping {
 			else
 				inverseVertices.resize(fragmentStart); // Degenerate.
 
-			if (outputStart == output.length) break; // All outside.
+			if (outputStart == output.length)
+				break; // All outside.
 
 			output.push(output[0]);
 			output.push(output[1]);
 
-			if (i == vLast) break;
+			if (i == vLast)
+				break;
 			var temp:Array<Float> = output;
 			output = input;
 			output.resize(0);
@@ -610,7 +621,11 @@ class SkeletonClipping {
 		var v:Array<Float> = polygon;
 		var n:Int = polygon.length;
 		var noCW:Bool = true, noCCW:Bool = true;
-		var area:Float = 0, prevX:Float = v[n - 2], prevY:Float = v[n - 1], currX:Float = v[0], currY:Float = v[1];
+		var area:Float = 0,
+			prevX:Float = v[n - 2],
+			prevY:Float = v[n - 1],
+			currX:Float = v[0],
+			currY:Float = v[1];
 		var i:Int = 2;
 		while (i < n) {
 			var nextX:Float = v[i], nextY:Float = v[i + 1];
@@ -676,7 +691,8 @@ class SkeletonClipping {
 			var x:Float = sorted[i], y:Float = sorted[i + 1];
 			while ((v[s - 2] - v[s - 4]) * (y - v[s - 3]) - (v[s - 1] - v[s - 3]) * (x - v[s - 4]) >= 0) {
 				s -= 2;
-				if (s == 2) break;
+				if (s == 2)
+					break;
 			}
 			v[s] = x;
 			v[s + 1] = y;
@@ -692,7 +708,8 @@ class SkeletonClipping {
 			var x:Float = sorted[i], y:Float = sorted[i + 1];
 			while ((v[s - 2] - v[s - 4]) * (y - v[s - 3]) - (v[s - 1] - v[s - 3]) * (x - v[s - 4]) >= 0) {
 				s -= 2;
-				if (s == t) break;
+				if (s == t)
+					break;
 			}
 			v[s] = x;
 			v[s + 1] = y;
