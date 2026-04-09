@@ -472,7 +472,7 @@ namespace Spine {
 		public float GetAbsoluteValue (float time, float alpha, bool fromSetup, bool add, float current, float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = GetCurveValue(time);
-			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
 		/// <summary>Returns the interpolated value for properties set as absolute values, using the specified timeline value rather than
@@ -484,7 +484,7 @@ namespace Spine {
 		public float GetAbsoluteValue (float time, float alpha, bool fromSetup, bool add, float current, float setup,
 			float value) {
 			if (time < frames[0]) return fromSetup ? setup : current;
-			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
 		/// <summary>Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.</summary>
@@ -2263,7 +2263,6 @@ namespace Spine {
 		public PathConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, (ulong)Property.PathConstraintMix << 53 | (uint)constraintIndex) {
 			this.constraintIndex = constraintIndex;
-			additive = true;
 		}
 
 		public override int FrameEntries {
@@ -2585,7 +2584,6 @@ namespace Spine {
 	public class SliderTimeline : ConstraintTimeline1 {
 		public SliderTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.SliderTime) {
-			additive = true;
 		}
 
 		/// <param name="events">May be null.</param>
