@@ -444,12 +444,12 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 	private getAbsoluteValue1 (time: number, alpha: number, fromSetup: boolean, add: boolean, current: number, setup: number) {
 		if (time < this.frames[0]) return fromSetup ? setup : current;
 		const value = this.getCurveValue(time);
-		return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+		return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 	}
 
 	private getAbsoluteValue2 (time: number, alpha: number, fromSetup: boolean, add: boolean, current: number, setup: number, value: number) {
 		if (time < this.frames[0]) return fromSetup ? setup : current;
-		return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+		return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 	}
 
 	/** Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.
@@ -2043,7 +2043,6 @@ export class PathConstraintMixTimeline extends CurveTimeline implements Constrai
 	constructor (frameCount: number, bezierCount: number, constraintIndex: number) {
 		super(frameCount, bezierCount, `${Property.pathConstraintMix}|${constraintIndex}`);
 		this.constraintIndex = constraintIndex;
-		this.additive = true;
 	}
 
 	getFrameEntries () {
@@ -2349,7 +2348,6 @@ export class PhysicsConstraintResetTimeline extends Timeline implements Constrai
 export class SliderTimeline extends ConstraintTimeline1 {
 	constructor (frameCount: number, bezierCount: number, constraintIndex: number) {
 		super(frameCount, bezierCount, constraintIndex, Property.sliderTime);
-		this.additive = true;
 	}
 
 	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, fromSetup: boolean,
