@@ -453,7 +453,7 @@ public class Animation {
 		public float getAbsoluteValue (float time, float alpha, boolean fromSetup, boolean add, float current, float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = getCurveValue(time);
-			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
 		/** Returns the interpolated value for properties set as absolute values, using the specified timeline value rather than
@@ -466,7 +466,7 @@ public class Animation {
 		public float getAbsoluteValue (float time, float alpha, boolean fromSetup, boolean add, float current, float setup,
 			float value) {
 			if (time < frames[0]) return fromSetup ? setup : current;
-			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
 		/** Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.
@@ -2108,7 +2108,6 @@ public class Animation {
 		public PathConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, (long)Property.pathConstraintMix.ordinal() << 53 | constraintIndex);
 			this.constraintIndex = constraintIndex;
-			additive = true;
 		}
 
 		public int getFrameEntries () {
@@ -2421,7 +2420,6 @@ public class Animation {
 	static public class SliderTimeline extends ConstraintTimeline1 {
 		public SliderTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.sliderTime.ordinal());
-			additive = true;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
