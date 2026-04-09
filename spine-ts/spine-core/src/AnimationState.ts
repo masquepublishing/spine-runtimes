@@ -1026,7 +1026,8 @@ export class TrackEntry {
 			if (duration === 0) return this.animationStart;
 			return (this.trackTime % duration) + this.animationStart;
 		}
-		return Math.min(this.trackTime + this.animationStart, this.animationEnd);
+		const animationTime = this.trackTime + this.animationStart;
+		return this.animationEnd >= this.animation!.duration ? animationTime : Math.min(animationTime, this.animationEnd);
 	}
 
 	setAnimationLast (animationLast: number) {
