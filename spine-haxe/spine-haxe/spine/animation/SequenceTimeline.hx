@@ -44,6 +44,7 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 		super(frameCount, Std.string(Property.sequence) + "|" + Std.string(slotIndex) + "|" + Std.string(attachment.sequence.id));
 		this.slotIndex = slotIndex;
 		this.attachment = attachment;
+		this.instant = true;
 	}
 
 	public override function getFrameEntries():Int {

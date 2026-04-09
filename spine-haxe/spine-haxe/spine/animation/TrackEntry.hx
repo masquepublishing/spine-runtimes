@@ -227,7 +227,8 @@ class TrackEntry implements Poolable {
 				return animationStart;
 			return (trackTime % duration) + animationStart;
 		}
-		return Math.min(trackTime + animationStart, animationEnd);
+		var animationTime = trackTime + animationStart;
+		return animationEnd >= animation.duration ? animationTime : Math.min(animationTime, animationEnd);
 	}
 
 	/** If this track entry is non-looping, the track time in seconds when TrackEntry.getAnimationEnd() is reached, or the current

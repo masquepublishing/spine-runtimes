@@ -115,11 +115,11 @@ class AnimationState {
 				var nextTime:Float = current.trackLast - next.delay;
 				if (nextTime >= 0) {
 					next.delay = 0;
-					next.trackTime = current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
+					next.trackTime += current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
 					current.trackTime += currentDelta;
 					setCurrent(i, next, true);
 					while (next.mixingFrom != null) {
-						next.mixTime += currentDelta;
+						next.mixTime += delta;
 						next = next.mixingFrom;
 					}
 					continue;
@@ -530,6 +530,7 @@ class AnimationState {
 	private function setCurrent(index:Int, current:TrackEntry, interrupt:Bool):Void {
 		var from:TrackEntry = expandToIndex(index);
 		tracks[index] = current;
+		current.previous = null;
 
 		if (from != null) {
 			if (interrupt)

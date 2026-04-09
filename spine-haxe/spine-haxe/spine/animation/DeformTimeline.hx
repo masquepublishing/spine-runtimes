@@ -52,6 +52,7 @@ class DeformTimeline extends SlotCurveTimeline {
 		this.attachment = attachment;
 		vertices = new Array<Array<Float>>();
 		vertices.resize(frameCount);
+		this.additive = true;
 	}
 
 	public override function getFrameCount():Int {
