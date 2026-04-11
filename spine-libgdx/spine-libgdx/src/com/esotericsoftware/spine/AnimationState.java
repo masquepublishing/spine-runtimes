@@ -110,7 +110,7 @@ public class AnimationState {
 					next.delay = 0;
 					next.trackTime += current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
 					current.trackTime += currentDelta;
-					setCurrent(i, next, true);
+					setTrack(i, next, true);
 					while (next.mixingFrom != null) {
 						next.mixTime += delta;
 						next = next.mixingFrom;
@@ -470,7 +470,7 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	private void setCurrent (int index, TrackEntry current, boolean interrupt) {
+	private void setTrack (int index, TrackEntry current, boolean interrupt) {
 		TrackEntry from = expandToIndex(index);
 		tracks.items[index] = current;
 		current.previous = null;
@@ -521,7 +521,7 @@ public class AnimationState {
 				clearNext(current);
 		}
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, current);
-		setCurrent(trackIndex, entry, interrupt);
+		setTrack(trackIndex, entry, interrupt);
 		queue.drain();
 		return entry;
 	}
@@ -556,7 +556,7 @@ public class AnimationState {
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, last);
 
 		if (last == null) {
-			setCurrent(trackIndex, entry, true);
+			setTrack(trackIndex, entry, true);
 			queue.drain();
 			if (delay < 0) delay = 0;
 		} else {
@@ -751,10 +751,17 @@ public class AnimationState {
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
-	public @Null TrackEntry getCurrent (int trackIndex) {
+	public @Null TrackEntry getTrack (int trackIndex) {
 		if (trackIndex < 0) throw new IllegalArgumentException("trackIndex must be >= 0.");
 		if (trackIndex >= tracks.size) return null;
 		return tracks.items[trackIndex];
+	}
+
+	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.
+	 * @deprecated Use {@link #getTrack(int)}. */
+	@Deprecated
+	public @Null TrackEntry getCurrent (int trackIndex) {
+		return getTrack(trackIndex);
 	}
 
 	/** Adds a listener to receive events for all track entries. */
@@ -857,7 +864,7 @@ public class AnimationState {
 
 		/** The index of the track where this track entry is either current or queued.
 		 * <p>
-		 * See {@link AnimationState#getCurrent(int)}. */
+		 * See {@link AnimationState#getTrack(int)}. */
 		public int getTrackIndex () {
 			return trackIndex;
 		}
@@ -901,9 +908,13 @@ public class AnimationState {
 			this.delay = delay;
 		}
 
-		/** Current time in seconds this track entry has been the current track entry. The track time determines
-		 * {@link #getAnimationTime()}. The track time can be set to start the animation at a time other than 0, without affecting
-		 * looping. */
+		/** The time in seconds this track entry has been the current track entry, starting at 0 and increasing forever. Compare to
+		 * {@link #getAnimationTime()}, which is always between {@link #animationStart} and {@link #animationEnd}.
+		 * <p>
+		 * The track time can be set to start the animation at a time other than 0, without affecting looping. When doing so,
+		 * {@link #animationLast} can be set to the same value to avoid firing events from the start of the animation.
+		 * <p>
+		 * To set the time an animation starts and loops, use {@link #animationStart} and {@link #animationEnd}. */
 		public float getTrackTime () {
 			return trackTime;
 		}
@@ -941,10 +952,10 @@ public class AnimationState {
 			return trackTime; // Next update.
 		}
 
-		/** Seconds when this animation starts, both initially and after looping. Defaults to 0.
+		/** The time in seconds for the first frame of this animation, both initially and after looping. Defaults to 0.
 		 * <p>
-		 * When changing the <code>animationStart</code> time, it often makes sense to set {@link #animationLast} to the same value
-		 * to prevent timeline keys before the start time from triggering. */
+		 * When setting <code>animationStart</code> time, {@link #animationLast} can be set to the same value to avoid firing events
+		 * from the start of the animation. */
 		public float getAnimationStart () {
 			return animationStart;
 		}
@@ -953,8 +964,8 @@ public class AnimationState {
 			this.animationStart = animationStart;
 		}
 
-		/** Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will
-		 * loop back to {@link #animationStart} at this time. Defaults to the animation {@link Animation#duration}. */
+		/** The time in seconds for the last frame of this animation. Past this time, non-looping animations hold the pose at this
+		 * time while looping animations will loop back to {@link #animationStart}. Defaults to the {@link Animation#duration}. */
 		public float getAnimationEnd () {
 			return animationEnd;
 		}
@@ -963,10 +974,10 @@ public class AnimationState {
 			this.animationEnd = animationEnd;
 		}
 
-		/** The time in seconds this animation was last applied. Some timelines use this for one-time triggers. Eg, when this
-		 * animation is applied, event timelines will fire all events between the <code>animationLast</code> time (exclusive) and
-		 * <code>animationTime</code> (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this animation
-		 * is applied. */
+		/** The time in seconds this animation was last applied. Some timelines use this for one-time triggers. For example, when
+		 * this animation is applied, event timelines will fire all events between the <code>animationLast</code> time (exclusive)
+		 * and <code>animationTime</code> (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this
+		 * animation is applied. */
 		public float getAnimationLast () {
 			return animationLast;
 		}
@@ -976,12 +987,9 @@ public class AnimationState {
 			nextAnimationLast = animationLast;
 		}
 
-		/** Uses {@link #trackTime} to compute the <code>animationTime</code>. When the <code>trackTime</code> is 0, the
-		 * <code>animationTime</code> is equal to the <code>animationStart</code> time.
-		 * <p>
-		 * The <code>animationTime</code> is between {@link #animationStart} and {@link #animationEnd}, except if this track entry
-		 * is non-looping and {@link #animationEnd} is >= to the {@link Animation#duration}, then <code>animationTime</code>
-		 * continues to increase past {@link #animationEnd}. */
+		/** Uses {@link #trackTime} to compute the <code>animationTime</code>, which is always between {@link #animationStart} and
+		 * {@link #animationEnd}. When <code>trackTime</code> is 0, <code>animationTime</code> is equal to the
+		 * <code>animationStart</code> time. */
 		public float getAnimationTime () {
 			if (loop) {
 				float duration = animationEnd - animationStart;
@@ -989,7 +997,7 @@ public class AnimationState {
 				return (trackTime % duration) + animationStart;
 			}
 			float animationTime = trackTime + animationStart;
-			return animationEnd >= animation.duration ? animationTime : Math.min(animationTime, animationEnd);
+			return animationEnd >= animation.duration ? animationEnd : Math.min(animationTime, animationEnd);
 		}
 
 		/** Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or
