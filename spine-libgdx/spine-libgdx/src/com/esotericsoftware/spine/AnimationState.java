@@ -41,6 +41,7 @@ import com.badlogic.gdx.utils.SnapshotArray;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderFolderTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
+import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 
@@ -229,6 +230,7 @@ public class AnimationState {
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
 				}
 			}
+			if (current.reverse) eventsReverse(current, animationLast, animationTime);
 			queueEvents(current, animationTime);
 			events.clear();
 			current.nextAnimationLast = animationTime;
@@ -303,6 +305,7 @@ public class AnimationState {
 			}
 		}
 
+		if (from.reverse && mix < from.eventThreshold) eventsReverse(from, animationLast, animationTime);
 		if (to.mixDuration > 0) queueEvents(from, animationTime);
 		this.events.clear();
 
@@ -392,18 +395,18 @@ public class AnimationState {
 	}
 
 	private void queueEvents (TrackEntry entry, float animationTime) {
-		float animationStart = entry.animationStart, animationEnd = entry.animationEnd;
-		float duration = animationEnd - animationStart;
-		float trackLastWrapped = entry.trackLast % duration;
+		float animationStart = entry.animationStart, animationEnd = entry.animationEnd, duration = animationEnd - animationStart;
+		boolean reverse = entry.reverse;
+		float split = entry.trackLast % duration;
+		if (reverse) split = duration - split;
 
 		// Queue events before complete.
 		Event[] events = this.events.items;
 		int i = 0, n = this.events.size;
 		for (; i < n; i++) {
 			Event event = events[i];
-			if (event.time < trackLastWrapped) break;
-			if (event.time > animationEnd) continue; // Discard events outside animation start/end.
-			queue.event(entry, event);
+			if (event.time < split ^ reverse) break;
+			if (event.time >= animationStart && event.time <= animationEnd) queue.event(entry, event);
 		}
 
 		// Queue complete if completed a loop iteration or the animation.
@@ -422,8 +425,35 @@ public class AnimationState {
 		// Queue events after complete.
 		for (; i < n; i++) {
 			Event event = events[i];
-			if (event.time < animationStart) continue; // Discard events outside animation start/end.
-			queue.event(entry, event);
+			if (event.time >= animationStart && event.time <= animationEnd) queue.event(entry, event);
+		}
+	}
+
+	private void eventsReverse (TrackEntry entry, float animationLast, float animationTime) {
+		float duration = entry.animation.duration, from = duration - animationLast, to = duration - animationTime;
+		Timeline[] timelines = entry.animation.timelines.items;
+		for (int i = 0, n = entry.animation.timelines.size; i < n; i++) {
+			if (!(timelines[i] instanceof EventTimeline eventTimeline)) continue;
+			Event[] timelineEvents = eventTimeline.getEvents();
+			float[] frames = eventTimeline.frames;
+			int frameCount = frames.length;
+			if (from >= to) { // from -> to
+				for (int ii = 0; ii < frameCount; ii++) {
+					if (frames[ii] < to) continue;
+					if (frames[ii] >= from) break;
+					events.add(timelineEvents[ii]);
+				}
+			} else {
+				for (int ii = 0; ii < frameCount; ii++) { // from -> 0
+					if (frames[ii] >= from) break;
+					events.add(timelineEvents[ii]);
+				}
+				int ii = 0; // end -> to
+				for (; ii < frameCount; ii++)
+					if (frames[ii] >= to) break;
+				for (; ii < frameCount; ii++)
+					events.add(timelineEvents[ii]);
+			}
 		}
 	}
 
@@ -1232,7 +1262,7 @@ public class AnimationState {
 			this.reverse = reverse;
 		}
 
-		/** If true, the animation will be applied in reverse and events will not be fired. */
+		/** If true, the animation will be applied in reverse. */
 		public boolean getReverse () {
 			return reverse;
 		}
