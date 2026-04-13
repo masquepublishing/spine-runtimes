@@ -30,6 +30,7 @@
 package spine.animation;
 
 import haxe.ds.StringMap;
+import spine.animation.EventTimeline;
 import spine.animation.Listeners.EventListeners;
 import spine.Event;
 import spine.Pool;
@@ -253,6 +254,8 @@ class AnimationState {
 					}
 				}
 			}
+			if (current.reverse)
+				eventsReverse(current, animationLast, animationTime);
 			queueEvents(current, animationTime);
 			events.resize(0);
 			current.nextAnimationLast = animationTime;
@@ -334,6 +337,8 @@ class AnimationState {
 			}
 		}
 
+		if (from.reverse && mix < from.eventThreshold)
+			eventsReverse(from, animationLast, animationTime);
 		if (to.mixDuration > 0)
 			queueEvents(from, animationTime);
 		events.resize(0);
@@ -436,7 +441,10 @@ class AnimationState {
 		var animationStart:Float = entry.animationStart,
 			animationEnd:Float = entry.animationEnd;
 		var duration:Float = animationEnd - animationStart;
-		var trackLastWrapped:Float = entry.trackLast % duration;
+		var reverse:Bool = entry.reverse;
+		var split:Float = entry.trackLast % duration;
+		if (reverse)
+			split = duration - split;
 
 		// Queue events before complete.
 		var event:Event;
@@ -446,11 +454,10 @@ class AnimationState {
 			event = events[i++];
 			if (event == null)
 				continue;
-			if (event.time < trackLastWrapped)
+			if ((event.time < split) != reverse)
 				break;
-			if (event.time > animationEnd)
-				continue; // Discard events outside animation start/end.
-			queue.event(entry, event);
+			if (event.time >= animationStart && event.time <= animationEnd)
+				queue.event(entry, event);
 		}
 
 		// Queue complete if completed a loop iteration or the animation.
@@ -472,9 +479,51 @@ class AnimationState {
 			event = events[i++];
 			if (event == null)
 				continue;
-			if (event.time < animationStart)
-				continue; // Discard events outside animation start/end.
-			queue.event(entry, event);
+			if (event.time >= animationStart && event.time <= animationEnd)
+				queue.event(entry, event);
+		}
+	}
+
+	private function eventsReverse(entry:TrackEntry, animationLast:Float, animationTime:Float):Void {
+		var duration:Float = entry.animation.duration,
+			from:Float = duration - animationLast,
+			to:Float = duration - animationTime;
+		var timelines:Array<Timeline> = entry.animation.timelines;
+		for (i in 0...entry.animation.timelines.length) {
+			var timeline:Timeline = timelines[i];
+			if (!Std.isOfType(timeline, EventTimeline))
+				continue;
+			var eventTimeline:EventTimeline = cast(timeline, EventTimeline);
+			var timelineEvents:Array<Event> = eventTimeline.events;
+			var frames = eventTimeline.frames;
+			var frameCount:Int = frames.length;
+			if (from >= to) { // from -> to
+				for (ii in 0...frameCount) {
+					if (frames[ii] < to)
+						continue;
+					if (frames[ii] >= from)
+						break;
+					events.push(timelineEvents[ii]);
+				}
+			} else {
+				var ii:Int = 0;
+				while (ii < frameCount) { // from -> 0
+					if (frames[ii] >= from)
+						break;
+					events.push(timelineEvents[ii]);
+					ii++;
+				}
+				ii = 0; // end -> to
+				while (ii < frameCount) {
+					if (frames[ii] >= to)
+						break;
+					ii++;
+				}
+				while (ii < frameCount) {
+					events.push(timelineEvents[ii]);
+					ii++;
+				}
+			}
 		}
 	}
 
