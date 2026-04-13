@@ -117,7 +117,7 @@ class AnimationState {
 					next.delay = 0;
 					next.trackTime += current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
 					current.trackTime += currentDelta;
-					setCurrent(i, next, true);
+					setTrack(i, next, true);
 					while (next.mixingFrom != null) {
 						next.mixTime += delta;
 						next = next.mixingFrom;
@@ -527,7 +527,7 @@ class AnimationState {
 		queue.drain();
 	}
 
-	private function setCurrent(index:Int, current:TrackEntry, interrupt:Bool):Void {
+	private function setTrack(index:Int, current:TrackEntry, interrupt:Bool):Void {
 		var from:TrackEntry = expandToIndex(index);
 		tracks[index] = current;
 		current.previous = null;
@@ -584,7 +584,7 @@ class AnimationState {
 			}
 		}
 		var entry:TrackEntry = trackEntry(trackIndex, animation, loop, current);
-		setCurrent(trackIndex, entry, interrupt);
+		setTrack(trackIndex, entry, interrupt);
 		queue.drain();
 		return entry;
 	}
@@ -624,7 +624,7 @@ class AnimationState {
 		var entry:TrackEntry = trackEntry(trackIndex, animation, loop, last);
 
 		if (last == null) {
-			setCurrent(trackIndex, entry, true);
+			setTrack(trackIndex, entry, true);
 			queue.drain();
 			if (delay < 0)
 				delay = 0;
@@ -837,10 +837,18 @@ class AnimationState {
 	/**
 	 * Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.
 	 */
-	public function getCurrent(trackIndex:Int):TrackEntry {
+	public function getTrack(trackIndex:Int):TrackEntry {
+		if (trackIndex < 0)
+			throw new SpineException("trackIndex must be >= 0.");
 		if (trackIndex >= tracks.length)
 			return null;
 		return tracks[trackIndex];
+	}
+
+	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
+	@:deprecated("Use getTrack()")
+	public function getCurrent(trackIndex:Int):TrackEntry {
+		return getTrack(trackIndex);
 	}
 
 	public var fHasEndListener(get, never):Bool;
