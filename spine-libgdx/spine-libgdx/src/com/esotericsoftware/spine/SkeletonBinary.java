@@ -702,6 +702,8 @@ public class SkeletonBinary extends SkeletonLoader {
 			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, name);
 			if (clip == null) yield null;
 			clip.setEndSlot(skeletonData.slots.items[endSlotIndex]);
+			clip.setConvex((flags & 32) != 0);
+			clip.setInverse((flags & 64) != 0);
 			clip.setWorldVerticesLength(vertices.length);
 			clip.setVertices(vertices.vertices);
 			clip.setBones(vertices.bones);

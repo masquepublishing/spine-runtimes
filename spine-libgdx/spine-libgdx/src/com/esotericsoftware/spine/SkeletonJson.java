@@ -671,6 +671,9 @@ public class SkeletonJson extends SkeletonLoader {
 				clip.setEndSlot(slot);
 			}
 
+			clip.setConvex(map.getBoolean("convex", false));
+			clip.setInverse(map.getBoolean("inverse", false));
+
 			readVertices(map, clip, map.getInt("vertexCount") << 1);
 
 			String color = map.getString("color", null);
