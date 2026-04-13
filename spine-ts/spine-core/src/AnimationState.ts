@@ -29,7 +29,7 @@
 
 /** biome-ignore-all lint/style/noNonNullAssertion: reference runtime expects some nullable to not be null */
 
-import { Animation, AttachmentTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, RotateTimeline, Timeline } from "./Animation.js";
+import { Animation, AttachmentTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, EventTimeline, RotateTimeline, Timeline } from "./Animation.js";
 import type { AnimationStateData } from "./AnimationStateData.js";
 import type { Event } from "./Event.js";
 import type { Skeleton } from "./Skeleton.js";
@@ -222,6 +222,7 @@ export class AnimationState {
 					}
 				}
 			}
+			if (current.reverse) this.eventsReverse(current, animationLast, animationTime);
 			this.queueEvents(current, animationTime);
 			events.length = 0;
 			current.nextAnimationLast = animationTime;
@@ -298,6 +299,7 @@ export class AnimationState {
 			}
 		}
 
+		if (from.reverse && mix < from.eventThreshold) this.eventsReverse(from, animationLast, animationTime);
 		if (to.mixDuration > 0) this.queueEvents(from, animationTime);
 		this.events.length = 0;
 
@@ -386,18 +388,18 @@ export class AnimationState {
 	}
 
 	queueEvents (entry: TrackEntry, animationTime: number) {
-		const animationStart = entry.animationStart, animationEnd = entry.animationEnd;
-		const duration = animationEnd - animationStart;
-		const trackLastWrapped = entry.trackLast % duration;
+		const animationStart = entry.animationStart, animationEnd = entry.animationEnd, duration = animationEnd - animationStart;
+		const reverse = entry.reverse;
+		let split = entry.trackLast % duration;
+		if (reverse) split = duration - split;
 
 		// Queue events before complete.
 		const events = this.events;
 		let i = 0, n = events.length;
 		for (; i < n; i++) {
 			const event = events[i];
-			if (event.time < trackLastWrapped) break;
-			if (event.time > animationEnd) continue; // Discard events outside animation start/end.
-			this.queue.event(entry, event);
+			if ((event.time < split) !== reverse) break; // java: if (event.time < split ^ reverse) break;
+			if (event.time >= animationStart && event.time <= animationEnd) this.queue.event(entry, event);
 		}
 
 		// Queue complete if completed a loop iteration or the animation.
@@ -416,8 +418,36 @@ export class AnimationState {
 		// Queue events after complete.
 		for (; i < n; i++) {
 			const event = events[i];
-			if (event.time < animationStart) continue; // Discard events outside animation start/end.
-			this.queue.event(entry, event);
+			if (event.time >= animationStart && event.time <= animationEnd) this.queue.event(entry, event);
+		}
+	}
+
+	private eventsReverse (entry: TrackEntry, animationLast: number, animationTime: number) {
+		const duration = entry.animation!.duration, from = duration - animationLast, to = duration - animationTime;
+		const timelines = entry.animation!.timelines;
+		for (let i = 0, n = entry.animation!.timelines.length; i < n; i++) {
+			const eventTimeline = timelines[i];
+			if (!(eventTimeline instanceof EventTimeline)) continue;
+			const timelineEvents = eventTimeline.events;
+			const frames = eventTimeline.frames;
+			const frameCount = frames.length;
+			if (from >= to) { // from -> to
+				for (let ii = 0; ii < frameCount; ii++) {
+					if (frames[ii] < to) continue;
+					if (frames[ii] >= from) break;
+					this.events.push(timelineEvents[ii]);
+				}
+			} else {
+				for (let ii = 0; ii < frameCount; ii++) { // from -> 0
+					if (frames[ii] >= from) break;
+					this.events.push(timelineEvents[ii]);
+				}
+				let ii = 0; // end -> to
+				for (; ii < frameCount; ii++)
+					if (frames[ii] >= to) break;
+				for (; ii < frameCount; ii++)
+					this.events.push(timelineEvents[ii]);
+			}
 		}
 	}
 
@@ -849,7 +879,7 @@ export class TrackEntry {
 	 * is next called. */
 	additive = false;
 
-	/** If true, the animation will be applied in reverse and events will not be fired. */
+	/** If true, the animation will be applied in reverse. */
 	reverse = false;
 
 	/** If true, mixing rotation between tracks always uses the shortest rotation direction. If the rotation is animated, the
