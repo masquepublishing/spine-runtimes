@@ -415,7 +415,6 @@
   - `Skeleton.Physics` was moved to `Physics` directly in `Spine` namespace, thus might clash with `UnityEngine.Physics`.
     - Spine Physics: `UpdateWorldTransform(Skeleton.Physics.Update)` → `UpdateWorldTransform(Spine.Physics.Update)`
     - UnityEngine Physics: `Physics.gravity` → `UnityEngine.Physics.gravity`.
-  - When enabling `Threaded Animation` at `SkeletonAnimation` components, `SkeletonAnimation.AnimationState` callbacks and `TrackEntry` callbacks are not automatically called on the main thread. There are additional main thread callbacks provided to subscribe to instead, like `MainThreadComplete` for `Complete` and the like - see *Additions* below. Please note that this requires a change of user code to subscribe to these main thread delegate variants instead.
   - `SkeletonRenderer`: `maskInteraction` → `MaskInteraction`.
   - Removed rather useless old menu entries `GameObject - Spine - SkeletonRenderer` and the like which are spawning e.g. a GameObject with an empty `SkeletonRenderer` component without `SkeletonDataAsset` assigned and thus also not initialized properly.
   - Removed `attachment.GetRemappedClone()` extension methods. Replace `attachment.GetRemappedClone(parameters)` with `attachment.Copy(); attachment.SetRegion(parameters)`. Removed `AttachmentCloneExtensions` class, `SetRegion` methods are now in `AttachmentRegionExtensions`.
@@ -423,7 +422,8 @@
   - Renamed `ToRegionAttachmentPMAClone` to `ToRegionAttachmentWithNewPMATexture`.
   - Removed support for long abandoned thirdparty asset "2D Toolkit" (TK2D) by Unikron Software.
   - Removed Spine Timeline `Spine Animation State Clip` property `Hold Previous`. New `AnimationState` hold system automatically calculates the required state values.
-  
+  - Removed intermediately added (4.3-beta branch only) `SkeletonAnimation` callbacks `MainThreadStart`, `MainThreadInterrupt`, `MainThreadEnd`, `MainThreadDispose`, `MainThreadComplete` and `MainThreadEvent`. Instead `SkeletonAnimation.AnimationState` and `TrackEntry` events are now automatically  processed on the main thread. There is no longer a change of user code required for these events, and `TrackEntry` events can be utilized directly even with threaded animation enabled.
+
 - **Changes of default values**
   - Changed default atlas texture workflow from PMA to straight alpha textures. This move was done because straight alpha textures are compatible with both Gamma and Linear color space, with the latter being the default for quite some time now in Unity. Note that `PMA Vertex Color` is unaffected and shall be enabled as usual to allow for single-pass additive rendering.
 
@@ -434,8 +434,6 @@
     - `Threaded MeshGeneration`: Default value for SkeletonRenderer and SkeletonGraphic threaded mesh generation
     - `Threaded Animation`: Default value for SkeletonAnimation and SkeletonMecanim threaded animation updates
   - Even when threading is enabled, the threading system defaults to  `SkeletonRenderer` and `SkeletonAnimation` user callbacks like `UpdateWorld` (not including `AnimationState` callbacks) being issued on the main thread to support existing user code. Can be configured via `SkeletonUpdateSystem.Instance.MainThreadUpdateCallbacks = false` to perform callbacks on worker threads if parallel execution is supported and desired by the user code. `OnPostProcessVertices` is an exception, as it it's deliberately left on worker threads so that parallellization can be utilized. Note that most Unity API calls are restricted to the main thread.
-  - For `SkeletonAnimation.AnimationState` callbacks, there are additional main thread callbacks `MainThreadStart`, `MainThreadInterrupt`, `MainThreadEnd`, `MainThreadDispose`, `MainThreadComplete` and `MainThreadEvent` provided directly at `SkeletonAnimation`, e.g. `SkeletonAnimation.MainThreadComplete` for `SkeletonAnimation.AnimationState.Complete` and so on. Please note that this requires a change of user code to subscribe to these main thread delegate variants instead.
-  - The same applies to the `TrackEntry.Start`, `Interrupt`, `End`, `Dispose`, `Complete`, and `Event` events. If you need these callbacks to run on the main thread instead of worker threads, you should register them using the corresponding `SkeletonAnimation.MainThreadStart`, `MainThreadInterrupt`, etc. callbacks. Note that this does require a small code change, since these events are **not** automatically unregistered when the `TrackEntry` is removed. You’ll need to handle that manually, typically with logic such as `if (trackEntry.Animation == attackAnimation) ..`.
   - Added `SkeletonUpdateSystem.Instance.GroupRenderersBySkeletonType` and `GroupAnimationBySkeletonType` properties. Defaults to disabled. Later when smart partitioning is implemented, enabling this parameter might slightly improve cache locality. Until then having it enabled combined with different skeleton complexity would lead to worse load balancing.
   - Added previously missing editor drag & drop skeleton instantiation option *SkeletonGraphic (UI) Mecanim* combining components `SkeletonGraphic` and `SkeletonMecanim`.
   - Added define `SPINE_DISABLE_THREADING` to disable threaded animation and mesh generation entirely, removing the respective code. This define can be set as `Scripting Define Symbols` globally or for selective build profiles where desired.

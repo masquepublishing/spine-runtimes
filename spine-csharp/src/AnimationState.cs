@@ -885,6 +885,15 @@ namespace Spine {
 			queue.Clear();
 		}
 
+		public void DelayListenerNotifications () {
+			queue.drainDisabled = true;
+		}
+
+		public void IssueDelayedListenerNotifications () {
+			queue.drainDisabled = false;
+			queue.Drain();
+		}
+
 		/// <summary>
 		/// <para>Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower
 		/// or faster. Defaults to 1.</para>
