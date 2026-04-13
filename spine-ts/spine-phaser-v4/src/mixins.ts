@@ -26,6 +26,8 @@ SOFTWARE.
 
 // biome-ignore-all lint: ignore biome for this file
 
+import * as Phaser from "phaser";
+
 const components = (Phaser.GameObjects.Components as any);
 export const ComputedSize = components.ComputedSize;
 export const Depth = components.Depth;
@@ -49,6 +51,31 @@ export type Mixin<GameObjectComponent, GameObjectConstraint extends Phaser.GameO
 	BaseGameObject: GameObjectType
 ) => GameObjectType & Type<GameObjectComponent>;
 
+/**
+ * Copies prototype properties from the given mixins onto the target class.
+ * Fallback for Phaser's ESM build, which does not export `Phaser.Class`.
+ */
+function applyMixinsFallback (target: Function, mixins: any[]): void {
+	for (const mixin of mixins) {
+		const source = mixin.prototype || mixin;
+		for (const key of Object.getOwnPropertyNames(source)) {
+			if (key === 'constructor') continue;
+			const descriptor = Object.getOwnPropertyDescriptor(source, key);
+			if (descriptor) {
+				Object.defineProperty(target.prototype, key, descriptor);
+			}
+		}
+	}
+}
+
+function applyMixins (target: Function, mixins: any[]): void {
+	if ((Phaser as any).Class?.mixin) {
+		(Phaser as any).Class.mixin(target, mixins);
+	} else {
+		applyMixinsFallback(target, mixins);
+	}
+}
+
 export function createMixin<
 	GameObjectComponent,
 	GameObjectConstraint extends Phaser.GameObjects.GameObject = Phaser.GameObjects.GameObject
@@ -56,7 +83,7 @@ export function createMixin<
 	...component: GameObjectComponent[]
 ): Mixin<GameObjectComponent, GameObjectConstraint> {
 	return (BaseGameObject) => {
-		(Phaser as any).Class.mixin(BaseGameObject, component);
+		applyMixins(BaseGameObject, component);
 		return BaseGameObject as any;
 	};
 }

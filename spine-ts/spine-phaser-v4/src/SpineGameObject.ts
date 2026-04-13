@@ -38,6 +38,7 @@ import {
 	Skin,
 	type Vector2,
 } from "@esotericsoftware/spine-core";
+import * as Phaser from "phaser";
 import { SPINE_GAME_OBJECT_TYPE } from "./keys.js";
 import {
 	AlphaMixin,
