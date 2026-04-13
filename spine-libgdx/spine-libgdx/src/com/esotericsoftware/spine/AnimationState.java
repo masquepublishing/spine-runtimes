@@ -787,13 +787,6 @@ public class AnimationState {
 		return tracks.items[trackIndex];
 	}
 
-	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.
-	 * @deprecated Use {@link #getTrack(int)}. */
-	@Deprecated
-	public @Null TrackEntry getCurrent (int trackIndex) {
-		return getTrack(trackIndex);
-	}
-
 	/** Adds a listener to receive events for all track entries. */
 	public void addListener (AnimationStateListener listener) {
 		if (listener == null) throw new IllegalArgumentException("listener cannot be null.");
