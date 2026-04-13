@@ -1014,13 +1014,10 @@ public class AnimationState {
 		 * {@link #animationEnd}. When <code>trackTime</code> is 0, <code>animationTime</code> is equal to the
 		 * <code>animationStart</code> time. */
 		public float getAnimationTime () {
-			if (loop) {
-				float duration = animationEnd - animationStart;
-				if (duration == 0) return animationStart;
-				return (trackTime % duration) + animationStart;
-			}
-			float animationTime = trackTime + animationStart;
-			return animationEnd >= animation.duration ? animationTime : Math.min(animationTime, animationEnd);
+			if (!loop) return Math.min(trackTime + animationStart, animationEnd);
+			float duration = animationEnd - animationStart;
+			if (duration == 0) return animationStart;
+			return (trackTime % duration) + animationStart;
 		}
 
 		/** Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or
