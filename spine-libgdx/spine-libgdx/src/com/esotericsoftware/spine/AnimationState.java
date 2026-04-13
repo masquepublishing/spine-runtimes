@@ -1020,7 +1020,7 @@ public class AnimationState {
 				return (trackTime % duration) + animationStart;
 			}
 			float animationTime = trackTime + animationStart;
-			return animationEnd >= animation.duration ? animationEnd : Math.min(animationTime, animationEnd);
+			return animationEnd >= animation.duration ? animationTime : Math.min(animationTime, animationEnd);
 		}
 
 		/** Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or

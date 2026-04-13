@@ -131,6 +131,40 @@ Use lowercase prefixes exactly as listed below.
 7. If the port changes the public API, investigate downstream wrapper runtimes before considering the port complete:
    - `spine-godot`: check whether Godot script bindings need methods or properties added, changed, or removed in the wrapper classes and `ClassDB::bind_method` registrations.
    - `spine-ue`: check whether Unreal wrappers need methods or properties added, changed, or removed in the Blueprint-exposed `UFUNCTION` and `UPROPERTY` APIs.
+   - For `AnimationState::getCurrent` -> `getTrack`, explicitly search Godot and UE wrapper code and examples for `getCurrent(` references. At the time of writing, both runtimes still contain wrapper/example call sites that need review if that API changes.
+8. Build and smoke-test downstream runtimes after bindings regenerate.
+   - `spine-c` CLI test:
+   ```bash
+   cd spine-c
+   ./build.sh clean
+   ./build/headless-test ../examples/spineboy/export/spineboy-pro.json ../examples/spineboy/export/spineboy-pma.atlas walk
+   ```
+   - `spine-ios` CLI test package:
+   ```bash
+   cd spine-ios/test
+   ./build.sh
+   ```
+   - `spine-flutter` headless scripts from the dedicated test package:
+   ```bash
+   cd spine-flutter/test
+   ./build.sh
+   dart run headless_test.dart
+   dart run skeleton_drawable_test.dart
+   ```
+   - `spine-flutter` desktop example after native or generated API changes:
+   ```bash
+   cd spine-flutter
+   ./setup.sh
+   cd example
+   flutter clean
+   flutter pub get
+   cd macos
+   rm -rf Pods Podfile.lock
+   pod install
+   cd ..
+   flutter run -d macos
+   ```
+   - The Flutter test scripts are not referenced by any repo shell runner. Treat the commands above as the verified manual workflow.
 
 ## spine-cpp / spine-libgdx test infrastructure
 

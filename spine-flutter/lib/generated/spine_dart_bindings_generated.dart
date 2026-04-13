@@ -16223,21 +16223,21 @@ class SpineDartBindings {
   late final _spine_animation_state_set_empty_animations =
       _spine_animation_state_set_empty_animationsPtr.asFunction<void Function(spine_animation_state, double)>();
 
-  spine_track_entry spine_animation_state_get_current(
+  spine_track_entry spine_animation_state_get_track(
     spine_animation_state self,
     int trackIndex,
   ) {
-    return _spine_animation_state_get_current(
+    return _spine_animation_state_get_track(
       self,
       trackIndex,
     );
   }
 
-  late final _spine_animation_state_get_currentPtr =
+  late final _spine_animation_state_get_trackPtr =
       _lookup<ffi.NativeFunction<spine_track_entry Function(spine_animation_state, ffi.Size)>>(
-          'spine_animation_state_get_current');
-  late final _spine_animation_state_get_current =
-      _spine_animation_state_get_currentPtr.asFunction<spine_track_entry Function(spine_animation_state, int)>();
+          'spine_animation_state_get_track');
+  late final _spine_animation_state_get_track =
+      _spine_animation_state_get_trackPtr.asFunction<spine_track_entry Function(spine_animation_state, int)>();
 
   /// The AnimationStateData to look up mix durations.
   spine_animation_state_data spine_animation_state_get_data(
@@ -20316,6 +20316,71 @@ class SpineDartBindings {
           'spine_clipping_attachment_set_end_slot');
   late final _spine_clipping_attachment_set_end_slot = _spine_clipping_attachment_set_end_slotPtr
       .asFunction<void Function(spine_clipping_attachment, spine_slot_data)>();
+
+  /// When true the clipping polygon is treated as convex for more efficient
+  /// clipping. If the polygon deforms to concave then the convex hull is used.
+  /// When false the clipping polygon can be concave and if so has an additional
+  /// CPU cost. Inverse clipping always uses convex.
+  bool spine_clipping_attachment_get_convex(
+    spine_clipping_attachment self,
+  ) {
+    return _spine_clipping_attachment_get_convex(
+      self,
+    );
+  }
+
+  late final _spine_clipping_attachment_get_convexPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_clipping_attachment)>>('spine_clipping_attachment_get_convex');
+  late final _spine_clipping_attachment_get_convex =
+      _spine_clipping_attachment_get_convexPtr.asFunction<bool Function(spine_clipping_attachment)>();
+
+  void spine_clipping_attachment_set_convex(
+    spine_clipping_attachment self,
+    bool convex,
+  ) {
+    return _spine_clipping_attachment_set_convex(
+      self,
+      convex,
+    );
+  }
+
+  late final _spine_clipping_attachment_set_convexPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_clipping_attachment, ffi.Bool)>>(
+          'spine_clipping_attachment_set_convex');
+  late final _spine_clipping_attachment_set_convex =
+      _spine_clipping_attachment_set_convexPtr.asFunction<void Function(spine_clipping_attachment, bool)>();
+
+  /// When false, everything inside the clipping polygon is visible. When true,
+  /// everything outside the clipping polygon is visible and clipping is convex.
+  bool spine_clipping_attachment_get_inverse(
+    spine_clipping_attachment self,
+  ) {
+    return _spine_clipping_attachment_get_inverse(
+      self,
+    );
+  }
+
+  late final _spine_clipping_attachment_get_inversePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_clipping_attachment)>>(
+          'spine_clipping_attachment_get_inverse');
+  late final _spine_clipping_attachment_get_inverse =
+      _spine_clipping_attachment_get_inversePtr.asFunction<bool Function(spine_clipping_attachment)>();
+
+  void spine_clipping_attachment_set_inverse(
+    spine_clipping_attachment self,
+    bool inverse,
+  ) {
+    return _spine_clipping_attachment_set_inverse(
+      self,
+      inverse,
+    );
+  }
+
+  late final _spine_clipping_attachment_set_inversePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_clipping_attachment, ffi.Bool)>>(
+          'spine_clipping_attachment_set_inverse');
+  late final _spine_clipping_attachment_set_inverse =
+      _spine_clipping_attachment_set_inversePtr.asFunction<void Function(spine_clipping_attachment, bool)>();
 
   spine_color spine_clipping_attachment_get_color(
     spine_clipping_attachment self,
@@ -47413,9 +47478,13 @@ class SpineDartBindings {
   late final _spine_track_entry_set_delay =
       _spine_track_entry_set_delayPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// Current time in seconds this track entry has been the current track entry.
-  /// The track time determines getAnimationTime(). The track time can be set to
-  /// start the animation at a time other than 0, without affecting looping.
+  /// The time in seconds this track entry has been the current track entry,
+  /// starting at 0 and increasing forever. Compare to getAnimationTime(), which is
+  /// always between animationStart and animationEnd.
+  ///
+  /// The track time can be set to start the animation at a time other than 0,
+  /// without affecting looping. When doing so, animationLast can be set to the
+  /// same value to avoid firing events from the start of the animation.
   double spine_track_entry_get_track_time(
     spine_track_entry self,
   ) {
@@ -47481,12 +47550,11 @@ class SpineDartBindings {
   late final _spine_track_entry_set_track_end =
       _spine_track_entry_set_track_endPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// Seconds when this animation starts, both initially and after looping.
-  /// Defaults to 0.
+  /// The time in seconds for the first frame of this animation, both initially and
+  /// after looping. Defaults to 0.
   ///
-  /// When changing the animation start time, it often makes sense to set
-  /// TrackEntry.AnimationLast to the same value to prevent timeline keys before
-  /// the start time from triggering.
+  /// When setting the animation start time, animationLast can be set to the same
+  /// value to avoid firing events from the start of the animation.
   double spine_track_entry_get_animation_start(
     spine_track_entry self,
   ) {
@@ -47516,9 +47584,9 @@ class SpineDartBindings {
   late final _spine_track_entry_set_animation_start =
       _spine_track_entry_set_animation_startPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// Seconds for the last frame of this animation. Non-looping animations won't
-  /// play past this time. Looping animations will loop back to
-  /// TrackEntry.AnimationStart at this time. Defaults to the animation duration.
+  /// The time in seconds for the last frame of this animation. Past this time,
+  /// non-looping animations hold the pose at this time while looping animations
+  /// will loop back to animationStart. Defaults to the animation duration.
   double spine_track_entry_get_animation_end(
     spine_track_entry self,
   ) {
@@ -47582,12 +47650,9 @@ class SpineDartBindings {
   late final _spine_track_entry_set_animation_last =
       _spine_track_entry_set_animation_lastPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// Uses the track time to compute animationTime. When trackTime is 0,
-  /// animationTime is equal to animationStart.
-  ///
-  /// animationTime is between animationStart and animationEnd, except if this
-  /// track entry is non-looping and animationEnd is >= the animation duration,
-  /// then animationTime continues to increase past animationEnd.
+  /// Uses the track time to compute animationTime, which is always between
+  /// animationStart and animationEnd. When trackTime is 0, animationTime is equal
+  /// to animationStart.
   double spine_track_entry_get_animation_time(
     spine_track_entry self,
   ) {

@@ -5,8 +5,10 @@
 - **Additions**
   - Added `spine_slider` and `spine_slider_data` types for slider constraints
   - Regenerated C bindings for the AnimationState additive/hold rework and Skin placeholder name rename in spine-cpp.
+  - Regenerated C bindings for the updated clipping runtime, including convex and inverse clipping support.
 
 - **Breaking changes**
+  - `spine_animation_state_get_current()` renamed to `spine_animation_state_get_track()`.
   - `spine_track_entry_get_mix_blend()` / `spine_track_entry_set_mix_blend()` removed. Use `spine_track_entry_get_additive()` / `spine_track_entry_set_additive()` instead.
   - `spine_track_entry_get_hold_previous()` / `spine_track_entry_set_hold_previous()` removed.
   - `spine_skin_entry_get_name()` renamed to `spine_skin_entry_get_placeholder_name()`.
@@ -95,8 +97,11 @@
   - Ported the Skin placeholder name rename from spine-libgdx. `Skin::AttachmentMap::Entry::_name` renamed to `_placeholderName`.
   - Fixed `SkeletonBinary::readLong()` sign extension bug that truncated 64-bit hash values to 32 bits.
   - Ported the sequence attachment refactor from spine-libgdx. `Sequence` now precomputes per-frame regions, UVs, and region offsets, and `RegionAttachment` / `MeshAttachment` now mirror the libgdx implementation.
+  - Ported the latest clipping runtime changes from spine-libgdx, including convex and inverse clipping support and the inverse clipping crash fix.
+  - Added `ClippingAttachment::getConvex()` / `setConvex()` and `getInverse()` / `setInverse()`.
 
 - **Breaking changes**
+  - `AnimationState::getCurrent()` renamed to `AnimationState::getTrack()`.
   - Headers reorganized from `spine-cpp/spine-cpp/include/spine/` to `spine-cpp/include/spine/`
   - Timeline `apply()` signature changed: `MixBlend blend, MixDirection direction` replaced with `bool fromSetup, bool add, bool out`. All timeline subclasses updated.
   - `Animation::apply()` signature changed to match the new timeline parameters.
@@ -237,12 +242,18 @@
 
 ### UE
 
+- **Additions**
+  - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
+
 - **Breaking changes**
+  - `USpineSkeletonAnimationComponent::GetCurrent()` renamed to `GetTrack()`.
+  - `USpineWidget::GetCurrent()` renamed to `GetTrack()`.
   - Updated to use new C++ runtime with all breaking changes above
 
 ### Godot
 
 - **Additions**
+  - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
   - Added `SpineSlider` and `SpineSliderData` classes for slider constraints
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
@@ -260,6 +271,7 @@
   - Added pose classes for constraints: `SpineIkConstraintPose`, `SpinePathConstraintPose`, `SpinePhysicsConstraintPose`, `SpineSliderPose`, `SpineTransformConstraintPose`
 
 - **Breaking changes**
+  - `SpineAnimationState.get_current()` renamed to `SpineAnimationState.get_track()` in the GDScript API.
   - Updated to use new C++ pose system internally
   - `SpineBone.get_pose()` and `SpineBoneData.get_setup_pose()` now return `SpineBonePose` to match the updated spine-cpp bone pose API.
   - Removed from `SpineBone`: `update_world_transform()`, `set_to_setup_pose()`, `get_world_to_local_rotation_x()`, `get_world_to_local_rotation_y()`
@@ -459,6 +471,14 @@
 - **Breaking changes**
   - Updated to use new C# runtime with all breaking changes above
 
+## iOS
+
+- **Additions**
+  - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
+
+- **Breaking changes**
+  - `AnimationState.getCurrent(_:)` renamed to `AnimationState.getTrack(_:)` in SpineSwift.
+
 ## Dart
 
 - **Additions**
@@ -468,6 +488,7 @@
   - Added `Pose`, `Posed`, and `PosedActive` base classes for unified pose management
 
 - **Breaking changes**
+  - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.
   - The Dart runtime is now fully auto-generated from the C runtime, maintaining the full C++ type hierarchy with proper nullability annotations
   - All properties are now exposed as getters and setters instead of methods
   - API changes to match C++ naming conventions:
@@ -486,10 +507,12 @@
 ### Flutter
 
 - **Additions**
+  - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
   - Added `fromMemory` methods to `AtlasFlutter`, `SkeletonDataFlutter`, `SkeletonDrawableFlutter`, and `SpineWidget` for loading Spine data from custom sources (memory, encrypted storage, databases, custom caching, etc.)
   - Added example `load_from_memory.dart` demonstrating how to load all assets into memory and use the `fromMemory` API
 
 - **Breaking changes**
+  - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.
   - Updated to use the new auto-generated Dart runtime with all the Dart API changes above
   - Generated Flutter bindings now use `BonePose` for bone setup and unconstrained pose accessors to match spine-cpp.
   - Generated Flutter bindings now expose event setup payloads via `EventData.setupPose` instead of directly on `EventData`.

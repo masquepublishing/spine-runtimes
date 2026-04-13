@@ -26,6 +26,26 @@ void spine_clipping_attachment_set_end_slot(spine_clipping_attachment self, /*@n
 	_self->setEndSlot((SlotData *) inValue);
 }
 
+bool spine_clipping_attachment_get_convex(spine_clipping_attachment self) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	return _self->getConvex();
+}
+
+void spine_clipping_attachment_set_convex(spine_clipping_attachment self, bool convex) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	_self->setConvex(convex);
+}
+
+bool spine_clipping_attachment_get_inverse(spine_clipping_attachment self) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	return _self->getInverse();
+}
+
+void spine_clipping_attachment_set_inverse(spine_clipping_attachment self, bool inverse) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	_self->setInverse(inverse);
+}
+
 spine_color spine_clipping_attachment_get_color(spine_clipping_attachment self) {
 	ClippingAttachment *_self = (ClippingAttachment *) self;
 	return (spine_color) &_self->getColor();

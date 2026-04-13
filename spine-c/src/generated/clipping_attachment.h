@@ -20,6 +20,20 @@ SPINE_C_API spine_rtti spine_clipping_attachment_get_rtti(spine_clipping_attachm
  */
 SPINE_C_API /*@null*/ spine_slot_data spine_clipping_attachment_get_end_slot(spine_clipping_attachment self);
 SPINE_C_API void spine_clipping_attachment_set_end_slot(spine_clipping_attachment self, /*@null*/ spine_slot_data inValue);
+/**
+ * When true the clipping polygon is treated as convex for more efficient
+ * clipping. If the polygon deforms to concave then the convex hull is used.
+ * When false the clipping polygon can be concave and if so has an additional
+ * CPU cost. Inverse clipping always uses convex.
+ */
+SPINE_C_API bool spine_clipping_attachment_get_convex(spine_clipping_attachment self);
+SPINE_C_API void spine_clipping_attachment_set_convex(spine_clipping_attachment self, bool convex);
+/**
+ * When false, everything inside the clipping polygon is visible. When true,
+ * everything outside the clipping polygon is visible and clipping is convex.
+ */
+SPINE_C_API bool spine_clipping_attachment_get_inverse(spine_clipping_attachment self);
+SPINE_C_API void spine_clipping_attachment_set_inverse(spine_clipping_attachment self, bool inverse);
 SPINE_C_API spine_color spine_clipping_attachment_get_color(spine_clipping_attachment self);
 SPINE_C_API spine_attachment spine_clipping_attachment_copy(spine_clipping_attachment self);
 /**
