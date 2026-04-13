@@ -114,6 +114,7 @@ public class HeadlessTest implements ApplicationListener {
 		sb.append("]}");
 		return sb.toString();
 	}
+
 	private String atlasPath;
 	private String animationName;
 	private String animationName2;

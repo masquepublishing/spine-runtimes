@@ -2202,6 +2202,12 @@ public class SkeletonSerializer {
 			writeSlotData(obj.getEndSlot());
 		}
 
+		json.writeName("inverse");
+		json.writeValue(obj.getInverse());
+
+		json.writeName("convex");
+		json.writeValue(obj.getConvex());
+
 		json.writeName("color");
 		writeColor(obj.getColor());
 
