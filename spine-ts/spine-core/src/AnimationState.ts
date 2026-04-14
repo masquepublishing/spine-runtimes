@@ -1059,13 +1059,10 @@ export class TrackEntry {
 	 * {@link animationEnd}. When `trackTime` is 0, `animationTime` is equal to the
 	 * `animationStart` time. */
 	getAnimationTime () {
-		if (this.loop) {
-			const duration = this.animationEnd - this.animationStart;
-			if (duration === 0) return this.animationStart;
-			return (this.trackTime % duration) + this.animationStart;
-		}
-		const animationTime = this.trackTime + this.animationStart;
-		return this.animationEnd >= this.animation!.duration ? this.animationEnd : Math.min(animationTime, this.animationEnd);
+		if (!this.loop) return Math.min(this.trackTime + this.animationStart, this.animationEnd);
+		const duration = this.animationEnd - this.animationStart;
+		if (duration === 0) return this.animationStart;
+		return (this.trackTime % duration) + this.animationStart;
 	}
 
 	setAnimationLast (animationLast: number) {
