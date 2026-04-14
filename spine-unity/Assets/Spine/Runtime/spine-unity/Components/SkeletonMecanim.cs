@@ -35,6 +35,10 @@
 #define BUILT_IN_SPRITE_MASK_COMPONENT
 #endif
 
+#if UNITY_6000_3_OR_NEWER
+#define USES_ENTITY_ID
+#endif
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -842,8 +846,13 @@ namespace Spine.Unity {
 
 			class AnimationClipEqualityComparer : IEqualityComparer<AnimationClip> {
 				internal static readonly IEqualityComparer<AnimationClip> Instance = new AnimationClipEqualityComparer();
+#if USES_ENTITY_ID
+				public bool Equals (AnimationClip x, AnimationClip y) { return x.GetEntityId() == y.GetEntityId(); }
+				public int GetHashCode (AnimationClip o) { return o.GetHashCode(); }
+#else
 				public bool Equals (AnimationClip x, AnimationClip y) { return x.GetInstanceID() == y.GetInstanceID(); }
 				public int GetHashCode (AnimationClip o) { return o.GetInstanceID(); }
+#endif
 			}
 
 			class IntEqualityComparer : IEqualityComparer<int> {

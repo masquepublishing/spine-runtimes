@@ -487,7 +487,7 @@ namespace Spine.Unity.Editor {
 			foreach (SkeletonGraphic skeletonGraphic in skeletonGraphicObjects) {
 
 				if (skeletonGraphic.skeletonDataAsset == null) {
-					int skeletonGraphicID = skeletonGraphic.GetInstanceID();
+					var skeletonGraphicID = skeletonGraphic.GetEntityOrInstanceId();
 					if (SpineEditorUtilities.DataReloadHandler.savedSkeletonDataAssetAtSKeletonGraphicID.ContainsKey(skeletonGraphicID)) {
 						string assetPath = SpineEditorUtilities.DataReloadHandler.savedSkeletonDataAssetAtSKeletonGraphicID[skeletonGraphicID];
 						skeletonGraphic.skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>(assetPath);
@@ -590,7 +590,11 @@ namespace Spine.Unity.Editor {
 							for (int i = 0; i < skeletonDataAtlasAssets.Length; i++) {
 								if (!ReferenceEquals(null, skeletonDataAtlasAssets[i]) &&
 									skeletonDataAtlasAssets[i].Equals(null) &&
+#if USES_ENTITY_ID
+									skeletonDataAtlasAssets[i].GetEntityId().IsValid()
+#else
 									skeletonDataAtlasAssets[i].GetInstanceID() != 0
+#endif
 								) {
 #if USES_ENTITY_ID
 									skeletonDataAtlasAssets[i] = EditorUtility.EntityIdToObject(skeletonDataAtlasAssets[i].GetEntityId()) as AtlasAssetBase;
@@ -624,7 +628,7 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		#region Import Atlases
+#region Import Atlases
 		static List<AtlasAssetBase> FindAtlasesAtPath (string path) {
 			List<AtlasAssetBase> arr = new List<AtlasAssetBase>();
 			DirectoryInfo dir = new DirectoryInfo(path);
@@ -1089,9 +1093,9 @@ namespace Spine.Unity.Editor {
 
 			MaterialChecks.EnablePMATextureAtMaterial(material, isUsingPMAWorkflow);
 		}
-		#endregion
+#endregion
 
-		#region Import SkeletonData (json or binary)
+#region Import SkeletonData (json or binary)
 		internal static string GetSkeletonDataAssetFilePath (TextAsset spineJson) {
 			string primaryName = Path.GetFileNameWithoutExtension(spineJson.name);
 			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spineJson)).Replace('\\', '/');
@@ -1147,9 +1151,9 @@ namespace Spine.Unity.Editor {
 				return null;
 			}
 		}
-		#endregion
+#endregion
 
-		#region Spine Skeleton Data File Validation
+#region Spine Skeleton Data File Validation
 		public static bool CheckForValidSkeletonData (string skeletonJSONPath) {
 			string dir = Path.GetDirectoryName(skeletonJSONPath).Replace('\\', '/');
 			TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonJSONPath);
@@ -1172,9 +1176,9 @@ namespace Spine.Unity.Editor {
 			compatibilityProblemInfo = SkeletonDataCompatibility.GetCompatibilityProblemInfo(fileVersion);
 			return isSpineSkeletonData;
 		}
-		#endregion
+#endregion
 
-		#region Dialogs
+#region Dialogs
 		public static void SkeletonImportDialog (string skeletonPath, List<AtlasAssetBase> localAtlases, List<string> requiredPaths, ref bool abortSkeletonImport) {
 			bool resolved = false;
 			while (!resolved) {
@@ -1359,7 +1363,7 @@ namespace Spine.Unity.Editor {
 			}
 			return (AtlasAssetBase)obj;
 		}
-		#endregion
+#endregion
 
 		public static string GetPathSafeName (string name) {
 			foreach (char c in System.IO.Path.GetInvalidFileNameChars()) { // Doesn't handle more obscure file name limitations.
@@ -1534,7 +1538,7 @@ namespace Spine.Unity.Editor {
 			return gameObject.AddComponent(type);
 		}
 
-		#region SkeletonMecanim
+#region SkeletonMecanim
 #if SPINE_SKELETONMECANIM
 		public static SkeletonMecanim InstantiateSkeletonMecanim (SkeletonDataAsset skeletonDataAsset, string skinName) {
 			return InstantiateSkeletonMecanim(skeletonDataAsset, skeletonDataAsset.GetSkeletonData(true).FindSkin(skinName));
@@ -1585,9 +1589,9 @@ namespace Spine.Unity.Editor {
 			return newSkeletonMecanim;
 		}
 #endif
-		#endregion SkeletonMecanim
+#endregion SkeletonMecanim
 
-		#region SkeletonGraphic
+#region SkeletonGraphic
 		public static Component SpawnSkeletonGraphicFromDrop (SkeletonDataAsset data) {
 			return InstantiateSkeletonGraphic(data);
 		}
@@ -1635,6 +1639,6 @@ namespace Spine.Unity.Editor {
 #endif
 			return go;
 		}
-		#endregion SkeletonGraphic
+#endregion SkeletonGraphic
 	}
 }
