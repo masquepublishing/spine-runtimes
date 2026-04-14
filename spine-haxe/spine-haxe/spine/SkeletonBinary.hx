@@ -725,6 +725,8 @@ class SkeletonBinary {
 				if (clip == null)
 					return null;
 				clip.endSlot = skeletonData.slots[endSlotIndex];
+				clip.convex = (flags & 32) != 0;
+				clip.inverse = (flags & 64) != 0;
 				clip.worldVerticesLength = vertices.length;
 				clip.vertices = vertices.vertices;
 				if (vertices.bones.length > 0)

@@ -673,6 +673,8 @@ class SkeletonJson {
 						throw new SpineException("Clipping end slot not found: " + end);
 					clip.endSlot = slot;
 				}
+				clip.convex = getBoolean(map, "convex", false);
+				clip.inverse = getBoolean(map, "inverse", false);
 				readVertices(map, clip, getInt(map, "vertexCount", 0) << 1);
 				color = Reflect.getProperty(map, "color");
 				if (color != null) {
