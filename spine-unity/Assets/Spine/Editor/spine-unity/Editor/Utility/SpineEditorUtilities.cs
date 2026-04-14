@@ -81,7 +81,7 @@ namespace Spine.Unity.Editor {
 #if USES_ENTITY_ID
 	using EntityIdType = EntityId;
 #else
-	using EntityIdType = int;
+	using EntityIdType = System.Int32;
 #endif
 
 	// Analysis disable once ConvertToStaticType
