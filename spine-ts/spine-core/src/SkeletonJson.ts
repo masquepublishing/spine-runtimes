@@ -610,6 +610,9 @@ export class SkeletonJson {
 				const end = getValue(map, "end", null);
 				if (end) clip.endSlot = skeletonData.findSlot(end);
 
+				clip.convex = getValue(map, "convex", false);
+				clip.inverse = getValue(map, "inverse", false);
+
 				const vertexCount = map.vertexCount;
 				this.readVertices(map, clip, vertexCount << 1);
 
