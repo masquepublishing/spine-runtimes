@@ -184,13 +184,10 @@ void TrackEntry::setAnimationLast(float inValue) {
 }
 
 float TrackEntry::getAnimationTime() {
-	if (_loop) {
-		float duration = _animationEnd - _animationStart;
-		if (duration == 0) return _animationStart;
-		return MathUtil::fmod(_trackTime, duration) + _animationStart;
-	}
-	float animationTime = _trackTime + _animationStart;
-	return _animationEnd >= _animation->getDuration() ? animationTime : MathUtil::min(animationTime, _animationEnd);
+	if (!_loop) return MathUtil::min(_trackTime + _animationStart, _animationEnd);
+	float duration = _animationEnd - _animationStart;
+	if (duration == 0) return _animationStart;
+	return MathUtil::fmod(_trackTime, duration) + _animationStart;
 }
 
 float TrackEntry::getTimeScale() {

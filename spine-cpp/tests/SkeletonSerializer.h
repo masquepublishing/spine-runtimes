@@ -2256,6 +2256,12 @@ namespace spine {
 				writeSlotData(obj->getEndSlot());
 			}
 
+			_json.writeName("inverse");
+			_json.writeValue(obj->getInverse());
+
+			_json.writeName("convex");
+			_json.writeValue(obj->getConvex());
+
 			_json.writeName("color");
 			writeColor(obj->getColor());
 

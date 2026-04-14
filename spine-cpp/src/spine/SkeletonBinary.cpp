@@ -730,6 +730,8 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			ClippingAttachment *clip = _attachmentLoader->newClippingAttachment(skin, name);
 			if (!clip) return NULL;
 			clip->setEndSlot(skeletonData._slots[endSlotIndex]);
+			clip->setConvex((flags & 32) != 0);
+			clip->setInverse((flags & 64) != 0);
 			clip->setWorldVerticesLength(verticesLength);
 			clip->setVertices(vertices);
 			clip->setBones(bones);

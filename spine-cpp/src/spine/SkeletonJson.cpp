@@ -733,6 +733,9 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 				clip->setEndSlot(slot);
 			}
 
+			clip->setConvex(Json::getBoolean(map, "convex", false));
+			clip->setInverse(Json::getBoolean(map, "inverse", false));
+
 			readVertices(map, clip, Json::getInt(map, "vertexCount", 0) << 1);
 
 			const char *color = Json::getString(map, "color", NULL);
