@@ -222,14 +222,12 @@ class TrackEntry implements Poolable {
 	 * TrackEntry.getAnimationEnd(). When trackTime is 0, animationTime is equal to the
 	 * animationStart time. */
 	public function getAnimationTime():Float {
-		if (loop) {
-			var duration:Float = animationEnd - animationStart;
-			if (duration == 0)
-				return animationStart;
-			return (trackTime % duration) + animationStart;
-		}
-		var animationTime = trackTime + animationStart;
-		return animationEnd >= animation.duration ? animationEnd : Math.min(animationTime, animationEnd);
+		if (!loop)
+			return Math.min(trackTime + animationStart, animationEnd);
+		var duration:Float = animationEnd - animationStart;
+		if (duration == 0)
+			return animationStart;
+		return (trackTime % duration) + animationStart;
 	}
 
 	/** If this track entry is non-looping, the track time in seconds when TrackEntry.getAnimationEnd() is reached, or the current
