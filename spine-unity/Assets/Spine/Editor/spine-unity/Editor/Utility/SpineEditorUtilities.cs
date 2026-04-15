@@ -62,8 +62,8 @@
 #define AUTO_UPGRADE_TO_43_COMPONENTS
 #endif
 
-#if UNITY_6000_3_OR_NEWER
-#define USES_ENTITY_ID
+#if UNITY_6000_4_OR_NEWER
+#define HIERARCHY_WINDOW_ENTITY_ID_CALLBACK
 #endif
 
 using System.Collections.Generic;
@@ -78,7 +78,7 @@ using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using EventType = UnityEngine.EventType;
-#if USES_ENTITY_ID
+#if HIERARCHY_WINDOW_ENTITY_ID_CALLBACK
 	using EntityIdType = EntityId;
 #else
 	using EntityIdType = System.Int32;
@@ -222,7 +222,7 @@ namespace Spine.Unity.Editor {
 			SceneView.onSceneGUIDelegate += DragAndDropInstantiation.SceneViewDragAndDrop;
 #endif
 
-#if USES_ENTITY_ID
+#if HIERARCHY_WINDOW_ENTITY_ID_CALLBACK
 			DragAndDrop.RemoveDropHandlerV2(HierarchyHandler.HandleDragAndDrop);
 			DragAndDrop.AddDropHandlerV2(HierarchyHandler.HandleDragAndDrop);
 #elif UNITY_2021_2_OR_NEWER
@@ -565,7 +565,7 @@ namespace Spine.Unity.Editor {
 #else
 				EditorApplication.hierarchyWindowChanged -= IconsOnChanged;
 #endif
-#if USES_ENTITY_ID
+#if HIERARCHY_WINDOW_ENTITY_ID_CALLBACK
 				EditorApplication.hierarchyWindowItemByEntityIdOnGUI -= IconsOnGUI;
 #else
 				EditorApplication.hierarchyWindowItemOnGUI -= IconsOnGUI;
@@ -576,7 +576,7 @@ namespace Spine.Unity.Editor {
 #else
 					EditorApplication.hierarchyWindowChanged += IconsOnChanged;
 #endif
-#if USES_ENTITY_ID
+#if HIERARCHY_WINDOW_ENTITY_ID_CALLBACK
 					EditorApplication.hierarchyWindowItemByEntityIdOnGUI += IconsOnGUI;
 #else
 					EditorApplication.hierarchyWindowItemOnGUI += IconsOnGUI;
@@ -650,7 +650,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-#if USES_ENTITY_ID
+#if HIERARCHY_WINDOW_ENTITY_ID_CALLBACK
 			internal static DragAndDropVisualMode HandleDragAndDrop (EntityId dropTargetEntityId, HierarchyDropFlags dropMode, Transform parentForDraggedObjects, bool perform) {
 				SkeletonDataAsset skeletonDataAsset = DragAndDrop.objectReferences.Length == 0 ? null :
 					DragAndDrop.objectReferences[0] as SkeletonDataAsset;
@@ -848,7 +848,7 @@ namespace Spine.Unity.Editor {
 
 	public static class EntityIdExtensions {
 		internal static EntityIdType GetEntityOrInstanceId (this GameObject gameObject) {
-#if USES_ENTITY_ID
+#if HIERARCHY_WINDOW_ENTITY_ID_CALLBACK
 			return gameObject.GetEntityId();
 #else
 			return gameObject.GetInstanceID();
@@ -856,7 +856,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		internal static EntityIdType GetEntityOrInstanceId (this Component component) {
-#if USES_ENTITY_ID
+#if HIERARCHY_WINDOW_ENTITY_ID_CALLBACK
 			return component.GetEntityId();
 #else
 			return component.GetInstanceID();

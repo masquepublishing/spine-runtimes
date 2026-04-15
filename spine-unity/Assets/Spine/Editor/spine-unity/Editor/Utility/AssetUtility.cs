@@ -487,7 +487,11 @@ namespace Spine.Unity.Editor {
 			foreach (SkeletonGraphic skeletonGraphic in skeletonGraphicObjects) {
 
 				if (skeletonGraphic.skeletonDataAsset == null) {
-					var skeletonGraphicID = skeletonGraphic.GetEntityOrInstanceId();
+#if USES_ENTITY_ID
+					var skeletonGraphicID = skeletonGraphic.GetEntityId();
+#else
+					var skeletonGraphicID = skeletonGraphic.GetInstanceID();
+#endif
 					if (SpineEditorUtilities.DataReloadHandler.savedSkeletonDataAssetAtSKeletonGraphicID.ContainsKey(skeletonGraphicID)) {
 						string assetPath = SpineEditorUtilities.DataReloadHandler.savedSkeletonDataAssetAtSKeletonGraphicID[skeletonGraphicID];
 						skeletonGraphic.skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>(assetPath);
