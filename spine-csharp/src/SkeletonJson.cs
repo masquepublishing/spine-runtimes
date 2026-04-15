@@ -682,6 +682,9 @@ namespace Spine {
 					clip.EndSlot = slot;
 				}
 
+				clip.Convex = GetBoolean(map, "convex", false);
+				clip.Inverse = GetBoolean(map, "inverse", false);
+
 				ReadVertices(map, clip, GetInt(map, "vertexCount", 0) << 1);
 
 				//string color = GetString(map, "color", null);

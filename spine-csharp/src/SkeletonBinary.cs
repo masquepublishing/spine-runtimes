@@ -684,6 +684,8 @@ namespace Spine {
 				ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
 				if (clip == null) return null;
 				clip.EndSlot = skeletonData.slots.Items[endSlotIndex];
+				clip.Convex = (flags & 32) != 0;
+				clip.Inverse = (flags & 64) != 0;
 				clip.worldVerticesLength = vertices.length;
 				clip.vertices = vertices.vertices;
 				clip.bones = vertices.bones;
