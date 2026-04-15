@@ -1098,13 +1098,10 @@ namespace Spine {
 		/// </summary>
 		public float AnimationTime {
 			get {
-				if (loop) {
-					float duration = animationEnd - animationStart;
-					if (duration == 0) return animationStart;
-					return (trackTime % duration) + animationStart;
-				}
-				float animationTime = trackTime + animationStart;
-				return animationEnd >= animation.duration ? animationTime : Math.Min(animationTime, animationEnd);
+				if (!loop) return Math.Min(trackTime + animationStart, animationEnd);
+				float duration = animationEnd - animationStart;
+				if (duration == 0) return animationStart;
+				return (trackTime % duration) + animationStart;
 			}
 		}
 
