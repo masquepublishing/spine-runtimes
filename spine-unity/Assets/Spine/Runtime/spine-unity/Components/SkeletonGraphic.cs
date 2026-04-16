@@ -1167,7 +1167,7 @@ namespace Spine.Unity {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
 					Texture originalTexture = instructionItems[i].material.mainTexture;
 
-					if (hasMaterialOrTextureOverride) {
+					if (hasMaterialOrTextureOverride && originalTexture != null) {
 						Material replacementMaterial;
 						Texture replacementTexture;
 						if (customMaterialOverride.TryGetValue(originalTexture, out replacementMaterial))
