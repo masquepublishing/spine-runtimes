@@ -2171,6 +2171,13 @@ public class SkeletonSerializer {
 			writeAttachment(obj.getTimelineAttachment());
 		}
 
+		json.writeName("timelineSlots");
+		json.writeArrayStart();
+		for (int item : obj.getTimelineSlots()) {
+			json.writeValue(item);
+		}
+		json.writeArrayEnd();
+
 		json.writeName("id");
 		json.writeValue(obj.getId());
 
@@ -2238,6 +2245,13 @@ public class SkeletonSerializer {
 		} else {
 			writeAttachment(obj.getTimelineAttachment());
 		}
+
+		json.writeName("timelineSlots");
+		json.writeArrayStart();
+		for (int item : obj.getTimelineSlots()) {
+			json.writeValue(item);
+		}
+		json.writeArrayEnd();
 
 		json.writeName("id");
 		json.writeValue(obj.getId());
@@ -2540,11 +2554,11 @@ public class SkeletonSerializer {
 		json.writeName("sequence");
 		writeSequence(obj.getSequence());
 
-		json.writeName("parentMesh");
-		if (obj.getParentMesh() == null) {
+		json.writeName("sourceMesh");
+		if (obj.getSourceMesh() == null) {
 			json.writeNull();
 		} else {
-			writeMeshAttachment(obj.getParentMesh());
+			writeMeshAttachment(obj.getSourceMesh());
 		}
 
 		json.writeName("bones");
@@ -2574,6 +2588,13 @@ public class SkeletonSerializer {
 		} else {
 			writeAttachment(obj.getTimelineAttachment());
 		}
+
+		json.writeName("timelineSlots");
+		json.writeArrayStart();
+		for (int item : obj.getTimelineSlots()) {
+			json.writeValue(item);
+		}
+		json.writeArrayEnd();
 
 		json.writeName("id");
 		json.writeValue(obj.getId());
@@ -2641,6 +2662,13 @@ public class SkeletonSerializer {
 		} else {
 			writeAttachment(obj.getTimelineAttachment());
 		}
+
+		json.writeName("timelineSlots");
+		json.writeArrayStart();
+		for (int item : obj.getTimelineSlots()) {
+			json.writeValue(item);
+		}
+		json.writeArrayEnd();
 
 		json.writeName("id");
 		json.writeValue(obj.getId());

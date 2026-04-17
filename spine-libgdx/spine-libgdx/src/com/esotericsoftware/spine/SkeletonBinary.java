@@ -474,10 +474,10 @@ public class SkeletonBinary extends SkeletonLoader {
 			for (int i = 0; i < n; i++) {
 				LinkedMesh linkedMesh = items[i];
 				Skin skin = skeletonData.skins.items[linkedMesh.skinIndex];
-				Attachment parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-				if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
-				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh);
-				linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
+				Attachment source = skin.getAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+				if (source == null) throw new SerializationException("Source mesh not found: " + linkedMesh.source);
+				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)source : linkedMesh.mesh);
+				linkedMesh.mesh.setSourceMesh((MeshAttachment)source);
 				linkedMesh.mesh.updateSequence();
 			}
 			linkedMeshes.clear();
@@ -610,6 +610,14 @@ public class SkeletonBinary extends SkeletonLoader {
 			float[] uvs = readFloatArray(input, vertices.length, 1);
 			short[] triangles = readShortArray(input, (vertices.length - hullLength - 2) * 3);
 
+			int slotCount = input.readInt(true);
+			int[] timelineSlots = null;
+			if (slotCount > 0) {
+				timelineSlots = new int[slotCount];
+				for (int i = 0; i < slotCount; i++)
+					timelineSlots[i] = input.readInt(true);
+			}
+
 			short[] edges = null;
 			float width = 0, height = 0;
 			if (nonessential) {
@@ -628,6 +636,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			mesh.setWorldVerticesLength(vertices.length);
 			mesh.setRegionUVs(uvs);
 			mesh.setTriangles(triangles);
+			if (timelineSlots != null) mesh.setTimelineSlots(timelineSlots);
 			if (nonessential) {
 				mesh.setEdges(edges);
 				mesh.setWidth(width * scale);
@@ -641,8 +650,10 @@ public class SkeletonBinary extends SkeletonLoader {
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
 			Sequence sequence = readSequence(input, (flags & 64) != 0);
 			boolean inheritTimelines = (flags & 128) != 0;
+			int sourceIndex = input.readInt(true);
 			int skinIndex = input.readInt(true);
-			String parent = input.readStringRef();
+			String source = input.readStringRef();
+
 			float width = 0, height = 0;
 			if (nonessential) {
 				width = input.readFloat();
@@ -657,16 +668,14 @@ public class SkeletonBinary extends SkeletonLoader {
 				mesh.setWidth(width * scale);
 				mesh.setHeight(height * scale);
 			}
-			linkedMeshes.add(new LinkedMesh(mesh, skinIndex, slotIndex, parent, inheritTimelines));
+			linkedMeshes.add(new LinkedMesh(mesh, skinIndex, slotIndex, sourceIndex, source, inheritTimelines));
 			yield mesh;
 		}
 		case path -> {
 			boolean closed = (flags & 16) != 0;
 			boolean constantSpeed = (flags & 32) != 0;
 			Vertices vertices = readVertices(input, (flags & 64) != 0);
-			var lengths = new float[vertices.length / 6];
-			for (int i = 0, n = lengths.length; i < n; i++)
-				lengths[i] = input.readFloat() * scale;
+			float[] lengths = readFloatArray(input, vertices.length / 6, scale);
 			int color = nonessential ? input.readInt() : 0;
 
 			PathAttachment path = attachmentLoader.newPathAttachment(skin, name);
@@ -1350,16 +1359,18 @@ public class SkeletonBinary extends SkeletonLoader {
 	}
 
 	static class LinkedMesh {
-		String parent;
-		int skinIndex, slotIndex;
+		String source;
+		int skinIndex, slotIndex, sourceIndex;
 		MeshAttachment mesh;
 		boolean inheritTimelines;
 
-		public LinkedMesh (MeshAttachment mesh, int skinIndex, int slotIndex, String parent, boolean inheritTimelines) {
+		public LinkedMesh (MeshAttachment mesh, int skinIndex, int slotIndex, int sourceIndex, String source,
+			boolean inheritTimelines) {
 			this.mesh = mesh;
 			this.skinIndex = skinIndex;
 			this.slotIndex = slotIndex;
-			this.parent = parent;
+			this.sourceIndex = sourceIndex;
+			this.source = source;
 			this.inheritTimelines = inheritTimelines;
 		}
 	}

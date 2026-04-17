@@ -490,11 +490,20 @@ public class SkeletonJson extends SkeletonLoader {
 				LinkedMesh linkedMesh = items[i];
 				Skin skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
 				if (skin == null) throw new SerializationException("Skin not found: " + linkedMesh.skin);
-				Attachment parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-				if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
-				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh);
-				linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
+				Attachment source = skin.getAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+				if (source == null) throw new SerializationException("Source mesh not found: " + linkedMesh.source);
+				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)source : linkedMesh.mesh);
+				linkedMesh.mesh.setSourceMesh((MeshAttachment)source);
 				linkedMesh.mesh.updateSequence();
+				outer:
+				if (linkedMesh.inheritTimelines && linkedMesh.slotIndex != linkedMesh.sourceIndex) {
+					int[] slots = source.getTimelineSlots();
+					for (int existing : slots)
+						if (existing == linkedMesh.slotIndex) break outer;
+					int[] newSlots = Arrays.copyOf(slots, slots.length + 1);
+					newSlots[slots.length] = linkedMesh.slotIndex;
+					source.setTimelineSlots(newSlots);
+				}
 			}
 			linkedMeshes.clear();
 
@@ -612,10 +621,17 @@ public class SkeletonJson extends SkeletonLoader {
 			mesh.setWidth(map.getFloat("width", 0) * scale);
 			mesh.setHeight(map.getFloat("height", 0) * scale);
 
-			String parent = map.getString("parent", null);
-			if (parent != null) {
-				linkedMeshes
-					.add(new LinkedMesh(mesh, map.getString("skin", null), slotIndex, parent, map.getBoolean("timelines", true)));
+			String source = map.getString("source", null);
+			if (source != null) {
+				int sourceIndex = slotIndex;
+				String slot = map.getString("slot", null);
+				if (slot != null) {
+					SlotData sourceSlot = skeletonData.findSlot(slot);
+					if (sourceSlot == null) throw new SerializationException("Source mesh slot not found: " + slot);
+					sourceIndex = sourceSlot.index;
+				}
+				linkedMeshes.add(new LinkedMesh(mesh, map.getString("skin", null), slotIndex, sourceIndex, source,
+					map.getBoolean("timelines", true)));
 				yield mesh;
 			}
 
@@ -1388,16 +1404,18 @@ public class SkeletonJson extends SkeletonLoader {
 	}
 
 	static class LinkedMesh {
-		String parent, skin;
-		int slotIndex;
+		String source, skin;
+		int slotIndex, sourceIndex;
 		MeshAttachment mesh;
 		boolean inheritTimelines;
 
-		public LinkedMesh (MeshAttachment mesh, String skin, int slotIndex, String parent, boolean inheritTimelines) {
+		public LinkedMesh (MeshAttachment mesh, String skin, int slotIndex, int sourceIndex, String source,
+			boolean inheritTimelines) {
 			this.mesh = mesh;
 			this.skin = skin;
 			this.slotIndex = slotIndex;
-			this.parent = parent;
+			this.sourceIndex = sourceIndex;
+			this.source = source;
 			this.inheritTimelines = inheritTimelines;
 		}
 	}
