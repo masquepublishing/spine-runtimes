@@ -1350,8 +1350,7 @@ public class Animation {
 		private final float[][] vertices;
 
 		public DeformTimeline (int frameCount, int bezierCount, int slotIndex, VertexAttachment attachment) {
-			super(frameCount, bezierCount, slotIndex,
-				(long)Property.deform.ordinal() << 53 | (long)slotIndex << 32 | +attachment.getId());
+			super(frameCount, bezierCount, (long)Property.deform.ordinal() << 53 | (long)slotIndex << 32 | +attachment.getId());
 			this.slotIndex = slotIndex;
 			this.attachment = attachment;
 			vertices = new float[frameCount][];

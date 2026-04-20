@@ -476,7 +476,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				Skin skin = skeletonData.skins.items[linkedMesh.skinIndex];
 				Attachment source = skin.getAttachment(linkedMesh.sourceIndex, linkedMesh.source);
 				if (source == null) throw new SerializationException("Source mesh not found: " + linkedMesh.source);
-				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)source : linkedMesh.mesh);
+				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? source : linkedMesh.mesh);
 				linkedMesh.mesh.setSourceMesh((MeshAttachment)source);
 				linkedMesh.mesh.updateSequence();
 			}
