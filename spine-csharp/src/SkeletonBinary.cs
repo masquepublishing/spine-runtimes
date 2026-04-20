@@ -457,10 +457,10 @@ namespace Spine {
 				for (int i = 0; i < n; i++) {
 					LinkedMesh linkedMesh = linkedMeshes[i];
 					Skin skin = skeletonData.skins.Items[linkedMesh.skinIndex];
-					Attachment parent = skin.GetAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-					if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
-					linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh;
-					linkedMesh.mesh.ParentMesh = (MeshAttachment)parent;
+					Attachment source = skin.GetAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+					if (source == null) throw new Exception("Source mesh not found: " + linkedMesh.source);
+					linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? source : linkedMesh.mesh;
+					linkedMesh.mesh.SourceMesh = (MeshAttachment)source;
 					linkedMesh.mesh.UpdateSequence();
 				}
 				linkedMeshes.Clear();
@@ -592,6 +592,14 @@ namespace Spine {
 				float[] uvs = ReadFloatArray(input, vertices.length, 1);
 				int[] triangles = ReadShortArray(input, (vertices.length - hullLength - 2) * 3);
 
+				int slotCount = input.ReadInt(true);
+				int[] timelineSlots = null;
+				if (slotCount > 0) {
+					timelineSlots = new int[slotCount];
+					for (int i = 0; i < slotCount; i++)
+						timelineSlots[i] = input.ReadInt(true);
+				}
+
 				int[] edges = null;
 				float width = 0, height = 0;
 				if (nonessential) {
@@ -610,6 +618,7 @@ namespace Spine {
 				mesh.WorldVerticesLength = vertices.length;
 				mesh.regionUVs = uvs;
 				mesh.triangles = triangles;
+				if (timelineSlots != null) mesh.TimelineSlots = timelineSlots;
 				if (nonessential) {
 					mesh.Edges = edges;
 					mesh.Width = width * scale;
@@ -623,8 +632,9 @@ namespace Spine {
 				uint color = (flags & 32) != 0 ? (uint)input.ReadInt() : 0xffffffff;
 				Sequence sequence = ReadSequence(input, (flags & 64) != 0);
 				bool inheritTimelines = (flags & 128) != 0;
+				int sourceIndex = input.ReadInt(true);
 				int skinIndex = input.ReadInt(true);
-				string parent = input.ReadStringRef();
+				string source = input.ReadStringRef();
 				float width = 0, height = 0;
 				if (nonessential) {
 					width = input.ReadFloat();
@@ -639,16 +649,14 @@ namespace Spine {
 					mesh.Width = width * scale;
 					mesh.Height = height * scale;
 				}
-				linkedMeshes.Add(new LinkedMesh(mesh, skinIndex, slotIndex, parent, inheritTimelines));
+				linkedMeshes.Add(new LinkedMesh(mesh, skinIndex, slotIndex, sourceIndex, source, inheritTimelines));
 				return mesh;
 			}
 			case AttachmentType.Path: {
 				bool closed = (flags & 16) != 0;
 				bool constantSpeed = (flags & 32) != 0;
 				Vertices vertices = ReadVertices(input, (flags & 64) != 0);
-				var lengths = new float[vertices.length / 6];
-				for (int i = 0, n = lengths.Length; i < n; i++)
-					lengths[i] = input.ReadFloat() * scale;
+				float[] lengths = ReadFloatArray(input, vertices.length / 6, scale);
 				if (nonessential) input.ReadInt(); // discard, int color = nonessential ? input.ReadInt() : 0;
 
 				PathAttachment path = attachmentLoader.NewPathAttachment(skin, name);
@@ -1512,16 +1520,18 @@ namespace Spine {
 		}
 
 		private class LinkedMesh {
-			internal string parent;
-			internal int skinIndex, slotIndex;
+			internal string source;
+			internal int skinIndex, slotIndex, sourceIndex;
 			internal MeshAttachment mesh;
 			internal bool inheritTimelines;
 
-			public LinkedMesh (MeshAttachment mesh, int skinIndex, int slotIndex, string parent, bool inheritTimelines) {
+			public LinkedMesh (MeshAttachment mesh, int skinIndex, int slotIndex, int sourceIndex, string source,
+				bool inheritTimelines) {
 				this.mesh = mesh;
 				this.skinIndex = skinIndex;
 				this.slotIndex = slotIndex;
-				this.parent = parent;
+				this.sourceIndex = sourceIndex;
+				this.source = source;
 				this.inheritTimelines = inheritTimelines;
 			}
 		}
