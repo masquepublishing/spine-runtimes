@@ -30,7 +30,6 @@
 import { AlphaTimeline, Animation, AttachmentTimeline, type BoneTimeline2, type CurveTimeline, CurveTimeline1, DeformTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, EventTimeline, IkConstraintTimeline, InheritTimeline, PathConstraintMixTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintMixTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintWindTimeline, RGB2Timeline, RGBA2Timeline, RGBATimeline, RGBTimeline, RotateTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, SequenceTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, SliderMixTimeline, SliderTimeline, type Timeline, TransformConstraintTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline } from "./Animation.js";
 import type { Attachment, VertexAttachment } from "./attachments/Attachment.js";
 import type { AttachmentLoader } from "./attachments/AttachmentLoader.js";
-import type { HasSequence } from "./attachments/HasSequence.js";
 import type { MeshAttachment } from "./attachments/MeshAttachment.js";
 import { Sequence, SequenceModeValues } from "./attachments/Sequence.js";
 import { BoneData } from "./BoneData.js";
@@ -370,11 +369,11 @@ export class SkeletonBinary {
 		for (let i = 0; i < n; i++) {
 			const linkedMesh = this.linkedMeshes[i];
 			const skin = skeletonData.skins[linkedMesh.skinIndex];
-			if (!linkedMesh.parent) throw new Error("Linked mesh parent must not be null");
-			const parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-			if (!parent) throw new Error(`Parent mesh not found: ${linkedMesh.parent}`);
-			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? parent as VertexAttachment : linkedMesh.mesh;
-			linkedMesh.mesh.setParentMesh(parent as MeshAttachment);
+			if (!linkedMesh.source) throw new Error("Linked mesh parent must not be null");
+			const source = skin.getAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+			if (!source) throw new Error(`Source mesh not found: ${linkedMesh.source}`);
+			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimelines ? source : linkedMesh.mesh;
+			linkedMesh.mesh.setSourceMesh(source as MeshAttachment);
 			linkedMesh.mesh.updateSequence();
 		}
 		this.linkedMeshes.length = 0;
@@ -510,6 +509,15 @@ export class SkeletonBinary {
 				const vertices = this.readVertices(input, (flags & 128) !== 0);
 				const uvs = this.readFloatArray(input, vertices.length, 1);
 				const triangles = this.readShortArray(input, (vertices.length - hullLength - 2) * 3);
+
+				const slotCount = input.readInt(true);
+				let timelineSlots = null;
+				if (slotCount > 0) {
+					timelineSlots = [];
+					for (let i = 0; i < slotCount; i++)
+						timelineSlots[i] = input.readInt(true);
+				}
+
 				let edges: number[] = [];
 				let width = 0, height = 0;
 				if (nonessential) {
@@ -529,6 +537,7 @@ export class SkeletonBinary {
 				mesh.worldVerticesLength = vertices.length;
 				mesh.regionUVs = uvs;
 				mesh.triangles = triangles;
+				if (timelineSlots) mesh.timelineSlots = timelineSlots;
 				if (nonessential) {
 					mesh.edges = edges;
 					mesh.width = width * scale;
@@ -543,8 +552,9 @@ export class SkeletonBinary {
 				const color = (flags & 32) !== 0 ? input.readInt32() : 0xffffffff;
 				const sequence = this.readSequence(input, (flags & 64) !== 0);
 				const inheritTimelines = (flags & 128) !== 0;
+				const sourceIndex = input.readInt(true);
 				const skinIndex = input.readInt(true);
-				const parent = input.readStringRef();
+				const source = input.readStringRef();
 				let width = 0, height = 0;
 				if (nonessential) {
 					width = input.readFloat();
@@ -559,7 +569,7 @@ export class SkeletonBinary {
 					mesh.width = width * scale;
 					mesh.height = height * scale;
 				}
-				this.linkedMeshes.push(new LinkedMesh(mesh, skinIndex, slotIndex, parent, inheritTimelines));
+				this.linkedMeshes.push(new LinkedMesh(mesh, skinIndex, slotIndex, sourceIndex, source, inheritTimelines));
 				return mesh;
 			}
 			case AttachmentType.Path: {
@@ -567,9 +577,7 @@ export class SkeletonBinary {
 				const constantSpeed = (flags & 32) !== 0;
 				const vertices = this.readVertices(input, (flags & 64) !== 0);
 
-				const lengths = Utils.newArray(vertices.length / 6, 0);
-				for (let i = 0, n = lengths.length; i < n; i++)
-					lengths[i] = input.readFloat() * scale;
+				const lengths = this.readFloatArray(input, vertices.length / 6, scale);
 				const color = nonessential ? input.readInt32() : 0;
 
 				const path = this.attachmentLoader.newPathAttachment(skin, name);
@@ -1117,7 +1125,7 @@ export class SkeletonBinary {
 							break;
 						}
 						case ATTACHMENT_SEQUENCE: {
-							const timeline = new SequenceTimeline(frameCount, slotIndex, attachment as unknown as HasSequence);
+							const timeline = new SequenceTimeline(frameCount, slotIndex, attachment as Attachment);
 							for (let frame = 0; frame < frameCount; frame++) {
 								const time = input.readFloat();
 								const modeAndIndex = input.readInt32();
@@ -1277,17 +1285,19 @@ export class BinaryInput {
 }
 
 class LinkedMesh {
-	parent: string | null; skinIndex: number;
-	slotIndex: number;
+	source: string | null;
+	skinIndex: number; slotIndex: number; sourceIndex: number
 	mesh: MeshAttachment;
-	inheritTimeline: boolean;
+	inheritTimelines: boolean;
 
-	constructor (mesh: MeshAttachment, skinIndex: number, slotIndex: number, parent: string | null, inheritDeform: boolean) {
+	constructor (mesh: MeshAttachment, skinIndex: number, slotIndex: number, sourceIndex: number, source: string | null,
+		inheritTimelines: boolean) {
 		this.mesh = mesh;
 		this.skinIndex = skinIndex;
 		this.slotIndex = slotIndex;
-		this.parent = parent;
-		this.inheritTimeline = inheritDeform;
+		this.sourceIndex = sourceIndex;
+		this.source = source;
+		this.inheritTimelines = inheritTimelines;
 	}
 }
 
