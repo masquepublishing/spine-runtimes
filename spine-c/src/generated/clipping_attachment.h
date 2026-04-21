@@ -80,6 +80,10 @@ SPINE_C_API /*@null*/ spine_attachment spine_clipping_attachment_get_timeline_at
 SPINE_C_API void spine_clipping_attachment_set_timeline_attachment(spine_clipping_attachment self, /*@null*/ spine_attachment attachment);
 SPINE_C_API void spine_clipping_attachment_copy_to(spine_clipping_attachment self, spine_vertex_attachment other);
 SPINE_C_API const char *spine_clipping_attachment_get_name(spine_clipping_attachment self);
+SPINE_C_API spine_array_int spine_clipping_attachment_get_timeline_slots(spine_clipping_attachment self);
+SPINE_C_API void spine_clipping_attachment_set_timeline_slots(spine_clipping_attachment self, spine_array_int timelineSlots);
+SPINE_C_API bool spine_clipping_attachment_is_timeline_active(spine_clipping_attachment self, spine_array_slot slots, int slotIndex,
+															  bool appliedPose);
 SPINE_C_API int spine_clipping_attachment_get_ref_count(spine_clipping_attachment self);
 SPINE_C_API void spine_clipping_attachment_reference(spine_clipping_attachment self);
 SPINE_C_API void spine_clipping_attachment_dereference(spine_clipping_attachment self);

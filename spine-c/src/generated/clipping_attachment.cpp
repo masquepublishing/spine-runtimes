@@ -123,6 +123,21 @@ const char *spine_clipping_attachment_get_name(spine_clipping_attachment self) {
 	return _self->getName().buffer();
 }
 
+spine_array_int spine_clipping_attachment_get_timeline_slots(spine_clipping_attachment self) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	return (spine_array_int) &_self->getTimelineSlots();
+}
+
+void spine_clipping_attachment_set_timeline_slots(spine_clipping_attachment self, spine_array_int timelineSlots) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	_self->setTimelineSlots(*((Array<int> *) timelineSlots));
+}
+
+bool spine_clipping_attachment_is_timeline_active(spine_clipping_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	return _self->isTimelineActive(*((Array<Slot *> *) slots), slotIndex, appliedPose);
+}
+
 int spine_clipping_attachment_get_ref_count(spine_clipping_attachment self) {
 	ClippingAttachment *_self = (ClippingAttachment *) self;
 	return _self->getRefCount();

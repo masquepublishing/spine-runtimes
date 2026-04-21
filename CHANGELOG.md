@@ -6,9 +6,12 @@
   - Added `spine_slider` and `spine_slider_data` types for slider constraints
   - Regenerated C bindings for the AnimationState additive/hold rework and Skin placeholder name rename in spine-cpp.
   - Regenerated C bindings for the updated clipping runtime, including convex and inverse clipping support.
+  - Regenerated linked mesh APIs so source meshes can be resolved from different slots, matching spine-cpp.
+  - Added generated attachment timeline slot APIs, including `spine_attachment_get_timeline_slots()`, `spine_attachment_set_timeline_slots()`, and `spine_attachment_is_timeline_active()`.
 
 - **Breaking changes**
   - `spine_animation_state_get_current()` renamed to `spine_animation_state_get_track()`.
+  - Generated mesh attachment APIs now use `source_mesh` naming instead of `parent_mesh` to match spine-cpp, eg `spine_mesh_attachment_get_source_mesh()` / `spine_mesh_attachment_set_source_mesh()`.
   - `spine_track_entry_get_mix_blend()` / `spine_track_entry_set_mix_blend()` removed. Use `spine_track_entry_get_additive()` / `spine_track_entry_set_additive()` instead.
   - `spine_track_entry_get_hold_previous()` / `spine_track_entry_set_hold_previous()` removed.
   - `spine_skin_entry_get_name()` renamed to `spine_skin_entry_get_placeholder_name()`.
@@ -81,6 +84,8 @@
 
 - **Additions**
   - Added `Slider` and `SliderData` classes for slider constraints
+  - Linked meshes can now inherit deform and sequence timelines from source meshes in different slots.
+  - Added `Attachment::getTimelineSlots()`, `Attachment::setTimelineSlots()`, and `Attachment::isTimelineActive()` for attachment timeline propagation across linked meshes.
   - Added `SliderTimeline` and `SliderMixTimeline` for animating sliders
   - Added new pose system with `BoneLocal`, `BonePose`, and related classes for improved transform handling
   - Added `Pose`, `Posed`, and `PosedActive` base classes for unified pose management
@@ -102,6 +107,7 @@
 
 - **Breaking changes**
   - `AnimationState::getCurrent()` renamed to `AnimationState::getTrack()`.
+  - `MeshAttachment::getParentMesh()` / `setParentMesh()` renamed to `getSourceMesh()` / `setSourceMesh()`.
   - Headers reorganized from `spine-cpp/spine-cpp/include/spine/` to `spine-cpp/include/spine/`
   - Timeline `apply()` signature changed: `MixBlend blend, MixDirection direction` replaced with `bool fromSetup, bool add, bool out`. All timeline subclasses updated.
   - `Animation::apply()` signature changed to match the new timeline parameters.
@@ -478,6 +484,8 @@
 
 - **Breaking changes**
   - `AnimationState.getCurrent(_:)` renamed to `AnimationState.getTrack(_:)` in SpineSwift.
+  - SpineSwift mesh attachment APIs now use `sourceMesh` naming instead of `parentMesh` to match spine-cpp.
+  - SpineSwift attachments now expose `timelineSlots` and `isTimelineActive(...)` to match spine-cpp.
 
 ## Dart
 
@@ -490,6 +498,7 @@
 - **Breaking changes**
   - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.
   - The Dart runtime is now fully auto-generated from the C runtime, maintaining the full C++ type hierarchy with proper nullability annotations
+  - `MeshAttachment.parentMesh` is now `MeshAttachment.sourceMesh`, and attachments now expose `timelineSlots` plus `isTimelineActive(...)` to match spine-cpp.
   - All properties are now exposed as getters and setters instead of methods
   - API changes to match C++ naming conventions:
     - `AnimationState.getData()` → `AnimationState.data` (property)
@@ -513,6 +522,8 @@
 
 - **Breaking changes**
   - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.
+  - Generated Flutter mesh attachment APIs now use `sourceMesh` naming instead of `parentMesh` to match spine-cpp.
+  - Generated Flutter bindings now expose `Attachment.timelineSlots` and `Attachment.isTimelineActive(...)` to match spine-cpp.
   - Updated to use the new auto-generated Dart runtime with all the Dart API changes above
   - Generated Flutter bindings now use `BonePose` for bone setup and unconstrained pose accessors to match spine-cpp.
   - Generated Flutter bindings now expose event setup payloads via `EventData.setupPose` instead of directly on `EventData`.

@@ -88,6 +88,16 @@ open class Attachment: NSObject {
         }
     }
 
+    public var timelineSlots: ArrayInt {
+        get {
+            let result = spine_attachment_get_timeline_slots(_ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
+        return ArrayInt(fromPointer: result!)
+        }
+        set {
+            spine_attachment_set_timeline_slots(_ptr.assumingMemoryBound(to: spine_attachment_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
+        }
+    }
+
     public var refCount: Int32 {
         let result = spine_attachment_get_ref_count(_ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
         return result
@@ -119,6 +129,11 @@ open class Attachment: NSObject {
         default:
             fatalError("Unknown concrete type: \(rttiClassName) for abstract class Attachment")
         }
+    }
+
+    public func isTimelineActive(_ slots: ArraySlot, _ slotIndex: Int32, _ appliedPose: Bool) -> Bool {
+        let result = spine_attachment_is_timeline_active(_ptr.assumingMemoryBound(to: spine_attachment_wrapper.self), slots._ptr.assumingMemoryBound(to: spine_array_slot_wrapper.self), slotIndex, appliedPose)
+        return result
     }
 
     public func reference() {

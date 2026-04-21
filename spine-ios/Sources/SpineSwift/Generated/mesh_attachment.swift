@@ -96,16 +96,16 @@ public class MeshAttachment: VertexAttachment {
         return Color(fromPointer: result!)
     }
 
-    /// The parent mesh if this is a linked mesh, else NULL. A linked mesh shares the bones,
-    /// vertices, regionUVs, triangles, hullLength, edges, width, and height with the parent mesh,
+    /// The source mesh if this is a linked mesh, else NULL. A linked mesh shares the bones,
+    /// vertices, regionUVs, triangles, hullLength, edges, width, and height with the source mesh,
     /// but may have a different name or path, and therefore a different texture region.
-    public var parentMesh: MeshAttachment? {
+    public var sourceMesh: MeshAttachment? {
         get {
-            let result = spine_mesh_attachment_get_parent_mesh(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
+            let result = spine_mesh_attachment_get_source_mesh(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
         return result.map { MeshAttachment(fromPointer: $0) }
         }
         set {
-            spine_mesh_attachment_set_parent_mesh(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
+            spine_mesh_attachment_set_source_mesh(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
         }
     }
 

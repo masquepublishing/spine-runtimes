@@ -2220,6 +2220,13 @@ namespace spine {
 				writeAttachment(obj->getTimelineAttachment());
 			}
 
+			_json.writeName("timelineSlots");
+			_json.writeArrayStart();
+			for (size_t i = 0; i < obj->getTimelineSlots().size(); i++) {
+				_json.writeValue(obj->getTimelineSlots()[i]);
+			}
+			_json.writeArrayEnd();
+
 			_json.writeName("id");
 			_json.writeValue(obj->getId());
 
@@ -2292,6 +2299,13 @@ namespace spine {
 			} else {
 				writeAttachment(obj->getTimelineAttachment());
 			}
+
+			_json.writeName("timelineSlots");
+			_json.writeArrayStart();
+			for (size_t i = 0; i < obj->getTimelineSlots().size(); i++) {
+				_json.writeValue(obj->getTimelineSlots()[i]);
+			}
+			_json.writeArrayEnd();
 
 			_json.writeName("id");
 			_json.writeValue(obj->getId());
@@ -2607,11 +2621,11 @@ namespace spine {
 			_json.writeName("sequence");
 			writeSequence(&obj->getSequence());
 
-			_json.writeName("parentMesh");
-			if (obj->getParentMesh() == nullptr) {
+			_json.writeName("sourceMesh");
+			if (obj->getSourceMesh() == nullptr) {
 				_json.writeNull();
 			} else {
-				writeMeshAttachment(obj->getParentMesh());
+				writeMeshAttachment(obj->getSourceMesh());
 			}
 
 			_json.writeName("bones");
@@ -2641,6 +2655,13 @@ namespace spine {
 			} else {
 				writeAttachment(obj->getTimelineAttachment());
 			}
+
+			_json.writeName("timelineSlots");
+			_json.writeArrayStart();
+			for (size_t i = 0; i < obj->getTimelineSlots().size(); i++) {
+				_json.writeValue(obj->getTimelineSlots()[i]);
+			}
+			_json.writeArrayEnd();
 
 			_json.writeName("id");
 			_json.writeValue(obj->getId());
@@ -2714,6 +2735,13 @@ namespace spine {
 			} else {
 				writeAttachment(obj->getTimelineAttachment());
 			}
+
+			_json.writeName("timelineSlots");
+			_json.writeArrayStart();
+			for (size_t i = 0; i < obj->getTimelineSlots().size(); i++) {
+				_json.writeValue(obj->getTimelineSlots()[i]);
+			}
+			_json.writeArrayEnd();
 
 			_json.writeName("id");
 			_json.writeValue(obj->getId());
