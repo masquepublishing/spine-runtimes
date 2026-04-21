@@ -55,7 +55,7 @@ tail06
 thiagobrayner
 	bounds: 2, 923, 350, 31
 
-dragon2.png
+dragon_2.png
 	size: 1024, 1024
 	filter: Linear, Linear
 left-wing07
@@ -65,7 +65,7 @@ right-wing07
 right-wing08
 	bounds: 2, 2, 365, 643
 
-dragon3.png
+dragon_3.png
 	size: 1024, 1024
 	filter: Linear, Linear
 left-wing06
@@ -75,7 +75,7 @@ right-wing05
 right-wing06
 	bounds: 2, 2, 365, 643
 
-dragon4.png
+dragon_4.png
 	size: 1024, 1024
 	filter: Linear, Linear
 left-wing05
@@ -85,7 +85,7 @@ right-wing03
 right-wing04
 	bounds: 2, 2, 365, 643
 
-dragon5.png
+dragon_5.png
 	size: 1024, 1024
 	filter: Linear, Linear
 left-wing04
