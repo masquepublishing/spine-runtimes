@@ -463,11 +463,11 @@ class SkeletonBinary {
 		// Linked meshes.
 		for (linkedMesh in linkedMeshes) {
 			var skin:Skin = skeletonData.skins[linkedMesh.skinIndex];
-			var parent:Attachment = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-			if (parent == null)
-				throw new SpineException("Parent mesh not found: " + linkedMesh.parent);
-			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? cast(parent, VertexAttachment) : linkedMesh.mesh;
-			linkedMesh.mesh.parentMesh = cast(parent, MeshAttachment);
+			var source:Attachment = skin.getAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+			if (source == null)
+				throw new SpineException("Source mesh not found: " + linkedMesh.source);
+			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimelines ? source : linkedMesh.mesh;
+			linkedMesh.mesh.sourceMesh = cast(source, MeshAttachment);
 			linkedMesh.mesh.updateSequence();
 		}
 		linkedMeshes.resize(0);
@@ -624,6 +624,16 @@ class SkeletonBinary {
 				vertices = readVertices(input, (flags & 128) != 0);
 				var uvs:Array<Float> = readFloatArray(input, vertices.length, 1);
 				var triangles:Array<Int> = readShortArray(input, (vertices.length - hullLength - 2) * 3);
+
+				var slotCount:Int = input.readInt(true);
+				var timelineSlots:Array<Int> = null;
+				if (slotCount > 0) {
+					timelineSlots = new Array<Int>();
+					timelineSlots.resize(slotCount);
+					for (i in 0...slotCount)
+						timelineSlots[i] = input.readInt(true);
+				}
+
 				var edges:Array<Int> = null;
 				if (nonessential) {
 					edges = readShortArray(input, input.readInt(true));
@@ -645,6 +655,8 @@ class SkeletonBinary {
 				mesh.worldVerticesLength = vertices.length;
 				mesh.regionUVs = uvs;
 				mesh.triangles = triangles;
+				if (timelineSlots != null)
+					mesh.timelineSlots = timelineSlots;
 				if (nonessential) {
 					mesh.edges = edges;
 					mesh.width = width * scale;
@@ -659,8 +671,9 @@ class SkeletonBinary {
 				color = (flags & 32) != 0 ? input.readInt32() : 0xffffffff;
 				var sequence = readSequence(input, (flags & 64) != 0);
 				var inheritTimelines:Bool = (flags & 128) != 0;
+				var sourceIndex = input.readInt(true);
 				var skinIndex = input.readInt(true);
-				var parent:String = input.readStringRef();
+				var source:String = input.readStringRef();
 				if (nonessential) {
 					width = input.readFloat();
 					height = input.readFloat();
@@ -675,17 +688,13 @@ class SkeletonBinary {
 					mesh.width = width * scale;
 					mesh.height = height * scale;
 				}
-				this.linkedMeshes.push(new LinkedMeshBinary(mesh, skinIndex, slotIndex, parent, inheritTimelines));
+				this.linkedMeshes.push(new LinkedMeshBinary(mesh, skinIndex, slotIndex, sourceIndex, source, inheritTimelines));
 				return mesh;
 			case AttachmentType.path:
 				var closed:Bool = (flags & 16) != 0;
 				var constantSpeed:Bool = (flags & 32) != 0;
 				vertices = readVertices(input, (flags & 64) != 0);
-				var lengths:Array<Float> = new Array<Float>();
-				lengths.resize(Std.int(vertices.length / 6));
-				for (i in 0...lengths.length) {
-					lengths[i] = input.readFloat() * scale;
-				}
+				var lengths:Array<Float> = readFloatArray(input, Std.int(vertices.length / 6), scale);
 				color = nonessential ? input.readInt32() : 0;
 
 				var pathAttachment:PathAttachment = attachmentLoader.newPathAttachment(skin, name);
@@ -1368,7 +1377,7 @@ class SkeletonBinary {
 							}
 							timelines.push(deformTimeline);
 						case ATTACHMENT_SEQUENCE:
-							var timeline = new SequenceTimeline(frameCount, slotIndex, cast(attachment, HasSequence));
+							var timeline = new SequenceTimeline(frameCount, slotIndex, attachment);
 							for (frame in 0...frameCount) {
 								var time = input.readFloat();
 								var modeAndIndex = input.readInt32();
@@ -1506,17 +1515,19 @@ class Vertices {
 }
 
 class LinkedMeshBinary {
-	public var parent(default, null):String;
+	public var source(default, null):String;
 	public var skinIndex(default, null):Int;
 	public var slotIndex(default, null):Int;
+	public var sourceIndex(default, null):Int;
 	public var mesh(default, null):MeshAttachment;
-	public var inheritTimeline(default, null):Bool;
+	public var inheritTimelines(default, null):Bool;
 
-	public function new(mesh:MeshAttachment, skinIndex:Int, slotIndex:Int, parent:String, inheritTimeline:Bool) {
+	public function new(mesh:MeshAttachment, skinIndex:Int, slotIndex:Int, sourceIndex:Int, source:String, inheritTimelines:Bool) {
 		this.mesh = mesh;
 		this.skinIndex = skinIndex;
 		this.slotIndex = slotIndex;
-		this.parent = parent;
-		this.inheritTimeline = inheritTimeline;
+		this.sourceIndex = sourceIndex;
+		this.source = source;
+		this.inheritTimelines = inheritTimelines;
 	}
 }
