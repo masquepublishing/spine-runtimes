@@ -106,6 +106,12 @@ namespace Spine.Unity {
 		public Material additiveMaterial;
 		public Material multiplyMaterial;
 		public Material screenMaterial;
+		/// <summary>
+		/// Normally when <see cref="MeshGenerator.Settings.pmaVertexColors">PMA Vertex Colors</see> is enabled,
+		/// additive blend mode is drawn in a single pass with normal blend mode and the normal material is used.
+		/// Enable this setting to use a separate additive material regardless.
+		/// </summary>
+		public bool forceAdditiveMaterial = false;
 
 		// Layout
 		protected float meshScale = 1f;
@@ -1221,7 +1227,7 @@ namespace Spine.Unity {
 			} else if (blendMode == BlendMode.Additive) {
 				if (pmaVertexColors)
 					allowCullTransparentMesh = false;
-				else if (additiveMaterial)
+				if (additiveMaterial && (!pmaVertexColors || forceAdditiveMaterial))
 					blendModeMaterial = additiveMaterial;
 			} else if (blendMode == BlendMode.Multiply && multiplyMaterial)
 				blendModeMaterial = multiplyMaterial;
