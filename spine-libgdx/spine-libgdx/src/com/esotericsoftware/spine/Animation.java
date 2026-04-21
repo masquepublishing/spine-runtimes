@@ -527,7 +527,7 @@ public class Animation {
 
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}. */
 		public BoneTimeline2 (int frameCount, int bezierCount, int boneIndex, long property1, long property2) {
-			super(frameCount, bezierCount, property1 << 53 | boneIndex, property2 << 53 | +boneIndex);
+			super(frameCount, bezierCount, property1 << 53 | boneIndex, property2 << 53 | boneIndex);
 			this.boneIndex = boneIndex;
 			additive = true;
 		}
@@ -1350,7 +1350,7 @@ public class Animation {
 		private final float[][] vertices;
 
 		public DeformTimeline (int frameCount, int bezierCount, int slotIndex, VertexAttachment attachment) {
-			super(frameCount, bezierCount, (long)Property.deform.ordinal() << 53 | (long)slotIndex << 32 | +attachment.getId());
+			super(frameCount, bezierCount, (long)Property.deform.ordinal() << 53 | (long)slotIndex << 32 | attachment.getId());
 			this.slotIndex = slotIndex;
 			this.attachment = attachment;
 			vertices = new float[frameCount][];
