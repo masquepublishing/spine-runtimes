@@ -150,6 +150,7 @@ namespace Spine.Unity.Editor {
 				if (skeletonGraphic != null) {
 					skeletonGraphic.CustomMaterialOverride.Clear();
 					skeletonGraphic.CustomTextureOverride.Clear();
+					skeletonGraphic.CustomSlotMaterials.Clear();
 					RemoveCustomMaterials();
 					SetCustomMaterials();
 					skeletonGraphic.LateUpdate();
