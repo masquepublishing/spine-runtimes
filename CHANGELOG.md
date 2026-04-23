@@ -470,6 +470,7 @@
   - `SkeletonGraphic` now allows using separate additive Materials despite having `PMA Vertex Colors` enabled (as required for Spine shaders) via the new `Blend Modes` - `Force Additive Material` property in the `Advanced` Inspector section.
   - `SkeletonGraphic` property `CustomSlotMaterials` now properly assigns the override material directly instead of assigning the texture of the override material, which was of little use. Thus you can now assign a `SkeletonGraphic` compatible material like `SkeletonGraphicAdditive-Straight`.
   - `SkeletonGraphicCustomMaterials` now exposes `Custom Slot Materials` property for slot material overrides.
+  - Exposed `SpineVisualElement.Initialize` as `public`.
 
 - **Deprecated**
 
