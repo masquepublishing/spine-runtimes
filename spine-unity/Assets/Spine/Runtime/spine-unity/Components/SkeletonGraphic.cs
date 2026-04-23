@@ -1191,7 +1191,7 @@ namespace Spine.Unity {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
 					Material instructionMaterial = instructionItems[i].material;
 					Texture originalTexture = instructionMaterial.mainTexture;
-					
+
 					bool isSlotOverride = hasSlotOverrides && customSlotMaterials.ContainsValue(instructionMaterial);
 					if (hasMaterialOrTextureOverride && originalTexture != null) {
 						Material replacementMaterial;
@@ -1277,7 +1277,10 @@ namespace Spine.Unity {
 		public override Material GetModifiedMaterial (Material baseMaterial) {
 			if (!HasMaterialOverride || allowMultipleCanvasRenderers)
 				return base.GetModifiedMaterial(baseMaterial);
-			return base.GetModifiedMaterial(rendererBuffers.sharedMaterials[0]);
+			Material[] sharedMaterials = rendererBuffers.sharedMaterials;
+			if (sharedMaterials == null || sharedMaterials.Length == 0)
+				return base.GetModifiedMaterial(baseMaterial);
+			return base.GetModifiedMaterial(sharedMaterials[0]);
 		}
 
 		/// <summary>

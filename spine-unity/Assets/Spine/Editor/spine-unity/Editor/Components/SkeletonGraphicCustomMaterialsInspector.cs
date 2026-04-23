@@ -146,6 +146,12 @@ namespace Spine.Unity.Editor {
 			_customTextureOverridesPrev = CopyList(componentCustomTextureOverrides);
 			_customSlotMaterialsPrev = CopyList(componentCustomSlotMaterials);
 
+			if (componentCustomSlotMaterials.Count > 0 &&
+				componentCustomSlotMaterials.Any(entry => entry.overrideEnabled)) {
+				EditorGUILayout.HelpBox("Please enable 'Advanced - Multiple CanvasRenderers' at the SkeletonGraphic " +
+					"component when using Custom Slot Materials.", MessageType.Warning, true);
+			}
+
 			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Clear and Reapply Changes", tooltip: "Removes all non-serialized overrides in the SkeletonGraphic and reapplies the overrides on this component."))) {
 				if (skeletonGraphic != null) {
 					skeletonGraphic.CustomMaterialOverride.Clear();
