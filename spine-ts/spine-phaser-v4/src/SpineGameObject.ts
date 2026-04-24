@@ -38,6 +38,7 @@ import {
 	Skin,
 	type Vector2,
 } from "@esotericsoftware/spine-core";
+import type { SceneRenderer } from "@esotericsoftware/spine-webgl";
 import * as Phaser from "phaser";
 import { SPINE_GAME_OBJECT_TYPE } from "./keys.js";
 import {
@@ -340,6 +341,20 @@ export class SpineGameObject extends DepthMixin(
 		return result;
 	}
 
+	private syncRendererCameraToDrawingContext (sceneRenderer: SceneRenderer, drawingContext: Phaser.Renderer.WebGL.DrawingContext) {
+		const viewportWidth = drawingContext.width;
+		const viewportHeight = drawingContext.height;
+		if (sceneRenderer.camera.viewportWidth === viewportWidth && sceneRenderer.camera.viewportHeight === viewportHeight &&
+			sceneRenderer.camera.position.x === viewportWidth / 2 && sceneRenderer.camera.position.y === viewportHeight / 2) {
+			return;
+		}
+
+		sceneRenderer.camera.position.x = viewportWidth / 2;
+		sceneRenderer.camera.position.y = viewportHeight / 2;
+		sceneRenderer.camera.setViewport(viewportWidth, viewportHeight);
+		sceneRenderer.camera.update();
+	}
+
 	renderWebGL (
 		renderer: Phaser.Renderer.WebGL.WebGLRenderer,
 		src: SpineGameObject,
@@ -360,12 +375,17 @@ export class SpineGameObject extends DepthMixin(
 		const nextGameObject = displayList[displayListIndex + 1];
 		const newType = !previousGameObject || previousGameObject.type !== src.type;
 		const nextTypeMatch = nextGameObject && nextGameObject.type === src.type;
-		if (newType) {
-			// Ensure framebuffer is properly set up.
-			if (drawingContext.renderer.renderNodes.currentBatchDrawingContext !== drawingContext) {
+		const drawingContextChanged = drawingContext.renderer.renderNodes.currentBatchDrawingContext !== drawingContext;
+		if (newType || drawingContextChanged) {
+			if (drawingContextChanged) {
+				if (sceneRenderer.batcher.isDrawing) {
+					sceneRenderer.end();
+				}
 				drawingContext.renderer.renderNodes.finishBatch();
 				drawingContext.beginDraw();
 			}
+
+			src.syncRendererCameraToDrawingContext(sceneRenderer, drawingContext);
 
 			// Yield Phaser context.
 			renderer.renderNodes.getNode('YieldContext')?.run(drawingContext);
