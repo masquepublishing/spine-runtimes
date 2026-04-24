@@ -303,7 +303,7 @@ namespace Spine.Unity {
 			}
 
 			private bool ApplyAnimation (Skeleton skeleton, ClipInfo info, AnimatorStateInfo stateInfo,
-										int layerIndex, float layerWeight, bool layerIsAdditive,
+										int layerIndex, float layerWeight, bool layerIsAdditive, bool fromSetup,
 										bool useCustomClipWeight = false, float customClipWeight = 1.0f) {
 				float weight = info.weight * layerWeight;
 				if (weight < WeightEpsilon)
@@ -315,7 +315,6 @@ namespace Spine.Unity {
 				float time = AnimationTime(stateInfo.normalizedTime, info.length,
 										info.isLooping, stateInfo.speed < 0);
 				weight = useCustomClipWeight ? layerWeight * customClipWeight : weight;
-				bool fromSetup = layerIndex == 0;
 				info.animation.Apply(skeleton, 0, time, info.isLooping, null,
 						weight, fromSetup, layerIsAdditive, false, false);
 				if (_OnClipApplied != null)
@@ -339,7 +338,7 @@ namespace Spine.Unity {
 				float time = AnimationTime(stateInfo.normalizedTime + interruptingClipTimeAddition,
 										info.length, stateInfo.speed < 0);
 				weight = useCustomClipWeight ? layerWeight * customClipWeight : weight;
-				bool fromSetup = layerIndex == 0;
+				bool fromSetup = false;
 				info.animation.Apply(skeleton, 0, time, info.isLooping, null,
 							weight, fromSetup, layerIsAdditive, false, false);
 				if (_OnClipApplied != null) {
@@ -434,6 +433,7 @@ namespace Spine.Unity {
 				}
 
 				// Apply
+				int appliedCount = 0;
 				for (int layer = 0, n = layerCount; layer < n; layer++) {
 					ClipInfos layerInfos = layerClipInfos[layer];
 					float layerWeight = layerInfos.layerWeight;
@@ -458,15 +458,16 @@ namespace Spine.Unity {
 					if (mode == MixMode.AlwaysMix) {
 						// Always use Mix instead of Applying the first non-zero weighted clip.
 						for (int c = 0; c < clipInfoCount; c++) {
-							ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, add);
+							ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, add, appliedCount++ == 0);
 						}
 						if (hasNext) {
 							for (int c = 0; c < nextClipInfoCount; c++) {
-								ApplyAnimation(skeleton, nextClipInfo[c], nextStateInfo, layer, layerWeight, add);
+								ApplyAnimation(skeleton, nextClipInfo[c], nextStateInfo, layer, layerWeight, add, appliedCount++ == 0);
 							}
 						}
 						if (isInterruptionActive) {
 							for (int c = 0; c < interruptingClipInfoCount; c++) {
+								appliedCount++;
 								ApplyInterruptionAnimation(skeleton, interpolateWeightTo1,
 									interruptingClipInfo[c], interruptingStateInfo,
 									layer, layerWeight, add, interruptingClipTimeAddition);
@@ -480,19 +481,20 @@ namespace Spine.Unity {
 
 						float[] customWeights = layerClipInfos[layer].clipResolvedWeights;
 						for (int c = 0; c < clipInfoCount; c++) {
-							ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, add, true,
-								customWeights[c]);
+							ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, add,
+								appliedCount++ == 0, true, customWeights[c]);
 						}
 						if (hasNext) {
 							customWeights = layerClipInfos[layer].nextClipResolvedWeights;
 							for (int c = 0; c < nextClipInfoCount; c++) {
 								ApplyAnimation(skeleton, nextClipInfo[c], nextStateInfo, layer, layerWeight, add,
-									true, customWeights[c]);
+									appliedCount++ == 0, true, customWeights[c]);
 							}
 						}
 						if (isInterruptionActive) {
 							customWeights = layerClipInfos[layer].interruptingClipResolvedWeights;
 							for (int c = 0; c < interruptingClipInfoCount; c++) {
+								appliedCount++;
 								ApplyInterruptionAnimation(skeleton, interpolateWeightTo1,
 									interruptingClipInfo[c], interruptingStateInfo,
 									layer, layerWeight, add, interruptingClipTimeAddition,
@@ -504,13 +506,13 @@ namespace Spine.Unity {
 						int c = 0;
 						for (; c < clipInfoCount; c++) {
 							if (!ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, add,
-								true, 1.0f))
+								appliedCount++ == 0, true, 1.0f))
 								continue;
 							++c; break;
 						}
 						// Mix the rest
 						for (; c < clipInfoCount; c++) {
-							ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, add);
+							ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, add, appliedCount++ == 0);
 						}
 
 						c = 0;
@@ -519,14 +521,14 @@ namespace Spine.Unity {
 							if (mode == MixMode.Hard) {
 								for (; c < nextClipInfoCount; c++) {
 									if (!ApplyAnimation(skeleton, nextClipInfo[c], nextStateInfo, layer, layerWeight, add,
-										true, 1.0f))
+										appliedCount++ == 0, true, 1.0f))
 										continue;
 									++c; break;
 								}
 							}
 							// Mix the rest
 							for (; c < nextClipInfoCount; c++) {
-								if (!ApplyAnimation(skeleton, nextClipInfo[c], nextStateInfo, layer, layerWeight, add))
+								if (!ApplyAnimation(skeleton, nextClipInfo[c], nextStateInfo, layer, layerWeight, add, appliedCount++ == 0))
 									continue;
 							}
 						}
@@ -536,6 +538,7 @@ namespace Spine.Unity {
 							// Apply next clip directly instead of mixing (ie: no crossfade, ignores mecanim transition weights)
 							if (mode == MixMode.Hard) {
 								for (; c < interruptingClipInfoCount; c++) {
+									appliedCount++;
 									if (ApplyInterruptionAnimation(skeleton, interpolateWeightTo1,
 										interruptingClipInfo[c], interruptingStateInfo,
 										layer, layerWeight, add, interruptingClipTimeAddition, true, 1.0f)) {
@@ -546,6 +549,7 @@ namespace Spine.Unity {
 							}
 							// Mix the rest
 							for (; c < interruptingClipInfoCount; c++) {
+								appliedCount++;
 								ApplyInterruptionAnimation(skeleton, interpolateWeightTo1,
 									interruptingClipInfo[c], interruptingStateInfo,
 									layer, layerWeight, add, interruptingClipTimeAddition);
