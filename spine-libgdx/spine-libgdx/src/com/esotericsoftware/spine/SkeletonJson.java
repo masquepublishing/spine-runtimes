@@ -204,6 +204,8 @@ public class SkeletonJson extends SkeletonLoader {
 				if (color != null) Color.valueOf(color, data.getColor());
 
 				data.icon = boneMap.getString("icon", null);
+				data.iconSize = boneMap.getFloat("iconSize", 1);
+				data.iconRotation = boneMap.getFloat("iconRotation", 0);
 				data.visible = boneMap.getBoolean("visible", true);
 
 				skeletonData.bones.add(data);

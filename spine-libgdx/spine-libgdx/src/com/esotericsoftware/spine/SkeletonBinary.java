@@ -245,6 +245,8 @@ public class SkeletonBinary extends SkeletonLoader {
 				if (nonessential) {
 					Color.rgba8888ToColor(data.color, input.readInt());
 					data.icon = input.readString();
+					data.iconSize = input.readFloat();
+					data.iconRotation = input.readFloat();
 					data.visible = input.readBoolean();
 				}
 				bones[i] = data;
