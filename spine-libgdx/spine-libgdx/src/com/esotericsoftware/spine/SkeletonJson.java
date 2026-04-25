@@ -1291,6 +1291,10 @@ public class SkeletonJson extends SkeletonLoader {
 		Animation animation = new Animation(name);
 		animation.setTimelines(timelines, bones);
 		animation.setDuration(duration);
+
+		String color = map.getString("color", null);
+		if (color != null) Color.valueOf(color, animation.color);
+
 		skeletonData.animations.add(animation);
 	}
 

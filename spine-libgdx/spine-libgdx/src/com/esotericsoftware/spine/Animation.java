@@ -56,6 +56,9 @@ public class Animation {
 	LongSet timelineIds;
 	IntArray bones;
 
+	// Nonessential.
+	final Color color = new Color(1, 1, 1, 1);
+
 	/** Creates a new animation. {@link #timelines} must be set before use. */
 	public Animation (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
@@ -157,6 +160,11 @@ public class Animation {
 	 * See {@link SkeletonData#findAnimation(String)}. */
 	public String getName () {
 		return name;
+	}
+
+	/** The color of the animation as it was in Spine, or a default color if nonessential data was not exported. */
+	public Color getColor () {
+		return color;
 	}
 
 	public String toString () {

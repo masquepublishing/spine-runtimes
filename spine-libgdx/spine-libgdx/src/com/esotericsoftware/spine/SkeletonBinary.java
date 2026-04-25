@@ -501,7 +501,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			// Animations.
 			Animation[] animations = skeletonData.animations.setSize(n = input.readInt(true));
 			for (int i = 0; i < n; i++)
-				animations[i] = readAnimation(input, input.readString(), skeletonData);
+				animations[i] = readAnimation(input, input.readString(), skeletonData, nonessential);
 
 			for (int i = 0; i < constraintCount; i++)
 				if (constraints[i] instanceof SliderData data) data.animation = animations[input.readInt(true)];
@@ -778,7 +778,8 @@ public class SkeletonBinary extends SkeletonLoader {
 		return array;
 	}
 
-	private Animation readAnimation (SkeletonInput input, String name, SkeletonData skeletonData) throws IOException {
+	private Animation readAnimation (SkeletonInput input, String name, SkeletonData skeletonData, boolean nonessential)
+		throws IOException {
 		var timelines = new Array<Timeline>(true, input.readInt(true), Timeline[]::new);
 		float scale = this.scale;
 
@@ -1230,6 +1231,7 @@ public class SkeletonBinary extends SkeletonLoader {
 		Animation animation = new Animation(name);
 		animation.setTimelines(timelines, bones);
 		animation.setDuration(duration);
+		if (nonessential) Color.rgba8888ToColor(animation.color, input.readInt());
 		return animation;
 	}
 
