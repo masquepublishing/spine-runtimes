@@ -2432,8 +2432,8 @@ public class SkeletonSerializer {
 		json.writeName("target");
 		writeBoneData(obj.getTarget());
 
-		json.writeName("uniform");
-		json.writeValue(obj.getUniform());
+		json.writeName("scaleY");
+		json.writeValue(obj.getScaleY().name());
 
 		json.writeName("name");
 		json.writeValue(obj.getName());

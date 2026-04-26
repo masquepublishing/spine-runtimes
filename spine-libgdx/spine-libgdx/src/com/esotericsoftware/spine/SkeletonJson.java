@@ -251,7 +251,9 @@ public class SkeletonJson extends SkeletonLoader {
 					data.target = skeletonData.findBone(targetName);
 					if (data.target == null) throw new SerializationException("IK target bone not found: " + targetName);
 
-					data.uniform = constraintMap.getBoolean("uniform", false);
+					String scaleY = constraintMap.getString("scaleY", null);
+					if (scaleY != null) data.scaleY = IkConstraintData.ScaleY.valueOf(scaleY);
+
 					IkConstraintPose setup = data.setupPose;
 					setup.mix = constraintMap.getFloat("mix", 1);
 					setup.softness = constraintMap.getFloat("softness", 0) * scale;
