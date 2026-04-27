@@ -484,7 +484,7 @@ namespace Spine {
 				// Animations.
 				Animation[] animations = skeletonData.animations.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++)
-					animations[i] = ReadAnimation(input, input.ReadString(), skeletonData);
+					animations[i] = ReadAnimation(input, input.ReadString(), skeletonData, nonessential);
 
 				for (int i = 0; i < constraintCount; i++) {
 					SliderData data = constraints[i] as SliderData;
@@ -762,7 +762,7 @@ namespace Spine {
 
 		/// <exception cref="SerializationException">SerializationException will be thrown when a Vertex attachment is not found.</exception>
 		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>
-		private Animation ReadAnimation (SkeletonInput input, string name, SkeletonData skeletonData) {
+		private Animation ReadAnimation (SkeletonInput input, string name, SkeletonData skeletonData, bool nonessential) {
 			var timelines = new ExposedList<Timeline>(input.ReadInt(true));
 			float scale = this.scale;
 
@@ -1282,6 +1282,7 @@ namespace Spine {
 			Animation animation = new Animation(name);
 			animation.SetTimelines(timelines, bones);
 			animation.Duration = duration;
+			if (nonessential) input.ReadInt(); // discard non-essential, Color.rgba8888ToColor(animation.color, input.readInt());
 			return animation;
 		}
 
