@@ -108,6 +108,9 @@ export class SkeletonJson {
 
 				const color = getValue(boneMap, "color", null);
 				if (color) data.color.setFromString(color);
+				data.icon = getValue(boneMap, "icon", undefined);
+				data.iconSize = getValue(boneMap, "iconSize", 1);
+				data.iconRotation = getValue(boneMap, "iconRotation", 0);
 
 				skeletonData.bones.push(data);
 			}

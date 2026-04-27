@@ -120,6 +120,8 @@ export class SkeletonBinary {
 			if (nonessential) {
 				Color.rgba8888ToColor(data.color, input.readInt32());
 				data.icon = input.readString() ?? undefined;
+				data.iconSize = input.readFloat();
+				data.iconRotation = input.readFloat();
 				data.visible = input.readBoolean();
 			}
 			bones.push(data);
