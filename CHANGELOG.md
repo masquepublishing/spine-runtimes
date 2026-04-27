@@ -920,6 +920,8 @@
   - Ported the sequence attachment refactor from spine-libgdx. `Sequence` now precomputes per-frame regions, UVs, and region offsets, and `RegionAttachment` / `MeshAttachment` now mirror the libgdx implementation
   - Ported the latest clipping runtime changes from spine-libgdx, including convex and inverse clipping support and the inverse clipping crash fix
   - Added `ClippingAttachment.convex` and `ClippingAttachment.inverse`
+  - Added `Animation.color` for the animation color as it was in Spine when nonessential data is exported
+  - Added `ScaleY` enum and `IkConstraintData.scaleY` to control how IK compress/stretch changes `BonePose.scaleY`, including volume preservation
   - Fixed `SkeletonData` default FPS and missing `PathAttachment` initialization
   - Fixed reverse IK bend positive logic and transform constraint/slider scaling issues
 
@@ -1029,6 +1031,7 @@
   - `RegionAttachment` and `MeshAttachment` now take a non-null `Sequence` in their constructors and use the new sequence attachment model
   - `EventData` no longer stores `intValue`, `floatValue`, `stringValue`, `volume`, and `balance` directly. Use `eventData.setupPose` to access the setup pose `Event` which provides these properties instead
   - `SkinEntry.name` renamed to `placeholderName` to better match Spine editor terminology
+  - `IkConstraintData.uniform` replaced by `IkConstraintData.scaleY`. `IkConstraint.apply()` methods now take `ScaleY` instead of a boolean `uniform` parameter
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
   - API changes to match reference runtime naming conventions:
     - `addAnimationWith()` → `addAnimation()`

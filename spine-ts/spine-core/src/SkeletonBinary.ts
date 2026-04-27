@@ -159,7 +159,7 @@ export class SkeletonBinary {
 					data.target = bones[input.readInt(true)];
 					const flags = input.readByte();
 					data.skinRequired = (flags & 1) !== 0;
-					data.uniform = (flags & 2) !== 0;
+					if ((flags & 2) !== 0) data.scaleY = input.readUnsignedByte();
 					const setup = data.setupPose;
 					setup.bendDirection = (flags & 4) !== 0 ? -1 : 1;
 					setup.compress = (flags & 8) !== 0;
@@ -402,7 +402,7 @@ export class SkeletonBinary {
 		for (let i = 0; i < n; i++) {
 			const animationName = input.readString();
 			if (!animationName) throw new Error("Animation name must not be null.");
-			animations.push(this.readAnimation(input, animationName, skeletonData));
+			animations.push(this.readAnimation(input, animationName, skeletonData, nonessential));
 		}
 
 		for (let i = 0; i < constraintCount; i++) {
@@ -676,7 +676,7 @@ export class SkeletonBinary {
 		return array;
 	}
 
-	private readAnimation (input: BinaryInput, name: string, skeletonData: SkeletonData): Animation {
+	private readAnimation (input: BinaryInput, name: string, skeletonData: SkeletonData, nonessential: boolean): Animation {
 		input.readInt(true); // Number of timelines.
 		const timelines: Timeline[] = [];
 		const scale = this.scale;
@@ -1188,7 +1188,9 @@ export class SkeletonBinary {
 		let duration = 0;
 		for (let i = 0, n = timelines.length; i < n; i++)
 			duration = Math.max(duration, timelines[i].getDuration());
-		return new Animation(name, timelines, duration);
+		const animation = new Animation(name, timelines, duration);
+		if (nonessential) Color.rgba8888ToColor(animation.color, input.readInt32());
+		return animation;
 	}
 }
 

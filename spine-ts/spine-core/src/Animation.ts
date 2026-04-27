@@ -50,7 +50,7 @@ import type { Slot } from "./Slot.js";
 import type { SlotPose } from "./SlotPose.js";
 import type { TransformConstraint } from "./TransformConstraint.js";
 import type { TransformConstraintPose } from "./TransformConstraintPose.js";
-import { type NumberArrayLike, StringSet, Utils } from "./Utils.js";
+import { Color, type NumberArrayLike, StringSet, Utils } from "./Utils.js";
 
 /** Stores a list of timelines to animate a skeleton's pose over time.
  *
@@ -72,6 +72,10 @@ export class Animation {
 	 *
 	 * See {@link BoneTimeline.bones}. */
 	readonly bones: Array<number>;
+
+	// Nonessential.
+	/** The color of the animation as it was in Spine, or a default color if nonessential data was not exported. */
+	readonly color = new Color(1, 1, 1, 1);
 
 	/** The duration of the animation in seconds, which is usually the highest time of all frames in the timeline. The duration is
 	 * used to know when it has completed and when it should loop back to the start. */

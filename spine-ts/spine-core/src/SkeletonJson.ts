@@ -35,7 +35,7 @@ import { Sequence, SequenceMode } from "./attachments/Sequence.js";
 import { BoneData, Inherit } from "./BoneData.js";
 import { Event } from "./Event.js";
 import { EventData } from "./EventData.js";
-import { IkConstraintData } from "./IkConstraintData.js";
+import { IkConstraintData, ScaleY } from "./IkConstraintData.js";
 import { PathConstraintData, PositionMode, RotateMode, SpacingMode } from "./PathConstraintData.js";
 import { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 import { SkeletonData } from "./SkeletonData.js";
@@ -157,7 +157,9 @@ export class SkeletonJson {
 						if (!target) throw new Error(`Couldn't find target bone ${targetName} for IK constraint ${name}.`);
 						data.target = target;
 
-						data.uniform = getValue(constraintMap, "uniform", false);
+						const scaleY = getValue(constraintMap, "scaleY", null);
+						if (scaleY != null) data.scaleY = Utils.enumValue(ScaleY, scaleY);
+
 						const setup = data.setupPose;
 						setup.mix = getValue(constraintMap, "mix", 1);
 						setup.softness = getValue(constraintMap, "softness", 0) * scale;
@@ -1226,7 +1228,7 @@ export class SkeletonJson {
 			}
 		}
 
-		// Event timelines.
+		// Event timeline.
 		if (map.events) {
 			const timeline = new EventTimeline(map.events.length);
 			let frame = 0;
@@ -1251,7 +1253,12 @@ export class SkeletonJson {
 		let duration = 0;
 		for (let i = 0, n = timelines.length; i < n; i++)
 			duration = Math.max(duration, timelines[i].getDuration());
-		skeletonData.animations.push(new Animation(name, timelines, duration));
+
+		const animation = new Animation(name, timelines, duration);
+		const color = getValue(map, "color", null);
+		if (color !== null) animation.color.setFromString(color);
+
+		skeletonData.animations.push(animation);
 	}
 }
 
