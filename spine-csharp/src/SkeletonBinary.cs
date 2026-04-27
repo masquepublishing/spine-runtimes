@@ -211,6 +211,8 @@ namespace Spine {
 					if (nonessential) { // discard non-essential data
 						input.ReadInt(); // Color.rgba8888ToColor(data.color, input.readInt());
 						input.ReadString(); // data.icon = input.readString();
+						input.ReadFloat(); // data.iconSize = input.readFloat();
+						input.ReadFloat(); // data.iconRotation = input.readFloat();
 						input.ReadBoolean(); // data.visible = input.readBoolean();
 					}
 					bones[i] = data;
