@@ -212,7 +212,8 @@ namespace Spine {
 							data.target = skeletonData.FindBone(targetName);
 							if (data.target == null) throw new Exception("IK target bone not found: " + targetName);
 
-							data.uniform = GetBoolean(constraintMap, "uniform", false);
+							string scaleY = GetString(constraintMap, "scaleY", null);
+							if (scaleY != null) data.scaleY = (IkConstraintData.ScaleYMode)Enum.Parse(typeof(IkConstraintData.ScaleYMode), scaleY, true);
 							IkConstraintPose setup = data.setupPose;
 							setup.mix = GetFloat(constraintMap, "mix", 1);
 							setup.softness = GetFloat(constraintMap, "softness", 0) * scale;

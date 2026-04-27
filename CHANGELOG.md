@@ -418,6 +418,7 @@
     | `EventData.Balance` |→| `EventData.SetupPose.Balance` |
   - `Timeline.PropertyIds` type changed from `string[]` to `ulong[]`. `Animation.HasTimeline()` parameter and Timeline constructors changed accordingly.
   - `Skeleton.DrawOrder` type changed from `ExposedList<Slot>` to `DrawOrder` class. Use `Skeleton.DrawOrder.AppliedPose` for rendering and `Skeleton.DrawOrder.Pose` for changing the draw order.
+  - `IkConstraintData.Uniform` replaced by `IkConstraintData.ScaleY`. `IkConstraint.Apply()` methods now take `ScaleY` instead of a `bool uniform` parameter.
 
 ### Unity
 

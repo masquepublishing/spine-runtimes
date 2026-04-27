@@ -255,7 +255,7 @@ namespace Spine {
 						data.target = bones[input.ReadInt(true)];
 						int flags = input.Read();
 						data.skinRequired = (flags & 1) != 0;
-						data.uniform = (flags & 2) != 0;
+						if ((flags & 2) != 0) data.scaleY = (IkConstraintData.ScaleYMode)input.Read();
 						IkConstraintPose setup = data.setupPose;
 						setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 						setup.compress = (flags & 8) != 0;
