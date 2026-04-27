@@ -456,7 +456,7 @@
   - Added `SkeletonUpdateSystem.Instance.GroupRenderersBySkeletonType` and `GroupAnimationBySkeletonType` properties. Defaults to disabled. Later when smart partitioning is implemented, enabling this parameter might slightly improve cache locality. Until then having it enabled combined with different skeleton complexity would lead to worse load balancing.
   - Added previously missing editor drag & drop skeleton instantiation option *SkeletonGraphic (UI) Mecanim* combining components `SkeletonGraphic` and `SkeletonMecanim`.
   - Added define `SPINE_DISABLE_THREADING` to disable threaded animation and mesh generation entirely, removing the respective code. This define can be set as `Scripting Define Symbols` globally or for selective build profiles where desired.
-  - Added automatic load balancing (work stealing) for improved performance when using threaded animation and mesh generation, enabled by default. Load balancing can be disabled via a new Spine preferences parameter `Threading Defaults - Load Balancing` setting a build define accordingly. 
+  - Added automatic load balancing (work stealing) for improved performance when using threaded animation and mesh generation, enabled by default. Load balancing can be disabled via a new Spine preferences parameter `Threading Defaults - Load Balancing` setting a build define accordingly.
     Additional configuration parameters `SkeletonUpdateSystem.UpdateChunksPerThread` and `LateUpdateChunksPerThread` are available to fine-tune the chunk count for load balancing. A minimum of 8 chunks is recommended with load balancing enabled. Higher values add higher overhead with potentially detrimental effect on performance.
   - Spine UI Toolkit UPM package now supports rendering back-face triangles. Enable `Flip Back Faces` to automatically fix back-face geometry in an additional pass (defaults to enabled). Disable the setting to save additional processing overhead.
   - Spine UI Toolkit UPM package now supports PMA atlas textures. At the `SpineVisualElement` expand `Blend Mode Materials` and hit `Detect Materials` to automatically assign the proper PMA or straight alpha material at `Normal Material`. Unity minimum version increased to 6000.3 which added  support for UI Toolkit materials.
@@ -907,6 +907,21 @@
   - Added `allowMissingRegions` parameter to `AtlasAttachmentLoader` constructor to support skeletons exported with per-skin atlases
   - Added `TextureLoader` type with optional `pma?: boolean` parameter to `AssetManagerBase`. `AssetManagerBase` now tracks and passes PMA metadata from atlas pages to texture loaders, allowing runtimes to automatically premultiply textures on upload
   - Added `SkeletonRendererCore` class to reduce complexity of runtime-specific render code
+  - Linked meshes can now inherit deform and sequence timelines from source meshes in different slots
+  - Added `Attachment.timelineSlots` and `Attachment.isTimelineActive()` for attachment timeline propagation across linked meshes
+  - Added `DrawOrderFolderTimeline` for animating draw order folders
+  - Added `Timeline.additive` and `Timeline.instant` to query timeline blending capabilities
+  - Added `TrackEntry.additive` to control additive blending per track entry
+  - Added support for passing `null` as the attachment name to `Skeleton.setAttachment()`
+  - Ported the latest parser fixes from spine-libgdx, including the 4.3 path constraint flag fix and the weighted mesh binary vertex allocation/count fix
+  - Ported the latest additive timeline updates and alpha/RGB timeline flicker fixes from spine-libgdx
+  - Ported the AnimationState additive/hold rework from spine-libgdx. `MixBlend` and `MixDirection` are no longer used by timelines. The new system uses `fromSetup`, `add`, and `out` parameters and automatically calculates the required hold state values
+  - Ported the Skin placeholder name rename from spine-libgdx. `SkinEntry.name` renamed to `placeholderName` to better match Spine editor terminology
+  - Ported the sequence attachment refactor from spine-libgdx. `Sequence` now precomputes per-frame regions, UVs, and region offsets, and `RegionAttachment` / `MeshAttachment` now mirror the libgdx implementation
+  - Ported the latest clipping runtime changes from spine-libgdx, including convex and inverse clipping support and the inverse clipping crash fix
+  - Added `ClippingAttachment.convex` and `ClippingAttachment.inverse`
+  - Fixed `SkeletonData` default FPS and missing `PathAttachment` initialization
+  - Fixed reverse IK bend positive logic and transform constraint/slider scaling issues
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
@@ -973,10 +988,10 @@
     | physicsConstraint.damping           |→| physicsConstraint.getPose().damping  |
     | physicsConstraint.massInverse       |→| physicsConstraint.getPose().massInverse |
     | physicsConstraint.wind              |→| physicsConstraint.getPose().wind     |
-  - `ConstraintData` properties moved to `constraintData.getSetupPose()`:
+  - `ConstraintData` properties moved to `constraintData.setupPose`:
     ||||
     |-----|-|-----|
-    | ikConstraintData.mix |→| ikConstraintData.setup.mix |
+    | ikConstraintData.mix |→| ikConstraintData.setupPose.mix |
     | ...| |...|
 
   - `SkeletonData` now provides a single `ConstraintData` list `constraints` instead of separate lists per constraint type
@@ -1004,8 +1019,16 @@
     | IkConstraint.setToSetupPose()     |→| IkConstraint.setupPose() |
   - `Physics` enum moved from nested `Skeleton.Physics` to standalone `Physics` export
     - `updateWorldTransform(Skeleton.Physics.update)` → `updateWorldTransform(Physics.update)`
-  - Timeline `apply()` methods now take an additional `appliedPose` parameter
+  - Timeline `apply()` methods now take `fromSetup`, `add`, `out`, and `appliedPose` parameters instead of `MixBlend` and `MixDirection`
+  - Removed `MixBlend` and `MixDirection`
+  - Removed `TrackEntry.holdPrevious` and internal interrupt alpha state. New `AnimationState` hold system automatically calculates the required state values
+  - Removed `TrackEntry.mixBlend`. Use `TrackEntry.additive` for additive blending
+  - `AnimationState.setCurrent()` renamed to `AnimationState.setTrack()`; `AnimationState.getCurrent()` is deprecated in favor of `AnimationState.getTrack()`
   - Attachment `computeWorldVertices()` methods now take an additional `skeleton` parameter
+  - `MeshAttachment.getParentMesh()` / `setParentMesh()` renamed to `getSourceMesh()` / `setSourceMesh()`
+  - `RegionAttachment` and `MeshAttachment` now take a non-null `Sequence` in their constructors and use the new sequence attachment model
+  - `EventData` no longer stores `intValue`, `floatValue`, `stringValue`, `volume`, and `balance` directly. Use `eventData.setupPose` to access the setup pose `Event` which provides these properties instead
+  - `SkinEntry.name` renamed to `placeholderName` to better match Spine editor terminology
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
   - API changes to match reference runtime naming conventions:
     - `addAnimationWith()` → `addAnimation()`
@@ -1044,6 +1067,14 @@
 
 ### Player
 
+- **Additions**
+  - Added support for multiple skins in the skin selector
+  - Added `debug` support as a boolean option
+
+- **Fixes**
+  - Fixed resize mode regressions
+  - The progress bar is now shown only when hovering the bottom bar and can be dragged outside its area
+
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
   - Removed `premultipliedAlpha` option from `SpinePlayerConfig` - PMA is now handled automatically
@@ -1065,6 +1096,9 @@
   - Added static `createOptions` method for Spine initialization config to simplify subclassing
   - Added `allowMissingRegions` parameter to game object factory
   - Restored control bones example
+
+- **Fixes**
+  - Fixed clipping regressions
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
