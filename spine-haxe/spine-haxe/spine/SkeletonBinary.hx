@@ -204,6 +204,8 @@ class SkeletonBinary {
 			if (nonessential) {
 				data.color.setFromRgba8888(input.readInt32());
 				data.icon = input.readString();
+				data.iconSize = input.readFloat();
+				data.iconRotation = input.readFloat();
 				data.visible = input.readBoolean();
 			}
 			bones.push(data);

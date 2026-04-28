@@ -144,6 +144,10 @@ class SkeletonJson {
 			var color:String = Reflect.getProperty(boneMap, "color");
 			if (color != null)
 				data.color.setFromString(color);
+			data.icon = Reflect.getProperty(boneMap, "icon");
+			data.iconSize = getFloat(boneMap, "iconSize", 1);
+			data.iconRotation = getFloat(boneMap, "iconRotation");
+			data.visible = Reflect.hasField(boneMap, "visible") ? cast(Reflect.getProperty(boneMap, "visible"), Bool) : true;
 
 			skeletonData.bones.push(data);
 		}
