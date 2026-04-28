@@ -1454,7 +1454,11 @@ class SkeletonJson {
 			duration = Math.max(duration, timelines[i].getDuration());
 		}
 
-		skeletonData.animations.push(new Animation(name, timelines, duration));
+		var animation = new Animation(name, timelines, duration);
+		var color:String = Reflect.getProperty(map, "color");
+		if (color != null)
+			animation.color.setFromString(color);
+		skeletonData.animations.push(animation);
 	}
 
 	static private function readTimeline(timelines:Array<Timeline>, keys:Array<Dynamic>, timeline:CurveTimeline1, defaultValue:Float, scale:Float) {

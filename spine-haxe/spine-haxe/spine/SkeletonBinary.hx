@@ -492,7 +492,7 @@ class SkeletonBinary {
 		var animations = skeletonData.animations;
 		n = input.readInt(true);
 		for (i in 0...n)
-			animations[i] = readAnimation(input, input.readString(), skeletonData);
+			animations[i] = readAnimation(input, input.readString(), skeletonData, nonessential);
 
 		for (i in 0...constraintCount)
 			if (Std.isOfType(constraints[i], SliderData)) {
@@ -825,7 +825,7 @@ class SkeletonBinary {
 		return array;
 	}
 
-	private function readAnimation(input:BinaryInput, name:String, skeletonData:SkeletonData):Animation {
+	private function readAnimation(input:BinaryInput, name:String, skeletonData:SkeletonData, nonessential:Bool):Animation {
 		input.readInt(true); // Count of timelines.
 		var timelines:Array<Timeline> = new Array<Timeline>();
 		var i:Int = 0, n:Int = 0, ii:Int = 0, nn:Int = 0;
@@ -1440,7 +1440,10 @@ class SkeletonBinary {
 		var duration:Float = 0;
 		for (i in 0...timelines.length)
 			duration = Math.max(duration, timelines[i].getDuration());
-		return new Animation(name, timelines, duration);
+		var animation = new Animation(name, timelines, duration);
+		if (nonessential)
+			animation.color.setFromRgba8888(input.readInt32());
+		return animation;
 	}
 
 	static private function readTimeline(input:BinaryInput, timelines:Array<Timeline>, timeline:CurveTimeline1, scale:Float) {
