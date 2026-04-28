@@ -411,6 +411,48 @@ export class Spine extends ViewContainer {
 	}
 
 	private hasNeverUpdated = true;
+
+	private _physicsPositionInheritanceFactor: PointData = { x: 1, y: 1 };
+	private _physicsRotationInheritanceFactor = 1;
+	private hasLastPhysicsTransform = false;
+	private lastPhysicsX = 0;
+	private lastPhysicsY = 0;
+	private lastPhysicsRotation = 0;
+	private readonly currentPhysicsPosition = { x: 0, y: 0 };
+	private readonly lastPhysicsPosition = { x: 0, y: 0 };
+
+	/**
+	 * Scales how much movement of this Pixi container is inherited by skeleton physics constraints.
+	 * The default is `{ x: 1, y: 1 }`, which applies container movement normally. Use `{ x: 0, y: 0 }`
+	 * to prevent container translation from affecting physics constraints.
+	 */
+	public get physicsPositionInheritanceFactor (): PointData {
+		return this._physicsPositionInheritanceFactor;
+	}
+
+	public set physicsPositionInheritanceFactor (value: PointData) {
+		const wasDisabled = this._physicsPositionInheritanceFactor.x === 0 && this._physicsPositionInheritanceFactor.y === 0;
+		const isEnabled = value.x !== 0 || value.y !== 0;
+
+		this._physicsPositionInheritanceFactor = { x: value.x, y: value.y };
+		if (wasDisabled && isEnabled) this.resetPhysicsPosition();
+	}
+
+	/**
+	 * Scales how much rotation of this Pixi container is inherited by skeleton physics constraints.
+	 * The default is `1`, which applies container rotation normally. Use `0` to prevent container
+	 * rotation from affecting physics constraints.
+	 */
+	public get physicsRotationInheritanceFactor (): number {
+		return this._physicsRotationInheritanceFactor;
+	}
+
+	public set physicsRotationInheritanceFactor (value: number) {
+		const wasDisabled = this._physicsRotationInheritanceFactor === 0;
+		this._physicsRotationInheritanceFactor = value;
+		if (wasDisabled && value !== 0) this.resetPhysicsRotation();
+	}
+
 	constructor (options: SkeletonData | SpineOptions | SpineFromOptions) {
 		super({});
 
@@ -445,6 +487,89 @@ export class Spine extends ViewContainer {
 
 	protected internalUpdate (ticker?: Ticker, deltaSeconds?: number): void {
 		this._updateAndApplyState(deltaSeconds ?? this._ticker.deltaMS / 1000);
+	}
+
+	/** Resets the position used for calculating inherited physics translation. */
+	public resetPhysicsPosition (): void {
+		const transform = this.worldTransform;
+		this.lastPhysicsX = transform.tx;
+		this.lastPhysicsY = transform.ty;
+		if (!this.hasLastPhysicsTransform) this.lastPhysicsRotation = this.getPhysicsRotation();
+		this.hasLastPhysicsTransform = true;
+	}
+
+	/** Resets the rotation used for calculating inherited physics rotation. */
+	public resetPhysicsRotation (): void {
+		const transform = this.worldTransform;
+		this.lastPhysicsRotation = this.getPhysicsRotation();
+		if (!this.hasLastPhysicsTransform) {
+			this.lastPhysicsX = transform.tx;
+			this.lastPhysicsY = transform.ty;
+		}
+		this.hasLastPhysicsTransform = true;
+	}
+
+	/** Resets the transform used for calculating inherited physics translation and rotation. */
+	public resetPhysicsTransform (): void {
+		this.resetPhysicsPosition();
+		this.resetPhysicsRotation();
+	}
+
+	private applyTransformMovementToPhysics (): void {
+		const { tx, ty } = this.worldTransform;
+		const currentRotation = this.getPhysicsRotation();
+
+		if (this.hasLastPhysicsTransform) {
+			this.applyPositionMovementToPhysics(tx, ty);
+			this.applyRotationMovementToPhysics(currentRotation);
+		}
+
+		this.setLastPhysicsTransform(tx, ty, currentRotation);
+	}
+
+	private applyPositionMovementToPhysics (currentX: number, currentY: number): void {
+		const positionFactor = this._physicsPositionInheritanceFactor;
+		if (positionFactor.x === 0 && positionFactor.y === 0) return;
+
+		const currentPosition = this.currentPhysicsPosition;
+		currentPosition.x = currentX;
+		currentPosition.y = currentY;
+		this.pixiWorldCoordinatesToSkeleton(currentPosition);
+
+		const lastPosition = this.lastPhysicsPosition;
+		lastPosition.x = this.lastPhysicsX;
+		lastPosition.y = this.lastPhysicsY;
+		this.pixiWorldCoordinatesToSkeleton(lastPosition);
+
+		this.skeleton.physicsTranslate(
+			(currentPosition.x - lastPosition.x) * positionFactor.x,
+			(currentPosition.y - lastPosition.y) * positionFactor.y
+		);
+	}
+
+	private applyRotationMovementToPhysics (currentRotation: number): void {
+		const rotationFactor = this._physicsRotationInheritanceFactor;
+		if (rotationFactor === 0) return;
+
+		this.skeleton.physicsRotate(0, 0, this.getRotationDelta(currentRotation, this.lastPhysicsRotation) * rotationFactor);
+	}
+
+	private setLastPhysicsTransform (x: number, y: number, rotation: number): void {
+		this.lastPhysicsX = x;
+		this.lastPhysicsY = y;
+		this.lastPhysicsRotation = rotation;
+		this.hasLastPhysicsTransform = true;
+	}
+
+	private getPhysicsRotation (): number {
+		const transform = this.worldTransform;
+		return Math.atan2(transform.b, transform.a) * 180 / Math.PI;
+	}
+
+	private getRotationDelta (current: number, previous: number): number {
+		let delta = current - previous;
+		delta = (delta + 180) % 360 - 180;
+		return delta < -180 ? delta + 360 : delta;
 	}
 
 	override get bounds () {
@@ -528,6 +653,7 @@ export class Spine extends ViewContainer {
 		const { skeleton } = this;
 
 		this.state.apply(skeleton);
+		this.applyTransformMovementToPhysics();
 
 		this.beforeUpdateWorldTransforms(this);
 		skeleton.updateWorldTransform(Physics.update);
