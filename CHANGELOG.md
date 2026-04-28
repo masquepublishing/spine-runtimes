@@ -472,6 +472,7 @@
   - `SkeletonGraphic` property `CustomSlotMaterials` now properly assigns the override material directly instead of assigning the texture of the override material, which was of little use. Thus you can now assign a `SkeletonGraphic` compatible material like `SkeletonGraphicAdditive-Straight`.
   - `SkeletonGraphicCustomMaterials` now exposes `Custom Slot Materials` property for slot material overrides.
   - Exposed `SpineVisualElement.Initialize` as `public`.
+  - `SkeletonRenderer` and `SkeletonGraphic` classes now provide `PhysicsPositionInheritanceLimit` and `PhysicsRotationInheritanceLimit` properties, exposed in the component Inspector under `Physics Inheritance` as `Limit` properties, below `Position` and `Rotation`.
 
 - **Deprecated**
 
