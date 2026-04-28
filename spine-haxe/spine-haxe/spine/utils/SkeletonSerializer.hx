@@ -4253,12 +4253,12 @@ class SkeletonSerializer {
 			"isNullable": false
 		});
 
-		json.writeName("uniform");
-		writeProperty(obj, "getUniform()", {
+		json.writeName("scaleY");
+		writeProperty(obj, "getScaleY().name()", {
 			"kind": "primitive",
-			"name": "uniform",
-			"getter": "getUniform()",
-			"valueType": "boolean",
+			"name": "scaleY",
+			"getter": "getScaleY().name()",
+			"valueType": "String",
 			"isNullable": false
 		});
 

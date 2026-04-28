@@ -30,6 +30,7 @@
 package spine;
 
 import haxe.DynamicAccess;
+import spine.IkConstraintData.ScaleY;
 import spine.animation.BoneTimeline2;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
@@ -198,8 +199,9 @@ class SkeletonJson {
 						if (data.target == null)
 							throw new SpineException("Target bone not found: " + Reflect.getProperty(constraintMap, "target"));
 
-						data.uniform = (Reflect.hasField(constraintMap, "uniform")
-							&& cast(Reflect.getProperty(constraintMap, "uniform"), Bool));
+						var scaleY:String = Reflect.getProperty(constraintMap, "scaleY");
+						if (scaleY != null)
+							data.scaleY = ScaleY.fromName(scaleY);
 						var setup = data.setupPose;
 						setup.mix = getFloat(constraintMap, "mix", 1);
 						setup.softness = getFloat(constraintMap, "softness", 0) * scale;
