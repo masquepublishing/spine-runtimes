@@ -49,6 +49,7 @@ class Animation {
 	public final bones:Array<Int>;
 
 	// Nonessential.
+
 	/** The color of the animation as it was in Spine, or a default color if nonessential data was not exported. */
 	public final color:Color = new Color(1, 1, 1, 1);
 
