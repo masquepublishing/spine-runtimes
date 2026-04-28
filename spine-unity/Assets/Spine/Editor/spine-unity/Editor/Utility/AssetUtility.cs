@@ -107,6 +107,24 @@ namespace Spine.Unity.Editor {
 		public static HashSet<string> assetsImportedInWrongState = new HashSet<string>();
 		public static bool isFirstPMAWorkflowMismatch = true;
 
+		// Set when DelayedSwitchToGamma issues a deferred call to switch project settings to gamma space after import.
+		static bool pendingSwitchToGamma = false;
+
+		public static ColorSpace ActiveColorSpace {
+			get { return pendingSwitchToGamma ? ColorSpace.Gamma : QualitySettings.activeColorSpace; }
+		}
+
+		public static void DelayedSwitchToGamma () {
+			if (pendingSwitchToGamma) return;
+			pendingSwitchToGamma = true;
+			// Defer to avoid hanging the editor by changing PlayerSettings.colorSpace inside OnPostprocessAllAssets.
+			EditorApplication.delayCall += () => {
+				PlayerSettings.colorSpace = ColorSpace.Gamma;
+				pendingSwitchToGamma = false;
+				Debug.Log("Switched Unity project to Gamma color space to support PMA atlas textures. To change it back go to 'Project Settings - Player - Other Settings - Color Space'.");
+			};
+		}
+
 		public static void HandleOnPostprocessAllAssets (string[] imported, List<string> texturesWithoutMetaFile) {
 			// In case user used "Assets -> Reimport All", during the import process,
 			// asset database is not initialized until some point. During that period,
@@ -632,7 +650,7 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-#region Import Atlases
+		#region Import Atlases
 		static List<AtlasAssetBase> FindAtlasesAtPath (string path) {
 			List<AtlasAssetBase> arr = new List<AtlasAssetBase>();
 			DirectoryInfo dir = new DirectoryInfo(path);
@@ -787,7 +805,7 @@ namespace Spine.Unity.Editor {
 
 		static void IssueAtlasWorkflowWarnings (bool isNewAtlas, Atlas atlas, SpineAtlasAsset atlasAsset) {
 			bool isPMA = atlas.Pages.Count > 0 && atlas.Pages[0].pma;
-			if (QualitySettings.activeColorSpace == ColorSpace.Linear && isPMA) {
+			if (ActiveColorSpace == ColorSpace.Linear && isPMA) {
 				bool wasFixed = false;
 				if (SpineEditorUtilities.Preferences.ShowWorkflowMismatchDialog)
 					wasFixed = ShowWorkflowMismatchDialog(atlasAsset, isLinearPMAMismatch: true, atlasIsPMA: isPMA);
@@ -1097,9 +1115,9 @@ namespace Spine.Unity.Editor {
 
 			MaterialChecks.EnablePMATextureAtMaterial(material, isUsingPMAWorkflow);
 		}
-#endregion
+		#endregion
 
-#region Import SkeletonData (json or binary)
+		#region Import SkeletonData (json or binary)
 		internal static string GetSkeletonDataAssetFilePath (TextAsset spineJson) {
 			string primaryName = Path.GetFileNameWithoutExtension(spineJson.name);
 			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spineJson)).Replace('\\', '/');
@@ -1155,9 +1173,9 @@ namespace Spine.Unity.Editor {
 				return null;
 			}
 		}
-#endregion
+		#endregion
 
-#region Spine Skeleton Data File Validation
+		#region Spine Skeleton Data File Validation
 		public static bool CheckForValidSkeletonData (string skeletonJSONPath) {
 			string dir = Path.GetDirectoryName(skeletonJSONPath).Replace('\\', '/');
 			TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonJSONPath);
@@ -1180,9 +1198,9 @@ namespace Spine.Unity.Editor {
 			compatibilityProblemInfo = SkeletonDataCompatibility.GetCompatibilityProblemInfo(fileVersion);
 			return isSpineSkeletonData;
 		}
-#endregion
+		#endregion
 
-#region Dialogs
+		#region Dialogs
 		public static void SkeletonImportDialog (string skeletonPath, List<AtlasAssetBase> localAtlases, List<string> requiredPaths, ref bool abortSkeletonImport) {
 			bool resolved = false;
 			while (!resolved) {
@@ -1367,7 +1385,7 @@ namespace Spine.Unity.Editor {
 			}
 			return (AtlasAssetBase)obj;
 		}
-#endregion
+		#endregion
 
 		public static string GetPathSafeName (string name) {
 			foreach (char c in System.IO.Path.GetInvalidFileNameChars()) { // Doesn't handle more obscure file name limitations.
@@ -1542,7 +1560,7 @@ namespace Spine.Unity.Editor {
 			return gameObject.AddComponent(type);
 		}
 
-#region SkeletonMecanim
+		#region SkeletonMecanim
 #if SPINE_SKELETONMECANIM
 		public static SkeletonMecanim InstantiateSkeletonMecanim (SkeletonDataAsset skeletonDataAsset, string skinName) {
 			return InstantiateSkeletonMecanim(skeletonDataAsset, skeletonDataAsset.GetSkeletonData(true).FindSkin(skinName));
@@ -1593,9 +1611,9 @@ namespace Spine.Unity.Editor {
 			return newSkeletonMecanim;
 		}
 #endif
-#endregion SkeletonMecanim
+		#endregion SkeletonMecanim
 
-#region SkeletonGraphic
+		#region SkeletonGraphic
 		public static Component SpawnSkeletonGraphicFromDrop (SkeletonDataAsset data) {
 			return InstantiateSkeletonGraphic(data);
 		}
@@ -1643,6 +1661,6 @@ namespace Spine.Unity.Editor {
 #endif
 			return go;
 		}
-#endregion SkeletonGraphic
+		#endregion SkeletonGraphic
 	}
 }
