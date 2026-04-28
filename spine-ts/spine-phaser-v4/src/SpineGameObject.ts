@@ -230,7 +230,8 @@ export class SpineGameObject extends DepthMixin(
 	afterUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
 	private offsetX = 0;
 	private offsetY = 0;
-	private _physicsPositionInheritanceFactor = { x: 1, y: 1 };
+	private _physicsPositionInheritanceFactorX = 1;
+	private _physicsPositionInheritanceFactorY = 1;
 	private _physicsRotationInheritanceFactor = 1;
 	private hasLastPhysicsTransform = false;
 	private lastPhysicsX = 0;
@@ -239,20 +240,27 @@ export class SpineGameObject extends DepthMixin(
 	private readonly currentPhysicsPosition = { x: 0, y: 0 };
 	private readonly lastPhysicsPosition = { x: 0, y: 0 };
 
-	/**
-	 * Scales how much movement of this Phaser game object is inherited by skeleton physics constraints.
-	 * The default is `{ x: 1, y: 1 }`, which applies game object movement normally. Use `{ x: 0, y: 0 }`
-	 * to prevent game object translation from affecting physics constraints.
-	 */
-	public get physicsPositionInheritanceFactor (): { x: number, y: number } {
-		return this._physicsPositionInheritanceFactor;
+	/** Scales how much horizontal translation of this Phaser game object is inherited by skeleton physics constraints. */
+	public get physicsPositionInheritanceFactorX (): number {
+		return this._physicsPositionInheritanceFactorX;
 	}
 
-	public set physicsPositionInheritanceFactor (value: { x: number, y: number }) {
-		const wasDisabled = this._physicsPositionInheritanceFactor.x === 0 && this._physicsPositionInheritanceFactor.y === 0;
-		const isEnabled = value.x !== 0 || value.y !== 0;
+	/** Scales how much vertical translation of this Phaser game object is inherited by skeleton physics constraints. */
+	public get physicsPositionInheritanceFactorY (): number {
+		return this._physicsPositionInheritanceFactorY;
+	}
 
-		this._physicsPositionInheritanceFactor = { x: value.x, y: value.y };
+	/**
+	 * Sets how much translation of this Phaser game object is inherited by skeleton physics constraints.
+	 * The default is (1, 1), which applies game object translation normally. Use (0, 0)
+	 * to prevent game object translation from affecting physics constraints.
+	 */
+	public setPhysicsPositionInheritanceFactor (x: number, y: number): void {
+		const wasDisabled = this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0;
+		const isEnabled = x !== 0 || y !== 0;
+
+		this._physicsPositionInheritanceFactorX = x;
+		this._physicsPositionInheritanceFactorY = y;
 		if (wasDisabled && isEnabled) this.resetPhysicsPosition();
 	}
 
@@ -396,8 +404,7 @@ export class SpineGameObject extends DepthMixin(
 	}
 
 	private applyPositionMovementToPhysics (currentX: number, currentY: number): void {
-		const positionFactor = this._physicsPositionInheritanceFactor;
-		if (positionFactor.x === 0 && positionFactor.y === 0) return;
+		if (this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0) return;
 
 		const currentPosition = this.currentPhysicsPosition;
 		currentPosition.x = currentX;
@@ -410,8 +417,8 @@ export class SpineGameObject extends DepthMixin(
 		this.phaserWorldCoordinatesToSkeleton(lastPosition);
 
 		this.skeleton.physicsTranslate(
-			(currentPosition.x - lastPosition.x) * positionFactor.x,
-			(currentPosition.y - lastPosition.y) * positionFactor.y
+			(currentPosition.x - lastPosition.x) * this._physicsPositionInheritanceFactorX,
+			(currentPosition.y - lastPosition.y) * this._physicsPositionInheritanceFactorY
 		);
 	}
 
