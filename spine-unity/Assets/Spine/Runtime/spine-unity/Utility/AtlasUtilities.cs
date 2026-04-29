@@ -615,7 +615,7 @@ namespace Spine.Unity.AttachmentTools {
 						regions[r] = repackedRegion;
 					}
 					--repackedIndex;
-					
+
 					textureAttachment.UpdateSequence();
 				}
 			}
@@ -1124,8 +1124,15 @@ namespace Spine.Unity.AttachmentTools {
 
 			// Note: originalW and originalH need to be scaled according to the
 			// repacked width and height, repacking can mess with aspect ratio, etc.
-			int originalW = Mathf.RoundToInt((float)w * ((float)referenceRegion.originalWidth / (float)referenceRegion.width));
-			int originalH = Mathf.RoundToInt((float)h * ((float)referenceRegion.originalHeight / (float)referenceRegion.height));
+			bool flipsWH = referenceRegion.degrees == 90;
+			float toOriginalRatioW = (float)referenceRegion.originalWidth /
+				(flipsWH ? (float)referenceRegion.height : (float)referenceRegion.width);
+			float toOriginalRatioH = (float)referenceRegion.originalHeight /
+				(flipsWH ? (float)referenceRegion.width : (float)referenceRegion.height);
+			int originalWUnflipped = Mathf.RoundToInt((float)w * toOriginalRatioW);
+			int originalHUnflipped = Mathf.RoundToInt((float)h * toOriginalRatioH);
+			int originalW = flipsWH ? originalHUnflipped : originalWUnflipped;
+			int originalH = flipsWH ? originalWUnflipped : originalHUnflipped;
 
 			int offsetX = Mathf.RoundToInt((float)referenceRegion.offsetX * ((float)w / (float)referenceRegion.width));
 			int offsetY = Mathf.RoundToInt((float)referenceRegion.offsetY * ((float)h / (float)referenceRegion.height));
