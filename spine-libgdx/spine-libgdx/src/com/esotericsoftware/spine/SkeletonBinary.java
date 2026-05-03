@@ -284,7 +284,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					data.target = bones[input.readInt(true)];
 					int flags = input.read();
 					data.skinRequired = (flags & 1) != 0;
-					if ((flags & 2) != 0) data.scaleY = IkConstraintData.ScaleY.values[input.read()];
+					if ((flags & 2) != 0) data.scaleYMode = IkConstraintData.ScaleYMode.values[input.read()];
 					IkConstraintPose setup = data.setupPose;
 					setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup.compress = (flags & 8) != 0;
