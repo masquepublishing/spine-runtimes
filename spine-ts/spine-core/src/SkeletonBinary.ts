@@ -161,7 +161,7 @@ export class SkeletonBinary {
 					data.target = bones[input.readInt(true)];
 					const flags = input.readByte();
 					data.skinRequired = (flags & 1) !== 0;
-					if ((flags & 2) !== 0) data.scaleY = input.readUnsignedByte();
+					if ((flags & 2) !== 0) data.scaleYMode = input.readUnsignedByte();
 					const setup = data.setupPose;
 					setup.bendDirection = (flags & 4) !== 0 ? -1 : 1;
 					setup.compress = (flags & 8) !== 0;

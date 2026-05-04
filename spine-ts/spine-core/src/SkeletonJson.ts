@@ -35,7 +35,7 @@ import { Sequence, SequenceMode } from "./attachments/Sequence.js";
 import { BoneData, Inherit } from "./BoneData.js";
 import { Event } from "./Event.js";
 import { EventData } from "./EventData.js";
-import { IkConstraintData, ScaleY } from "./IkConstraintData.js";
+import { IkConstraintData, ScaleYMode } from "./IkConstraintData.js";
 import { PathConstraintData, PositionMode, RotateMode, SpacingMode } from "./PathConstraintData.js";
 import { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 import { SkeletonData } from "./SkeletonData.js";
@@ -161,7 +161,7 @@ export class SkeletonJson {
 						data.target = target;
 
 						const scaleY = getValue(constraintMap, "scaleY", null);
-						if (scaleY != null) data.scaleY = Utils.enumValue(ScaleY, scaleY);
+						if (scaleY != null) data.scaleYMode = Utils.enumValue(ScaleYMode, scaleY);
 
 						const setup = data.setupPose;
 						setup.mix = getValue(constraintMap, "mix", 1);
