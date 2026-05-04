@@ -32,7 +32,7 @@ package spine;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
 import spine.TransformConstraintData;
-import spine.IkConstraintData.ScaleY;
+import spine.IkConstraintData.ScaleYMode;
 import haxe.io.Bytes;
 import StringTools;
 import spine.animation.AlphaTimeline;
@@ -250,7 +250,7 @@ class SkeletonBinary {
 					var flags = input.readByte();
 					data.skinRequired = (flags & 1) != 0;
 					if ((flags & 2) != 0)
-						data.scaleY = ScaleY.values[input.readUnsignedByte()];
+						data.scaleYMode = ScaleYMode.values[input.readUnsignedByte()];
 					var setup = data.setupPose;
 					setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup.compress = (flags & 8) != 0;
