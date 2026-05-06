@@ -49,7 +49,7 @@ class AnimationState {
 	public static inline var HOLD_FIRST:Int = 3;
 
 	public static inline var SETUP:Int = 1;
-	public static inline var CURRENT:Int = 2;
+	public static inline var RETAIN:Int = 2;
 
 	private static var emptyAnimation:Animation = new Animation("<empty>", new Array<Timeline>(), 0);
 
@@ -228,13 +228,13 @@ class AnimationState {
 			if (i == 0 && alpha == 1) {
 				for (timeline in timelines) {
 					if (Std.isOfType(timeline, AttachmentTimeline))
-						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, true, false, true);
+						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, true, true);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
 				}
 			} else {
 				var timelineMode:Array<Int> = current.timelineMode;
-				var attachments:Bool = alpha >= current.alphaAttachmentThreshold;
+				var retainAttachments:Bool = alpha >= current.alphaAttachmentThreshold;
 				var add = current.additive,
 					shortestRotation = add || current.shortestRotation;
 				var firstFrame:Bool = !shortestRotation && current.timelinesRotation.length != timelineCount << 1;
@@ -248,7 +248,7 @@ class AnimationState {
 						applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, current.timelinesRotation, ii << 1,
 							firstFrame);
 					} else if (Std.isOfType(timeline, AttachmentTimeline)) {
-						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, fromSetup, false, attachments);
+						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, fromSetup, retainAttachments);
 					} else {
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
 					}
@@ -262,9 +262,7 @@ class AnimationState {
 			current.nextTrackLast = current.trackTime;
 		}
 
-		// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
-		// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
-		// the time is before the first key).
+		// Set slot attachments to the setup pose if they were set temporarily to apply deform timelines.
 		var setupState:Int = unkeyedState + SETUP;
 		for (slot in skeleton.slots) {
 			if (slot.attachmentState == setupState) {
@@ -272,7 +270,7 @@ class AnimationState {
 				slot.pose.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, attachmentName);
 			}
 		}
-		unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
+		unkeyedState += 2; // Reset.
 
 		queue.drain();
 		return applied;
@@ -292,7 +290,7 @@ class AnimationState {
 		var timelineMode:Array<Int> = from.timelineMode;
 		var timelineHoldMix:Array<TrackEntry> = from.timelineHoldMix;
 
-		var attachments:Bool = mix < from.mixAttachmentThreshold,
+		var retainAttachments:Bool = mix < from.mixAttachmentThreshold,
 			drawOrder:Bool = mix < from.mixDrawOrderThreshold;
 		var add = from.additive,
 			shortestRotation = add || from.shortestRotation;
@@ -329,8 +327,8 @@ class AnimationState {
 			if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
 				applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 			} else if (Std.isOfType(timeline, AttachmentTimeline)) {
-				applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, fromSetup,
-					true, attachments && alpha >= from.alphaAttachmentThreshold);
+				applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime,
+					fromSetup, retainAttachments && alpha >= from.alphaAttachmentThreshold);
 			} else {
 				var out = !drawOrder || !Std.isOfType(timeline, DrawOrderTimeline) || !fromSetup;
 				timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, out, false);
@@ -350,23 +348,30 @@ class AnimationState {
 
 	/**
 	 * Applies the attachment timeline and sets spine.Slot.attachmentState.
-	 * @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
-	 *           is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
-	 *           timelines see any deform.
+	 * @param retain True if the attachment remains after apply, false if temporary for deform timelines.
 	 */
-	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, fromSetup:Bool, out:Bool, attachments:Bool) {
+	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, fromSetup:Bool, retain:Bool) {
 		var slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active)
 			return;
+		if (!retain && slot.attachmentState == this.unkeyedState + RETAIN)
+			return;
 
-		if (out || time < timeline.frames[0]) {
-			if (fromSetup)
-				this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
-		} else
-			this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search1(timeline.frames, time)], attachments);
-
-		// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
-		if (slot.attachmentState <= this.unkeyedState)
+		var setup:Bool = time < timeline.frames[0];
+		var name:String = null;
+		if (!setup) {
+			name = timeline.attachmentNames[Timeline.search1(timeline.frames, time)];
+			setup = !retain && name == null;
+		}
+		if (setup) {
+			if (!fromSetup)
+				return;
+			name = slot.data.attachmentName;
+		}
+		slot.pose.attachment = name == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, name);
+		if (retain)
+			slot.attachmentState = this.unkeyedState + RETAIN;
+		else if (!setup)
 			slot.attachmentState = this.unkeyedState + SETUP;
 	}
 
@@ -429,12 +434,6 @@ class AnimationState {
 		}
 		timelinesRotation[i + 1] = diff;
 		pose.rotation = r1 + total * alpha;
-	}
-
-	private function setAttachment(skeleton:Skeleton, slot:Slot, attachmentName:String, attachments:Bool):Void {
-		slot.pose.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, attachmentName);
-		if (attachments)
-			slot.attachmentState = unkeyedState + CURRENT;
 	}
 
 	private function queueEvents(entry:TrackEntry, animationTime:Float):Void {
