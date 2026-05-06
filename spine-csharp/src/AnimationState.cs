@@ -48,7 +48,7 @@ namespace Spine {
 			return empty;
 		}
 
-		internal const int Subsequent = 0, First = 1, Hold = 2, HoldFirst = 3, Setup = 1, Current = 2;
+		internal const int Subsequent = 0, First = 1, Hold = 2, HoldFirst = 3, Setup = 1, Retain = 2;
 
 		protected AnimationStateData data;
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
@@ -236,7 +236,7 @@ namespace Spine {
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelines[ii];
 						if (timeline is AttachmentTimeline)
-							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, true, false, true);
+							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, true, true);
 						else {
 							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
 						}
@@ -244,7 +244,7 @@ namespace Spine {
 				} else {
 					int[] timelineMode = current.timelineMode.Items;
 
-					bool attachments = alpha >= current.alphaAttachmentThreshold;
+					bool retainAttachments = alpha >= current.alphaAttachmentThreshold;
 					bool add = current.additive, shortestRotation = add || current.shortestRotation;
 					bool firstFrame = !shortestRotation && current.timelinesRotation.Count != timelineCount << 1;
 					if (firstFrame) current.timelinesRotation.EnsureSize(timelineCount << 1);
@@ -258,7 +258,7 @@ namespace Spine {
 							ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation,
 												ii << 1, firstFrame);
 						else if (timeline is AttachmentTimeline)
-							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, fromSetup, false, attachments);
+							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, fromSetup, retainAttachments);
 						else
 							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
 					}
@@ -269,9 +269,7 @@ namespace Spine {
 				current.nextTrackLast = current.trackTime;
 			}
 
-			// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
-			// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
-			// the time is before the first key).
+			// Set slot attachments to the setup pose if they were set temporarily to apply deform timelines.
 			int setupState = unkeyedState + Setup;
 			Slot[] slots = skeleton.slots.Items;
 			for (int i = 0, n = skeleton.slots.Count; i < n; i++) {
@@ -281,7 +279,7 @@ namespace Spine {
 					slot.pose.Attachment = (attachmentName == null ? null : skeleton.GetAttachment(slot.data.index, attachmentName));
 				}
 			}
-			unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
+			unkeyedState += 2; // Reset.
 
 			queue.Drain();
 			return applied;
@@ -341,7 +339,7 @@ namespace Spine {
 			int[] timelineMode = from.timelineMode.Items;
 			TrackEntry[] timelineHoldMix = from.timelineHoldMix.Items;
 
-			bool attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
+			bool retainAttachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 			bool add = from.additive, shortestRotation = add || from.shortestRotation;
 			bool firstFrame = !shortestRotation && from.timelinesRotation.Count != timelineCount << 1;
 			if (firstFrame) from.timelinesRotation.EnsureSize(timelineCount << 1);
@@ -374,8 +372,8 @@ namespace Spine {
 					ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1,
 						firstFrame);
 				} else if (timeline is AttachmentTimeline) {
-					ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, fromSetup, true,
-						attachments && alpha >= from.alphaAttachmentThreshold);
+					ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, fromSetup,
+						retainAttachments && alpha >= from.alphaAttachmentThreshold);
 				} else {
 					bool mixOut = !drawOrder || !(timeline is DrawOrderTimeline) || !fromSetup;
 					timeline.Apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, mixOut, false);
@@ -423,28 +421,29 @@ namespace Spine {
 		}
 
 		/// <summary> Applies the attachment timeline and sets <see cref="Slot.attachmentState"/>.</summary>
-		/// <param name="attachments">False when: 1) the attachment timeline is mixing out, 2) mix &lt; attachmentThreshold, and 3) the timeline
-		/// is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
-		/// timelines see any deform.</param>
+		/// <param name="retain">True if the attachment remains after apply, false if temporary for deform timelines.</param>
 		private void ApplyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, bool fromSetup,
-		bool mixOut, bool attachments) {
+			bool retain) {
 
 			Slot slot = skeleton.slots.Items[timeline.SlotIndex];
 			if (!slot.bone.active) return;
+			if (!retain && slot.attachmentState == unkeyedState + Retain) return;
 
-			float[] frames = timeline.frames;
-			if (mixOut || time < timeline.frames[0]) {
-				if (fromSetup) SetAttachment(skeleton, slot, slot.data.attachmentName, attachments);
-			} else
-				SetAttachment(skeleton, slot, timeline.AttachmentNames[Timeline.Search(frames, time)], attachments);
-
-			// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
-			if (slot.attachmentState <= unkeyedState) slot.attachmentState = unkeyedState + Setup;
-		}
-
-		private void SetAttachment (Skeleton skeleton, Slot slot, String attachmentName, bool attachments) {
-			slot.pose.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slot.data.index, attachmentName);
-			if (attachments) slot.attachmentState = unkeyedState + Current;
+			bool setup = time < timeline.frames[0];
+			string name = null;
+			if (!setup) {
+				name = timeline.AttachmentNames[Timeline.Search(timeline.frames, time)];
+				setup = !retain && name == null;
+			}
+			if (setup) {
+				if (!fromSetup) return;
+				name = slot.data.attachmentName;
+			}
+			slot.pose.Attachment = name == null ? null : skeleton.GetAttachment(slot.data.index, name);
+			if (retain)
+				slot.attachmentState = unkeyedState + Retain;
+			else if (!setup) //
+				slot.attachmentState = unkeyedState + Setup;
 		}
 
 		/// <summary>
