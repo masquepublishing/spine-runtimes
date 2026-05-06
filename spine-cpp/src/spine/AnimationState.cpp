@@ -575,13 +575,13 @@ bool AnimationState::apply(Skeleton &skeleton) {
 			for (size_t ii = 0; ii < timelineCount; ++ii) {
 				Timeline *timeline = timelines[ii];
 				if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
-					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, true, false, true);
+					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, true, true);
 				else
 					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
 			}
 		} else {
 			Array<int> &timelineMode = current._timelineMode;
-			bool attachments = alpha >= current._alphaAttachmentThreshold;
+			bool retainAttachments = alpha >= current._alphaAttachmentThreshold;
 			bool add = current._additive, shortestRotation = add || current._shortestRotation;
 			bool firstFrame = !shortestRotation && current._timelinesRotation.size() != timelines.size() << 1;
 			if (firstFrame) current._timelinesRotation.setSize(timelines.size() << 1, 0);
@@ -597,7 +597,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, applyTime, alpha, fromSetup, timelinesRotation, ii << 1,
 										firstFrame);
 				else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
-					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, fromSetup, false, attachments);
+					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, fromSetup, retainAttachments);
 				else
 					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
 			}
@@ -818,20 +818,26 @@ Animation *AnimationState::getEmptyAnimation() {
 	return &ret;
 }
 
-void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float time, bool fromSetup, bool out,
-											 bool attachments) {
+void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float time, bool fromSetup, bool retain) {
 	Slot *slot = skeleton.getSlots()[attachmentTimeline->getSlotIndex()];
 	if (!slot->getBone().isActive()) return;
+	if (!retain && slot->_attachmentState == _unkeyedState + Retain) return;
 
-	if (out || time < attachmentTimeline->getFrames()[0]) {
-		if (fromSetup) setAttachment(skeleton, *slot, slot->getData().getAttachmentName(), attachments);
-	} else {
-		setAttachment(skeleton, *slot, attachmentTimeline->getAttachmentNames()[Animation::search(attachmentTimeline->getFrames(), time)],
-					  attachments);
+	bool setup = time < attachmentTimeline->getFrames()[0];
+	const String *name = NULL;
+	if (!setup) {
+		name = &attachmentTimeline->getAttachmentNames()[Animation::search(attachmentTimeline->getFrames(), time)];
+		setup = !retain && name->isEmpty();
 	}
-
-	/* If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.*/
-	if (slot->_attachmentState <= _unkeyedState) slot->_attachmentState = _unkeyedState + Setup;
+	if (setup) {
+		if (!fromSetup) return;
+		name = &slot->getData().getAttachmentName();
+	}
+	slot->_pose.setAttachment(name->isEmpty() ? NULL : skeleton.getAttachment(slot->getData().getIndex(), *name));
+	if (retain)
+		slot->_attachmentState = _unkeyedState + Retain;
+	else if (!setup)
+		slot->_attachmentState = _unkeyedState + Setup;
 }
 
 
@@ -935,7 +941,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 	Array<int> &timelineMode = from->_timelineMode;
 	Array<TrackEntry *> &timelineHoldMix = from->_timelineHoldMix;
 
-	bool attachments = mix < from->_mixAttachmentThreshold, drawOrder = mix < from->_mixDrawOrderThreshold;
+	bool retainAttachments = mix < from->_mixAttachmentThreshold, drawOrder = mix < from->_mixDrawOrderThreshold;
 	bool add = from->_additive, shortestRotation = add || from->_shortestRotation;
 	bool firstFrame = !shortestRotation && from->_timelinesRotation.size() != timelines.size() << 1;
 	if (firstFrame) from->_timelinesRotation.setSize(timelines.size() << 1, 0);
@@ -966,8 +972,8 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 		if (!shortestRotation && timeline->getRTTI().isExactly(RotateTimeline::rtti)) {
 			applyRotateTimeline((RotateTimeline *) timeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 		} else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
-			applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, fromSetup, true,
-									attachments && alpha >= from->_alphaAttachmentThreshold);
+			applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, fromSetup,
+									retainAttachments && alpha >= from->_alphaAttachmentThreshold);
 		} else {
 			bool out = !drawOrder || !timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) || !fromSetup;
 			timeline->apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
@@ -984,11 +990,6 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 	from->_nextAnimationLast = animationTime;
 	from->_nextTrackLast = from->_trackTime;
 	return mix;
-}
-
-void AnimationState::setAttachment(Skeleton &skeleton, Slot &slot, const String &attachmentName, bool attachments) {
-	slot._pose.setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot.getData().getIndex(), attachmentName));
-	if (attachments) slot._attachmentState = _unkeyedState + Current;
 }
 
 void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {

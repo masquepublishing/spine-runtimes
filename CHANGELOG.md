@@ -10,6 +10,9 @@
   - Added generated attachment timeline slot APIs, including `spine_attachment_get_timeline_slots()`, `spine_attachment_set_timeline_slots()`, and `spine_attachment_is_timeline_active()`.
   - Added generated animation color and bone icon size/rotation APIs.
 
+- **Bug fixes**
+  - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
+
 - **Breaking changes**
   - `spine_animation_state_get_current()` renamed to `spine_animation_state_get_track()`.
   - Generated mesh attachment APIs now use `source_mesh` naming instead of `parent_mesh` to match spine-cpp, eg `spine_mesh_attachment_get_source_mesh()` / `spine_mesh_attachment_set_source_mesh()`.
@@ -108,6 +111,9 @@
   - Ported the latest clipping runtime changes from spine-libgdx, including convex and inverse clipping support and the inverse clipping crash fix.
   - Added `ClippingAttachment::getConvex()` / `setConvex()` and `getInverse()` / `setInverse()`.
   - Added `Animation::getColor()` and `BoneData` icon size/rotation accessors for nonessential editor data.
+
+- **Bug fixes**
+  - Fixed `AnimationState` attachment timeline handling so deforms are applied correctly when an attachment is hidden in the setup pose.
 
 - **Breaking changes**
   - `AnimationState::getCurrent()` renamed to `AnimationState::getTrack()`.
@@ -270,6 +276,7 @@
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
 - **Bug fixes**
+  - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed Godot 4.6 GDExtension builds with the latest `godot-cpp` by including the required `Ref` support header in `SpineCommon.h`, updated `SpineEventData` for the `EventData.setupPose` API change, and refreshed vendored `spine-cpp` sources during clean setup.
 
 - **Breaking changes (since previous 4.3 beta)**
@@ -496,6 +503,9 @@
 - **Additions**
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
+- **Bug fixes**
+  - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
+
 - **Breaking changes**
   - `AnimationState.getCurrent(_:)` renamed to `AnimationState.getTrack(_:)` in SpineSwift.
   - SpineSwift mesh attachment APIs now use `sourceMesh` naming instead of `parentMesh` to match spine-cpp.
@@ -510,6 +520,9 @@
   - Added `SliderTimeline` and `SliderMixTimeline` for animating sliders
   - Added new pose system with `BoneLocal`, `BonePose`, and related classes
   - Added `Pose`, `Posed`, and `PosedActive` base classes for unified pose management
+
+- **Bug fixes**
+  - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
   - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.
@@ -536,6 +549,9 @@
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
   - Added `fromMemory` methods to `AtlasFlutter`, `SkeletonDataFlutter`, `SkeletonDrawableFlutter`, and `SpineWidget` for loading Spine data from custom sources (memory, encrypted storage, databases, custom caching, etc.)
   - Added example `load_from_memory.dart` demonstrating how to load all assets into memory and use the `fromMemory` API
+
+- **Bug fixes**
+  - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
   - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.

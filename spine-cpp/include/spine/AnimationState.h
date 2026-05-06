@@ -541,7 +541,7 @@ namespace spine {
 		static const int HoldFirst = 3;
 
 		static const int Setup = 1;
-		static const int Current = 2;
+		static const int Retain = 2;
 
 		AnimationStateData *_data;
 
@@ -573,11 +573,8 @@ namespace spine {
 										Array<float> &timelinesRotation, size_t i, bool firstFrame);
 
 		/// Applies the attachment timeline and sets Slot::attachmentState.
-		/// @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
-		/// is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
-		/// timelines see any deform.
-		void applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float animationTime, bool fromSetup, bool out,
-									 bool attachments);
+		/// @param retain True if the attachment remains after apply, false if temporary for deform timelines.
+		void applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float animationTime, bool fromSetup, bool retain);
 
 		/// Returns true when all mixing from entries are complete.
 		bool updateMixingFrom(TrackEntry *to, float delta);
@@ -603,8 +600,6 @@ namespace spine {
 		void animationsChanged();
 
 		void computeHold(TrackEntry *entry);
-
-		void setAttachment(Skeleton &skeleton, Slot &slot, const String &attachmentName, bool attachments);
 	};
 }
 

@@ -113,6 +113,9 @@ public class SkeletonSerializer {
 		json.writeName("duration");
 		json.writeValue(obj.getDuration());
 
+		json.writeName("color");
+		writeColor(obj.getColor());
+
 		json.writeName("bones");
 		writeIntArray(obj.getBones());
 
@@ -2038,6 +2041,12 @@ public class SkeletonSerializer {
 
 		json.writeName("icon");
 		json.writeValue(obj.getIcon());
+
+		json.writeName("iconSize");
+		json.writeValue(obj.getIconSize());
+
+		json.writeName("iconRotation");
+		json.writeValue(obj.getIconRotation());
 
 		json.writeName("visible");
 		json.writeValue(obj.getVisible());
