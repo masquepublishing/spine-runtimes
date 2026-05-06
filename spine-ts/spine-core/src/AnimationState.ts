@@ -197,13 +197,13 @@ export class AnimationState {
 					Utils.webkit602BugfixHelper(alpha);
 					const timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline)
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, true, false, true);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, true, true);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
 				}
 			} else {
 				const timelineMode = current.timelineMode;
-				const attachments = alpha >= current.alphaAttachmentThreshold;
+				const retainAttachments = alpha >= current.alphaAttachmentThreshold;
 				const add = current.additive, shortestRotation = add || current.shortestRotation;
 				const firstFrame = !shortestRotation && current.timelinesRotation.length !== timelineCount << 1;
 				if (firstFrame) current.timelinesRotation.length = timelineCount << 1;
@@ -214,7 +214,7 @@ export class AnimationState {
 					if (!shortestRotation && timeline instanceof RotateTimeline) {
 						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, fromSetup, current.timelinesRotation, ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline) {
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup, false, attachments);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup, retainAttachments);
 					} else {
 						// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
 						Utils.webkit602BugfixHelper(alpha);
@@ -229,9 +229,7 @@ export class AnimationState {
 			current.nextTrackLast = current.trackTime;
 		}
 
-		// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
-		// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
-		// the time is before the first key).
+		// Set slot attachments to the setup pose if they were set temporarily to apply deform timelines.
 		const setupState = this.unkeyedState + SETUP;
 		const slots = skeleton.slots;
 		for (let i = 0, n = skeleton.slots.length; i < n; i++) {
@@ -241,7 +239,7 @@ export class AnimationState {
 				slot.pose.setAttachment(!attachmentName ? null : skeleton.getAttachment(slot.data.index, attachmentName));
 			}
 		}
-		this.unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
+		this.unkeyedState += 2; // Reset.
 
 		this.queue.drain();
 		return applied;
@@ -260,7 +258,7 @@ export class AnimationState {
 		const timelineMode = from.timelineMode;
 		const timelineHoldMix = from.timelineHoldMix;
 
-		const attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
+		const retainAttachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 		const add = from.additive, shortestRotation = add || from.shortestRotation;
 		const firstFrame = !shortestRotation && from.timelinesRotation.length !== timelineCount << 1;
 		if (firstFrame) from.timelinesRotation.length = timelineCount << 1;
@@ -291,8 +289,8 @@ export class AnimationState {
 			if (!shortestRotation && timeline instanceof RotateTimeline) {
 				this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 			} else if (timeline instanceof AttachmentTimeline)
-				this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup, true,
-					attachments && alpha >= from.alphaAttachmentThreshold);
+				this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup,
+					retainAttachments && alpha >= from.alphaAttachmentThreshold);
 			else {
 				const out = !drawOrder || !(timeline instanceof DrawOrderTimeline) || !fromSetup;
 				timeline.apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
@@ -309,26 +307,27 @@ export class AnimationState {
 	}
 
 	/** Applies the attachment timeline and sets {@link Slot.attachmentState}.
-	 * @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
-	 * is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
-	 * timelines see any deform. */
-	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, fromSetup: boolean,
-		out: boolean, attachments: boolean) {
+	 * @param retain True if the attachment remains after apply, false if temporary for deform timelines. */
+	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, fromSetup: boolean, retain: boolean) {
 		const slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active) return;
+		if (!retain && slot.attachmentState === this.unkeyedState + RETAIN) return;
 
-		if (out || time < timeline.frames[0]) {
-			if (fromSetup) this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
-		} else
-			this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(timeline.frames, time)], attachments);
-
-		// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
-		if (slot.attachmentState <= this.unkeyedState) slot.attachmentState = this.unkeyedState + SETUP;
-	}
-
-	setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string | null, attachments: boolean) {
-		slot.pose.setAttachment(!attachmentName ? null : skeleton.getAttachment(slot.data.index, attachmentName));
-		if (attachments) slot.attachmentState = this.unkeyedState + CURRENT;
+		let setup = time < timeline.frames[0];
+		let name = null;
+		if (!setup) {
+			name = timeline.attachmentNames[Timeline.search(timeline.frames, time)];
+			setup = !retain && name == null;
+		}
+		if (setup) {
+			if (!fromSetup) return;
+			name = slot.data.attachmentName;
+		}
+		slot.pose.setAttachment(name == null ? null : skeleton.getAttachment(slot.data.index, name));
+		if (retain)
+			slot.attachmentState = this.unkeyedState + RETAIN;
+		else if (!setup) //
+			slot.attachmentState = this.unkeyedState + SETUP;
 	}
 
 	/** Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
@@ -1299,4 +1298,4 @@ export const HOLD = 2;
 export const HOLD_FIRST = 3;
 
 export const SETUP = 1;
-export const CURRENT = 2;
+export const RETAIN = 2;
