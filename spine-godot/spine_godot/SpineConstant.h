@@ -93,10 +93,10 @@ public:
 		BlendMode_Screen
 	};
 
-	enum ScaleY {
-		ScaleY_None = 0,
-		ScaleY_Uniform,
-		ScaleY_Volume
+	enum ScaleYMode {
+		ScaleYMode_None = 0,
+		ScaleYMode_Uniform,
+		ScaleYMode_Volume
 	};
 
 	enum UpdateMode {
@@ -124,7 +124,7 @@ VARIANT_ENUM_CAST(SpineConstant::PositionMode)
 VARIANT_ENUM_CAST(SpineConstant::SpacingMode)
 VARIANT_ENUM_CAST(SpineConstant::RotateMode)
 VARIANT_ENUM_CAST(SpineConstant::BlendMode)
-VARIANT_ENUM_CAST(SpineConstant::ScaleY)
+VARIANT_ENUM_CAST(SpineConstant::ScaleYMode)
 VARIANT_ENUM_CAST(SpineConstant::UpdateMode)
 VARIANT_ENUM_CAST(SpineConstant::BoneMode)
 VARIANT_ENUM_CAST(SpineConstant::Physics)

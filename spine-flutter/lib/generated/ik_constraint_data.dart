@@ -43,7 +43,7 @@ import 'ik_constraint_pose.dart';
 import 'path_constraint.dart';
 import 'physics_constraint.dart';
 import 'posed_data.dart';
-import 'scale_y.dart';
+import 'scale_y_mode.dart';
 import 'skeleton.dart';
 import 'slider.dart';
 import 'transform_constraint.dart';
@@ -120,13 +120,13 @@ class IkConstraintData extends PosedData implements ConstraintData {
   /// Determines how BonePose::getScaleY() changes when
   /// IkConstraintPose::getCompress() or IkConstraintPose::getStretch() sets
   /// BonePose::getScaleX().
-  ScaleY get scaleY {
-    final result = SpineBindings.bindings.spine_ik_constraint_data_get_scale_y(_ptr);
-    return ScaleY.fromValue(result);
+  ScaleYMode get scaleYMode {
+    final result = SpineBindings.bindings.spine_ik_constraint_data_get_scale_y_mode(_ptr);
+    return ScaleYMode.fromValue(result);
   }
 
-  set scaleY(ScaleY value) {
-    SpineBindings.bindings.spine_ik_constraint_data_set_scale_y(_ptr, value.value);
+  set scaleYMode(ScaleYMode value) {
+    SpineBindings.bindings.spine_ik_constraint_data_set_scale_y_mode(_ptr, value.value);
   }
 
   /// The setup pose that most animations are relative to.

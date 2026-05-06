@@ -24824,7 +24824,7 @@ class SpineDartBindings {
     double targetY,
     bool compress,
     bool stretch,
-    int scaleY,
+    int scaleYMode,
     double mix,
   ) {
     return _spine_ik_constraint_apply_1(
@@ -24834,7 +24834,7 @@ class SpineDartBindings {
       targetY,
       compress,
       stretch,
-      scaleY,
+      scaleYMode,
       mix,
     );
   }
@@ -24859,7 +24859,7 @@ class SpineDartBindings {
     double targetY,
     int bendDirection,
     bool stretch,
-    int scaleY,
+    int scaleYMode,
     double softness,
     double mix,
   ) {
@@ -24871,7 +24871,7 @@ class SpineDartBindings {
       targetY,
       bendDirection,
       stretch,
-      scaleY,
+      scaleYMode,
       softness,
       mix,
     );
@@ -25331,34 +25331,35 @@ class SpineDartBindings {
   /// Determines how BonePose::getScaleY() changes when
   /// IkConstraintPose::getCompress() or IkConstraintPose::getStretch() sets
   /// BonePose::getScaleX().
-  int spine_ik_constraint_data_get_scale_y(
+  int spine_ik_constraint_data_get_scale_y_mode(
     spine_ik_constraint_data self,
   ) {
-    return _spine_ik_constraint_data_get_scale_y(
+    return _spine_ik_constraint_data_get_scale_y_mode(
       self,
     );
   }
 
-  late final _spine_ik_constraint_data_get_scale_yPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint_data)>>('spine_ik_constraint_data_get_scale_y');
-  late final _spine_ik_constraint_data_get_scale_y =
-      _spine_ik_constraint_data_get_scale_yPtr.asFunction<int Function(spine_ik_constraint_data)>();
+  late final _spine_ik_constraint_data_get_scale_y_modePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint_data)>>(
+          'spine_ik_constraint_data_get_scale_y_mode');
+  late final _spine_ik_constraint_data_get_scale_y_mode =
+      _spine_ik_constraint_data_get_scale_y_modePtr.asFunction<int Function(spine_ik_constraint_data)>();
 
-  void spine_ik_constraint_data_set_scale_y(
+  void spine_ik_constraint_data_set_scale_y_mode(
     spine_ik_constraint_data self,
-    int scaleY,
+    int scaleYMode,
   ) {
-    return _spine_ik_constraint_data_set_scale_y(
+    return _spine_ik_constraint_data_set_scale_y_mode(
       self,
-      scaleY,
+      scaleYMode,
     );
   }
 
-  late final _spine_ik_constraint_data_set_scale_yPtr =
+  late final _spine_ik_constraint_data_set_scale_y_modePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_ik_constraint_data, ffi.Int32)>>(
-          'spine_ik_constraint_data_set_scale_y');
-  late final _spine_ik_constraint_data_set_scale_y =
-      _spine_ik_constraint_data_set_scale_yPtr.asFunction<void Function(spine_ik_constraint_data, int)>();
+          'spine_ik_constraint_data_set_scale_y_mode');
+  late final _spine_ik_constraint_data_set_scale_y_mode =
+      _spine_ik_constraint_data_set_scale_y_modePtr.asFunction<void Function(spine_ik_constraint_data, int)>();
 
   /// Resolve ambiguity by forwarding to PosedData's implementation
   ffi.Pointer<ffi.Char> spine_ik_constraint_data_get_name(
@@ -52300,10 +52301,10 @@ abstract class spine_rotate_mode {
   static const int SPINE_ROTATE_MODE_CHAIN_SCALE = 2;
 }
 
-abstract class spine_scale_y {
-  static const int SPINE_SCALE_Y_NONE = 0;
-  static const int SPINE_SCALE_Y_UNIFORM = 1;
-  static const int SPINE_SCALE_Y_VOLUME = 2;
+abstract class spine_scale_y_mode {
+  static const int SPINE_SCALE_Y_MODE_NONE = 0;
+  static const int SPINE_SCALE_Y_MODE_UNIFORM = 1;
+  static const int SPINE_SCALE_Y_MODE_VOLUME = 2;
 }
 
 abstract class spine_sequence_mode {

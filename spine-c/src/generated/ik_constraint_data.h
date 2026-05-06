@@ -29,8 +29,8 @@ SPINE_C_API void spine_ik_constraint_data_set_target(spine_ik_constraint_data se
  * IkConstraintPose::getCompress() or IkConstraintPose::getStretch() sets
  * BonePose::getScaleX().
  */
-SPINE_C_API spine_scale_y spine_ik_constraint_data_get_scale_y(spine_ik_constraint_data self);
-SPINE_C_API void spine_ik_constraint_data_set_scale_y(spine_ik_constraint_data self, spine_scale_y scaleY);
+SPINE_C_API spine_scale_y_mode spine_ik_constraint_data_get_scale_y_mode(spine_ik_constraint_data self);
+SPINE_C_API void spine_ik_constraint_data_set_scale_y_mode(spine_ik_constraint_data self, spine_scale_y_mode scaleYMode);
 /**
  * Resolve ambiguity by forwarding to PosedData's implementation
  */

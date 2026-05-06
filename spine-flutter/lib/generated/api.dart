@@ -41,7 +41,7 @@ export 'physics.dart';
 export 'position_mode.dart';
 export 'property.dart';
 export 'rotate_mode.dart';
-export 'scale_y.dart';
+export 'scale_y_mode.dart';
 export 'sequence_mode.dart';
 export 'spacing_mode.dart';
 export 'texture_filter.dart';

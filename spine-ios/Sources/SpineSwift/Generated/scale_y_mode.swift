@@ -29,19 +29,15 @@
 
 // AUTO GENERATED FILE, DO NOT EDIT.
 
-/// ScaleY enum
-enum ScaleY {
-  none(0),
-  uniform(1),
-  volume(2);
+import Foundation
 
-  const ScaleY(this.value);
-  final int value;
+/// ScaleYMode enum
+public enum ScaleYMode: Int32, CaseIterable {
+    case none = 0
+    case uniform = 1
+    case volume = 2
 
-  static ScaleY fromValue(int value) {
-    return values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => throw ArgumentError('Invalid ScaleY value: $value'),
-    );
-  }
+    public static func fromValue(_ value: Int32) -> ScaleYMode? {
+        return ScaleYMode(rawValue: value)
+    }
 }

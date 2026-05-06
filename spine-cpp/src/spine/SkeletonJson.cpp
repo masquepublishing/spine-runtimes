@@ -291,7 +291,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				if (!data->_target) SKELETON_JSON_ERROR(root, "IK target bone not found: ", targetName);
 
 				const char *scaleY = Json::getString(constraintMap, "scaleY", NULL);
-				if (scaleY) data->_scaleY = ScaleY_valueOf(scaleY);
+				if (scaleY) data->_scaleYMode = ScaleYMode_valueOf(scaleY);
 				IkConstraintPose &setup = data->_setupPose;
 				setup._mix = Json::getFloat(constraintMap, "mix", 1);
 				setup._softness = Json::getFloat(constraintMap, "softness", 0) * _scale;

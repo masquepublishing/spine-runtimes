@@ -36,14 +36,14 @@ void spine_ik_constraint_data_set_target(spine_ik_constraint_data self, spine_bo
 	_self->setTarget(*((BoneData *) inValue));
 }
 
-spine_scale_y spine_ik_constraint_data_get_scale_y(spine_ik_constraint_data self) {
+spine_scale_y_mode spine_ik_constraint_data_get_scale_y_mode(spine_ik_constraint_data self) {
 	IkConstraintData *_self = (IkConstraintData *) self;
-	return (spine_scale_y) _self->getScaleY();
+	return (spine_scale_y_mode) _self->getScaleYMode();
 }
 
-void spine_ik_constraint_data_set_scale_y(spine_ik_constraint_data self, spine_scale_y scaleY) {
+void spine_ik_constraint_data_set_scale_y_mode(spine_ik_constraint_data self, spine_scale_y_mode scaleYMode) {
 	IkConstraintData *_self = (IkConstraintData *) self;
-	_self->setScaleY((ScaleY) scaleY);
+	_self->setScaleYMode((ScaleYMode) scaleYMode);
 }
 
 const char *spine_ik_constraint_data_get_name(spine_ik_constraint_data self) {

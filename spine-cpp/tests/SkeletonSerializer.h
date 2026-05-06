@@ -2509,7 +2509,7 @@ namespace spine {
 			writeBoneData(obj->getTarget());
 
 			_json.writeName("scaleY");
-			_json.writeValue(ScaleY_toString(obj->getScaleY()));
+			_json.writeValue(ScaleYMode_toString(obj->getScaleYMode()));
 
 			_json.writeName("name");
 			_json.writeValue(obj->getName());

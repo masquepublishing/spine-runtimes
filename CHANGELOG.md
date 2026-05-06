@@ -24,6 +24,7 @@
   - Added `spine_pose`, `spine_posed`, and `spine_posed_active` base types
   - Regenerated the C API for the sequence attachment refactor in spine-cpp. `spine_region_attachment` and `spine_mesh_attachment` now mirror the new non-null `Sequence` model exposed by the C++ runtime.
   - IK constraint data now uses `spine_scale_y` instead of the old `uniform` boolean, matching spine-cpp.
+  - `spine_ik_constraint_data_get_scale_y()` / `spine_ik_constraint_data_set_scale_y()` and `spine_scale_y` renamed to `spine_ik_constraint_data_get_scale_y_mode()` / `spine_ik_constraint_data_set_scale_y_mode()` and `spine_scale_y_mode`.
 
 - **Breaking changes**
   - **IMPORTANT**: The C runtime has been completely rewritten as an auto-generated wrapper around the C++ runtime. This is a major breaking change. Users must update their code to use the new API. See https://esotericsoftware.com/spine-c
@@ -122,6 +123,7 @@
   - `AnimationState` hold constants changed: `HoldSubsequent` and `HoldMix` removed, replaced with bitmask system (`Subsequent=0, First=1, Hold=2, HoldFirst=3`).
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
   - `IkConstraintData::getUniform()` / `setUniform()` replaced by `getScaleY()` / `setScaleY()` and `ScaleY` (`none`, `uniform`, `volume`).
+  - `IkConstraintData::getScaleY()` / `setScaleY()` and `ScaleY` renamed to `getScaleYMode()` / `setScaleYMode()` and `ScaleYMode`.
   - `BoneData::getSetupPose()` and `Bone::getPose()` now use `BonePose` instead of `BoneLocal`. Bone timelines and parser setup pose data were updated to match the spine-libgdx `BoneLocal` removal.
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
   - Changed timeline class hierarchy with new base classes `BoneTimeline`, `SlotCurveTimeline`, and `ConstraintTimeline`
@@ -279,6 +281,7 @@
   - `SpineAnimationTrack` property `hold_previous` replaced with `additive`, property `mix_blend` removed.
   - Added `SpineBoneLocal` and `SpineBonePose` classes for new pose system
   - Added pose classes for constraints: `SpineIkConstraintPose`, `SpinePathConstraintPose`, `SpinePhysicsConstraintPose`, `SpineSliderPose`, `SpineTransformConstraintPose`
+  - `SpineIkConstraintData.get_scale_y()` / `set_scale_y()` and `SpineConstant.ScaleY` renamed to `get_scale_y_mode()` / `set_scale_y_mode()` and `SpineConstant.ScaleYMode`.
 
 - **Breaking changes**
   - `SpineAnimationState.get_current()` renamed to `SpineAnimationState.get_track()` in the GDScript API.
@@ -498,6 +501,7 @@
   - SpineSwift mesh attachment APIs now use `sourceMesh` naming instead of `parentMesh` to match spine-cpp.
   - SpineSwift attachments now expose `timelineSlots` and `isTimelineActive(...)` to match spine-cpp.
   - SpineSwift IK constraint data now uses `scaleY` instead of the old `uniform` boolean.
+  - SpineSwift IK constraint data `scaleY` and `ScaleY` renamed to `scaleYMode` and `ScaleYMode`.
 
 ## Dart
 
@@ -524,6 +528,7 @@
     - `Skeleton.setSlotsToSetupPose()` → `Skeleton.setupPoseSlots()`
   - Timeline `apply()` methods now take an additional `appliedPose` parameter
   - `EventData` setup payload access moved to `data.setupPose`
+  - IK constraint data `scaleY` and `ScaleY` renamed to `scaleYMode` and `ScaleYMode`.
 
 ### Flutter
 
@@ -536,6 +541,7 @@
   - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.
   - Generated Flutter mesh attachment APIs now use `sourceMesh` naming instead of `parentMesh` to match spine-cpp.
   - Generated Flutter bindings now expose `Attachment.timelineSlots` and `Attachment.isTimelineActive(...)` to match spine-cpp.
+  - Generated Flutter IK constraint data `scaleY` and `ScaleY` renamed to `scaleYMode` and `ScaleYMode`.
   - Updated to use the new auto-generated Dart runtime with all the Dart API changes above
   - Generated Flutter bindings now use `BonePose` for bone setup and unconstrained pose accessors to match spine-cpp.
   - Generated Flutter bindings now expose event setup payloads via `EventData.setupPose` instead of directly on `EventData`.

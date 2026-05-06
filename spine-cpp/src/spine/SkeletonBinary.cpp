@@ -237,7 +237,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					data->_target = bones[input.readInt(true)];
 					int flags = input.read();
 					data->_skinRequired = (flags & 1) != 0;
-					if ((flags & 2) != 0) data->_scaleY = static_cast<ScaleY>(input.read());
+					if ((flags & 2) != 0) data->_scaleYMode = static_cast<ScaleYMode>(input.read());
 					IkConstraintPose &setup = data->_setupPose;
 					setup._bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup._compress = (flags & 8) != 0;

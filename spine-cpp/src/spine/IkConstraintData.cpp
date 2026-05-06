@@ -37,7 +37,7 @@ using namespace spine;
 RTTI_IMPL(IkConstraintData, ConstraintData)
 
 IkConstraintData::IkConstraintData(const String &name)
-	: ConstraintDataGeneric<IkConstraint, IkConstraintPose>(name), _target(NULL), _scaleY(ScaleY_None) {
+	: ConstraintDataGeneric<IkConstraint, IkConstraintPose>(name), _target(NULL), _scaleYMode(ScaleYMode_None) {
 }
 
 Array<BoneData *> &IkConstraintData::getBones() {
@@ -52,12 +52,12 @@ void IkConstraintData::setTarget(BoneData &inValue) {
 	_target = &inValue;
 }
 
-ScaleY IkConstraintData::getScaleY() {
-	return _scaleY;
+ScaleYMode IkConstraintData::getScaleYMode() {
+	return _scaleYMode;
 }
 
-void IkConstraintData::setScaleY(ScaleY scaleY) {
-	_scaleY = scaleY;
+void IkConstraintData::setScaleYMode(ScaleYMode scaleYMode) {
+	_scaleYMode = scaleYMode;
 }
 
 Constraint &IkConstraintData::create(Skeleton &skeleton) {

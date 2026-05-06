@@ -52,8 +52,8 @@ public:
 	Ref<SpineBoneData> get_target();
 	void set_target(Ref<SpineBoneData> v);
 
-	SpineConstant::ScaleY get_scale_y();
-	void set_scale_y(SpineConstant::ScaleY v);
+	SpineConstant::ScaleYMode get_scale_y_mode();
+	void set_scale_y_mode(SpineConstant::ScaleYMode v);
 
 	Ref<SpineIkConstraintPose> get_setup_pose();
 };

@@ -42,26 +42,26 @@ namespace spine {
 	class BoneData;
 	class IkConstraint;
 
-	enum ScaleY {
-		ScaleY_None = 0,
-		ScaleY_Uniform,
-		ScaleY_Volume
+	enum ScaleYMode {
+		ScaleYMode_None = 0,
+		ScaleYMode_Uniform,
+		ScaleYMode_Volume
 	};
 
-	inline ScaleY ScaleY_valueOf(const char *value) {
+	inline ScaleYMode ScaleYMode_valueOf(const char *value) {
 		if (strcmp(value, "uniform") == 0)
-			return ScaleY_Uniform;
+			return ScaleYMode_Uniform;
 		else if (strcmp(value, "volume") == 0)
-			return ScaleY_Volume;
+			return ScaleYMode_Volume;
 		else
-			return ScaleY_None;
+			return ScaleYMode_None;
 	}
 
-	inline const char *ScaleY_toString(ScaleY scaleY) {
-		switch (scaleY) {
-			case ScaleY_Uniform:
+	inline const char *ScaleYMode_toString(ScaleYMode scaleYMode) {
+		switch (scaleYMode) {
+			case ScaleYMode_Uniform:
 				return "uniform";
-			case ScaleY_Volume:
+			case ScaleYMode_Volume:
 				return "volume";
 			default:
 				return "none";
@@ -96,14 +96,14 @@ namespace spine {
 
 		/// Determines how BonePose::getScaleY() changes when IkConstraintPose::getCompress() or IkConstraintPose::getStretch()
 		/// sets BonePose::getScaleX().
-		ScaleY getScaleY();
+		ScaleYMode getScaleYMode();
 
-		void setScaleY(ScaleY scaleY);
+		void setScaleYMode(ScaleYMode scaleYMode);
 
 	private:
 		Array<BoneData *> _bones;
 		BoneData *_target;
-		ScaleY _scaleY;
+		ScaleYMode _scaleYMode;
 	};
 }
 

@@ -53,7 +53,7 @@ public class TransformConstraintPose: NSObject {
     public var mixRotate: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_rotate(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_transform_constraint_pose_set_mix_rotate(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
@@ -65,7 +65,7 @@ public class TransformConstraintPose: NSObject {
     public var mixX: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_x(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_transform_constraint_pose_set_mix_x(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
@@ -77,7 +77,7 @@ public class TransformConstraintPose: NSObject {
     public var mixY: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_transform_constraint_pose_set_mix_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
@@ -89,7 +89,7 @@ public class TransformConstraintPose: NSObject {
     public var mixScaleX: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_scale_x(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_transform_constraint_pose_set_mix_scale_x(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
@@ -101,7 +101,7 @@ public class TransformConstraintPose: NSObject {
     public var mixScaleY: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_scale_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_transform_constraint_pose_set_mix_scale_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
@@ -113,7 +113,7 @@ public class TransformConstraintPose: NSObject {
     public var mixShearY: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_shear_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_transform_constraint_pose_set_mix_shear_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
@@ -121,9 +121,7 @@ public class TransformConstraintPose: NSObject {
     }
 
     public func set(_ pose: TransformConstraintPose) {
-        spine_transform_constraint_pose_set(
-            _ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self),
-            pose._ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
+        spine_transform_constraint_pose_set(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
     }
 
     public func dispose() {
