@@ -311,6 +311,12 @@
   - Added `Animation.Bones` property to get bone indices used by an animation
   - Added `Skeleton` properties `GravityX`, `GravityY`, `WindX`, `WindY` to allow rotating physics force directions
   - Added `Color32F` class used in new `.GetColor()` and `.SetColor()` methods replacing `.R` `.G` `.B` `.A` properties
+  - Linked meshes can now inherit deform and sequence timelines from source meshes in different slots
+  - Added `Attachment.TimelineSlots` and `Attachment.IsTimelineActive()` for attachment timeline propagation across linked meshes
+  - Added `DrawOrderFolderTimeline` for animating draw order folders
+  - Added `ClippingAttachment.Convex` and `ClippingAttachment.Inverse`
+  - Added `IkConstraintData.ScaleYMode` enum and `IkConstraintData.ScaleY` to control how IK compress/stretch changes `BonePose.ScaleY`, including volume preservation
+  - Added `allowMissingRegions` parameter to `AtlasAttachmentLoader` constructor to support skeletons exported with per-skin atlases
 
 - **Breaking changes**
   - Color properties `.R` `.G` `.B` `.A` are replaced by `.GetColor()` and `.SetColor()`
@@ -433,8 +439,10 @@
   - `Timeline.PropertyIds` type changed from `string[]` to `ulong[]`. `Animation.HasTimeline()` parameter and Timeline constructors changed accordingly.
   - `Skeleton.DrawOrder` type changed from `ExposedList<Slot>` to `DrawOrder` class. Use `Skeleton.DrawOrder.AppliedPose` for rendering and `Skeleton.DrawOrder.Pose` for changing the draw order.
   - `IkConstraintData.Uniform` replaced by `IkConstraintData.ScaleY`. `IkConstraint.Apply()` methods now take `ScaleY` instead of a `bool uniform` parameter.
+  - `MeshAttachment.ParentMesh` renamed to `MeshAttachment.SourceMesh`
+  - `AttachmentLoader` methods `NewRegionAttachment`, `NewMeshAttachment`, `NewBoundingBoxAttachment`, `NewClippingAttachment`, `NewPathAttachment`, and `NewPointAttachment` now take an additional `string placeholder` parameter. Update any custom `AttachmentLoader` implementations accordingly.
   - Renamed `Skin.SkinEntry.Name` to `Skin.SkinEntry.Placeholder` to better match Spine editor terminology. Was intermediately renamed to `PlaceholderName` which was then changed to `Placeholder`.
-
+  
 ### Unity
 
 - **Officially supported Unity versions are 2017.1-6000.4**.
