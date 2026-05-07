@@ -447,21 +447,21 @@ export class SkeletonBinary {
 		for (let i = 0; i < slotCount; i++) {
 			const slotIndex = input.readInt(true);
 			for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
-				const name = input.readStringRef();
-				if (!name)
+				const placeholder = input.readStringRef();
+				if (!placeholder)
 					throw new Error("Attachment name must not be null");
-				const attachment = this.readAttachment(input, skeletonData, skin, slotIndex, name, nonessential);
-				if (attachment) skin.setAttachment(slotIndex, name, attachment);
+				const attachment = this.readAttachment(input, skeletonData, skin, slotIndex, placeholder, nonessential);
+				if (attachment) skin.setAttachment(slotIndex, placeholder, attachment);
 			}
 		}
 		return skin;
 	}
 
-	private readAttachment (input: BinaryInput, skeletonData: SkeletonData, skin: Skin, slotIndex: number, attachmentName: string | null | undefined, nonessential: boolean): Attachment | null {
+	private readAttachment (input: BinaryInput, skeletonData: SkeletonData, skin: Skin, slotIndex: number, placeholder: string, nonessential: boolean): Attachment | null {
 		const scale = this.scale;
 
 		const flags = input.readByte();
-		const name = (flags & 8) !== 0 ? input.readStringRef() : attachmentName;
+		const name = (flags & 8) !== 0 ? input.readStringRef() : placeholder;
 		if (!name) throw new Error("Attachment name must not be null");
 		switch ((flags & 0b111) as AttachmentType) { // BUG?
 			case AttachmentType.Region: {
@@ -477,7 +477,7 @@ export class SkeletonBinary {
 				const height = input.readFloat();
 
 				if (!path) path = name;
-				const region = this.attachmentLoader.newRegionAttachment(skin, name, path, sequence);
+				const region = this.attachmentLoader.newRegionAttachment(skin, placeholder, name, path, sequence);
 				if (!region) return null;
 				region.path = path;
 				region.x = x * scale;
@@ -495,7 +495,7 @@ export class SkeletonBinary {
 				const vertices = this.readVertices(input, (flags & 16) !== 0);
 				const color = nonessential ? input.readInt32() : 0;
 
-				const box = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
+				const box = this.attachmentLoader.newBoundingBoxAttachment(skin, placeholder, name);
 				if (!box) return null;
 				box.worldVerticesLength = vertices.length;
 				box.vertices = vertices.vertices;
@@ -529,7 +529,7 @@ export class SkeletonBinary {
 				}
 
 				if (!path) path = name;
-				const mesh = this.attachmentLoader.newMeshAttachment(skin, name, path, sequence);
+				const mesh = this.attachmentLoader.newMeshAttachment(skin, placeholder, name, path, sequence);
 				if (!mesh) return null;
 				mesh.path = path;
 				Color.rgba8888ToColor(mesh.color, color);
@@ -563,7 +563,7 @@ export class SkeletonBinary {
 					height = input.readFloat();
 				}
 
-				const mesh = this.attachmentLoader.newMeshAttachment(skin, name, path, sequence);
+				const mesh = this.attachmentLoader.newMeshAttachment(skin, placeholder, name, path, sequence);
 				if (!mesh) return null;
 				mesh.path = path;
 				Color.rgba8888ToColor(mesh.color, color);
@@ -582,7 +582,7 @@ export class SkeletonBinary {
 				const lengths = this.readFloatArray(input, vertices.length / 6, scale);
 				const color = nonessential ? input.readInt32() : 0;
 
-				const path = this.attachmentLoader.newPathAttachment(skin, name);
+				const path = this.attachmentLoader.newPathAttachment(skin, placeholder, name);
 				if (!path) return null;
 				path.closed = closed;
 				path.constantSpeed = constantSpeed;
@@ -599,7 +599,7 @@ export class SkeletonBinary {
 				const y = input.readFloat();
 				const color = nonessential ? input.readInt32() : 0;
 
-				const point = this.attachmentLoader.newPointAttachment(skin, name);
+				const point = this.attachmentLoader.newPointAttachment(skin, placeholder, name);
 				if (!point) return null;
 				point.x = x * scale;
 				point.y = y * scale;
@@ -612,7 +612,7 @@ export class SkeletonBinary {
 				const vertices = this.readVertices(input, (flags & 16) !== 0);
 				const color = nonessential ? input.readInt32() : 0;
 
-				const clip = this.attachmentLoader.newClippingAttachment(skin, name);
+				const clip = this.attachmentLoader.newClippingAttachment(skin, placeholder, name);
 				if (!clip) return null;
 				clip.endSlot = skeletonData.slots[endSlotIndex];
 				clip.convex = (flags & 32) !== 0;
