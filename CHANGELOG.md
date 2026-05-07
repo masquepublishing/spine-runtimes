@@ -420,7 +420,6 @@
   - Renamed timeline constraint index methods to use unified `ConstraintIndex` property
   - Reorganized timeline class hierarchy with new base classes
   - Removed `AtlasAttachmentLoader` method `AtlasRegion FindRegion(string name)` from public interface. Added `protected AtlasRegion FindRegion(string name, string path)` instead which may be overridden instead when deriving your own subclass.
-  - Renamed `Skin.SkinEntry.Name` to `Skin.SkinEntry.PlaceholderName` to better match Spine editor terminology.
   - Removed `TrackEntry.HoldPrevious` and `TrackEntry.InterruptAlpha`. New `AnimationState` hold system automatically calculates the required state values.
   - Removed `BoneLocal` class. `BonePose` now directly implements `IPose<BonePose>` and contains all local pose fields. Replace any use of `BoneLocal` → `BonePose`.
   - `EventData` no longer stores `Int`, `Float`, `String`, `Volume`, and `Balance` properties directly. Use `EventData.SetupPose` to access the setup pose `Event` which provides these properties instead.
@@ -434,6 +433,7 @@
   - `Timeline.PropertyIds` type changed from `string[]` to `ulong[]`. `Animation.HasTimeline()` parameter and Timeline constructors changed accordingly.
   - `Skeleton.DrawOrder` type changed from `ExposedList<Slot>` to `DrawOrder` class. Use `Skeleton.DrawOrder.AppliedPose` for rendering and `Skeleton.DrawOrder.Pose` for changing the draw order.
   - `IkConstraintData.Uniform` replaced by `IkConstraintData.ScaleY`. `IkConstraint.Apply()` methods now take `ScaleY` instead of a `bool uniform` parameter.
+  - Renamed `Skin.SkinEntry.Name` to `Skin.SkinEntry.Placeholder` to better match Spine editor terminology. Was intermediately renamed to `PlaceholderName` which was then changed to `Placeholder`.
 
 ### Unity
 

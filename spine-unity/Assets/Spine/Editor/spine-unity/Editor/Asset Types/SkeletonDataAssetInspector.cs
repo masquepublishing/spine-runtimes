@@ -592,7 +592,7 @@ namespace Spine.Unity.Editor {
 								Skin.SkinEntry skinEntry = slotAttachments[a];
 								Attachment attachment = skinEntry.Attachment;
 								var slotPose = slot.AppliedPose;
-								string attachmentName = skinEntry.PlaceholderName;
+								string attachmentName = skinEntry.Placeholder;
 								bool attachmentIsFromSkin = !defaultSkinAttachments.Contains(skinEntry);
 
 								Texture2D attachmentTypeIcon = Icons.GetAttachmentIcon(attachment);
