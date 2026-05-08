@@ -591,6 +591,22 @@
   - Added `Animation.getBones()` to get bone indices used by an animation
   - Added `Skeleton` properties `windX`, `windY`, `gravityX`, `gravityY` to allow rotating physics force directions
   - Added `SequenceTimeline` for sequence animation
+  - Added `allowMissingRegions` parameter to `AtlasAttachmentLoader` constructor to support skeletons exported with per-skin atlases
+  - Linked meshes can now inherit deform and sequence timelines from source meshes in different slots
+  - Added `Attachment.timelineSlots` and `Attachment.isTimelineActive()` for attachment timeline propagation across linked meshes
+  - Added `DrawOrderFolderTimeline` for animating draw order folders
+  - Added `Timeline.additive` and `Timeline.instant` to query timeline blending capabilities
+  - Added `TrackEntry.additive` to control additive blending per track entry
+  - Ported the latest additive timeline updates and alpha/RGB timeline flicker fixes from spine-libgdx
+  - Ported the AnimationState additive/hold rework from spine-libgdx. `MixBlend` and `MixDirection` are no longer used by timelines. The new system uses `fromSetup`, `add`, and `out` parameters and automatically calculates the required hold state values
+  - Ported the Skin placeholder name rename from spine-libgdx. `SkinEntry.name` renamed to `placeholderName` to better match Spine editor terminology
+  - Ported the sequence attachment refactor from spine-libgdx. `Sequence` now precomputes per-frame regions, UVs, and region offsets, and `RegionAttachment` / `MeshAttachment` now mirror the libgdx implementation
+  - Ported the latest clipping runtime changes from spine-libgdx, including convex and inverse clipping support and the inverse clipping crash fix
+  - Added `ClippingAttachment.convex` and `ClippingAttachment.inverse`
+  - Added `Animation.color` for the animation color as it was in Spine when nonessential data is exported
+  - Added `BoneData` icon size and rotation accessors for nonessential editor data
+  - Added `ScaleY` enum and `IkConstraintData.scaleY` to control how IK compress/stretch changes `BonePose.scaleY`, including volume preservation
+  - Fixed `SkeletonData` default FPS and missing `PathAttachment` initialization
   - BoundsProvider System: added a new flexible BoundsProvider system to improve bounds calculation performance and correctness across all renderers.
     - Added `BoundsProvider` abstract class with interface for calculating skeleton bounding boxes
     - Implemented four concrete `BoundsProvider` classes:
@@ -598,6 +614,9 @@
       - `CurrentPoseBoundsProvider` - Calculates bounds dynamically from the current skeleton pose
       - `SetupPoseBoundsProvider` - Uses setup pose bounds (default implementation)
       - `SkinsAndAnimationBoundsProvider` - Calculates bounds based on specific skins and animations
+
+- **Bug fixes**
+  - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
@@ -695,8 +714,18 @@
     | IkConstraint.setToSetupPose()     |→| IkConstraint.setupPose() |
   - `Physics` enum moved from nested `Skeleton.Physics` to standalone `Physics` class
     - `updateWorldTransform(Skeleton.Physics.update)` → `updateWorldTransform(Physics.update)`
-  - Timeline `apply()` methods now take an additional `appliedPose` parameter
+  - Timeline `apply()` methods now take `fromSetup`, `add`, `out`, and `appliedPose` parameters instead of `MixBlend` and `MixDirection`
+  - Removed `MixBlend` and `MixDirection`
+  - Removed `TrackEntry.holdPrevious` and internal interrupt alpha state. New `AnimationState` hold system automatically calculates the required state values
+  - Removed `TrackEntry.mixBlend`. Use `TrackEntry.additive` for additive blending
+  - `AnimationState.setCurrent()` renamed to `AnimationState.setTrack()`; `AnimationState.getCurrent()` is deprecated in favor of `AnimationState.getTrack()`
   - Attachment `computeWorldVertices()` methods now take an additional `skeleton` parameter
+  - `MeshAttachment.getParentMesh()` / `setParentMesh()` renamed to `getSourceMesh()` / `setSourceMesh()`
+  - `RegionAttachment` and `MeshAttachment` now take a non-null `Sequence` in their constructors and use the new sequence attachment model
+  - `SkinEntry.name` renamed to `placeholderName` to better match Spine editor terminology
+  - `AttachmentLoader` methods now receive both the skin `placeholder` and resolved attachment `name`.
+  - `IkConstraintData.uniform` replaced by `IkConstraintData.scaleY`. `IkConstraint.apply()` methods now take `ScaleY` instead of a boolean `uniform` parameter
+  - `IkConstraintData.scaleY` and `ScaleY` renamed to `scaleYMode` and `ScaleYMode`.
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
 
 ### Starling
@@ -708,6 +737,7 @@
     - Added `calculateBounds()` method to recalculate bounds on demand
     - Constructor now accepts optional third parameter `boundsProvider` (defaults to `SetupPoseBoundsProvider`)
     - Simplified `getBounds()` implementation to use `BoundsProvider` instead of direct calculation
+  - Added physics position and rotation inheritance settings.
   - Scale Integration
     - Connected `SkeletonSprite.scale`, `scaleX`, and `scaleY` properties to `skeleton.scaleX/scaleY` values
     - Setting scale properties now automatically updates skeleton scale and recalculates bounds
@@ -728,6 +758,7 @@
     - Added `boundsProvider` public field for customizing bounds calculation strategy
     - Added `calculateBounds()` method to recalculate bounds on demand
     - Added `bounds` property to get the bounds coordinates
+  - Added physics position and rotation inheritance settings.
 - **Breaking changes**
   - `SkeletonSprite` now extends `FlxTypedGroup<FlxObject>` instead of FlxObject. This was necessary because `FlxObject` bounding/hitbox is always connected to its position and size and cannot be offset
     - This eables proper bounds handling independent of position
@@ -967,9 +998,13 @@
   - Ported the latest clipping runtime changes from spine-libgdx, including convex and inverse clipping support and the inverse clipping crash fix
   - Added `ClippingAttachment.convex` and `ClippingAttachment.inverse`
   - Added `Animation.color` for the animation color as it was in Spine when nonessential data is exported
+  - Added `BoneData` icon size and rotation accessors for nonessential editor data
   - Added `ScaleY` enum and `IkConstraintData.scaleY` to control how IK compress/stretch changes `BonePose.scaleY`, including volume preservation
   - Fixed `SkeletonData` default FPS and missing `PathAttachment` initialization
   - Fixed reverse IK bend positive logic and transform constraint/slider scaling issues
+
+- **Bug fixes**
+  - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
@@ -1077,7 +1112,9 @@
   - `RegionAttachment` and `MeshAttachment` now take a non-null `Sequence` in their constructors and use the new sequence attachment model
   - `EventData` no longer stores `intValue`, `floatValue`, `stringValue`, `volume`, and `balance` directly. Use `eventData.setupPose` to access the setup pose `Event` which provides these properties instead
   - `SkinEntry.name` renamed to `placeholderName` to better match Spine editor terminology
+  - `AttachmentLoader` methods now receive both the skin `placeholder` and resolved attachment `name`.
   - `IkConstraintData.uniform` replaced by `IkConstraintData.scaleY`. `IkConstraint.apply()` methods now take `ScaleY` instead of a boolean `uniform` parameter
+  - `IkConstraintData.scaleY` and `ScaleY` renamed to `scaleYMode` and `ScaleYMode`.
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
   - API changes to match reference runtime naming conventions:
     - `addAnimationWith()` → `addAnimation()`
@@ -1110,6 +1147,9 @@
 
 ### Three.js backend
 
+- **Additions**
+  - Added physics position and rotation inheritance settings.
+
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
   - `AssetManager` constructor no longer takes `pma` parameter - PMA is handled automatically
@@ -1133,6 +1173,7 @@
 - **Additions**
   - Added static `createOptions` method for Spine initialization config to simplify subclassing
   - Added `allowMissingRegions` parameter to game object factory
+  - Added physics position and rotation inheritance settings.
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
@@ -1144,6 +1185,7 @@
 - **Additions**
   - Added static `createOptions` method for Spine initialization config to simplify subclassing
   - Added `allowMissingRegions` parameter to game object factory
+  - Added physics position and rotation inheritance settings.
   - Restored control bones example
 
 - **Fixes**
@@ -1155,12 +1197,18 @@
 
 ### Phaser v3
 
+- **Additions**
+  - Added physics position and rotation inheritance settings.
+
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
   - `SpinePlugin.spineAtlas()` loader no longer takes `premultipliedAlpha` parameter - PMA is handled automatically
   - `SpinePlugin.createSkeleton()` no longer takes `premultipliedAlpha` parameter
 
 ### Phaser v4
+
+- **Additions**
+  - Added physics position and rotation inheritance settings.
 
 - **Breaking changes**
   - Updated to use new TypeScript/JavaScript runtime
