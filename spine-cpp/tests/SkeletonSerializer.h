@@ -11,6 +11,7 @@ namespace spine {
 	class SkeletonSerializer {
 	private:
 		HashMap<void *, String> _visitedObjects;
+		HashMap<String, String> _visitedSkinEntries;
 		int _nextId;
 		JsonWriter _json;
 
@@ -22,6 +23,7 @@ namespace spine {
 
 		String serializeSkeletonData(SkeletonData *data) {
 			_visitedObjects.clear();
+			_visitedSkinEntries.clear();
 			_nextId = 1;
 			_json = JsonWriter();
 			writeSkeletonData(data);
@@ -30,6 +32,7 @@ namespace spine {
 
 		String serializeSkeleton(Skeleton *skeleton) {
 			_visitedObjects.clear();
+			_visitedSkinEntries.clear();
 			_nextId = 1;
 			_json = JsonWriter();
 			writeSkeleton(skeleton);
@@ -38,6 +41,7 @@ namespace spine {
 
 		String serializeAnimationState(AnimationState *state) {
 			_visitedObjects.clear();
+			_visitedSkinEntries.clear();
 			_nextId = 1;
 			_json = JsonWriter();
 			writeAnimationState(state);
@@ -3483,14 +3487,21 @@ namespace spine {
 		}
 
 		void writeSkinEntry(Skin::AttachmentMap::Entry *obj) {
-			_json.writeObjectStart();
-			String placeholderName = obj->_placeholderName;
+			String placeholder = obj->_placeholder;
+			String key = String().append((int) obj->_slotIndex).append(":").append(placeholder);
+			if (_visitedSkinEntries.containsKey(key)) {
+				_json.writeValue(_visitedSkinEntries[key]);
+				return;
+			}
 			String refString;
-			if (!placeholderName.isEmpty()) {
-				refString.append("<SkinEntry-").append(placeholderName).append(">");
+			if (!placeholder.isEmpty()) {
+				refString.append("<SkinEntry-").append(placeholder).append(">");
 			} else {
 				refString.append("<SkinEntry-").append(_nextId++).append(">");
 			}
+			_visitedSkinEntries.put(key, refString);
+
+			_json.writeObjectStart();
 			_json.writeName("refString");
 			_json.writeValue(refString);
 			_json.writeName("type");
@@ -3498,7 +3509,7 @@ namespace spine {
 			_json.writeName("slotIndex");
 			_json.writeValue((int) obj->_slotIndex);
 			_json.writeName("name");
-			_json.writeValue(obj->_placeholderName);
+			_json.writeValue(obj->_placeholder);
 			_json.writeName("attachment");
 			writeAttachment(obj->_attachment);
 			_json.writeObjectEnd();

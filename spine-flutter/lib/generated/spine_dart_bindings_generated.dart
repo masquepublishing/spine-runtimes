@@ -16590,6 +16590,7 @@ class SpineDartBindings {
   spine_region_attachment spine_atlas_attachment_loader_new_region_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
     ffi.Pointer<ffi.Char> path,
     spine_sequence sequence,
@@ -16597,6 +16598,7 @@ class SpineDartBindings {
     return _spine_atlas_attachment_loader_new_region_attachment(
       self,
       skin,
+      placeholder,
       name,
       path,
       sequence,
@@ -16605,16 +16607,22 @@ class SpineDartBindings {
 
   late final _spine_atlas_attachment_loader_new_region_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_region_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>>('spine_atlas_attachment_loader_new_region_attachment');
+          spine_region_attachment Function(
+              spine_atlas_attachment_loader,
+              spine_skin,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              spine_sequence)>>('spine_atlas_attachment_loader_new_region_attachment');
   late final _spine_atlas_attachment_loader_new_region_attachment =
       _spine_atlas_attachment_loader_new_region_attachmentPtr.asFunction<
           spine_region_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>();
+              ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, spine_sequence)>();
 
   spine_mesh_attachment spine_atlas_attachment_loader_new_mesh_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
     ffi.Pointer<ffi.Char> path,
     spine_sequence sequence,
@@ -16622,6 +16630,7 @@ class SpineDartBindings {
     return _spine_atlas_attachment_loader_new_mesh_attachment(
       self,
       skin,
+      placeholder,
       name,
       path,
       sequence,
@@ -16630,91 +16639,109 @@ class SpineDartBindings {
 
   late final _spine_atlas_attachment_loader_new_mesh_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_mesh_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>>('spine_atlas_attachment_loader_new_mesh_attachment');
+          spine_mesh_attachment Function(
+              spine_atlas_attachment_loader,
+              spine_skin,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              spine_sequence)>>('spine_atlas_attachment_loader_new_mesh_attachment');
   late final _spine_atlas_attachment_loader_new_mesh_attachment =
       _spine_atlas_attachment_loader_new_mesh_attachmentPtr.asFunction<
           spine_mesh_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>();
+              ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, spine_sequence)>();
 
   spine_bounding_box_attachment spine_atlas_attachment_loader_new_bounding_box_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_atlas_attachment_loader_new_bounding_box_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_atlas_attachment_loader_new_bounding_box_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_bounding_box_attachment Function(spine_atlas_attachment_loader, spine_skin,
+          spine_bounding_box_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_atlas_attachment_loader_new_bounding_box_attachment');
   late final _spine_atlas_attachment_loader_new_bounding_box_attachment =
       _spine_atlas_attachment_loader_new_bounding_box_attachmentPtr.asFunction<
-          spine_bounding_box_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+          spine_bounding_box_attachment Function(
+              spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_path_attachment spine_atlas_attachment_loader_new_path_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_atlas_attachment_loader_new_path_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_atlas_attachment_loader_new_path_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_path_attachment Function(spine_atlas_attachment_loader, spine_skin,
+          spine_path_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_atlas_attachment_loader_new_path_attachment');
-  late final _spine_atlas_attachment_loader_new_path_attachment = _spine_atlas_attachment_loader_new_path_attachmentPtr
-      .asFunction<spine_path_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+  late final _spine_atlas_attachment_loader_new_path_attachment =
+      _spine_atlas_attachment_loader_new_path_attachmentPtr.asFunction<
+          spine_path_attachment Function(
+              spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_point_attachment spine_atlas_attachment_loader_new_point_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_atlas_attachment_loader_new_point_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_atlas_attachment_loader_new_point_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_point_attachment Function(spine_atlas_attachment_loader, spine_skin,
+          spine_point_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_atlas_attachment_loader_new_point_attachment');
   late final _spine_atlas_attachment_loader_new_point_attachment =
       _spine_atlas_attachment_loader_new_point_attachmentPtr.asFunction<
-          spine_point_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+          spine_point_attachment Function(
+              spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_clipping_attachment spine_atlas_attachment_loader_new_clipping_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_atlas_attachment_loader_new_clipping_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_atlas_attachment_loader_new_clipping_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_clipping_attachment Function(spine_atlas_attachment_loader, spine_skin,
+          spine_clipping_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_atlas_attachment_loader_new_clipping_attachment');
   late final _spine_atlas_attachment_loader_new_clipping_attachment =
       _spine_atlas_attachment_loader_new_clipping_attachmentPtr.asFunction<
-          spine_clipping_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+          spine_clipping_attachment Function(
+              spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_atlas_region spine_atlas_attachment_loader_find_region(
     spine_atlas_attachment_loader self,
@@ -17980,6 +18007,7 @@ class SpineDartBindings {
   spine_region_attachment spine_attachment_loader_new_region_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
     ffi.Pointer<ffi.Char> path,
     spine_sequence sequence,
@@ -17987,6 +18015,7 @@ class SpineDartBindings {
     return _spine_attachment_loader_new_region_attachment(
       self,
       skin,
+      placeholder,
       name,
       path,
       sequence,
@@ -17995,16 +18024,22 @@ class SpineDartBindings {
 
   late final _spine_attachment_loader_new_region_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_region_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>>('spine_attachment_loader_new_region_attachment');
+          spine_region_attachment Function(
+              spine_attachment_loader,
+              spine_skin,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              spine_sequence)>>('spine_attachment_loader_new_region_attachment');
   late final _spine_attachment_loader_new_region_attachment =
       _spine_attachment_loader_new_region_attachmentPtr.asFunction<
-          spine_region_attachment Function(
-              spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, spine_sequence)>();
+          spine_region_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, spine_sequence)>();
 
   spine_mesh_attachment spine_attachment_loader_new_mesh_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
     ffi.Pointer<ffi.Char> path,
     spine_sequence sequence,
@@ -18012,6 +18047,7 @@ class SpineDartBindings {
     return _spine_attachment_loader_new_mesh_attachment(
       self,
       skin,
+      placeholder,
       name,
       path,
       sequence,
@@ -18020,88 +18056,107 @@ class SpineDartBindings {
 
   late final _spine_attachment_loader_new_mesh_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_mesh_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>>('spine_attachment_loader_new_mesh_attachment');
+          spine_mesh_attachment Function(
+              spine_attachment_loader,
+              spine_skin,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              spine_sequence)>>('spine_attachment_loader_new_mesh_attachment');
   late final _spine_attachment_loader_new_mesh_attachment = _spine_attachment_loader_new_mesh_attachmentPtr.asFunction<
-      spine_mesh_attachment Function(
-          spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, spine_sequence)>();
+      spine_mesh_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Char>, spine_sequence)>();
 
   spine_bounding_box_attachment spine_attachment_loader_new_bounding_box_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_attachment_loader_new_bounding_box_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_attachment_loader_new_bounding_box_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_bounding_box_attachment Function(spine_attachment_loader, spine_skin,
+          spine_bounding_box_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_attachment_loader_new_bounding_box_attachment');
   late final _spine_attachment_loader_new_bounding_box_attachment =
       _spine_attachment_loader_new_bounding_box_attachmentPtr.asFunction<
-          spine_bounding_box_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+          spine_bounding_box_attachment Function(
+              spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_path_attachment spine_attachment_loader_new_path_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_attachment_loader_new_path_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_attachment_loader_new_path_attachmentPtr = _lookup<
-          ffi
-          .NativeFunction<spine_path_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>>(
-      'spine_attachment_loader_new_path_attachment');
-  late final _spine_attachment_loader_new_path_attachment = _spine_attachment_loader_new_path_attachmentPtr
-      .asFunction<spine_path_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+      ffi.NativeFunction<
+          spine_path_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('spine_attachment_loader_new_path_attachment');
+  late final _spine_attachment_loader_new_path_attachment = _spine_attachment_loader_new_path_attachmentPtr.asFunction<
+      spine_path_attachment Function(
+          spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_point_attachment spine_attachment_loader_new_point_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_attachment_loader_new_point_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_attachment_loader_new_point_attachmentPtr = _lookup<
-          ffi
-          .NativeFunction<spine_point_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>>(
-      'spine_attachment_loader_new_point_attachment');
-  late final _spine_attachment_loader_new_point_attachment = _spine_attachment_loader_new_point_attachmentPtr
-      .asFunction<spine_point_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+      ffi.NativeFunction<
+          spine_point_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('spine_attachment_loader_new_point_attachment');
+  late final _spine_attachment_loader_new_point_attachment =
+      _spine_attachment_loader_new_point_attachmentPtr.asFunction<
+          spine_point_attachment Function(
+              spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_clipping_attachment spine_attachment_loader_new_clipping_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_attachment_loader_new_clipping_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_attachment_loader_new_clipping_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_clipping_attachment Function(spine_attachment_loader, spine_skin,
+          spine_clipping_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_attachment_loader_new_clipping_attachment');
-  late final _spine_attachment_loader_new_clipping_attachment = _spine_attachment_loader_new_clipping_attachmentPtr
-      .asFunction<spine_clipping_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+  late final _spine_attachment_loader_new_clipping_attachment =
+      _spine_attachment_loader_new_clipping_attachmentPtr.asFunction<
+          spine_clipping_attachment Function(
+              spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_attachment_timeline spine_attachment_timeline_create(
     int frameCount,
@@ -42335,12 +42390,12 @@ class SpineDartBindings {
   spine_attachment spine_skeleton_get_attachment_1(
     spine_skeleton self,
     ffi.Pointer<ffi.Char> slotName,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
   ) {
     return _spine_skeleton_get_attachment_1(
       self,
       slotName,
-      placeholderName,
+      placeholder,
     );
   }
 
@@ -42353,12 +42408,12 @@ class SpineDartBindings {
   spine_attachment spine_skeleton_get_attachment_2(
     spine_skeleton self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
   ) {
     return _spine_skeleton_get_attachment_2(
       self,
       slotIndex,
-      placeholderName,
+      placeholder,
     );
   }
 
@@ -42372,16 +42427,16 @@ class SpineDartBindings {
   /// findSlot(String), finding the attachment with getAttachment(int, String),
   /// then setting the slot's SlotPose::getAttachment().
   ///
-  /// @param placeholderName May be empty.
+  /// @param placeholder May be empty.
   void spine_skeleton_set_attachment(
     spine_skeleton self,
     ffi.Pointer<ffi.Char> slotName,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
   ) {
     return _spine_skeleton_set_attachment(
       self,
       slotName,
-      placeholderName,
+      placeholder,
     );
   }
 
@@ -43710,13 +43765,13 @@ class SpineDartBindings {
   void spine_skin_set_attachment(
     spine_skin self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
     spine_attachment attachment,
   ) {
     return _spine_skin_set_attachment(
       self,
       slotIndex,
-      placeholderName,
+      placeholder,
       attachment,
     );
   }
@@ -43730,12 +43785,12 @@ class SpineDartBindings {
   spine_attachment spine_skin_get_attachment(
     spine_skin self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
   ) {
     return _spine_skin_get_attachment(
       self,
       slotIndex,
-      placeholderName,
+      placeholder,
     );
   }
 
@@ -43749,12 +43804,12 @@ class SpineDartBindings {
   void spine_skin_remove_attachment(
     spine_skin self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
   ) {
     return _spine_skin_remove_attachment(
       self,
       slotIndex,
-      placeholderName,
+      placeholder,
     );
   }
 

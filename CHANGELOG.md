@@ -14,6 +14,7 @@
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
+  - Attachment loader APIs now receive both the skin `placeholder` and resolved attachment `name`.
   - `spine_animation_state_get_current()` renamed to `spine_animation_state_get_track()`.
   - Generated mesh attachment APIs now use `source_mesh` naming instead of `parent_mesh` to match spine-cpp, eg `spine_mesh_attachment_get_source_mesh()` / `spine_mesh_attachment_set_source_mesh()`.
   - `spine_track_entry_get_mix_blend()` / `spine_track_entry_set_mix_blend()` removed. Use `spine_track_entry_get_additive()` / `spine_track_entry_set_additive()` instead.
@@ -116,6 +117,7 @@
   - Fixed `AnimationState` attachment timeline handling so deforms are applied correctly when an attachment is hidden in the setup pose.
 
 - **Breaking changes**
+  - `AttachmentLoader` methods now receive both the skin `placeholder` and resolved attachment `name`. `Skin::AttachmentMap::Entry::_placeholderName` renamed to `_placeholder`.
   - `AnimationState::getCurrent()` renamed to `AnimationState::getTrack()`.
   - `MeshAttachment::getParentMesh()` / `setParentMesh()` renamed to `getSourceMesh()` / `setSourceMesh()`.
   - Headers reorganized from `spine-cpp/spine-cpp/include/spine/` to `spine-cpp/include/spine/`
@@ -264,6 +266,7 @@
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
+  - Custom C++ `AttachmentLoader` implementations now receive both the skin `placeholder` and resolved attachment `name`.
   - `USpineSkeletonAnimationComponent::GetCurrent()` renamed to `GetTrack()`.
   - `USpineWidget::GetCurrent()` renamed to `GetTrack()`.
   - Updated to use new C++ runtime with all breaking changes above
@@ -281,6 +284,7 @@
   - Fixed Godot 4.6 GDExtension builds with the latest `godot-cpp` by including the required `Ref` support header in `SpineCommon.h`, updated `SpineEventData` for the `EventData.setupPose` API change, and refreshed vendored `spine-cpp` sources during clean setup.
 
 - **Breaking changes (since previous 4.3 beta)**
+  - `SpineSkin` attachment method argument names now use `placeholder` instead of `name`.
   - `SpineTrackEntry.get_hold_previous()` / `set_hold_previous()` removed.
   - `SpineTrackEntry.get_mix_blend()` / `set_mix_blend()` removed. Use `get_additive()` / `set_additive()` for additive blending.
   - `SpineConstant.MixBlend` and `SpineConstant.MixDirection` enums removed.
@@ -516,6 +520,7 @@
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
+  - Generated SpineSwift attachment loader APIs now receive both the skin `placeholder` and resolved attachment `name`.
   - `AnimationState.getCurrent(_:)` renamed to `AnimationState.getTrack(_:)` in SpineSwift.
   - SpineSwift mesh attachment APIs now use `sourceMesh` naming instead of `parentMesh` to match spine-cpp.
   - SpineSwift attachments now expose `timelineSlots` and `isTimelineActive(...)` to match spine-cpp.
@@ -534,6 +539,7 @@
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
+  - Generated Dart attachment loader APIs now receive both the skin `placeholder` and resolved attachment `name`.
   - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.
   - The Dart runtime is now fully auto-generated from the C runtime, maintaining the full C++ type hierarchy with proper nullability annotations
   - `MeshAttachment.parentMesh` is now `MeshAttachment.sourceMesh`, and attachments now expose `timelineSlots` plus `isTimelineActive(...)` to match spine-cpp.
@@ -564,6 +570,7 @@
 
 - **Breaking changes**
   - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.
+  - Generated Flutter attachment loader APIs now receive both the skin `placeholder` and resolved attachment `name`.
   - Generated Flutter mesh attachment APIs now use `sourceMesh` naming instead of `parentMesh` to match spine-cpp.
   - Generated Flutter bindings now expose `Attachment.timelineSlots` and `Attachment.isTimelineActive(...)` to match spine-cpp.
   - Generated Flutter IK constraint data `scaleY` and `ScaleY` renamed to `scaleYMode` and `ScaleYMode`.

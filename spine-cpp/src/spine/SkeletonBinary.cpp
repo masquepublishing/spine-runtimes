@@ -561,12 +561,12 @@ Skin *SkeletonBinary::readSkin(DataInput &input, SkeletonData &skeletonData, boo
 	for (int i = 0; i < slotCount; ++i) {
 		int slotIndex = input.readInt(true);
 		for (int ii = 0, nn = input.readInt(true); ii < nn; ++ii) {
-			String name(input.readStringRef());
-			Attachment *attachment = readAttachment(input, *skin, slotIndex, name, skeletonData, nonessential);
+			String placeholder(input.readStringRef());
+			Attachment *attachment = readAttachment(input, *skin, slotIndex, placeholder, skeletonData, nonessential);
 			if (attachment)
-				skin->setAttachment(slotIndex, name, attachment);
+				skin->setAttachment(slotIndex, placeholder, attachment);
 			else {
-				setError("Error reading attachment: ", name.buffer());
+				setError("Error reading attachment: ", placeholder.buffer());
 				delete skin;
 				return NULL;
 			}
@@ -575,12 +575,12 @@ Skin *SkeletonBinary::readSkin(DataInput &input, SkeletonData &skeletonData, boo
 	return skin;
 }
 
-Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slotIndex, const String &attachmentName, SkeletonData &skeletonData,
+Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slotIndex, const String &placeholder, SkeletonData &skeletonData,
 										   bool nonessential) {
 	float scale = _scale;
 
 	int flags = input.readByte();
-	String name = (flags & 8) != 0 ? input.readStringRef() : attachmentName;
+	String name = (flags & 8) != 0 ? input.readStringRef() : placeholder;
 	AttachmentType type = static_cast<AttachmentType>(flags & 0x7);
 	switch (type) {
 		case AttachmentType_Region: {
@@ -595,7 +595,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			float width = input.readFloat();
 			float height = input.readFloat();
 
-			RegionAttachment *region = _attachmentLoader->newRegionAttachment(skin, name, path, sequence);
+			RegionAttachment *region = _attachmentLoader->newRegionAttachment(skin, placeholder, name, path, sequence);
 			if (!region) return NULL;
 			region->setPath(path);
 			region->setX(x * scale);
@@ -615,7 +615,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			int verticesLength = readVertices(input, vertices, bones, (flags & 16) != 0);
 			int color = nonessential ? input.readInt() : 0;
 
-			BoundingBoxAttachment *box = _attachmentLoader->newBoundingBoxAttachment(skin, name);
+			BoundingBoxAttachment *box = _attachmentLoader->newBoundingBoxAttachment(skin, placeholder, name);
 			if (!box) return NULL;
 			box->setWorldVerticesLength(verticesLength);
 			box->setVertices(vertices);
@@ -648,7 +648,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 				height = input.readFloat();
 			}
 
-			MeshAttachment *mesh = _attachmentLoader->newMeshAttachment(skin, name, path, sequence);
+			MeshAttachment *mesh = _attachmentLoader->newMeshAttachment(skin, placeholder, name, path, sequence);
 			if (!mesh) return NULL;
 			mesh->setPath(path);
 			Color::rgba8888ToColor(mesh->getColor(), color);
@@ -681,7 +681,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 				height = input.readFloat();
 			}
 
-			MeshAttachment *mesh = _attachmentLoader->newMeshAttachment(skin, name, path, sequence);
+			MeshAttachment *mesh = _attachmentLoader->newMeshAttachment(skin, placeholder, name, path, sequence);
 			if (!mesh) return NULL;
 			mesh->setPath(path);
 			Color::rgba8888ToColor(mesh->getColor(), color);
@@ -702,7 +702,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			readFloatArray(input, verticesLength / 6, scale, lengths);
 			int color = nonessential ? input.readInt() : 0;
 
-			PathAttachment *path = _attachmentLoader->newPathAttachment(skin, name);
+			PathAttachment *path = _attachmentLoader->newPathAttachment(skin, placeholder, name);
 			if (!path) return NULL;
 			path->setClosed(closed);
 			path->setConstantSpeed(constantSpeed);
@@ -719,7 +719,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			float y = input.readFloat();
 			int color = nonessential ? input.readInt() : 0;
 
-			PointAttachment *point = _attachmentLoader->newPointAttachment(skin, name);
+			PointAttachment *point = _attachmentLoader->newPointAttachment(skin, placeholder, name);
 			if (!point) return NULL;
 			point->setX(x * scale);
 			point->setY(y * scale);
@@ -734,7 +734,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			int verticesLength = readVertices(input, vertices, bones, (flags & 16) != 0);
 			int color = nonessential ? input.readInt() : 0;
 
-			ClippingAttachment *clip = _attachmentLoader->newClippingAttachment(skin, name);
+			ClippingAttachment *clip = _attachmentLoader->newClippingAttachment(skin, placeholder, name);
 			if (!clip) return NULL;
 			clip->setEndSlot(skeletonData._slots[endSlotIndex]);
 			clip->setConvex((flags & 32) != 0);
