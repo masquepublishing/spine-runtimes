@@ -1162,12 +1162,11 @@ export class EventQueue {
 		if (this.drainDisabled) return; // Not reentrant.
 		this.drainDisabled = true;
 
-		const listeners = this.animState.listeners;
-
 		for (let i = 0; i < this.objects.length; i += 2) {
 			const objects = this.objects;
 			const type = objects[i] as EventType;
 			const entry = objects[i + 1] as TrackEntry;
+			const listeners = this.animState.listeners.slice();
 			switch (type) {
 				case EventType.start:
 					if (entry.listener?.start) entry.listener.start(entry);
