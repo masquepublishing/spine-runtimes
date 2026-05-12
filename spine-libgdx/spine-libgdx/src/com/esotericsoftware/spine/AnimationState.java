@@ -29,6 +29,7 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
@@ -256,7 +257,7 @@ public class AnimationState {
 	private float applyMixingFrom (TrackEntry to, Skeleton skeleton) {
 		TrackEntry from = to.mixingFrom;
 		float fromMix = from.mixingFrom != null ? applyMixingFrom(from, skeleton) : 1;
-		float mix = to.mixDuration == 0 ? 1 : Math.min(1, to.mixTime / to.mixDuration);
+		float mix = to.mix();
 
 		float a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
 		float alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
@@ -285,7 +286,7 @@ public class AnimationState {
 			float alpha;
 			if ((mode & HOLD) != 0) {
 				TrackEntry holdMix = timelineHoldMix[i];
-				alpha = holdMix == null ? alphaHold : alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
 				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 				alpha = alphaMix;
@@ -697,6 +698,7 @@ public class AnimationState {
 		entry.alpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
+		entry.mixInterpolation = Interpolation.linear;
 		entry.totalAlpha = 0;
 		entry.keepHold = false;
 		return entry;
@@ -863,6 +865,7 @@ public class AnimationState {
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 		float alpha, mixTime, mixDuration, totalAlpha;
+		Interpolation mixInterpolation = Interpolation.linear;
 
 		/** For each timeline:
 		 * <li>Bit 0, FIRST: 0 = mix from current pose, 1 = mix from setup pose. Timeline is first to set the property.
@@ -878,6 +881,7 @@ public class AnimationState {
 			next = null;
 			mixingFrom = null;
 			mixingTo = null;
+			mixInterpolation = Interpolation.linear;
 			animation = null;
 			listener = null;
 			timelineMode.clear();
@@ -1067,9 +1071,9 @@ public class AnimationState {
 			this.alpha = alpha;
 		}
 
-		/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the <code>eventThreshold</code>, event
-		 * timelines are applied while this animation is being mixed out. Defaults to 0, so event timelines are not applied while
-		 * this animation is being mixed out. */
+		/** When the interpolated mix percentage is less than the <code>eventThreshold</code>, event timelines are applied while
+		 * this animation is being mixed out. Defaults to 0, so event timelines are not applied while this animation is being mixed
+		 * out. */
 		public float getEventThreshold () {
 			return eventThreshold;
 		}
@@ -1079,8 +1083,8 @@ public class AnimationState {
 		}
 
 		/** When the computed alpha is greater than <code>alphaAttachmentThreshold</code>, attachment timelines are applied. The
-		 * computed alpha includes {@link #alpha} and the mix percentage. Defaults to 0, so attachment timelines are always
-		 * applied. */
+		 * computed alpha includes {@link #alpha} and the interpolated mix percentage. Defaults to 0, so attachment timelines are
+		 * always applied. */
 		public float getAlphaAttachmentThreshold () {
 			return alphaAttachmentThreshold;
 		}
@@ -1089,9 +1093,9 @@ public class AnimationState {
 			this.alphaAttachmentThreshold = alphaAttachmentThreshold;
 		}
 
-		/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the <code>mixAttachmentThreshold</code>,
-		 * attachment timelines are applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not
-		 * applied while this animation is being mixed out. */
+		/** When the interpolated mix percentage is less than the <code>mixAttachmentThreshold</code>, attachment timelines are
+		 * applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not applied while this
+		 * animation is being mixed out. */
 		public float getMixAttachmentThreshold () {
 			return mixAttachmentThreshold;
 		}
@@ -1100,9 +1104,9 @@ public class AnimationState {
 			this.mixAttachmentThreshold = mixAttachmentThreshold;
 		}
 
-		/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the <code>mixDrawOrderThreshold</code>,
-		 * draw order timelines are applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not
-		 * applied while this animation is being mixed out. */
+		/** When the interpolated mix percentage is less than the <code>mixDrawOrderThreshold</code>, draw order timelines are
+		 * applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not applied while this
+		 * animation is being mixed out. */
 		public float getMixDrawOrderThreshold () {
 			return mixDrawOrderThreshold;
 		}
@@ -1196,6 +1200,28 @@ public class AnimationState {
 			this.mixDuration = mixDuration;
 			if (delay <= 0) delay = previous == null ? 0 : Math.max(delay + previous.getTrackComplete() - mixDuration, 0);
 			this.delay = delay;
+		}
+
+		/** The interpolation to apply to the mix percentage ({@link #mixTime} / {@link #mixDuration}) when mixing from the previous
+		 * animation to this animation. Defaults to linear. */
+		public Interpolation getMixInterpolation () {
+			return mixInterpolation;
+		}
+
+		public void setMixInterpolation (Interpolation mixInterpolation) {
+			if (mixInterpolation == null) throw new IllegalArgumentException("mixInterpolation cannot be null.");
+			this.mixInterpolation = mixInterpolation;
+		}
+
+		float mix () {
+			if (mixDuration == 0) return 1;
+			float mix = mixTime / mixDuration;
+			if (mix >= 1) return 1;
+			if (mixInterpolation == Interpolation.linear) return mix;
+			mix = mixInterpolation.apply(mix);
+			if (mix < 0) return 0;
+			if (mix > 1) return 1;
+			return mix;
 		}
 
 		/** When true, timelines in this animation that support additive have their values added to the setup or current pose values
