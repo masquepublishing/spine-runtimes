@@ -202,7 +202,7 @@ namespace Spine.Unity.Editor {
 		protected virtual void HandleSelect (object menuItemObject) {
 			SpineDrawerValuePair clickedItem = (SpineDrawerValuePair)menuItemObject;
 			SerializedProperty serializedProperty = clickedItem.property;
-			if (serializedProperty.serializedObject.isEditingMultipleObjects) serializedProperty.stringValue = "oaifnoiasf��123526"; // HACK: to trigger change on multi-editing.
+			if (serializedProperty.serializedObject.isEditingMultipleObjects) serializedProperty.stringValue = "oaifnoiasf°ñ123526"; // HACK: to trigger change on multi-editing.
 			serializedProperty.stringValue = clickedItem.stringValue;
 			serializedProperty.serializedObject.ApplyModifiedProperties();
 		}
