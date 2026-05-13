@@ -33,6 +33,7 @@ import haxe.ds.StringMap;
 import spine.animation.EventTimeline;
 import spine.animation.Listeners.EventListeners;
 import spine.Event;
+import spine.Interpolation;
 import spine.Pool;
 import spine.Skeleton;
 
@@ -279,7 +280,7 @@ class AnimationState {
 	private function applyMixingFrom(to:TrackEntry, skeleton:Skeleton):Float {
 		var from:TrackEntry = to.mixingFrom;
 		var fromMix:Float = from.mixingFrom != null ? applyMixingFrom(from, skeleton) : 1;
-		var mix:Float = to.mixDuration == 0 ? 1 : Math.min(1, to.mixTime / to.mixDuration);
+		var mix:Float = to.mix();
 
 		var a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
 		var alphaMix = a * (1 - mix),
@@ -316,7 +317,7 @@ class AnimationState {
 			var alpha:Float = 0;
 			if ((mode & HOLD) != 0) {
 				var holdMix:TrackEntry = timelineHoldMix[i];
-				alpha = holdMix == null ? alphaHold : alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
 				if (!drawOrder && Std.isOfType(timeline, DrawOrderTimeline))
 					continue;
@@ -790,6 +791,7 @@ class AnimationState {
 		entry.alpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
+		entry.mixInterpolation = Interpolation.linear;
 		entry.totalAlpha = 0;
 		entry.keepHold = false;
 		return entry;
