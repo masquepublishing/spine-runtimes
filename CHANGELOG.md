@@ -325,6 +325,7 @@
   - Added `ClippingAttachment.Convex` and `ClippingAttachment.Inverse`
   - Added `IkConstraintData.ScaleYMode` enum and `IkConstraintData.ScaleY` to control how IK compress/stretch changes `BonePose.ScaleY`, including volume preservation
   - Added `allowMissingRegions` parameter to `AtlasAttachmentLoader` constructor to support skeletons exported with per-skin atlases
+  - Added `TrackEntry.MixInterpolation` for customizable non-linear mixing. Defaults to `Interpolation.Linear` to maintain existing behaviour.
 
 - **Breaking changes**
   - Color properties `.R` `.G` `.B` `.A` are replaced by `.GetColor()` and `.SetColor()`
@@ -450,7 +451,8 @@
   - `MeshAttachment.ParentMesh` renamed to `MeshAttachment.SourceMesh`
   - `AttachmentLoader` methods `NewRegionAttachment`, `NewMeshAttachment`, `NewBoundingBoxAttachment`, `NewClippingAttachment`, `NewPathAttachment`, and `NewPointAttachment` now take an additional `string placeholder` parameter. Update any custom `AttachmentLoader` implementations accordingly.
   - Renamed `Skin.SkinEntry.Name` to `Skin.SkinEntry.Placeholder` to better match Spine editor terminology. Was intermediately renamed to `PlaceholderName` which was then changed to `Placeholder`.
-  
+  - `MathUtils.IInterpolation` class is replaced by new `Interpolation` class, see *Additions* above.
+
 ### Unity
 
 - **Officially supported Unity versions are 2017.1-6000.4**.

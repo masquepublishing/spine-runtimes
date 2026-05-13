@@ -329,7 +329,7 @@ namespace Spine {
 		private float ApplyMixingFrom (TrackEntry to, Skeleton skeleton) {
 			TrackEntry from = to.mixingFrom;
 			float fromMix = from.mixingFrom != null ? ApplyMixingFrom(from, skeleton) : 1;
-			float mix = to.mixDuration == 0 ? 1 : Math.Min(1, to.mixTime / to.mixDuration);
+			float mix = to.Mix();
 
 			float a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
 			float alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
@@ -359,7 +359,7 @@ namespace Spine {
 				float alpha;
 				if ((mode & AnimationState.Hold) != 0) {
 					TrackEntry holdMix = timelineHoldMix[i];
-					alpha = holdMix == null ? alphaHold : alphaHold * Math.Max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+					alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.Mix());
 				} else {
 					if (!drawOrder && timeline is DrawOrderTimeline) continue;
 					alpha = alphaMix;
@@ -785,7 +785,7 @@ namespace Spine {
 			entry.alpha = 1;
 			entry.mixTime = 0;
 			entry.mixDuration = last == null ? 0 : data.GetMix(last.animation, animation);
-
+			entry.mixInterpolation = Interpolation.Linear;
 			entry.totalAlpha = 0;
 			entry.keepHold = false;
 			return entry;
@@ -960,6 +960,8 @@ namespace Spine {
 		internal float animationStart, animationEnd, animationLast, nextAnimationLast;
 		internal float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale = 1f;
 		internal float alpha, mixTime, mixDuration, totalAlpha;
+		internal Interpolation mixInterpolation = Interpolation.Linear;
+
 		/// <summary>
 		/// For each timeline:
 		/// <list type="bullet">
@@ -979,6 +981,7 @@ namespace Spine {
 			next = null;
 			mixingFrom = null;
 			mixingTo = null;
+			mixInterpolation = Interpolation.Linear;
 			animation = null;
 			// replaces 'listener = null;' since delegates are used for event callbacks
 			Start = null;
@@ -1134,32 +1137,57 @@ namespace Spine {
 		public float Alpha { get { return alpha; } set { alpha = value; } }
 
 		/// <summary>
-		/// When the mix percentage (<see cref="TrackEntry.MixTime"/> / <see cref="TrackEntry.MixDuration"/>) is less than the
-		/// <c>EventThreshold</c>, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
-		/// timelines are not applied while this animation is being mixed out.
+		/// When the interpolated mix percentage is less than the <c>EventThreshold</c>, event timelines are applied while
+		/// this animation is being mixed out. Defaults to 0, so event timelines are not applied while this animation is being mixed
+		/// out.
 		/// </summary>
 		public float EventThreshold { get { return eventThreshold; } set { eventThreshold = value; } }
 
 		/// <summary>
 		/// When the computed alpha is greater than <c>AlphaAttachmentThreshold</c>, attachment timelines are applied. The
-		/// computed alpha includes <see cref="Alpha"/> and the mix percentage. Defaults to 0, so attachment timelines are always
-		/// applied.
+		/// computed alpha includes <see cref="Alpha"/> and the interpolated mix percentage. Defaults to 0, so attachment timelines are
+		/// always applied.
 		/// </summary>
 		public float AlphaAttachmentThreshold { get { return alphaAttachmentThreshold; } set { alphaAttachmentThreshold = value; } }
 
 		/// <summary>
-		/// When the mix percentage (<see cref="TrackEntry.MixTime"/> / <see cref="TrackEntry.MixDuration"/>) is less than the
-		/// <c>MixAttachmentThreshold</c>, attachment timelines are applied while this animation is being mixed out. Defaults
-		/// to 0, so attachment timelines are not applied while this animation is being mixed out.
+		/// When the interpolated mix percentage is less than the <c>MixAttachmentThreshold</c>, attachment timelines are
+		/// applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not applied while this
+		/// animation is being mixed out.
 		/// </summary>
 		public float MixAttachmentThreshold { get { return mixAttachmentThreshold; } set { mixAttachmentThreshold = value; } }
 
 		/// <summary>
-		/// When the mix percentage (<see cref="TrackEntry.MixTime"/> / <see cref="TrackEntry.MixDuration"/>) is less than the
-		/// <c>MixDrawOrderThreshold</c>, draw order timelines are applied while this animation is being mixed out. Defaults to
-		/// 0, so draw order timelines are not applied while this animation is being mixed out.
+		/// When the interpolated mix percentage is less than the <c>MixDrawOrderThreshold</c>, draw order timelines are
+		/// applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not applied while this
+		/// animation is being mixed out.
 		/// </summary>
 		public float MixDrawOrderThreshold { get { return mixDrawOrderThreshold; } set { mixDrawOrderThreshold = value; } }
+
+		/// <summary>
+		/// The interpolation to apply to the mix percentage <see cref="MixTime"/> / <see cref="MixDuration"/> when mixing from the previous
+		/// animation to this animation. Defaults to linear.
+		/// </summary>
+		public Interpolation MixInterpolation {
+			get {
+				return mixInterpolation;
+			}
+			set {
+				if (value == null) throw new ArgumentNullException("MixInterpolation", "MixInterpolation value cannot be null.");
+				this.mixInterpolation = value;
+			}
+		}
+
+		internal float Mix () {
+			if (mixDuration == 0) return 1;
+			float mix = mixTime / mixDuration;
+			if (mix >= 1) return 1;
+			if (mixInterpolation == Interpolation.Linear) return mix;
+			mix = mixInterpolation.Apply(mix);
+			if (mix < 0) return 0;
+			if (mix > 1) return 1;
+			return mix;
+		}
 
 		/// <summary>
 		/// The animation queued to start after this animation, or null if there is none. <c>next</c> makes up a doubly linked
