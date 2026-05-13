@@ -37,6 +37,7 @@
 #include <spine/DrawOrderTimeline.h>
 #include <spine/Event.h>
 #include <spine/EventTimeline.h>
+#include <spine/Interpolation.h>
 #include <spine/RotateTimeline.h>
 #include <spine/Skeleton.h>
 #include <spine/SkeletonData.h>
@@ -77,7 +78,8 @@ TrackEntry::TrackEntry()
 	  _reverse(false), _shortestRotation(false), _keepHold(false), _eventThreshold(0), _mixAttachmentThreshold(0), _alphaAttachmentThreshold(0),
 	  _mixDrawOrderThreshold(0), _animationStart(0), _animationEnd(0), _animationLast(0), _nextAnimationLast(0), _delay(0), _trackTime(0),
 	  _trackLast(0), _nextTrackLast(0), _trackEnd(0), _timeScale(1.0f), _alpha(0), _mixTime(0), _mixDuration(0), _totalAlpha(0),
-	  _listener(dummyOnAnimationEventFunc), SP_ANIMATION_LISTENER_USER_DATA_CTOR _listenerObject(NULL), _state(NULL) {
+	  _mixInterpolation(&Interpolation::linear()), _listener(dummyOnAnimationEventFunc), SP_ANIMATION_LISTENER_USER_DATA_CTOR _listenerObject(NULL),
+	  _state(NULL) {
 }
 
 TrackEntry::~TrackEntry() {
@@ -268,6 +270,25 @@ void TrackEntry::setMixDuration(float mixDuration, float delay) {
 	this->_delay = delay;
 }
 
+Interpolation &TrackEntry::getMixInterpolation() {
+	return *_mixInterpolation;
+}
+
+void TrackEntry::setMixInterpolation(Interpolation &mixInterpolation) {
+	_mixInterpolation = &mixInterpolation;
+}
+
+float TrackEntry::mix() {
+	if (_mixDuration == 0) return 1;
+	float mix = _mixTime / _mixDuration;
+	if (mix >= 1) return 1;
+	if (_mixInterpolation == &Interpolation::linear()) return mix;
+	mix = _mixInterpolation->apply(mix);
+	if (mix < 0) return 0;
+	if (mix > 1) return 1;
+	return mix;
+}
+
 TrackEntry *TrackEntry::getMixingFrom() {
 	return _mixingFrom;
 }
@@ -305,6 +326,7 @@ void TrackEntry::reset() {
 	_next = NULL;
 	_mixingFrom = NULL;
 	_mixingTo = NULL;
+	_mixInterpolation = &Interpolation::linear();
 
 	setRendererObject(NULL);
 
@@ -931,7 +953,7 @@ bool AnimationState::updateMixingFrom(TrackEntry *to, float delta) {
 float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 	TrackEntry *from = to->_mixingFrom;
 	float fromMix = from->_mixingFrom != NULL ? applyMixingFrom(from, skeleton) : 1;
-	float mix = to->_mixDuration == 0 ? 1 : MathUtil::min(1.0f, to->_mixTime / to->_mixDuration);
+	float mix = to->mix();
 
 	float a = from->_alpha * fromMix, keep = 1 - mix * to->_alpha;
 	float alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
@@ -962,7 +984,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 		float alpha;
 		if ((mode & Hold) != 0) {
 			TrackEntry *holdMix = timelineHoldMix[i];
-			alpha = holdMix == NULL ? alphaHold : alphaHold * MathUtil::max(0.0f, 1.0f - holdMix->_mixTime / holdMix->_mixDuration);
+			alpha = holdMix == NULL ? alphaHold : alphaHold * (1 - holdMix->mix());
 		} else {
 			if (!drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti)) continue;
 			alpha = alphaMix;
@@ -1111,6 +1133,7 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	entry._alpha = 1;
 	entry._mixTime = 0;
 	entry._mixDuration = (last == NULL) ? 0 : _data->getMix(*last->_animation, *animation);
+	entry._mixInterpolation = &Interpolation::linear();
 	entry._totalAlpha = 0;
 	entry._keepHold = false;
 

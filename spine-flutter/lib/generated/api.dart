@@ -105,6 +105,7 @@ export 'ik_constraint_data.dart';
 export 'ik_constraint_pose.dart';
 export 'ik_constraint_timeline.dart';
 export 'inherit_timeline.dart';
+export 'interpolation.dart';
 export 'linked_mesh.dart';
 export 'mesh_attachment.dart';
 export 'path_attachment.dart';

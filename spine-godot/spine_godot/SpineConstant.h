@@ -116,6 +116,14 @@ public:
 		Physics_Update,
 		Physics_Pose
 	};
+
+	enum MixInterpolation {
+		MixInterpolation_Linear,
+		MixInterpolation_Smooth,
+		MixInterpolation_SlowFast,
+		MixInterpolation_FastSlow,
+		MixInterpolation_Circle
+	};
 };
 
 VARIANT_ENUM_CAST(SpineConstant::PropertyId)
@@ -128,3 +136,4 @@ VARIANT_ENUM_CAST(SpineConstant::ScaleYMode)
 VARIANT_ENUM_CAST(SpineConstant::UpdateMode)
 VARIANT_ENUM_CAST(SpineConstant::BoneMode)
 VARIANT_ENUM_CAST(SpineConstant::Physics)
+VARIANT_ENUM_CAST(SpineConstant::MixInterpolation)

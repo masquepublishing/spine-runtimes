@@ -40,6 +40,10 @@ method: TrackEntry::setRendererObject
 # Array<String> returning methods and fields not supported
 method: AttachmentTimeline::getAttachmentNames
 method: Skin::findNamesForSlot
+
+# Interpolation built-in singletons are exposed but should not be constructed or disposed through C.
+method: Interpolation::Interpolation
+method: Interpolation::~Interpolation
 method: AtlasRegion::getNames
 method: AtlasRegion::setNames
 

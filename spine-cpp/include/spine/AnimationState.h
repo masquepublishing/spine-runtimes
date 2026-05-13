@@ -36,6 +36,7 @@
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 #include <spine/HasRendererObject.h>
+#include <spine/Interpolation.h>
 #include "Slot.h"
 
 #ifdef SPINE_USE_STD_FUNCTION
@@ -214,28 +215,26 @@ namespace spine {
 		void setAlpha(float inValue);
 
 		///
-		/// When the mix percentage (mix time / mix duration) is less than the event threshold, event timelines for the animation
-		/// being mixed out will be applied. Defaults to 0, so event timelines are not applied for an animation being mixed out.
+		/// When the interpolated mix percentage is less than the event threshold, event timelines for the animation being mixed out
+		/// will be applied. Defaults to 0, so event timelines are not applied for an animation being mixed out.
 		float getEventThreshold();
 
 		void setEventThreshold(float inValue);
 
-		/// When the mix percentage (mix time / mix duration) is less than the attachment threshold, attachment timelines for the
-		/// animation being mixed out will be applied. Defaults to 0, so attachment timelines are not applied for an animation being
-		/// mixed out.
+		/// When the interpolated mix percentage is less than the attachment threshold, attachment timelines for the animation being
+		/// mixed out will be applied. Defaults to 0, so attachment timelines are not applied for an animation being mixed out.
 		float getMixAttachmentThreshold();
 
 		void setMixAttachmentThreshold(float inValue);
 
-		/// When alpha is greater than alphaAttachmentThreshold, attachment timelines are applied.
-		/// Defaults to 0, so attachment timelines are always applied. */
+		/// When the computed alpha is greater than alphaAttachmentThreshold, attachment timelines are applied. The computed alpha
+		/// includes alpha and the interpolated mix percentage. Defaults to 0, so attachment timelines are always applied.
 		float getAlphaAttachmentThreshold();
 
 		void setAlphaAttachmentThreshold(float inValue);
 
-		/// When the mix percentage (mix time / mix duration) is less than the draw order threshold, draw order timelines for the
-		/// animation being mixed out will be applied. Defaults to 0, so draw order timelines are not applied for an animation being
-		/// mixed out.
+		/// When the interpolated mix percentage is less than the draw order threshold, draw order timelines for the animation being
+		/// mixed out will be applied. Defaults to 0, so draw order timelines are not applied for an animation being mixed out.
 		float getMixDrawOrderThreshold();
 
 		void setMixDrawOrderThreshold(float inValue);
@@ -270,6 +269,12 @@ namespace spine {
 		///           (delay = 0) or before (delay < 0) the previous track entry duration). If the previous
 		///           entry is looping, its next loop completion is used instead of its duration.
 		void setMixDuration(float mixDuration, float delay);
+
+		/// The interpolation to apply to the mix percentage (mix time / mix duration) when mixing from the previous animation to
+		/// this animation. Defaults to linear.
+		Interpolation &getMixInterpolation();
+
+		void setMixInterpolation(Interpolation &mixInterpolation);
 
 		/// The track entry for the previous animation when mixing to this animation, or NULL if no mixing is currently occurring.
 		/// When mixing from multiple animations, MixingFrom makes up a doubly linked list with MixingTo.
@@ -334,6 +339,7 @@ namespace spine {
 		float _animationStart, _animationEnd, _animationLast, _nextAnimationLast;
 		float _delay, _trackTime, _trackLast, _nextTrackLast, _trackEnd, _timeScale;
 		float _alpha, _mixTime, _mixDuration, _totalAlpha;
+		Interpolation *_mixInterpolation;
 		Array<int> _timelineMode;
 		Array<TrackEntry *> _timelineHoldMix;
 		Array<float> _timelinesRotation;
@@ -343,6 +349,8 @@ namespace spine {
 #endif
 		AnimationStateListenerObject *_listenerObject;
 		AnimationState *_state;
+
+		float mix();
 
 		void reset();
 	};

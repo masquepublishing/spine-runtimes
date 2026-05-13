@@ -3,6 +3,7 @@
 ## C
 
 - **Additions**
+  - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs for non-linear animation mixing.
   - Added `spine_slider` and `spine_slider_data` types for slider constraints
   - Regenerated C bindings for the AnimationState additive/hold rework and Skin placeholder name rename in spine-cpp.
   - Regenerated C bindings for the updated clipping runtime, including convex and inverse clipping support.
@@ -90,6 +91,7 @@
 ## C++
 
 - **Additions**
+  - Added `Interpolation` and `TrackEntry::getMixInterpolation()` / `setMixInterpolation()` for non-linear animation mixing.
   - Added `Slider` and `SliderData` classes for slider constraints
   - Linked meshes can now inherit deform and sequence timelines from source meshes in different slots.
   - Added `Attachment::getTimelineSlots()`, `Attachment::setTimelineSlots()`, and `Attachment::isTimelineActive()` for attachment timeline propagation across linked meshes.
@@ -263,6 +265,7 @@
 ### UE
 
 - **Additions**
+  - Added Blueprint APIs for `TrackEntry` mix interpolation.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
@@ -274,6 +277,7 @@
 ### Godot
 
 - **Additions**
+  - Added `SpineTrackEntry` mix interpolation APIs and `SpineConstant.MixInterpolation`.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
   - Added `SpineSlider` and `SpineSliderData` classes for slider constraints
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
@@ -514,6 +518,7 @@
 ## iOS
 
 - **Additions**
+  - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
 - **Bug fixes**
@@ -530,6 +535,7 @@
 ## Dart
 
 - **Additions**
+  - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added `Slider` and `SliderData` classes for slider constraints
   - Added `SliderTimeline` and `SliderMixTimeline` for animating sliders
   - Added new pose system with `BoneLocal`, `BonePose`, and related classes
@@ -561,6 +567,7 @@
 ### Flutter
 
 - **Additions**
+  - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
   - Added `fromMemory` methods to `AtlasFlutter`, `SkeletonDataFlutter`, `SkeletonDrawableFlutter`, and `SpineWidget` for loading Spine data from custom sources (memory, encrypted storage, databases, custom caching, etc.)
   - Added example `load_from_memory.dart` demonstrating how to load all assets into memory and use the `fromMemory` API

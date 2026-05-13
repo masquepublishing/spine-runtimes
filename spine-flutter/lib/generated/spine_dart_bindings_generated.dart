@@ -26292,6 +26292,87 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_rtti Function()>>('spine_inherit_timeline_rtti');
   late final _spine_inherit_timeline_rtti = _spine_inherit_timeline_rttiPtr.asFunction<spine_rtti Function()>();
 
+  /// @param a Alpha value between 0 and 1.
+  double spine_interpolation_apply_1(
+    spine_interpolation self,
+    double a,
+  ) {
+    return _spine_interpolation_apply_1(
+      self,
+      a,
+    );
+  }
+
+  late final _spine_interpolation_apply_1Ptr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_interpolation, ffi.Float)>>('spine_interpolation_apply_1');
+  late final _spine_interpolation_apply_1 =
+      _spine_interpolation_apply_1Ptr.asFunction<double Function(spine_interpolation, double)>();
+
+  double spine_interpolation_apply_2(
+    spine_interpolation self,
+    double start,
+    double end,
+    double a,
+  ) {
+    return _spine_interpolation_apply_2(
+      self,
+      start,
+      end,
+      a,
+    );
+  }
+
+  late final _spine_interpolation_apply_2Ptr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_interpolation, ffi.Float, ffi.Float, ffi.Float)>>(
+          'spine_interpolation_apply_2');
+  late final _spine_interpolation_apply_2 =
+      _spine_interpolation_apply_2Ptr.asFunction<double Function(spine_interpolation, double, double, double)>();
+
+  spine_interpolation spine_interpolation_linear() {
+    return _spine_interpolation_linear();
+  }
+
+  late final _spine_interpolation_linearPtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function()>>('spine_interpolation_linear');
+  late final _spine_interpolation_linear = _spine_interpolation_linearPtr.asFunction<spine_interpolation Function()>();
+
+  /// Aka "smoothstep".
+  spine_interpolation spine_interpolation_smooth() {
+    return _spine_interpolation_smooth();
+  }
+
+  late final _spine_interpolation_smoothPtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function()>>('spine_interpolation_smooth');
+  late final _spine_interpolation_smooth = _spine_interpolation_smoothPtr.asFunction<spine_interpolation Function()>();
+
+  /// Slow, then fast.
+  spine_interpolation spine_interpolation_slow_fast() {
+    return _spine_interpolation_slow_fast();
+  }
+
+  late final _spine_interpolation_slow_fastPtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function()>>('spine_interpolation_slow_fast');
+  late final _spine_interpolation_slow_fast =
+      _spine_interpolation_slow_fastPtr.asFunction<spine_interpolation Function()>();
+
+  /// Fast, then slow.
+  spine_interpolation spine_interpolation_fast_slow() {
+    return _spine_interpolation_fast_slow();
+  }
+
+  late final _spine_interpolation_fast_slowPtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function()>>('spine_interpolation_fast_slow');
+  late final _spine_interpolation_fast_slow =
+      _spine_interpolation_fast_slowPtr.asFunction<spine_interpolation Function()>();
+
+  spine_interpolation spine_interpolation_circle() {
+    return _spine_interpolation_circle();
+  }
+
+  late final _spine_interpolation_circlePtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function()>>('spine_interpolation_circle');
+  late final _spine_interpolation_circle = _spine_interpolation_circlePtr.asFunction<spine_interpolation Function()>();
+
   spine_linked_mesh spine_linked_mesh_create(
     spine_mesh_attachment mesh,
     int skinIndex,
@@ -48227,10 +48308,9 @@ class SpineDartBindings {
   late final _spine_track_entry_set_alpha =
       _spine_track_entry_set_alphaPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// When the mix percentage (mix time / mix duration) is less than the event
-  /// threshold, event timelines for the animation being mixed out will be applied.
-  /// Defaults to 0, so event timelines are not applied for an animation being
-  /// mixed out.
+  /// When the interpolated mix percentage is less than the event threshold, event
+  /// timelines for the animation being mixed out will be applied. Defaults to 0,
+  /// so event timelines are not applied for an animation being mixed out.
   double spine_track_entry_get_event_threshold(
     spine_track_entry self,
   ) {
@@ -48260,10 +48340,10 @@ class SpineDartBindings {
   late final _spine_track_entry_set_event_threshold =
       _spine_track_entry_set_event_thresholdPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// When the mix percentage (mix time / mix duration) is less than the attachment
-  /// threshold, attachment timelines for the animation being mixed out will be
-  /// applied. Defaults to 0, so attachment timelines are not applied for an
-  /// animation being mixed out.
+  /// When the interpolated mix percentage is less than the attachment threshold,
+  /// attachment timelines for the animation being mixed out will be applied.
+  /// Defaults to 0, so attachment timelines are not applied for an animation being
+  /// mixed out.
   double spine_track_entry_get_mix_attachment_threshold(
     spine_track_entry self,
   ) {
@@ -48294,8 +48374,9 @@ class SpineDartBindings {
   late final _spine_track_entry_set_mix_attachment_threshold =
       _spine_track_entry_set_mix_attachment_thresholdPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// When alpha is greater than alphaAttachmentThreshold, attachment timelines are
-  /// applied. Defaults to 0, so attachment timelines are always applied.
+  /// When the computed alpha is greater than alphaAttachmentThreshold, attachment
+  /// timelines are applied. The computed alpha includes alpha and the interpolated
+  /// mix percentage. Defaults to 0, so attachment timelines are always applied.
   double spine_track_entry_get_alpha_attachment_threshold(
     spine_track_entry self,
   ) {
@@ -48326,10 +48407,10 @@ class SpineDartBindings {
   late final _spine_track_entry_set_alpha_attachment_threshold =
       _spine_track_entry_set_alpha_attachment_thresholdPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// When the mix percentage (mix time / mix duration) is less than the draw order
-  /// threshold, draw order timelines for the animation being mixed out will be
-  /// applied. Defaults to 0, so draw order timelines are not applied for an
-  /// animation being mixed out.
+  /// When the interpolated mix percentage is less than the draw order threshold,
+  /// draw order timelines for the animation being mixed out will be applied.
+  /// Defaults to 0, so draw order timelines are not applied for an animation being
+  /// mixed out.
   double spine_track_entry_get_mix_draw_order_threshold(
     spine_track_entry self,
   ) {
@@ -48478,6 +48559,39 @@ class SpineDartBindings {
           'spine_track_entry_set_mix_duration_2');
   late final _spine_track_entry_set_mix_duration_2 =
       _spine_track_entry_set_mix_duration_2Ptr.asFunction<void Function(spine_track_entry, double, double)>();
+
+  /// The interpolation to apply to the mix percentage (mix time / mix duration)
+  /// when mixing from the previous animation to this animation. Defaults to
+  /// linear.
+  spine_interpolation spine_track_entry_get_mix_interpolation(
+    spine_track_entry self,
+  ) {
+    return _spine_track_entry_get_mix_interpolation(
+      self,
+    );
+  }
+
+  late final _spine_track_entry_get_mix_interpolationPtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function(spine_track_entry)>>(
+          'spine_track_entry_get_mix_interpolation');
+  late final _spine_track_entry_get_mix_interpolation =
+      _spine_track_entry_get_mix_interpolationPtr.asFunction<spine_interpolation Function(spine_track_entry)>();
+
+  void spine_track_entry_set_mix_interpolation(
+    spine_track_entry self,
+    spine_interpolation mixInterpolation,
+  ) {
+    return _spine_track_entry_set_mix_interpolation(
+      self,
+      mixInterpolation,
+    );
+  }
+
+  late final _spine_track_entry_set_mix_interpolationPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_track_entry, spine_interpolation)>>(
+          'spine_track_entry_set_mix_interpolation');
+  late final _spine_track_entry_set_mix_interpolation =
+      _spine_track_entry_set_mix_interpolationPtr.asFunction<void Function(spine_track_entry, spine_interpolation)>();
 
   spine_track_entry spine_track_entry_get_mixing_from(
     spine_track_entry self,
@@ -52093,6 +52207,8 @@ final class spine_ik_constraint_timeline_wrapper extends ffi.Opaque {}
 
 final class spine_inherit_timeline_wrapper extends ffi.Opaque {}
 
+final class spine_interpolation_wrapper extends ffi.Opaque {}
+
 final class spine_linked_mesh_wrapper extends ffi.Opaque {}
 
 final class spine_mesh_attachment_wrapper extends ffi.Opaque {}
@@ -52868,6 +52984,9 @@ typedef spine_event_queue_entry = ffi.Pointer<spine_event_queue_entry_wrapper>;
 
 /// Forward declarations for all non-enum types
 typedef spine_ik_constraint_pose = ffi.Pointer<spine_ik_constraint_pose_wrapper>;
+
+/// Forward declarations for all non-enum types
+typedef spine_interpolation = ffi.Pointer<spine_interpolation_wrapper>;
 
 /// Forward declarations for all non-enum types
 typedef spine_linked_mesh = ffi.Pointer<spine_linked_mesh_wrapper>;

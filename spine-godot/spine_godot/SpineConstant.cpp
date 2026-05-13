@@ -88,4 +88,10 @@ void SpineConstant::_bind_methods() {
 	BIND_ENUM_CONSTANT(Physics_Reset);
 	BIND_ENUM_CONSTANT(Physics_Update);
 	BIND_ENUM_CONSTANT(Physics_Pose);
+
+	BIND_ENUM_CONSTANT(MixInterpolation_Linear);
+	BIND_ENUM_CONSTANT(MixInterpolation_Smooth);
+	BIND_ENUM_CONSTANT(MixInterpolation_SlowFast);
+	BIND_ENUM_CONSTANT(MixInterpolation_FastSlow);
+	BIND_ENUM_CONSTANT(MixInterpolation_Circle);
 }
