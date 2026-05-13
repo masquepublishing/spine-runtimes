@@ -597,6 +597,7 @@
   - Added `DrawOrderFolderTimeline` for animating draw order folders
   - Added `Timeline.additive` and `Timeline.instant` to query timeline blending capabilities
   - Added `TrackEntry.additive` to control additive blending per track entry
+  - Added `TrackEntry.mixInterpolation` and `Interpolation` helpers for non-linear AnimationState mixes
   - Ported the latest additive timeline updates and alpha/RGB timeline flicker fixes from spine-libgdx
   - Ported the AnimationState additive/hold rework from spine-libgdx. `MixBlend` and `MixDirection` are no longer used by timelines. The new system uses `fromSetup`, `add`, and `out` parameters and automatically calculates the required hold state values
   - Ported the Skin placeholder name rename from spine-libgdx. `SkinEntry.name` renamed to `placeholderName` to better match Spine editor terminology
@@ -989,6 +990,7 @@
   - Added `DrawOrderFolderTimeline` for animating draw order folders
   - Added `Timeline.additive` and `Timeline.instant` to query timeline blending capabilities
   - Added `TrackEntry.additive` to control additive blending per track entry
+  - Added `TrackEntry.mixInterpolation` and `Interpolation` helpers for non-linear AnimationState mixes
   - Added support for passing `null` as the attachment name to `Skeleton.setAttachment()`
   - Ported the latest parser fixes from spine-libgdx, including the 4.3 path constraint flag fix and the weighted mesh binary vertex allocation/count fix
   - Ported the latest additive timeline updates and alpha/RGB timeline flicker fixes from spine-libgdx
@@ -1148,6 +1150,8 @@
 ### Three.js backend
 
 - **Additions**
+  - Added a React Three Fiber example for using `SkeletonMesh` with R3F's `<primitive />` and `useFrame`
+  - Added support for Three.js versions from `0.162.0` up to `0.184.x`
   - Added physics position and rotation inheritance settings.
 
 - **Breaking changes**
