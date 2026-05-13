@@ -582,6 +582,7 @@ class AnimationState {
 		current.previous = null;
 
 		if (from != null) {
+			from.next = null;
 			if (interrupt)
 				queue.interrupt(from);
 			current.mixingFrom = from;

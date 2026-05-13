@@ -624,6 +624,7 @@ namespace Spine {
 			current.previous = null;
 
 			if (from != null) {
+				from.next = null;
 				if (interrupt) queue.Interrupt(from);
 				current.mixingFrom = from;
 				from.mixingTo = current;

@@ -1083,6 +1083,7 @@ void AnimationState::setTrack(size_t index, TrackEntry *current, bool interrupt)
 	current->_previous = NULL;
 
 	if (from != NULL) {
+		from->_next = NULL;
 		if (interrupt) _queue->interrupt(from);
 
 		current->_mixingFrom = from;
