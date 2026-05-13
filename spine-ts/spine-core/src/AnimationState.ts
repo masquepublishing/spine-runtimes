@@ -34,7 +34,7 @@ import type { AnimationStateData } from "./AnimationStateData.js";
 import type { Event } from "./Event.js";
 import type { Skeleton } from "./Skeleton.js";
 import type { Slot } from "./Slot.js";
-import { MathUtils, Pool, StringSet, Utils } from "./Utils.js";
+import { Interpolation, MathUtils, Pool, StringSet, Utils } from "./Utils.js";
 
 
 /** Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
@@ -248,7 +248,7 @@ export class AnimationState {
 	applyMixingFrom (to: TrackEntry, skeleton: Skeleton) {
 		const from = to.mixingFrom!;
 		const fromMix = from.mixingFrom !== null ? this.applyMixingFrom(from, skeleton) : 1;
-		const mix: number = to.mixDuration === 0 ? 1 : Math.min(1, to.mixTime / to.mixDuration);
+		const mix = to.mix();
 
 		const a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
 		const alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
@@ -279,7 +279,7 @@ export class AnimationState {
 			let alpha = 0;
 			if ((mode & HOLD) !== 0) {
 				const holdMix = timelineHoldMix[i];
-				alpha = holdMix == null ? alphaHold : alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
 				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 				alpha = alphaMix;
@@ -892,24 +892,24 @@ export class TrackEntry {
 
 	keepHold = false;
 
-	/** When the mix percentage ({@link mixTime} / {@link mixDuration}) is less than the `eventThreshold`, event
-	 * timelines are applied while this animation is being mixed out. Defaults to 0, so event timelines are not applied while
-	 * this animation is being mixed out. */
+	/** When the interpolated mix percentage is less than the `eventThreshold` , event timelines are applied while
+	 * this animation is being mixed out. Defaults to 0, so event timelines are not applied while this animation is being mixed
+	 * out. */
 	eventThreshold = 0;
 
-	/** When the mix percentage ({@link mixTime} / {@link mixDuration}) is less than the `mixAttachmentThreshold`,
-	 * attachment timelines are applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not
-	 * applied while this animation is being mixed out. */
+	/** When the interpolated mix percentage is less than the `mixAttachmentThreshold`, attachment timelines are
+	 * applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not applied while this
+	 * animation is being mixed out. */
 	mixAttachmentThreshold = 0;
 
 	/** When the computed alpha is greater than `alphaAttachmentThreshold`, attachment timelines are applied. The
-	 * computed alpha includes {@link alpha} and the mix percentage. Defaults to 0, so attachment timelines are always
-	 * applied. */
+	 * computed alpha includes {@link alpha} and the interpolated mix percentage. Defaults to 0, so attachment timelines are
+	 * always applied. */
 	alphaAttachmentThreshold = 0;
 
-	/** When the mix percentage ({@link mixTime} / {@link mixDuration}) is less than the `mixDrawOrderThreshold`,
-	 * draw order timelines are applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not
-	 * applied while this animation is being mixed out. */
+	/** When the interpolated mix percentage is less than the `mixAttachmentThreshold`, attachment timelines are
+	 * applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not applied while this
+	 * animation is being mixed out. */
 	mixDrawOrderThreshold = 0;
 
 	/** The time in seconds for the first frame of this animation, both initially and after looping. Defaults to 0.
@@ -1020,6 +1020,8 @@ export class TrackEntry {
 
 	totalAlpha = 0;
 
+	mixInterpolation: Interpolation = Interpolation.linear;
+
 	/** Sets both {@link getMixDuration} and {@link getDelay}.
 	 * @param delay If > 0, sets {@link getDelay}. If <= 0, the delay set is the duration of the previous track entry minus
 	 *           the specified mix duration plus the specified `delay` (ie the mix ends at (when `delay` =
@@ -1031,6 +1033,24 @@ export class TrackEntry {
 			if (delay <= 0) delay = this.previous == null ? 0 : Math.max(delay + this.previous.getTrackComplete() - mixDuration, 0);
 			this.delay = delay;
 		}
+	}
+
+	/** The interpolation to apply to the mix percentage ({@link mixTime} / {@link mixDuration}) when mixing from the previous
+	 * animation to this animation. Defaults to linear. */
+	setMixInterpolation (mixInterpolation: Interpolation) {
+		if (!mixInterpolation) throw new Error("mixInterpolation cannot be null.");
+		this.mixInterpolation = mixInterpolation;
+	}
+
+	mix (): number {
+		if (this.mixDuration === 0) return 1;
+		let mix = this.mixTime / this.mixDuration;
+		if (mix >= 1) return 1;
+		if (this.mixInterpolation === Interpolation.linear) return mix;
+		mix = this.mixInterpolation.apply(mix);
+		if (mix < 0) return 0;
+		if (mix > 1) return 1;
+		return mix;
 	}
 
 	/** For each timeline:
@@ -1047,6 +1067,7 @@ export class TrackEntry {
 		this.previous = null;
 		this.mixingFrom = null;
 		this.mixingTo = null;
+		this.mixInterpolation = Interpolation.linear;
 		this.animation = null;
 		this.listener = null;
 		this.timelineMode.length = 0;
