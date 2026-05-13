@@ -138,7 +138,7 @@ namespace Spine {
 						next.delay = 0;
 						next.trackTime += current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
 						current.trackTime += currentDelta;
-						SetCurrent(i, next, true);
+						SetTrack(i, next, true);
 						while (next.mixingFrom != null) {
 							next.mixTime += delta;
 							next = next.mixingFrom;
@@ -587,7 +587,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the active TrackEntry for a given track number.</summary>
-		private void SetCurrent (int index, TrackEntry current, bool interrupt) {
+		private void SetTrack (int index, TrackEntry current, bool interrupt) {
 			TrackEntry from = ExpandToIndex(index);
 			tracks.Items[index] = current;
 			current.previous = null;
@@ -637,7 +637,7 @@ namespace Spine {
 					ClearNext(current);
 			}
 			TrackEntry entry = NewTrackEntry(trackIndex, animation, loop, current);
-			SetCurrent(trackIndex, entry, interrupt);
+			SetTrack(trackIndex, entry, interrupt);
 			queue.Drain();
 			return entry;
 		}
@@ -672,7 +672,7 @@ namespace Spine {
 			TrackEntry entry = NewTrackEntry(trackIndex, animation, loop, last);
 
 			if (last == null) {
-				SetCurrent(trackIndex, entry, true);
+				SetTrack(trackIndex, entry, true);
 				queue.Drain();
 				if (delay < 0) delay = 0;
 			} else {
@@ -870,10 +870,18 @@ namespace Spine {
 			}
 		}
 
-		/// <returns>The track entry for the animation currently playing on the track, or null if no animation is currently playing.</returns>
-		public TrackEntry GetCurrent (int trackIndex) {
+		/// <summary>Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.</summary>
+		public TrackEntry GetTrack (int trackIndex) {
+			if (trackIndex < 0) throw new ArgumentException("trackIndex must be >= 0.", "trackIndex");
 			if (trackIndex >= tracks.Count) return null;
 			return tracks.Items[trackIndex];
+		}
+
+		/// <summary>Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.</summary>
+		/// <remarks>Deprecated. Use <see cref="GetTrack(int)"/>.</remarks>
+		[Obsolete("Use GetTrack(int).")]
+		public TrackEntry GetCurrent (int trackIndex) {
+			return GetTrack(trackIndex);
 		}
 
 		/// <summary> Discards all listener notifications that have not yet been delivered. This can be useful to call from an
@@ -995,8 +1003,8 @@ namespace Spine {
 			timelinesRotation.Clear();
 		}
 
-		/// <summary>The index of the track where this entry is either current or queued.</summary>
-		/// <seealso cref="AnimationState.GetCurrent(int)"/>
+		/// <summary>The index of the track where this track entry is either current or queued.</summary>
+		/// <seealso cref="AnimationState.GetTrack(int)"/>
 		public int TrackIndex { get { return trackIndex; } }
 
 		/// <summary>The animation to apply for this track entry.</summary>
@@ -1023,15 +1031,21 @@ namespace Spine {
 		public float Delay {
 			get { return delay; }
 			set {
-				if (delay < 0) throw new ArgumentException("delay must be >= 0.", "delay");
+				if (value < 0) throw new ArgumentException("delay must be >= 0.", "delay");
 				delay = value;
 			}
 		}
 
 		/// <summary>
-		/// Current time in seconds this track entry has been the current track entry. The track time determines
-		/// <see cref="TrackEntry.AnimationTime"/>. The track time can be set to start the animation at a time other than 0, without affecting
-		/// looping.</summary>
+		/// The time in seconds this track entry has been the current track entry, starting at 0 and increasing forever. Compare to
+		/// <see cref="TrackEntry.AnimationTime"/>, which is always between <see cref="TrackEntry.AnimationStart"/> and
+		/// <see cref="TrackEntry.AnimationEnd"/>.
+		/// <para>
+		/// The track time can be set to start the animation at a time other than 0, without affecting looping. When doing so,
+		/// <see cref="TrackEntry.AnimationLast"/> can be set to the same value to avoid firing events from the start of the animation.</para>
+		/// <para>
+		/// To set the time an animation starts and loops, use <see cref="TrackEntry.AnimationStart"/> and
+		/// <see cref="TrackEntry.AnimationEnd"/>.</para></summary>
 		public float TrackTime { get { return trackTime; } set { trackTime = value; } }
 
 		/// <summary>
@@ -1064,22 +1078,23 @@ namespace Spine {
 
 		/// <summary>
 		/// <para>
-		/// Seconds when this animation starts, both initially and after looping. Defaults to 0.</para>
+		/// The time in seconds for the first frame of this animation, both initially and after looping. Defaults to 0.</para>
 		/// <para>
-		/// When changing the <c>AnimationStart</c> time, it often makes sense to set <see cref="TrackEntry.AnimationLast"/> to the same
-		/// value to prevent timeline keys before the start time from triggering.</para>
+		/// When setting the <c>AnimationStart</c> time, <see cref="TrackEntry.AnimationLast"/> can be set to the same value to avoid
+		/// firing events from the start of the animation.</para>
 		/// </summary>
 		public float AnimationStart { get { return animationStart; } set { animationStart = value; } }
 
 		/// <summary>
-		/// Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will
-		/// loop back to <see cref="TrackEntry.AnimationStart"/> at this time. Defaults to the animation <see cref="Animation.Duration"/>.
+		/// The time in seconds for the last frame of this animation. Past this time, non-looping animations hold the pose at this
+		/// time while looping animations will loop back to <see cref="TrackEntry.AnimationStart"/>. Defaults to the
+		/// <see cref="Animation.Duration"/>.
 		/// </summary>
 		public float AnimationEnd { get { return animationEnd; } set { animationEnd = value; } }
 
 		/// <summary>
-		/// The time in seconds this animation was last applied. Some timelines use this for one-time triggers. Eg, when this
-		/// animation is applied, event timelines will fire all events between the <c>AnimationLast</c> time (exclusive) and
+		/// The time in seconds this animation was last applied. Some timelines use this for one-time triggers. For example, when
+		/// this animation is applied, event timelines will fire all events between the <c>AnimationLast</c> time (exclusive) and
 		/// <c>AnimationTime</c> (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this animation
 		/// is applied.</summary>
 		public float AnimationLast {
@@ -1091,12 +1106,9 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Uses <see cref="TrackEntry.TrackTime"/> to compute the <c>AnimationTime</c>. When the <c>TrackTime</c> is 0, the
+		/// Uses <see cref="TrackEntry.TrackTime"/> to compute the <c>AnimationTime</c>, which is always between
+		/// <see cref="TrackEntry.AnimationStart"/> and <see cref="TrackEntry.AnimationEnd"/>. When <c>TrackTime</c> is 0,
 		/// <c>AnimationTime</c> is equal to the <c>AnimationStart</c> time.
-		/// <para>
-		/// The <c>animationTime</c> is between <see cref="AnimationStart"/> and <see cref="AnimationEnd"/>, except if this
-		/// track entry is non-looping and <see cref="AnimationEnd"/> is >= to the <see cref="Animation.Duration"/>, then
-		/// <c>animationTime</c> continues to increase past <see cref="AnimationEnd"/>.</para>
 		/// </summary>
 		public float AnimationTime {
 			get {

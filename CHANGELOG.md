@@ -452,6 +452,7 @@
   - `AttachmentLoader` methods `NewRegionAttachment`, `NewMeshAttachment`, `NewBoundingBoxAttachment`, `NewClippingAttachment`, `NewPathAttachment`, and `NewPointAttachment` now take an additional `string placeholder` parameter. Update any custom `AttachmentLoader` implementations accordingly.
   - Renamed `Skin.SkinEntry.Name` to `Skin.SkinEntry.Placeholder` to better match Spine editor terminology. Was intermediately renamed to `PlaceholderName` which was then changed to `Placeholder`.
   - `MathUtils.IInterpolation` class is replaced by new `Interpolation` class, see *Additions* above.
+  - `AnimationState.SetCurrent()` renamed to `AnimationState.SetTrack()`; `AnimationState.GetCurrent()` is deprecated in favor of `AnimationState.GetTrack()`
 
 ### Unity
 
