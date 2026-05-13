@@ -908,13 +908,6 @@ namespace Spine {
 			return tracks.Items[trackIndex];
 		}
 
-		/// <summary>Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.</summary>
-		/// <remarks>Deprecated. Use <see cref="GetTrack(int)"/>.</remarks>
-		[Obsolete("Use GetTrack(int).")]
-		public TrackEntry GetCurrent (int trackIndex) {
-			return GetTrack(trackIndex);
-		}
-
 		/// <summary> Discards all listener notifications that have not yet been delivered. This can be useful to call from an
 		/// AnimationState event subscriber when it is known that further notifications that may have been already queued for delivery
 		/// are not wanted because new animations are being set.
