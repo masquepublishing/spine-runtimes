@@ -325,6 +325,7 @@
   - Added `ClippingAttachment.Convex` and `ClippingAttachment.Inverse`
   - Added `IkConstraintData.ScaleYMode` enum and `IkConstraintData.ScaleY` to control how IK compress/stretch changes `BonePose.ScaleY`, including volume preservation
   - Added `allowMissingRegions` parameter to `AtlasAttachmentLoader` constructor to support skeletons exported with per-skin atlases
+  - `TrackEntry.Reverse` animations now fire events. Previously events were not fired when an animation was played in reverse.
   - Added `TrackEntry.MixInterpolation` for customizable non-linear mixing. Defaults to `Interpolation.Linear` to maintain existing behaviour.
 
 - **Breaking changes**

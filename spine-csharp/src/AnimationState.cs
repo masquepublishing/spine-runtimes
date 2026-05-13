@@ -263,6 +263,7 @@ namespace Spine {
 							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
 					}
 				}
+				if (current.reverse) EventsReverse(current, animationLast, animationTime);
 				QueueEvents(current, animationTime);
 				events.Clear(false);
 				current.nextAnimationLast = animationTime;
@@ -380,6 +381,7 @@ namespace Spine {
 				}
 			}
 
+			if (from.reverse && mix < from.eventThreshold) EventsReverse(from, animationLast, animationTime);
 			if (to.mixDuration > 0) QueueEvents(from, animationTime);
 			this.events.Clear(false);
 
@@ -504,18 +506,18 @@ namespace Spine {
 		}
 
 		private void QueueEvents (TrackEntry entry, float animationTime) {
-			float animationStart = entry.animationStart, animationEnd = entry.animationEnd;
-			float duration = animationEnd - animationStart;
-			float trackLastWrapped = entry.trackLast % duration;
+			float animationStart = entry.animationStart, animationEnd = entry.animationEnd, duration = animationEnd - animationStart;
+			bool reverse = entry.reverse;
+			float split = entry.trackLast % duration;
+			if (reverse) split = duration - split;
 
 			// Queue events before complete.
 			Event[] eventsItems = this.events.Items;
 			int i = 0, n = events.Count;
 			for (; i < n; i++) {
 				Event e = eventsItems[i];
-				if (e.time < trackLastWrapped) break;
-				if (e.time > animationEnd) continue; // Discard events outside animation start/end.
-				queue.Event(entry, e);
+				if ((e.time < split) ^ reverse) break;
+				if (e.time >= animationStart && e.time <= animationEnd) queue.Event(entry, e);
 			}
 
 			// Queue complete if completed a loop iteration or the animation.
@@ -534,8 +536,37 @@ namespace Spine {
 			// Queue events after complete.
 			for (; i < n; i++) {
 				Event e = eventsItems[i];
-				if (e.time < animationStart) continue; // Discard events outside animation start/end.
-				queue.Event(entry, eventsItems[i]);
+				if (e.time >= animationStart && e.time <= animationEnd) queue.Event(entry, e);
+			}
+		}
+
+		private void EventsReverse (TrackEntry entry, float animationLast, float animationTime) {
+			float duration = entry.animation.duration, from = duration - animationLast, to = duration - animationTime;
+			Timeline[] timelines = entry.animation.timelines.Items;
+			for (int i = 0, n = entry.animation.timelines.Count; i < n; i++) {
+				EventTimeline eventTimeline = timelines[i] as EventTimeline;
+				if (eventTimeline == null) continue;
+				Event[] timelineEvents = eventTimeline.Events;
+				float[] frames = eventTimeline.frames;
+				int frameCount = frames.Length;
+				if (from >= to) { // from -> to
+					for (int ii = 0; ii < frameCount; ii++) {
+						if (frames[ii] < to) continue;
+						if (frames[ii] >= from) break;
+						events.Add(timelineEvents[ii]);
+					}
+				} else {
+					int ii = 0;
+					for (; ii < frameCount; ii++) { // from -> 0
+						if (frames[ii] >= from) break;
+						events.Add(timelineEvents[ii]);
+					}
+					ii = 0; // end -> to
+					for (; ii < frameCount; ii++)
+						if (frames[ii] >= to) break;
+					for (; ii < frameCount; ii++)
+						events.Add(timelineEvents[ii]);
+				}
 			}
 		}
 
@@ -1292,7 +1323,7 @@ namespace Spine {
 		public TrackEntry MixingTo { get { return mixingTo; } }
 
 		/// <summary>
-		/// If true, the animation will be applied in reverse and events will not be fired.</summary>
+		/// If true, the animation will be applied in reverse.</summary>
 		public bool Reverse { get { return reverse; } set { reverse = value; } }
 
 		/// <summary><para>
