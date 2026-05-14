@@ -33,7 +33,7 @@ method: TrackEntry::setListener
 method: TrackEntry::getListener
 method: Atlas::Atlas
 
-# Used in UE4/cocos2dx, not used anywhere else
+# Used in UE4, not used anywhere else
 method: AnimationState::setRendererObject
 method: TrackEntry::setRendererObject
 
