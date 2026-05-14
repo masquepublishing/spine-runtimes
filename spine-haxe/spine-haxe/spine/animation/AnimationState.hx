@@ -451,13 +451,16 @@ class AnimationState {
 		var i:Int = 0;
 		var n:Int = events.length;
 		while (i < n) {
-			event = events[i++];
-			if (event == null)
+			event = events[i];
+			if (event == null) {
+				i++;
 				continue;
+			}
 			if ((event.time < split) != reverse)
 				break;
 			if (event.time >= animationStart && event.time <= animationEnd)
 				queue.event(entry, event);
+			i++;
 		}
 
 		// Queue complete if completed a loop iteration or the animation.
@@ -551,6 +554,8 @@ class AnimationState {
 	 * rather than leaving them in their current pose.
 	 */
 	public function clearTrack(trackIndex:Int):Void {
+		if (trackIndex < 0)
+			throw new SpineException("trackIndex must be >= 0.");
 		if (trackIndex >= tracks.length)
 			return;
 		var current:TrackEntry = tracks[trackIndex];
@@ -616,6 +621,8 @@ class AnimationState {
 	 *         after the spine.animation.AnimationStateListener.dispose() event occurs.
 	 */
 	public function setAnimation(trackIndex:Int, animation:Animation, loop:Bool):TrackEntry {
+		if (trackIndex < 0)
+			throw new SpineException("trackIndex must be >= 0.");
 		if (animation == null)
 			throw new SpineException("animation cannot be null.");
 		var interrupt:Bool = true;
@@ -661,6 +668,8 @@ class AnimationState {
 	 *         after the spine.animation.AnimationStateListener.dispose() event occurs.
 	 */
 	public function addAnimation(trackIndex:Int, animation:Animation, loop:Bool, delay:Float):TrackEntry {
+		if (trackIndex < 0)
+			throw new SpineException("trackIndex must be >= 0.");
 		if (animation == null)
 			throw new SpineException("animation cannot be null.");
 
@@ -896,17 +905,6 @@ class AnimationState {
 		return tracks[trackIndex];
 	}
 
-	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
-	@:deprecated("Use getTrack()")
-	public function getCurrent(trackIndex:Int):TrackEntry {
-		return getTrack(trackIndex);
-	}
-
-	public var fHasEndListener(get, never):Bool;
-
-	private function get_fHasEndListener():Bool {
-		return onComplete.listeners.length > 0 || onEnd.listeners.length > 0;
-	}
 
 	/**
 	 * Removes all listeners added with spine.animation.AnimationState.addListener().

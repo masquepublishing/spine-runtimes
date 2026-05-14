@@ -289,19 +289,15 @@ class TrackEntry implements Poolable {
 	}
 
 	/** Sets both TrackEntry.getMixDuration() and TrackEntry.getDelay().
-	 * @param mixDuration If > 0, sets TrackEntry.getDelay(). If <= 0, the delay set is the duration of the previous track
+	 * @param delay If > 0, sets TrackEntry.getDelay(). If <= 0, the delay set is the duration of the previous track
 	 *           entry minus the specified mix duration plus the specified delay (ie the mix ends at
 	 *           (delay = 0) or before (delay < 0) the previous track entry duration). If the previous
 	 *           entry is looping, its next loop completion is used instead of its duration. */
-	public function setMixDurationWithDelay(mixDuration:Float):Float {
+	public function setMixDurationWithDelay(mixDuration:Float, delay:Float):Void {
 		this.mixDuration = mixDuration;
-		if (delay <= 0) {
-			if (this.previous != null)
-				delay = Math.max(delay + this.previous.getTrackComplete() - mixDuration, 0);
-			else
-				delay = 0;
-		}
-		return mixDuration;
+		if (delay <= 0)
+			delay = this.previous == null ? 0 : Math.max(delay + this.previous.getTrackComplete() - mixDuration, 0);
+		this.delay = delay;
 	}
 
 	public function setMixInterpolation(mixInterpolation:Interpolation):Void {
