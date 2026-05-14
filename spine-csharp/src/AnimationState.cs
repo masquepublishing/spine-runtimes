@@ -594,6 +594,7 @@ namespace Spine {
 		/// leaving them in their current pose.</para>
 		/// </summary>
 		public void ClearTrack (int trackIndex) {
+			if (trackIndex < 0) throw new ArgumentException("trackIndex must be >= 0.", "trackIndex");
 			if (trackIndex >= tracks.Count) return;
 			TrackEntry current = tracks.Items[trackIndex];
 			if (current == null) return;
@@ -649,10 +650,11 @@ namespace Spine {
 		/// from).
 		/// </para></summary>
 		/// <param name="loop">If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
-		///          duration. In either case<see cref="TrackEntry.TrackEnd"/> determines when the track is cleared.</param>
+		///          duration. In either case <see cref="TrackEntry.TrackEnd"/> determines when the track is cleared.</param>
 		/// <returns> A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		///          after the <see cref="AnimationState.Dispose"/> event occurs.</returns>
 		public TrackEntry SetAnimation (int trackIndex, Animation animation, bool loop) {
+			if (trackIndex < 0) throw new ArgumentException("trackIndex must be >= 0.", "trackIndex");
 			if (animation == null) throw new ArgumentNullException("animation", "animation cannot be null.");
 			bool interrupt = true;
 			TrackEntry current = ExpandToIndex(trackIndex);
@@ -693,6 +695,7 @@ namespace Spine {
 		/// <returns>A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		/// after the <see cref="AnimationState.Dispose"/> event occurs.</returns>
 		public TrackEntry AddAnimation (int trackIndex, Animation animation, bool loop, float delay) {
+			if (trackIndex < 0) throw new ArgumentException("trackIndex must be >= 0.", "trackIndex");
 			if (animation == null) throw new ArgumentNullException("animation", "animation cannot be null.");
 
 			TrackEntry last = ExpandToIndex(trackIndex);
@@ -719,7 +722,7 @@ namespace Spine {
 
 		/// <summary>
 		/// <para>Sets an empty animation for a track, discarding any queued animations, and sets the track entry's
-		/// <see cref="TrackEntry.getMixDuration()"/>. An empty animation has no timelines and serves as a placeholder for mixing in or out.</para>
+		/// <see cref="TrackEntry.MixDuration"/>. An empty animation has no timelines and serves as a placeholder for mixing in or out.</para>
 		/// <para>
 		/// Mixing out is done by setting an empty animation with a mix duration using either <see cref="AnimationState.SetEmptyAnimation(int, float)"/>,
 		/// <see cref="AnimationState.SetEmptyAnimations(float)"/>, or <see cref="AnimationState.AddEmptyAnimation(int, float, float)"/>. Mixing to an empty animation causes
@@ -940,7 +943,7 @@ namespace Spine {
 				return data;
 			}
 			set {
-				if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
+				if (value == null) throw new ArgumentNullException("data", "data cannot be null.");
 				this.data = value;
 			}
 		}
@@ -966,7 +969,7 @@ namespace Spine {
 	/// <para>
 	/// Stores settings and other state for the playback of an animation on an <see cref="AnimationState"/> track.</para>
 	/// <para>
-	/// References to a track entry must not be kept after the <see cref="AnimationStateListener.Dispose(TrackEntry)"/> event occurs.</para>
+	/// References to a track entry must not be kept after the <see cref="AnimationState.Dispose"/> event occurs</para>
 	/// </summary>
 	public class TrackEntry : Pool<TrackEntry>.IPoolable {
 		internal Animation animation;
@@ -976,7 +979,9 @@ namespace Spine {
 		/// <summary>See <see href="https://esotericsoftware.com/spine-api-reference#AnimationStateListener-Methods">
 		/// API Reference documentation pages here</see> for details. Usage in C# and spine-unity is explained
 		/// <see href="https://esotericsoftware.com/spine-unity-main-components#Processing-AnimationState-Events">here</see>
-		/// on the spine-unity documentation pages.</summary>
+		/// on the spine-unity documentation pages.
+		/// <para>A track entry returned from <see cref="AnimationState.SetAnimation(int, Animation, bool)"/> is already the current
+		/// animation for the track, so the <see cref="Start"/> callback will not be called for subscribers added afterward.</para></summary>
 		public event AnimationState.TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
 		public event AnimationState.TrackEntryEventDelegate Event;
 		internal void OnStart () { if (Start != null) Start(this); }
@@ -1033,7 +1038,13 @@ namespace Spine {
 		public int TrackIndex { get { return trackIndex; } }
 
 		/// <summary>The animation to apply for this track entry.</summary>
-		public Animation Animation { get { return animation; } }
+		public Animation Animation {
+			get { return animation; }
+			set {
+				if (value == null) throw new ArgumentNullException("animation", "animation cannot be null.");
+				animation = value;
+			}
+		}
 
 		/// <summary>
 		/// If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
@@ -1050,8 +1061,8 @@ namespace Spine {
 		/// <para>
 		/// <see cref="TrackEntry.TimeScale"/> affects the delay.</para>
 		/// <para>
-		/// When passing <c>delay</c> &lt;= 0 <see cref="AnimationState.AddAnimation(int, Animation, bool, float)"/>, this
-		/// <c>delay</c> is set using a mix duration from the <see cref="AnimationStateData"/>. To change the <see cref="mixDuration"/>
+		/// When passing <c>delay</c> &lt;= 0 to <see cref="AnimationState.AddAnimation(int, Animation, bool, float)"/>, this
+		/// <c>delay</c> is set using a mix duration from the <see cref="AnimationStateData"/>. To change the <see cref="MixDuration"/>
 		/// afterward, use <see cref="SetMixDuration(float, float)"/> so this <c>delay</c> is adjusted.</para></summary>
 		public float Delay {
 			get { return delay; }
