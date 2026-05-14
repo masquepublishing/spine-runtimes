@@ -905,7 +905,6 @@ class AnimationState {
 		return tracks[trackIndex];
 	}
 
-
 	/**
 	 * Removes all listeners added with spine.animation.AnimationState.addListener().
 	 */
