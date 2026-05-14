@@ -792,7 +792,15 @@ class SkeletonViewerUI {
 		}
 	}
 
-	static record MixInterpolation (String name, Interpolation interpolation) {
+	static class MixInterpolation {
+		String name;
+		Interpolation interpolation;
+
+		MixInterpolation (String name, Interpolation interpolation) {
+			this.name = name;
+			this.interpolation = interpolation;
+		}
+
 		public final String toString () {
 			return name;
 		}
