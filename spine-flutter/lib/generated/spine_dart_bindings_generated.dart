@@ -6011,21 +6011,6 @@ class SpineDartBindings {
   late final _spine_bone_pose_modify_world =
       _spine_bone_pose_modify_worldPtr.asFunction<void Function(spine_bone_pose, int)>();
 
-  void spine_bone_pose_reset_world(
-    spine_bone_pose self,
-    int update,
-  ) {
-    return _spine_bone_pose_reset_world(
-      self,
-      update,
-    );
-  }
-
-  late final _spine_bone_pose_reset_worldPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_pose, ffi.Int)>>('spine_bone_pose_reset_world');
-  late final _spine_bone_pose_reset_world =
-      _spine_bone_pose_reset_worldPtr.asFunction<void Function(spine_bone_pose, int)>();
-
   /// The world transform [a b][c d] x-axis x component.
   double spine_bone_pose_get_a(
     spine_bone_pose self,
@@ -17926,6 +17911,11 @@ class SpineDartBindings {
   late final _spine_attachment_set_timeline_slots =
       _spine_attachment_set_timeline_slotsPtr.asFunction<void Function(spine_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_attachment_is_timeline_active(
     spine_attachment self,
     spine_array_slot slots,
@@ -20405,6 +20395,11 @@ class SpineDartBindings {
   late final _spine_bounding_box_attachment_set_timeline_slots = _spine_bounding_box_attachment_set_timeline_slotsPtr
       .asFunction<void Function(spine_bounding_box_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_bounding_box_attachment_is_timeline_active(
     spine_bounding_box_attachment self,
     spine_array_slot slots,
@@ -20914,6 +20909,11 @@ class SpineDartBindings {
   late final _spine_clipping_attachment_set_timeline_slots = _spine_clipping_attachment_set_timeline_slotsPtr
       .asFunction<void Function(spine_clipping_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_clipping_attachment_is_timeline_active(
     spine_clipping_attachment self,
     spine_array_slot slots,
@@ -27066,6 +27066,11 @@ class SpineDartBindings {
   late final _spine_mesh_attachment_set_timeline_slots =
       _spine_mesh_attachment_set_timeline_slotsPtr.asFunction<void Function(spine_mesh_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_mesh_attachment_is_timeline_active(
     spine_mesh_attachment self,
     spine_array_slot slots,
@@ -27563,6 +27568,11 @@ class SpineDartBindings {
   late final _spine_path_attachment_set_timeline_slots =
       _spine_path_attachment_set_timeline_slotsPtr.asFunction<void Function(spine_path_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_path_attachment_is_timeline_active(
     spine_path_attachment self,
     spine_array_slot slots,
@@ -36093,6 +36103,11 @@ class SpineDartBindings {
   late final _spine_point_attachment_set_timeline_slots = _spine_point_attachment_set_timeline_slotsPtr
       .asFunction<void Function(spine_point_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_point_attachment_is_timeline_active(
     spine_point_attachment self,
     spine_array_slot slots,
@@ -36917,6 +36932,11 @@ class SpineDartBindings {
   late final _spine_region_attachment_set_timeline_slots = _spine_region_attachment_set_timeline_slotsPtr
       .asFunction<void Function(spine_region_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_region_attachment_is_timeline_active(
     spine_region_attachment self,
     spine_array_slot slots,
@@ -52039,6 +52059,11 @@ class SpineDartBindings {
   late final _spine_vertex_attachment_set_timeline_slots = _spine_vertex_attachment_set_timeline_slotsPtr
       .asFunction<void Function(spine_vertex_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_vertex_attachment_is_timeline_active(
     spine_vertex_attachment self,
     spine_array_slot slots,

@@ -13,8 +13,10 @@
 
 - **Bug fixes**
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
+  - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
 
 - **Breaking changes**
+  - Removed generated `spine_bone_pose_reset_world()` because resetWorld is an internal implementation detail.
   - Attachment loader APIs now receive both the skin `placeholder` and resolved attachment `name`.
   - `spine_animation_state_get_current()` renamed to `spine_animation_state_get_track()`.
   - Generated mesh attachment APIs now use `source_mesh` naming instead of `parent_mesh` to match spine-cpp, eg `spine_mesh_attachment_get_source_mesh()` / `spine_mesh_attachment_set_source_mesh()`.
@@ -117,8 +119,10 @@
 
 - **Bug fixes**
   - Fixed `AnimationState` attachment timeline handling so deforms are applied correctly when an attachment is hidden in the setup pose.
+  - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
 
 - **Breaking changes**
+  - `BonePose::resetWorld()` is now private.
   - `AttachmentLoader` methods now receive both the skin `placeholder` and resolved attachment `name`. `Skin::AttachmentMap::Entry::_placeholderName` renamed to `_placeholder`.
   - `AnimationState::getCurrent()` renamed to `AnimationState::getTrack()`.
   - `MeshAttachment::getParentMesh()` / `setParentMesh()` renamed to `getSourceMesh()` / `setSourceMesh()`.
@@ -533,6 +537,7 @@
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
+  - Removed generated `BonePose.resetWorld(_:)` because resetWorld is an internal implementation detail.
   - Generated SpineSwift attachment loader APIs now receive both the skin `placeholder` and resolved attachment `name`.
   - `AnimationState.getCurrent(_:)` renamed to `AnimationState.getTrack(_:)` in SpineSwift.
   - SpineSwift mesh attachment APIs now use `sourceMesh` naming instead of `parentMesh` to match spine-cpp.
@@ -553,6 +558,7 @@
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
+  - Removed generated `BonePose.resetWorld()` because resetWorld is an internal implementation detail.
   - Generated Dart attachment loader APIs now receive both the skin `placeholder` and resolved attachment `name`.
   - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.
   - The Dart runtime is now fully auto-generated from the C runtime, maintaining the full C++ type hierarchy with proper nullability annotations
@@ -584,6 +590,7 @@
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
+  - Removed generated `BonePose.resetWorld()` because resetWorld is an internal implementation detail.
   - `AnimationState.getCurrent()` renamed to `AnimationState.getTrack()`.
   - Generated Flutter attachment loader APIs now receive both the skin `placeholder` and resolved attachment `name`.
   - Generated Flutter mesh attachment APIs now use `sourceMesh` naming instead of `parentMesh` to match spine-cpp.

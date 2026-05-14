@@ -213,7 +213,7 @@ void Skeleton::sortReset(Array<Bone *> &bones) {
 void Skeleton::updateWorldTransform(Physics physics) {
 	_update++;
 
-	_drawOrder.reset();
+	if (_drawOrder._appliedPose == &_drawOrder._constrainedPose) _drawOrder.reset();
 	Posed **resetCache = _resetCache.buffer();
 	for (size_t i = 0, n = _resetCache.size(); i < n; i++) {
 		resetCache[i]->resetConstrained();
