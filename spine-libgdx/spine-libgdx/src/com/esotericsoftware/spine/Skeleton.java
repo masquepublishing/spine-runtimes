@@ -233,7 +233,7 @@ public class Skeleton {
 	public void updateWorldTransform (Physics physics) {
 		update++;
 
-		drawOrder.reset();
+		if (drawOrder.appliedPose == drawOrder.constrainedPose) drawOrder.reset();
 		Posed[] resetCache = this.resetCache.items;
 		for (int i = 0, n = this.resetCache.size; i < n; i++)
 			resetCache[i].reset();
@@ -253,7 +253,7 @@ public class Skeleton {
 
 		update++;
 
-		drawOrder.reset();
+		if (drawOrder.appliedPose == drawOrder.constrainedPose) drawOrder.reset();
 		Posed[] resetCache = this.resetCache.items;
 		for (int i = 0, n = this.resetCache.size; i < n; i++)
 			resetCache[i].reset();
