@@ -469,6 +469,7 @@ export class AnimationState {
 	 * Usually you want to use {@link setEmptyAnimation} to mix the skeletons back to the setup pose, rather than
 	 * leaving them in their current pose. */
 	clearTrack (trackIndex: number) {
+		if (trackIndex < 0) throw new Error("trackIndex must be >= 0.");
 		if (trackIndex >= this.tracks.length) return;
 		const current = this.tracks[trackIndex];
 		if (!current) return;
@@ -596,6 +597,7 @@ export class AnimationState {
 	}
 
 	private addAnimation2 (trackIndex: number, animation: Animation, loop: boolean = false, delay: number = 0) {
+		if (trackIndex < 0) throw new Error("trackIndex must be >= 0.");
 		if (!animation) throw new Error("animation cannot be null.");
 
 		let last = this.expandToIndex(trackIndex);
@@ -808,11 +810,6 @@ export class AnimationState {
 		return this.tracks[trackIndex];
 	}
 
-	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.
-	 * @deprecated Use {@link getTrack}. */
-	getCurrent (trackIndex: number) {
-		return this.getTrack(trackIndex);
-	}
 
 	/** Adds a listener to receive events for all track entries. */
 	addListener (listener: AnimationStateListener) {
