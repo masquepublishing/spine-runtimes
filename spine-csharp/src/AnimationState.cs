@@ -305,7 +305,12 @@ namespace Spine {
 				if (current.mixingFrom != null) ApplyMixingFromEventTimelinesOnly(current, skeleton, issueEvents);
 
 				// Apply current entry.
-				float animationLast = current.animationLast, animationTime = current.AnimationTime;
+				float animationLast = current.animationLast, animationTime = current.AnimationTime, applyTime = animationTime;
+				ExposedList<Event> applyEvents = events;
+				if (current.reverse) {
+					applyTime = current.animation.duration - applyTime;
+					applyEvents = null;
+				}
 
 				if (issueEvents) {
 					int timelineCount = current.animation.timelines.Count;
@@ -313,8 +318,9 @@ namespace Spine {
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelines[ii];
 						if (timeline is EventTimeline)
-							timeline.Apply(skeleton, animationLast, animationTime, events, 1.0f, true, false, false, false);
+							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, 1.0f, true, false, false, false);
 					}
+					if (current.reverse) EventsReverse(current, animationLast, animationTime);
 					QueueEvents(current, animationTime);
 					events.Clear(false);
 				}
@@ -398,21 +404,26 @@ namespace Spine {
 			TrackEntry from = to.mixingFrom;
 			if (from.mixingFrom != null) ApplyMixingFromEventTimelinesOnly(from, skeleton, issueEvents);
 
-			float mix = to.mixDuration == 0 ? 1 : Math.Min(1, to.mixTime / to.mixDuration);
+			float mix = to.Mix();
 
-			ExposedList<Event> eventBuffer = mix < from.eventThreshold ? this.events : null;
-			if (eventBuffer == null) return mix;
+			float animationLast = from.animationLast, animationTime = from.AnimationTime, applyTime = animationTime;
+			ExposedList<Event> events = this.events;
+			if (from.reverse) {
+				applyTime = from.animation.duration - applyTime;
+				events = null;
+			}
 
-			float animationLast = from.animationLast, animationTime = from.AnimationTime;
 			if (issueEvents) {
-				int timelineCount = from.animation.timelines.Count;
-				Timeline[] timelines = from.animation.timelines.Items;
-				for (int i = 0; i < timelineCount; i++) {
-					Timeline timeline = timelines[i];
-					if (timeline is EventTimeline)
-						timeline.Apply(skeleton, animationLast, animationTime, eventBuffer, 0, true, false, true, false);
+				if (mix < from.eventThreshold) {
+					int timelineCount = from.animation.timelines.Count;
+					Timeline[] timelines = from.animation.timelines.Items;
+					for (int i = 0; i < timelineCount; i++) {
+						Timeline timeline = timelines[i];
+						if (timeline is EventTimeline)
+							timeline.Apply(skeleton, animationLast, applyTime, events, 0, true, false, true, false);
+					}
+					if (from.reverse) EventsReverse(from, animationLast, animationTime);
 				}
-
 				if (to.mixDuration > 0) QueueEvents(from, animationTime);
 				this.events.Clear(false);
 			}
