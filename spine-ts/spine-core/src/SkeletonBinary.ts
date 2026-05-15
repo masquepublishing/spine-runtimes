@@ -1197,7 +1197,7 @@ export class SkeletonBinary {
 }
 
 export class BinaryInput {
-	constructor (data: Uint8Array | ArrayBuffer, public strings = [] as string[], private index: number = 0, private buffer = new DataView(data instanceof ArrayBuffer ? data : data.buffer)) {
+	constructor (data: Uint8Array | ArrayBuffer, public strings = [] as string[], private index: number = 0, private buffer: DataView = new DataView(data instanceof ArrayBuffer ? data : data.buffer)) {
 	}
 
 	readByte (): number {

@@ -368,7 +368,7 @@ export class Utils {
 		}
 	}
 
-	static toFloatArray (array: Array<number>) {
+	static toFloatArray (array: Array<number>): number[] | Float32Array {
 		return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
 	}
 
