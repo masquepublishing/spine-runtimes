@@ -237,7 +237,8 @@ class Skeleton {
 	public function updateWorldTransform(physics:Physics):Void {
 		_update++;
 
-		drawOrder.resetConstrained();
+		if (drawOrder.appliedPose == drawOrder.constrainedPose)
+			drawOrder.resetConstrained();
 		for (resetable in resetCache)
 			resetable.resetConstrained();
 
