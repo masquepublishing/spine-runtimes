@@ -262,7 +262,7 @@ export class Skeleton {
 	updateWorldTransform (physics: Physics): void {
 		this._update++;
 
-		this.drawOrder.resetConstrained();
+		if (this.drawOrder.appliedPose === this.drawOrder.constrainedPose) this.drawOrder.resetConstrained();
 		const resetCache = this.resetCache;
 		for (let i = 0, n = this.resetCache.length; i < n; i++)
 			resetCache[i].resetConstrained();
