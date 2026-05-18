@@ -334,7 +334,7 @@ namespace Spine {
 			ResetWorld(update);
 		}
 
-		internal void ResetWorld (int update) {
+		private void ResetWorld (int update) {
 			Bone[] children = bone.children.Items;
 			for (int i = 0, n = bone.children.Count; i < n; i++) {
 				BonePose child = children[i].appliedPose;
