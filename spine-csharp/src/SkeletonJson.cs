@@ -213,7 +213,7 @@ namespace Spine {
 							if (data.target == null) throw new Exception("IK target bone not found: " + targetName);
 
 							string scaleY = GetString(constraintMap, "scaleY", null);
-							if (scaleY != null) data.scaleY = (IkConstraintData.ScaleYMode)Enum.Parse(typeof(IkConstraintData.ScaleYMode), scaleY, true);
+							if (scaleY != null) data.scaleY = (ScaleYMode)Enum.Parse(typeof(ScaleYMode), scaleY, true);
 							IkConstraintPose setup = data.setupPose;
 							setup.mix = GetFloat(constraintMap, "mix", 1);
 							setup.softness = GetFloat(constraintMap, "softness", 0) * scale;
@@ -368,6 +368,10 @@ namespace Spine {
 							data.y = GetFloat(constraintMap, "y", 0);
 							data.rotate = GetFloat(constraintMap, "rotate", 0);
 							data.scaleX = GetFloat(constraintMap, "scaleX", 0);
+
+							string scaleY = GetString(constraintMap, "scaleY", null);
+							if (scaleY != null) data.scaleYMode = (ScaleYMode)Enum.Parse(typeof(ScaleYMode), scaleY, true);
+
 							data.shearX = GetFloat(constraintMap, "shearX", 0);
 							data.limit = GetFloat(constraintMap, "limit", 5000) * scale;
 							data.step = 1f / GetInt(constraintMap, "fps", 60);
