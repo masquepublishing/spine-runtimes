@@ -972,6 +972,10 @@
 - **Breaking changes**
   - Updated to use new Java runtime with all breaking changes above
 
+- **Bug fixes**
+  - Updated the Android atlas attachment loader to match the current `AttachmentLoader` method signatures.
+  - Updated the Android examples to use `AnimationState.getTrack()` instead of the removed `getCurrent()` API.
+
 ## Swift
 
 - **Additions**
