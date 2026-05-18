@@ -157,7 +157,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, floa
 						bone._scaleY *= s;
 						break;
 					case ScaleYMode_Volume:
-						bone._scaleY /= s;
+						bone._scaleY /= s < 0.7f ? 0.25f + 0.642857f * s : s;
 						break;
 					default:
 						break;
@@ -248,7 +248,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &parent, BonePose &child, 
 						parent._scaleY *= a;
 						break;
 					case ScaleYMode_Volume:
-						parent._scaleY /= a;
+						parent._scaleY /= a < 0.7f ? 0.25f + 0.642857f * a : a;
 						break;
 					default:
 						break;

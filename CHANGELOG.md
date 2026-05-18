@@ -3,6 +3,7 @@
 ## C
 
 - **Additions**
+  - Added generated physics constraint `ScaleYMode` APIs.
   - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs for non-linear animation mixing.
   - Added `spine_slider` and `spine_slider_data` types for slider constraints
   - Regenerated C bindings for the AnimationState additive/hold rework and Skin placeholder name rename in spine-cpp.
@@ -12,6 +13,7 @@
   - Added generated animation color and bone icon size/rotation APIs.
 
 - **Bug fixes**
+  - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
 
@@ -93,6 +95,7 @@
 ## C++
 
 - **Additions**
+  - Added `PhysicsConstraintData::getScaleYMode()` / `setScaleYMode()` to control how physics scaleX affects scaleY.
   - Added `Interpolation` and `TrackEntry::getMixInterpolation()` / `setMixInterpolation()` for non-linear animation mixing.
   - Added `Slider` and `SliderData` classes for slider constraints
   - Linked meshes can now inherit deform and sequence timelines from source meshes in different slots.
@@ -118,6 +121,7 @@
   - Added `Animation::getColor()` and `BoneData` icon size/rotation accessors for nonessential editor data.
 
 - **Bug fixes**
+  - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
   - Fixed `AnimationState` attachment timeline handling so deforms are applied correctly when an attachment is hidden in the setup pose.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
 
@@ -281,6 +285,7 @@
 ### Godot
 
 - **Additions**
+  - Added `SpinePhysicsConstraintData.get_scale_y_mode()` / `set_scale_y_mode()`.
   - Added `SpineTrackEntry` mix interpolation APIs and `SpineConstant.MixInterpolation`.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
   - Added `SpineSlider` and `SpineSliderData` classes for slider constraints
@@ -530,6 +535,7 @@
 ## iOS
 
 - **Additions**
+  - Added generated physics constraint `scaleYMode` APIs.
   - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
@@ -548,6 +554,7 @@
 ## Dart
 
 - **Additions**
+  - Added generated physics constraint `scaleYMode` APIs.
   - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added `Slider` and `SliderData` classes for slider constraints
   - Added `SliderTimeline` and `SliderMixTimeline` for animating sliders
@@ -581,6 +588,7 @@
 ### Flutter
 
 - **Additions**
+  - Added generated physics constraint `scaleYMode` APIs.
   - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
   - Added `fromMemory` methods to `AtlasFlutter`, `SkeletonDataFlutter`, `SkeletonDrawableFlutter`, and `SpineWidget` for loading Spine data from custom sources (memory, encrypted storage, databases, custom caching, etc.)
@@ -956,6 +964,7 @@
   - Updated to use new pose system from Java runtime
 
 - **Bug fixes**
+  - Updated the Gradle wrapper and fixed the headless test fat jar task to build included libgdx runtime classpath artifacts before packaging.
   - Gradle builds now delete stale Eclipse `bin/` output before compiling so removed classes don't linger on Java headless test classpaths.
 
 ### Android

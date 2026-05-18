@@ -431,6 +431,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				data->_y = Json::getFloat(constraintMap, "y", 0);
 				data->_rotate = Json::getFloat(constraintMap, "rotate", 0);
 				data->_scaleX = Json::getFloat(constraintMap, "scaleX", 0);
+				const char *scaleY = Json::getString(constraintMap, "scaleY", NULL);
+				if (scaleY) data->_scaleYMode = ScaleYMode_valueOf(scaleY);
 				data->_shearX = Json::getFloat(constraintMap, "shearX", 0);
 				data->_limit = Json::getFloat(constraintMap, "limit", 5000) * _scale;
 				data->_step = 1.0f / Json::getInt(constraintMap, "fps", 60);

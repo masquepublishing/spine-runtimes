@@ -31420,6 +31420,38 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_limit =
       _spine_physics_constraint_data_set_limitPtr.asFunction<void Function(spine_physics_constraint_data, double)>();
 
+  /// Determines how BonePose::getScaleY() changes when
+  /// PhysicsConstraintData::getScaleX() sets BonePose::getScaleX().
+  int spine_physics_constraint_data_get_scale_y_mode(
+    spine_physics_constraint_data self,
+  ) {
+    return _spine_physics_constraint_data_get_scale_y_mode(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_data_get_scale_y_modePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_physics_constraint_data)>>(
+          'spine_physics_constraint_data_get_scale_y_mode');
+  late final _spine_physics_constraint_data_get_scale_y_mode =
+      _spine_physics_constraint_data_get_scale_y_modePtr.asFunction<int Function(spine_physics_constraint_data)>();
+
+  void spine_physics_constraint_data_set_scale_y_mode(
+    spine_physics_constraint_data self,
+    int scaleYMode,
+  ) {
+    return _spine_physics_constraint_data_set_scale_y_mode(
+      self,
+      scaleYMode,
+    );
+  }
+
+  late final _spine_physics_constraint_data_set_scale_y_modePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_physics_constraint_data, ffi.Int32)>>(
+          'spine_physics_constraint_data_set_scale_y_mode');
+  late final _spine_physics_constraint_data_set_scale_y_mode = _spine_physics_constraint_data_set_scale_y_modePtr
+      .asFunction<void Function(spine_physics_constraint_data, int)>();
+
   /// True when this constraint's inertia is controlled by global slider timelines.
   bool spine_physics_constraint_data_get_inertia_global(
     spine_physics_constraint_data self,
