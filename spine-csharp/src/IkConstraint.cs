@@ -30,8 +30,6 @@
 using System;
 
 namespace Spine {
-	using ScaleYMode = IkConstraintData.ScaleYMode;
-
 	/// <summary>
 	/// <para>
 	/// Adjusts the local rotation of 1 or 2 constrained bones so the world position of the tip of the last bone is as close to the
@@ -164,7 +162,7 @@ namespace Spine {
 							bone.scaleY *= s;
 							break;
 						case ScaleYMode.Volume:
-							bone.scaleY /= s;
+							bone.scaleY /= s < 0.7f ? 0.25f + 0.642857f * s : s;
 							break;
 						}
 					}
@@ -256,7 +254,7 @@ namespace Spine {
 							parent.scaleY *= a;
 							break;
 						case ScaleYMode.Volume:
-							parent.scaleY /= a;
+							parent.scaleY /= a < 0.7f ? 0.25f + 0.642857f * a : a;
 							break;
 						}
 					}
