@@ -87,6 +87,7 @@ import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.Animation.TranslateXTimeline;
 import com.esotericsoftware.spine.Animation.TranslateYTimeline;
 import com.esotericsoftware.spine.BoneData.Inherit;
+import com.esotericsoftware.spine.ConstraintData.ScaleYMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
@@ -252,7 +253,7 @@ public class SkeletonJson extends SkeletonLoader {
 					if (data.target == null) throw new SerializationException("IK target bone not found: " + targetName);
 
 					String scaleY = constraintMap.getString("scaleY", null);
-					if (scaleY != null) data.scaleYMode = IkConstraintData.ScaleYMode.valueOf(scaleY);
+					if (scaleY != null) data.scaleYMode = ScaleYMode.valueOf(scaleY);
 
 					IkConstraintPose setup = data.setupPose;
 					setup.mix = constraintMap.getFloat("mix", 1);
@@ -386,6 +387,10 @@ public class SkeletonJson extends SkeletonLoader {
 					data.y = constraintMap.getFloat("y", 0);
 					data.rotate = constraintMap.getFloat("rotate", 0);
 					data.scaleX = constraintMap.getFloat("scaleX", 0);
+
+					String scaleY = constraintMap.getString("scaleY", null);
+					if (scaleY != null) data.scaleYMode = ScaleYMode.valueOf(scaleY);
+
 					data.shearX = constraintMap.getFloat("shearX", 0);
 					data.limit = constraintMap.getFloat("limit", 5000) * scale;
 					data.step = 1f / constraintMap.getInt("fps", 60);

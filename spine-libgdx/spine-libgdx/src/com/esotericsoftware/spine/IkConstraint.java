@@ -34,7 +34,7 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 import com.badlogic.gdx.utils.Array;
 
 import com.esotericsoftware.spine.BoneData.Inherit;
-import com.esotericsoftware.spine.IkConstraintData.ScaleYMode;
+import com.esotericsoftware.spine.ConstraintData.ScaleYMode;
 
 /** Adjusts the local rotation of 1 or 2 constrained bones so the world position of the tip of the last bone is as close to the
  * target bone as possible.
@@ -158,7 +158,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 					bone.scaleX *= s;
 					switch (scaleYMode) {
 					case uniform -> bone.scaleY *= s;
-					case volume -> bone.scaleY /= s;
+					case volume -> bone.scaleY /= s < 0.7f ? 0.25f + 0.642857f * s : s;
 					}
 				}
 			}
@@ -247,7 +247,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 					parent.scaleX *= a;
 					switch (scaleYMode) {
 					case uniform -> parent.scaleY *= a;
-					case volume -> parent.scaleY /= a;
+					case volume -> parent.scaleY /= a < 0.7f ? 0.25f + 0.642857f * a : a;
 					}
 				}
 			} else
