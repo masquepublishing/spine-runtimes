@@ -966,6 +966,7 @@
 - **Bug fixes**
   - Updated the Gradle wrapper and fixed the headless test fat jar task to build included libgdx runtime classpath artifacts before packaging.
   - Gradle builds now delete stale Eclipse `bin/` output before compiling so removed classes don't linger on Java headless test classpaths.
+  - Updated the libGDX dependency from `1.14.1-SNAPSHOT` to the released `1.14.1`.
 
 ### Android
 
@@ -975,6 +976,7 @@
 - **Bug fixes**
   - Updated the Android atlas attachment loader to match the current `AttachmentLoader` method signatures.
   - Updated the Android examples to use `AnimationState.getTrack()` instead of the removed `getCurrent()` API.
+  - Updated the libGDX dependency from `1.14.1-SNAPSHOT` to the released `1.14.1`.
 
 ## Swift
 
