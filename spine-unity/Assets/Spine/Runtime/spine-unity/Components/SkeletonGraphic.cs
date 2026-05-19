@@ -1222,7 +1222,7 @@ namespace Spine.Unity {
 					sharedMaterials[i] = submeshGraphics[i].UpdateModifiedMaterial(sharedMaterials[i]);
 				}
 			} else {
-				canvasRenderer.SetMaterial(sharedMaterials[0], usedTextures.Items[0]);
+				canvasRenderer.SetMaterial(sharedMaterials.Length > 0 ? sharedMaterials[0] : material, usedTextures.Items[0]);
 			}
 		}
 
