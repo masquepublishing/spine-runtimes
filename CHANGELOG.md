@@ -122,6 +122,7 @@
 
 - **Bug fixes**
   - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
+  - Fixed `InheritTimeline` so inherit keys are applied to the keyed bone instead of an uninitialized bone index.
   - Fixed `AnimationState` attachment timeline handling so deforms are applied correctly when an attachment is hidden in the setup pose.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
 

@@ -42,7 +42,7 @@ using namespace spine;
 
 RTTI_IMPL_MULTI(InheritTimeline, Timeline, BoneTimeline)
 
-InheritTimeline::InheritTimeline(size_t frameCount, int boneIndex) : Timeline(frameCount, ENTRIES), BoneTimeline(boneIndex) {
+InheritTimeline::InheritTimeline(size_t frameCount, int boneIndex) : Timeline(frameCount, ENTRIES), BoneTimeline(boneIndex), _boneIndex(boneIndex) {
 	PropertyId ids[] = {((PropertyId) Property_Inherit << 32) | boneIndex};
 	setPropertyIds(ids, 1);
 	_instant = true;
