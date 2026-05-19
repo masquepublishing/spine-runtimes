@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-libgdx works with data exported from Spine 4.2.xx.
+spine-libgdx works with data exported from Spine 4.3.xx.
 
 spine-libgdx supports all Spine features and is the reference runtime implementation.
 
@@ -49,7 +49,7 @@ To add the spine-libgdx runtime to your Maven project, add this dependency:
 <dependency>
 	<groupId>com.esotericsoftware.spine</groupId>
 	<artifactId>spine-libgdx</artifactId>
-	<version>4.2.0</version>
+	<version>4.3.0</version>
 </dependency>
 ```
 
@@ -76,12 +76,12 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
 
-        compile "com.esotericsoftware.spine:spine-libgdx:4.2.+"
+        compile "com.esotericsoftware.spine:spine-libgdx:4.3.+"
     }
 }
 ```
 
-Note that `4.2.+` will pull in the latest `-SNAPSHOT` release. Our snapshot releases are considered stable and based on the latest commit to the Spine Runtimes branch corresponding to the latest Spine Editor release version.
+Note that `4.3.+` will pull in the latest `-SNAPSHOT` release. Our snapshot releases are considered stable and based on the latest commit to the Spine Runtimes branch corresponding to the latest Spine Editor release version.
 
 ## Running the examples
 

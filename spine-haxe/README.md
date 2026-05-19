@@ -18,7 +18,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-haxe works with data exported from Spine 4.2.xx.
+spine-haxe works with data exported from Spine 4.3.xx.
 
 spine-haxe supports all Spine features except premultiplied alpha atlases and two color tinting.
 
@@ -36,7 +36,7 @@ haxelib install starling
 haxelib install flixel
 ```
 
-Once you have installed the dependencies, you can [download the latest version of spine-haxe](https://esotericsoftware.com/files/spine-haxe/4.2/spine-haxe-latest.zip) and install it:
+Once you have installed the dependencies, you can [download the latest version of spine-haxe](https://esotericsoftware.com/files/spine-haxe/4.3/spine-haxe-latest.zip) and install it:
 
 ```
 haxelib install spine-haxe-x.y.z.zip
