@@ -294,6 +294,8 @@
 - **Bug fixes**
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed `SpineAnimationTrack` editor preview paths for nested `AnimationPlayer` roots, and prevented inactive tracks from clearing `SpineSprite` preview animations.
+  - Fixed GDExtension animation mix editing in the Godot inspector.
+  - Updated Godot 4.x CI builds to Godot 4.6.2.
   - Fixed Godot 4.6 Windows editor CI builds by installing Direct3D 12 SDK dependencies before building Godot.
   - Fixed Godot 4.6 GDExtension builds with the latest `godot-cpp` by including the required `Ref` support header in `SpineCommon.h`, updated `SpineEventData` for the `EventData.setupPose` API change, and refreshed vendored `spine-cpp` sources during clean setup.
 
