@@ -30,7 +30,7 @@
 package spine;
 
 import haxe.DynamicAccess;
-import spine.IkConstraintData.ScaleYMode;
+import spine.ConstraintData.ScaleYMode;
 import spine.animation.BoneTimeline2;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
@@ -355,6 +355,9 @@ class SkeletonJson {
 						data.y = getFloat(constraintMap, "y");
 						data.rotate = getFloat(constraintMap, "rotate");
 						data.scaleX = getFloat(constraintMap, "scaleX");
+						var scaleY:String = Reflect.getProperty(constraintMap, "scaleY");
+						if (scaleY != null)
+							data.scaleYMode = ScaleYMode.fromName(scaleY);
 						data.shearX = getFloat(constraintMap, "shearX");
 						data.limit = getFloat(constraintMap, "limit", 5000) * scale;
 						data.step = 1 / getFloat(constraintMap, "fps", 60);

@@ -29,7 +29,7 @@
 
 package spine;
 
-import spine.IkConstraintData.ScaleYMode;
+import spine.ConstraintData.ScaleYMode;
 
 /** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
  * the last bone is as close to the target bone as possible.
@@ -157,7 +157,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 						case ScaleYMode.uniform:
 							bone.scaleY *= s;
 						case ScaleYMode.volume:
-							bone.scaleY /= s;
+							bone.scaleY /= s < 0.7 ? 0.25 + 0.642857 * s : s;
 						case ScaleYMode.none:
 					}
 				}
@@ -253,7 +253,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 						case ScaleYMode.uniform:
 							parent.scaleY *= a;
 						case ScaleYMode.volume:
-							parent.scaleY /= a;
+							parent.scaleY /= a < 0.7 ? 0.25 + 0.642857 * a : a;
 						case ScaleYMode.none:
 					}
 				}
