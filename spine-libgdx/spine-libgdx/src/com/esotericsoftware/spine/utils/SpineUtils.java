@@ -30,7 +30,7 @@
 package com.esotericsoftware.spine.utils;
 
 public class SpineUtils {
-	static public final float epsilon = 0.00001f, epsilon2 = epsilon * epsilon;
+	static public final float epsilon = 0.00001f, epsilonSq = epsilon * epsilon;
 	static public final float PI = 3.1415927f, PI2 = PI * 2, invPI2 = 1 / PI2;
 	static public final float radiansToDegrees = 180f / PI, radDeg = radiansToDegrees;
 	static public final float degreesToRadians = PI / 180, degRad = degreesToRadians;

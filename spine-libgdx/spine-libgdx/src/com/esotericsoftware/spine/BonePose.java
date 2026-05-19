@@ -192,7 +192,7 @@ public class BonePose implements Pose<BonePose>, Update {
 			pa *= sxi;
 			pc *= syi;
 			float s = pa * pa + pc * pc, r;
-			if (s > epsilon2) {
+			if (s > epsilonSq) {
 				s = Math.abs(pa * pd * syi - pb * sxi * pc) / s;
 				pb = pc * s;
 				pd = pa * s;
@@ -305,7 +305,7 @@ public class BonePose implements Pose<BonePose>, Update {
 
 	private void set (float ra, float rb, float rc, float rd) {
 		float x = ra * ra + rc * rc, y = rb * rb + rd * rd;
-		if (x > epsilon2) {
+		if (x > epsilonSq) {
 			shearX = atan2Deg(rc, ra);
 			scaleX = (float)Math.sqrt(x);
 		} else {
@@ -313,7 +313,7 @@ public class BonePose implements Pose<BonePose>, Update {
 			scaleX = 0;
 		}
 		scaleY = (float)Math.sqrt(y);
-		if (y > epsilon2) {
+		if (y > epsilonSq) {
 			shearY = atan2Deg(rd, rb);
 			if (ra * rd - rb * rc < 0) {
 				scaleY = -scaleY;
@@ -331,12 +331,12 @@ public class BonePose implements Pose<BonePose>, Update {
 	private void set (float ra, float rb, float rc, float rd, float ro) {
 		shearX = 0;
 		float x = ra * ra + rc * rc, y = rb * rb + rd * rd;
-		if (x > epsilon2) {
+		if (x > epsilonSq) {
 			float r = atan2Deg(rc, ra);
 			rotation = r + ro;
 			scaleX = (float)Math.sqrt(x);
 			scaleY = (float)Math.sqrt(y);
-			if (y > epsilon2) {
+			if (y > epsilonSq) {
 				shearY = atan2Deg(rd, rb);
 				if (ra * rd - rb * rc < 0) {
 					scaleY = -scaleY;
@@ -353,7 +353,7 @@ public class BonePose implements Pose<BonePose>, Update {
 			scaleX = 0;
 			scaleY = (float)Math.sqrt(y);
 			shearY = 0;
-			rotation = y > epsilon2 ? atan2Deg(rd, rb) - 90 + ro : ro;
+			rotation = y > epsilonSq ? atan2Deg(rd, rb) - 90 + ro : ro;
 		}
 	}
 
