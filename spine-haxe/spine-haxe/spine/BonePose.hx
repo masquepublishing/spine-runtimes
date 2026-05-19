@@ -160,7 +160,7 @@ class BonePose implements Pose<BonePose> implements Update {
 				pa *= sxi;
 				pc *= syi;
 				var s = pa * pa + pc * pc, r:Float;
-				if (s > MathUtils.epsilon) {
+				if (s > MathUtils.epsilon2) {
 					s = Math.abs(pa * pd * syi - pb * sxi * pc) / s;
 					pb = pc * s;
 					pd = pa * s;
