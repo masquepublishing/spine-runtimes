@@ -192,7 +192,7 @@ public class BonePose implements Pose<BonePose>, Update {
 			pa *= sxi;
 			pc *= syi;
 			float s = pa * pa + pc * pc, r;
-			if (s > epsilon) {
+			if (s > epsilon2) {
 				s = Math.abs(pa * pd * syi - pb * sxi * pc) / s;
 				pb = pc * s;
 				pd = pa * s;
