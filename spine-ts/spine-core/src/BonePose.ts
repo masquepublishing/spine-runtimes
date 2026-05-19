@@ -194,7 +194,7 @@ export class BonePose implements Pose<BonePose>, Update {
 				pc *= syi;
 				let s = pa * pa + pc * pc;
 				let r = 0;
-				if (s > MathUtils.epsilon) {
+				if (s > MathUtils.epsilon2) {
 					s = Math.abs(pa * pd * syi - pb * sxi * pc) / s;
 					pb = pc * s;
 					pd = pa * s;
