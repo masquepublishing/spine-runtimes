@@ -33,9 +33,10 @@ import type { AttachmentLoader } from "./attachments/AttachmentLoader.js";
 import type { MeshAttachment } from "./attachments/MeshAttachment.js";
 import { Sequence, SequenceMode } from "./attachments/Sequence.js";
 import { BoneData, Inherit } from "./BoneData.js";
+import { ScaleYMode } from "./ConstraintData.js";
 import { Event } from "./Event.js";
 import { EventData } from "./EventData.js";
-import { IkConstraintData, ScaleYMode } from "./IkConstraintData.js";
+import { IkConstraintData } from "./IkConstraintData.js";
 import { PathConstraintData, PositionMode, RotateMode, SpacingMode } from "./PathConstraintData.js";
 import { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 import { SkeletonData } from "./SkeletonData.js";
@@ -310,6 +311,10 @@ export class SkeletonJson {
 						data.y = getValue(constraintMap, "y", 0);
 						data.rotate = getValue(constraintMap, "rotate", 0);
 						data.scaleX = getValue(constraintMap, "scaleX", 0);
+
+						const scaleY = getValue(constraintMap, "scaleY", null);
+						if (scaleY != null) data.scaleYMode = Utils.enumValue(ScaleYMode, scaleY);
+
 						data.shearX = getValue(constraintMap, "shearX", 0);
 						data.limit = getValue(constraintMap, "limit", 5000) * scale;
 						data.step = 1 / getValue(constraintMap, "fps", 60);

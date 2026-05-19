@@ -33,6 +33,7 @@ import type { AttachmentLoader } from "./attachments/AttachmentLoader.js";
 import type { MeshAttachment } from "./attachments/MeshAttachment.js";
 import { Sequence, SequenceModeValues } from "./attachments/Sequence.js";
 import { BoneData } from "./BoneData.js";
+import { ScaleYMode } from "./ConstraintData.js";
 import { Event } from "./Event.js";
 import { EventData } from "./EventData.js";
 import { IkConstraintData } from "./IkConstraintData.js";
@@ -285,7 +286,17 @@ export class SkeletonBinary {
 					if ((flags & 2) !== 0) data.x = input.readFloat();
 					if ((flags & 4) !== 0) data.y = input.readFloat();
 					if ((flags & 8) !== 0) data.rotate = input.readFloat();
-					if ((flags & 16) !== 0) data.scaleX = input.readFloat();
+					if ((flags & 16) !== 0) {
+						let scaleX = input.readFloat();
+						if (scaleX < -2) {
+							data.scaleYMode = ScaleYMode.Volume;
+							scaleX = -2 - scaleX;
+						} else if (scaleX < 0) {
+							data.scaleYMode = ScaleYMode.Uniform;
+							scaleX = -1 - scaleX;
+						}
+						data.scaleX = scaleX;
+					}
 					if ((flags & 32) !== 0) data.shearX = input.readFloat();
 					data.limit = ((flags & 64) !== 0 ? input.readFloat() : 5000) * scale;
 					data.step = 1 / input.readUnsignedByte();

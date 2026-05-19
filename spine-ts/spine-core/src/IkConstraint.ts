@@ -31,7 +31,8 @@ import type { Bone } from "./Bone.js";
 import { Inherit } from "./BoneData.js";
 import type { BonePose } from "./BonePose.js";
 import { Constraint } from "./Constraint.js";
-import { type IkConstraintData, ScaleYMode } from "./IkConstraintData.js";
+import { ScaleYMode } from "./ConstraintData.js";
+import type { IkConstraintData } from "./IkConstraintData.js";
 import { IkConstraintPose } from "./IkConstraintPose.js";
 import type { Physics } from "./Physics.js";
 import type { Skeleton } from "./Skeleton.js";
@@ -171,7 +172,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 					bone.scaleX *= s;
 					switch (scaleYMode) {
 						case ScaleYMode.Uniform: bone.scaleY *= s; break;
-						case ScaleYMode.Volume: bone.scaleY /= s;
+						case ScaleYMode.Volume: bone.scaleY /= s < 0.7 ? 0.25 + 0.642857 * s : s;
 					}
 				}
 			}
@@ -259,7 +260,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 					parent.scaleX *= a;
 					switch (scaleYMode) {
 						case ScaleYMode.Uniform: parent.scaleY *= a; break;
-						case ScaleYMode.Volume: parent.scaleY /= a;
+						case ScaleYMode.Volume: parent.scaleY /= a < 0.7 ? 0.25 + 0.642857 * a : a;
 					}
 				}
 			} else
