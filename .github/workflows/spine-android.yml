@@ -3,7 +3,9 @@ name: Build spine-android
 on:
   push:
     paths:
+      - '.github/workflows/spine-android.yml'
       - 'spine-android/**'
+      - 'spine-libgdx/gradle.properties'
   workflow_dispatch:
 
 jobs:
