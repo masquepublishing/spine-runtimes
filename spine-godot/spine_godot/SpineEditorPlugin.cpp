@@ -554,7 +554,8 @@ void SpineEditorPropertyAnimationMixes::rebuild_ui() {
 				from_option->add_item(animation_names[j]);
 				if (animation_names[j] == mix->get_from()) from_option->select(j);
 			}
-			from_option->connect(SNAME("item_selected"), callable_mp(this, &SpineEditorPropertyAnimationMixes::on_from_changed).bind(i), CONNECT_DEFERRED);
+			from_option->connect(SNAME("item_selected"), callable_mp(this, &SpineEditorPropertyAnimationMixes::on_from_changed).bind(i),
+								 CONNECT_DEFERRED);
 			hbox->add_child(from_option);
 
 			auto to_option = memnew(OptionButton);
@@ -563,7 +564,8 @@ void SpineEditorPropertyAnimationMixes::rebuild_ui() {
 				to_option->add_item(animation_names[j]);
 				if (animation_names[j] == mix->get_to()) to_option->select(j);
 			}
-			to_option->connect(SNAME("item_selected"), callable_mp(this, &SpineEditorPropertyAnimationMixes::on_to_changed).bind(i), CONNECT_DEFERRED);
+			to_option->connect(SNAME("item_selected"), callable_mp(this, &SpineEditorPropertyAnimationMixes::on_to_changed).bind(i),
+							   CONNECT_DEFERRED);
 			hbox->add_child(to_option);
 
 			auto spin_box = memnew(SpinBox);
@@ -572,7 +574,8 @@ void SpineEditorPropertyAnimationMixes::rebuild_ui() {
 			spin_box->set_max(9999999.0);
 			spin_box->set_step(0.001);
 			spin_box->set_value(mix->get_mix());
-			spin_box->connect(SNAME("value_changed"), callable_mp(this, &SpineEditorPropertyAnimationMixes::on_mix_value_changed).bind(i), CONNECT_DEFERRED);
+			spin_box->connect(SNAME("value_changed"), callable_mp(this, &SpineEditorPropertyAnimationMixes::on_mix_value_changed).bind(i),
+							  CONNECT_DEFERRED);
 			hbox->add_child(spin_box);
 		}
 
