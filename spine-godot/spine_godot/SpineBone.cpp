@@ -159,9 +159,11 @@ Transform2D SpineBone::get_transform() {
 	auto &pose = get_spine_object()->getPose();
 	float rotation_x = spine::MathUtil::Deg_Rad * (pose.getRotation() + pose.getShearX());
 	float rotation_y = spine::MathUtil::Deg_Rad * (pose.getRotation() + 90 + pose.getShearY());
-	return Transform2D(Vector2(spine::MathUtil::cos(rotation_x) * pose.getScaleX(), spine::MathUtil::sin(rotation_x) * pose.getScaleX()),
-						 Vector2(spine::MathUtil::cos(rotation_y) * pose.getScaleY(), spine::MathUtil::sin(rotation_y) * pose.getScaleY()),
-						 Vector2(pose.getX(), pose.getY()));
+	Transform2D transform;
+	transform[0] = Vector2(spine::MathUtil::cos(rotation_x) * pose.getScaleX(), spine::MathUtil::sin(rotation_x) * pose.getScaleX());
+	transform[1] = Vector2(spine::MathUtil::cos(rotation_y) * pose.getScaleY(), spine::MathUtil::sin(rotation_y) * pose.getScaleY());
+	transform[2] = Vector2(pose.getX(), pose.getY());
+	return transform;
 }
 
 void SpineBone::set_transform(Transform2D transform) {
@@ -185,8 +187,10 @@ Transform2D SpineBone::get_global_transform() {
 	if (!get_spine_owner()) return get_transform();
 	if (!get_spine_owner()->is_visible_in_tree()) return get_transform();
 	auto &applied_pose = get_spine_object()->getAppliedPose();
-	Transform2D local(Vector2(applied_pose.getA(), applied_pose.getC()), Vector2(applied_pose.getB(), applied_pose.getD()),
-					  Vector2(applied_pose.getWorldX(), applied_pose.getWorldY()));
+	Transform2D local;
+	local[0] = Vector2(applied_pose.getA(), applied_pose.getC());
+	local[1] = Vector2(applied_pose.getB(), applied_pose.getD());
+	local[2] = Vector2(applied_pose.getWorldX(), applied_pose.getWorldY());
 	return get_spine_owner()->get_global_transform() * local;
 }
 
