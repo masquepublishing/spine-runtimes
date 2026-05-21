@@ -51,7 +51,7 @@
             "spineboy-atlas"
           );
           spineboy.scale = scale;
-          spineboy.animationState.setAnimation(0, "walk", true);
+          spineboy.animationState.setAnimation(0, "portal", true);
           return spineboy;
         };
 
@@ -91,6 +91,7 @@
               const status = drawCalls <= expectedDrawCalls ? "OK" : "TOO MANY";
               this.debugText.style.color = drawCalls <= expectedDrawCalls ? "#80ff80" : "#ff8080";
               return "Spine draw calls: " + drawCalls + " / expected <= " + expectedDrawCalls + " (" + status + ")" +
+                "\nPortal animation tests normal/additive PMA batching" +
                 "\nCamera forceComposite + internal/external filters" +
                 "\nContainer + invisible skipped children";
             })();
