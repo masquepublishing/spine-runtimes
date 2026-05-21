@@ -13,6 +13,7 @@
   - Added generated animation color and bone icon size/rotation APIs.
 
 - **Bug fixes**
+  - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose::updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
@@ -122,6 +123,7 @@
   - Added `Animation::getColor()` and `BoneData` icon size/rotation accessors for nonessential editor data.
 
 - **Bug fixes**
+  - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose::updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance, plus related IK epsilon handling.
   - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
   - Fixed `InheritTimeline` so inherit keys are applied to the keyed bone instead of an uninitialized bone index.
@@ -548,6 +550,7 @@
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
 - **Bug fixes**
+  - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose.updateLocalTransform(_:)` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
@@ -571,6 +574,7 @@
   - Added `Pose`, `Posed`, and `PosedActive` base classes for unified pose management
 
 - **Bug fixes**
+  - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
@@ -605,6 +609,7 @@
   - Added example `load_from_memory.dart` demonstrating how to load all assets into memory and use the `fromMemory` API
 
 - **Bug fixes**
+  - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 

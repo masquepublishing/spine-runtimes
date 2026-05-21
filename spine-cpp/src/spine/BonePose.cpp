@@ -102,7 +102,7 @@ void BonePose::updateWorldTransform(Skeleton &skeleton) {
 			pa *= sxi;
 			pc *= syi;
 			float s = pa * pa + pc * pc, r;
-			if (s > MathUtil::Epsilon) {
+			if (s > MathUtil::Epsilon2) {
 				s = MathUtil::abs(pa * pd * syi - pb * sxi * pc) / s;
 				pb = pc * s;
 				pd = pa * s;
