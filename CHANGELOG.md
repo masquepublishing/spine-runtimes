@@ -131,6 +131,7 @@
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
 
 - **Breaking changes**
+  - `MathUtil::Epsilon2` renamed to `MathUtil::EpsilonSq`.
   - `BonePose::resetWorld()` is now private.
   - `AttachmentLoader` methods now receive both the skin `placeholder` and resolved attachment `name`. `Skin::AttachmentMap::Entry::_placeholderName` renamed to `_placeholder`.
   - `AnimationState::getCurrent()` renamed to `AnimationState::getTrack()`.

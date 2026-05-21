@@ -102,7 +102,7 @@ void BonePose::updateWorldTransform(Skeleton &skeleton) {
 			pa *= sxi;
 			pc *= syi;
 			float s = pa * pa + pc * pc, r;
-			if (s > MathUtil::Epsilon2) {
+			if (s > MathUtil::EpsilonSq) {
 				s = MathUtil::abs(pa * pd * syi - pb * sxi * pc) / s;
 				pb = pc * s;
 				pd = pa * s;
@@ -220,7 +220,7 @@ void BonePose::updateLocalTransform(Skeleton &skeleton) {
 
 void BonePose::setLocal(float ra, float rb, float rc, float rd) {
 	float x = ra * ra + rc * rc, y = rb * rb + rd * rd;
-	if (x > MathUtil::Epsilon2) {
+	if (x > MathUtil::EpsilonSq) {
 		_shearX = MathUtil::atan2Deg(rc, ra);
 		_scaleX = MathUtil::sqrt(x);
 	} else {
@@ -228,7 +228,7 @@ void BonePose::setLocal(float ra, float rb, float rc, float rd) {
 		_scaleX = 0;
 	}
 	_scaleY = MathUtil::sqrt(y);
-	if (y > MathUtil::Epsilon2) {
+	if (y > MathUtil::EpsilonSq) {
 		_shearY = MathUtil::atan2Deg(rd, rb);
 		if (ra * rd - rb * rc < 0) {
 			_scaleY = -_scaleY;
@@ -246,12 +246,12 @@ void BonePose::setLocal(float ra, float rb, float rc, float rd) {
 void BonePose::setLocal(float ra, float rb, float rc, float rd, float ro) {
 	_shearX = 0;
 	float x = ra * ra + rc * rc, y = rb * rb + rd * rd;
-	if (x > MathUtil::Epsilon2) {
+	if (x > MathUtil::EpsilonSq) {
 		float r = MathUtil::atan2Deg(rc, ra);
 		_rotation = r + ro;
 		_scaleX = MathUtil::sqrt(x);
 		_scaleY = MathUtil::sqrt(y);
-		if (y > MathUtil::Epsilon2) {
+		if (y > MathUtil::EpsilonSq) {
 			_shearY = MathUtil::atan2Deg(rd, rb);
 			if (ra * rd - rb * rc < 0) {
 				_scaleY = -_scaleY;
@@ -268,7 +268,7 @@ void BonePose::setLocal(float ra, float rb, float rc, float rd, float ro) {
 		_scaleX = 0;
 		_scaleY = MathUtil::sqrt(y);
 		_shearY = 0;
-		_rotation = y > MathUtil::Epsilon2 ? MathUtil::atan2Deg(rd, rb) - 90 + ro : ro;
+		_rotation = y > MathUtil::EpsilonSq ? MathUtil::atan2Deg(rd, rb) - 90 + ro : ro;
 	}
 }
 
