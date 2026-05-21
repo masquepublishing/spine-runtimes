@@ -378,7 +378,7 @@
     | Slot.Attachment       |→| Slot.AppliedPose.Attachment |
     | Slot.R .G .B .A       |→| Slot.AppliedPose.GetColor() and Slot.AppliedPose.SetColor() |
     | Slot.R2 .G2 .B2       |→| Slot.AppliedPose.GetDarkColor() and Slot.AppliedPose.SetDarkColor() |
-    | Slot.HasSecondColor   |→| Slot.AppliedPose.HasSecondColor |
+    | Slot.HasSecondColor   |→| Slot.AppliedPose.HasDarkColor |
     | Slot.Deform           |→| Slot.AppliedPose.Deform |
     | Slot.SequenceIndex    |→| Slot.AppliedPose.SequenceIndex |
   - `Constraint` properties moved to `Constraint.Pose`:
