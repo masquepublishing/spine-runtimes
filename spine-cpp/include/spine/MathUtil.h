@@ -44,6 +44,8 @@ namespace spine {
 		MathUtil();
 
 	public:
+		static const float Epsilon;
+		static const float Epsilon2;
 		static const float Pi;
 		static const float Pi_2;
 		static const float InvPi_2;
