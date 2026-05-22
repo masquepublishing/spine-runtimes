@@ -235,7 +235,7 @@ bool SpineSkeletonDataResourceInspectorPlugin::_can_handle(Object *object) const
 #else
 bool SpineSkeletonDataResourceInspectorPlugin::can_handle(Object *object) {
 #endif
-	return object->is_class("SpineSkeletonDataResource");
+	return object && object->is_class("SpineSkeletonDataResource");
 }
 
 #if VERSION_MAJOR > 3
