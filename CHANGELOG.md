@@ -13,6 +13,7 @@
   - Added generated animation color and bone icon size/rotation APIs.
 
 - **Bug fixes**
+  - Fixed slider sorting crashes when slider animations key slot or constraint timelines.
   - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose::updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
@@ -123,6 +124,7 @@
   - Added `Animation::getColor()` and `BoneData` icon size/rotation accessors for nonessential editor data.
 
 - **Bug fixes**
+  - Fixed slider sorting crashes when slider animations key slot or constraint timelines.
   - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose::updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance, plus related IK epsilon handling.
   - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
@@ -298,6 +300,7 @@
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
 - **Bug fixes**
+  - Fixed editor crashes when assigning skeleton data with slider animations that key slots or constraints.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed `SpineAnimationTrack` editor preview paths for nested `AnimationPlayer` roots, and prevented inactive tracks from clearing `SpineSprite` preview animations.
   - Fixed GDExtension animation mix editing in the Godot inspector.

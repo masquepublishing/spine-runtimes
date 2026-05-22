@@ -41,7 +41,7 @@
 
 using namespace spine;
 
-RTTI_IMPL(DeformTimeline, CurveTimeline)
+RTTI_IMPL(DeformTimeline, SlotCurveTimeline)
 
 DeformTimeline::DeformTimeline(size_t frameCount, size_t bezierCount, int slotIndex, VertexAttachment &attachment)
 	: SlotCurveTimeline(frameCount, 1, bezierCount, slotIndex), _attachment(&attachment) {
