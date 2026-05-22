@@ -957,7 +957,7 @@ public class AnimationState {
 		 * properties keyed by the animation are set to the setup pose and the track is cleared.
 		 * <p>
 		 * Usually you want to use {@link AnimationState#addEmptyAnimation(int, float, float)} rather than have the animation
-		 * abruptly cease being applied. */
+		 * abruptly cease being applied, leaving the current pose. */
 		public float getTrackEnd () {
 			return trackEnd;
 		}
