@@ -120,8 +120,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.limit = limit;
 	}
 
-	/** Determines how the {@link BonePose#scaleY} changes when {@link PhysicsConstraintData#scaleX} sets
-	 * {@link BonePose#scaleX}. */
+	/** Determines how the {@link BonePose#scaleY} changes when {@link #scaleX} sets {@link BonePose#scaleX}. */
 	public ScaleYMode getScaleYMode () {
 		return scaleYMode;
 	}
