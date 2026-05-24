@@ -417,7 +417,6 @@ public class SkeletonJson extends SkeletonLoader {
 					data.skinRequired = skinRequired;
 					data.additive = constraintMap.getBoolean("additive", false);
 					data.loop = constraintMap.getBoolean("loop", false);
-					data.setupPose.time = constraintMap.getFloat("time", 0);
 					data.setupPose.mix = constraintMap.getFloat("mix", 1);
 
 					String boneName = constraintMap.getString("bone", null);
@@ -430,8 +429,10 @@ public class SkeletonJson extends SkeletonLoader {
 						data.property.offset = constraintMap.getFloat("from", 0) * propertyScale;
 						data.offset = constraintMap.getFloat("to", 0);
 						data.scale = constraintMap.getFloat("scale", 1) / propertyScale;
+						data.max = constraintMap.getFloat("max", 0);
 						data.local = constraintMap.getBoolean("local", false);
-					}
+					} else
+						data.setupPose.time = constraintMap.getFloat("time", 0);
 
 					skeletonData.constraints.add(data);
 				}
