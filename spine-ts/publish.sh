@@ -73,8 +73,10 @@ else
     exit 1
 fi
 
+read -p "npm OTP: " NPM_OTP
+
 log_action "Publishing all workspaces"
-if NPM_OUTPUT=$(npm publish --access public --workspaces 2>&1); then
+if NPM_OUTPUT=$(npm publish --access public --workspaces --otp="$NPM_OTP" 2>&1); then
     log_ok
     log_summary "✓ TypeScript packages published successfully with version $newVersion"
 else

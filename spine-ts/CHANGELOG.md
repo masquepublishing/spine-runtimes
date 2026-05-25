@@ -2,6 +2,20 @@
 
 Recovered from the `4.3` branch release history up to `4.3.3`.
 
+## 4.3.4 - TBD
+
+### spine-core
+
+- Fixed `SkeletonClipping.clipTrianglesUnpacked()` to update its typed output views before returning from inverse clipping.
+
+### spine-pixi-v8
+
+- Fixed clipped attachments to force a Pixi batch rebuild when triangle indices change without changing the index count, preventing rendering glitches.
+
+### spine-ts
+
+- Updated `publish.sh` to prompt for an npm one-time password and pass it to `npm publish`.
+
 ## 4.3.3 - 2026-05-21
 
 ### spine-pixi-v7 / spine-pixi-v8
