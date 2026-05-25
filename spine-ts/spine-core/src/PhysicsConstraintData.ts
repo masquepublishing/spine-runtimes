@@ -89,7 +89,7 @@ export class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 	/** True when this constraint's mix is controlled by global slider timelines. */
 	mixGlobal = false;
 
-	/** Determines how the {@link BonePose.scaleY} changes when {@link PhysicsConstraintData.scaleX} sets
+	/** Determines how the {@link BonePose.scaleY} changes when {@link BonePose.scaleX} sets
 	 * {@link BonePose.scaleX}. */
 	private _scaleYMode = ScaleYMode.None;
 	get scaleYMode (): ScaleYMode {

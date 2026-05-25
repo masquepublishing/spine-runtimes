@@ -958,7 +958,7 @@ export class TrackEntry {
 	 * properties keyed by the animation are set to the setup pose and the track is cleared.
 	 *
 	 * Usually you want to use {@link AnimationState.addEmptyAnimation} rather than have the animation
-	 * abruptly cease being applied. */
+	 * abruptly cease being applied, leaving the current pose. */
 	trackEnd = 0;
 
 	/** Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or
