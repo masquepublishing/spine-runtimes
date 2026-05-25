@@ -426,8 +426,13 @@ class SkeletonBinary {
 					data.skinRequired = (flags & 1) != 0;
 					data.loop = (flags & 2) != 0;
 					data.additive = (flags & 4) != 0;
-					if ((flags & 8) != 0)
-						data.setupPose.time = input.readFloat();
+					if ((flags & 8) != 0) {
+						var value = input.readFloat();
+						if (nonessential && (flags & 64) != 0)
+							data.max = value;
+						else
+							data.setupPose.time = value;
+					}
 					if ((flags & 16) != 0)
 						data.setupPose.mix = (flags & 32) != 0 ? input.readFloat() : 1;
 					if ((flags & 64) != 0) {

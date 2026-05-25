@@ -388,7 +388,6 @@ class SkeletonJson {
 						data.skinRequired = skinRequired;
 						data.additive = getBoolean(constraintMap, "additive", false);
 						data.loop = getBoolean(constraintMap, "loop", false);
-						data.setupPose.time = getFloat(constraintMap, "time", 0);
 						data.setupPose.mix = getFloat(constraintMap, "mix", 1);
 
 						var boneName = getString(constraintMap, "bone", null);
@@ -402,8 +401,10 @@ class SkeletonJson {
 							data.property.offset = getFloat(constraintMap, "from", 0) * propertyScale;
 							data.offset = getFloat(constraintMap, "to", 0);
 							data.scale = getFloat(constraintMap, "scale", 1) / propertyScale;
+							data.max = getFloat(constraintMap, "max", 0);
 							data.local = getBoolean(constraintMap, "local", false);
-						}
+						} else
+							data.setupPose.time = getFloat(constraintMap, "time", 0);
 
 						skeletonData.constraints.push(data);
 				}
