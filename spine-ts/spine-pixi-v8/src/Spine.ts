@@ -912,7 +912,14 @@ export class Spine extends ViewContainer {
 		const { vertices, uvs, indices } = clippedData;
 		vertices.set(clippedVerticesTyped);
 		uvs.set(clippedUVsTyped);
-		indices.set(clippedTrianglesTyped);
+
+		for (let i = 0; i < indicesCount; i++) {
+			const index = clippedTrianglesTyped[i];
+			// Pixi's Batcher.updateElement() repacks vertex attributes (positions, UVs, colors),
+			// but it does not repack the index buffer. So we need to check indices differences.
+			if (indices[i] !== index) this.spineAttachmentsDirty = true;
+			indices[i] = index;
+		}
 		clippedData.vertexCount = verticesCount;
 		clippedData.indicesCount = indicesCount;
 	}
