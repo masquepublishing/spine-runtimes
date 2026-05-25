@@ -1,8 +1,12 @@
 # spine-ts 4.3 changelog
 
-Recovered from the `4.3` branch release history up to `4.3.3`.
+## Unreleased
 
-## 4.3.4 - TBD
+### spine-core
+
+- Port of d463f340: Support nonessential slider max.
+
+## 4.3.4 - 2026-05-25
 
 ### spine-core
 

@@ -343,7 +343,6 @@ export class SkeletonJson {
 
 						data.additive = getValue(constraintMap, "additive", false);
 						data.loop = getValue(constraintMap, "loop", false);
-						data.setupPose.time = getValue(constraintMap, "time", 0);
 						data.setupPose.mix = getValue(constraintMap, "mix", 1);
 
 						const boneName: string = constraintMap.bone;
@@ -356,8 +355,11 @@ export class SkeletonJson {
 							data.property.offset = getValue(constraintMap, "from", 0) * propertyScale;
 							data.offset = getValue(constraintMap, "to", 0);
 							data.scale = getValue(constraintMap, "scale", 1) / propertyScale;
+							data.max = getValue(constraintMap, "max", 0);
 							data.local = getValue(constraintMap, "local", false);
-						}
+						} else
+							data.setupPose.time = getValue(constraintMap, "time", 0);
+
 
 						skeletonData.constraints.push(data);
 						break;
