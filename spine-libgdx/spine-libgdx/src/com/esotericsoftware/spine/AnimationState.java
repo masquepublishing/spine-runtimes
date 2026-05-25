@@ -283,16 +283,16 @@ public class AnimationState {
 		for (int i = 0; i < timelineCount; i++) {
 			Timeline timeline = timelines[i];
 			int mode = timelineMode[i];
+			boolean fromSetup = (mode & FIRST) != 0;
 			float alpha;
 			if ((mode & HOLD) != 0) {
 				TrackEntry holdMix = timelineHoldMix[i];
 				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
-				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+				if (!drawOrder && timeline instanceof DrawOrderTimeline && !fromSetup) continue;
 				alpha = alphaMix;
 			}
 			from.totalAlpha += alpha;
-			boolean fromSetup = (mode & FIRST) != 0;
 			if (!shortestRotation && timeline instanceof RotateTimeline rotateTimeline) {
 				applyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 			} else if (timeline instanceof AttachmentTimeline attachmentTimeline)
