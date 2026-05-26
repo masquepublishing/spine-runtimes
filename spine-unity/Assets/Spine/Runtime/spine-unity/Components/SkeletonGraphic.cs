@@ -194,7 +194,7 @@ namespace Spine.Unity {
 				return overrideTexture;
 			}
 			set {
-				customTextureOverride.Add(Texture2D.whiteTexture, value);
+				customTextureOverride[Texture2D.whiteTexture] = value;
 				SetMainRendererTexture(value);
 				materialsNeedUpdate = true;
 			}
