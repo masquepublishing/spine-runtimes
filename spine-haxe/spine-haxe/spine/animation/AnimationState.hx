@@ -314,17 +314,17 @@ class AnimationState {
 		for (i in 0...timelineCount) {
 			var timeline:Timeline = timelines[i];
 			var mode = timelineMode[i];
+			var fromSetup = (mode & FIRST) != 0;
 			var alpha:Float = 0;
 			if ((mode & HOLD) != 0) {
 				var holdMix:TrackEntry = timelineHoldMix[i];
 				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
-				if (!drawOrder && Std.isOfType(timeline, DrawOrderTimeline))
+				if (!drawOrder && Std.isOfType(timeline, DrawOrderTimeline) && !fromSetup)
 					continue;
 				alpha = alphaMix;
 			}
 			from.totalAlpha += alpha;
-			var fromSetup = (mode & FIRST) != 0;
 			if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
 				applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 			} else if (Std.isOfType(timeline, AttachmentTimeline)) {
