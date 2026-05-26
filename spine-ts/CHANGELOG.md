@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.3.5 - 2026-05-26
+
 ### spine-core
 
 - Fixed JSON transform constraint timelines to carry `mixShearY` forward between keyframes, and fixed world-space `ToShearY` scale-axis handling. (`cef55a40d`)
