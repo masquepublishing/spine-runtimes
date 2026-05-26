@@ -363,17 +363,17 @@ namespace Spine {
 			for (int i = 0; i < timelineCount; i++) {
 				Timeline timeline = timelines[i];
 				int mode = timelineMode[i];
+				bool fromSetup = (mode & AnimationState.First) != 0;
 				float alpha;
 				if ((mode & AnimationState.Hold) != 0) {
 					TrackEntry holdMix = timelineHoldMix[i];
 					alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.Mix());
 				} else {
-					if (!drawOrder && timeline is DrawOrderTimeline) continue;
+					if (!drawOrder && timeline is DrawOrderTimeline && !fromSetup) continue;
 					alpha = alphaMix;
 				}
 
 				from.totalAlpha += alpha;
-				bool fromSetup = (mode & AnimationState.First) != 0;
 				RotateTimeline rotateTimeline = timeline as RotateTimeline;
 				if (!shortestRotation && rotateTimeline != null) {
 					ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1,
