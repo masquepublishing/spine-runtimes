@@ -981,16 +981,16 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 	for (size_t i = 0; i < timelineCount; i++) {
 		Timeline *timeline = timelines[i];
 		int mode = timelineMode[i];
+		bool fromSetup = (mode & First) != 0;
 		float alpha;
 		if ((mode & Hold) != 0) {
 			TrackEntry *holdMix = timelineHoldMix[i];
 			alpha = holdMix == NULL ? alphaHold : alphaHold * (1 - holdMix->mix());
 		} else {
-			if (!drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti)) continue;
+			if (!drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) && !fromSetup) continue;
 			alpha = alphaMix;
 		}
 		from->_totalAlpha += alpha;
-		bool fromSetup = (mode & First) != 0;
 		if (!shortestRotation && timeline->getRTTI().isExactly(RotateTimeline::rtti)) {
 			applyRotateTimeline((RotateTimeline *) timeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 		} else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {

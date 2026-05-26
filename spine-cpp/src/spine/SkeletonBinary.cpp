@@ -406,7 +406,13 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					data->_loop = (flags & 2) != 0;
 					data->_additive = (flags & 4) != 0;
 					SliderPose &setup = data->_setupPose;
-					if ((flags & 8) != 0) setup._time = input.readFloat();
+					if ((flags & 8) != 0) {
+						float value = input.readFloat();
+						if (nonessential && (flags & 64) != 0)
+							data->_max = value;
+						else
+							setup._time = value;
+					}
 					if ((flags & 16) != 0) setup._mix = (flags & 32) != 0 ? input.readFloat() : 1;
 					if ((flags & 64) != 0) {
 						data->_local = (flags & 128) != 0;

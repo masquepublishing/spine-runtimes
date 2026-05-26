@@ -184,8 +184,8 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_limit(_ptr, value);
   }
 
-  /// Determines how BonePose::getScaleY() changes when
-  /// PhysicsConstraintData::getScaleX() sets BonePose::getScaleX().
+  /// Determines how BonePose::getScaleY() changes when getScaleX() sets
+  /// BonePose::getScaleX().
   ScaleYMode get scaleYMode {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_scale_y_mode(_ptr);
     return ScaleYMode.fromValue(result);

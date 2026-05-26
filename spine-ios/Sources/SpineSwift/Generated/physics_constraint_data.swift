@@ -142,8 +142,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
-    /// Determines how BonePose::getScaleY() changes when PhysicsConstraintData::getScaleX() sets
-    /// BonePose::getScaleX().
+    /// Determines how BonePose::getScaleY() changes when getScaleX() sets BonePose::getScaleX().
     public var scaleYMode: ScaleYMode {
         get {
             let result = spine_physics_constraint_data_get_scale_y_mode(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))

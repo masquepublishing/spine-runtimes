@@ -31420,8 +31420,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_limit =
       _spine_physics_constraint_data_set_limitPtr.asFunction<void Function(spine_physics_constraint_data, double)>();
 
-  /// Determines how BonePose::getScaleY() changes when
-  /// PhysicsConstraintData::getScaleX() sets BonePose::getScaleX().
+  /// Determines how BonePose::getScaleY() changes when getScaleX() sets
+  /// BonePose::getScaleX().
   int spine_physics_constraint_data_get_scale_y_mode(
     spine_physics_constraint_data self,
   ) {
@@ -44764,6 +44764,36 @@ class SpineDartBindings {
   late final _spine_slider_data_set_offset =
       _spine_slider_data_set_offsetPtr.asFunction<void Function(spine_slider_data, double)>();
 
+  /// When a bone is set, the maximum slider time for the bone property range, or 0
+  /// if nonessential data was not exported.
+  double spine_slider_data_get_max(
+    spine_slider_data self,
+  ) {
+    return _spine_slider_data_get_max(
+      self,
+    );
+  }
+
+  late final _spine_slider_data_get_maxPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_slider_data)>>('spine_slider_data_get_max');
+  late final _spine_slider_data_get_max =
+      _spine_slider_data_get_maxPtr.asFunction<double Function(spine_slider_data)>();
+
+  void spine_slider_data_set_max(
+    spine_slider_data self,
+    double max,
+  ) {
+    return _spine_slider_data_set_max(
+      self,
+      max,
+    );
+  }
+
+  late final _spine_slider_data_set_maxPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_slider_data, ffi.Float)>>('spine_slider_data_set_max');
+  late final _spine_slider_data_set_max =
+      _spine_slider_data_set_maxPtr.asFunction<void Function(spine_slider_data, double)>();
+
   /// When true and a bone is set, the bone's local transform property is read
   /// instead of its world transform.
   bool spine_slider_data_get_local(
@@ -48139,7 +48169,8 @@ class SpineDartBindings {
   /// animation are set to the setup pose and the track is cleared.
   ///
   /// It may be desired to use AnimationState::addEmptyAnimation(int, float, float)
-  /// rather than have the animation abruptly cease being applied.
+  /// rather than have the animation abruptly cease being applied, leaving the
+  /// current pose.
   double spine_track_entry_get_track_end(
     spine_track_entry self,
   ) {

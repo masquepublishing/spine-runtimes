@@ -159,7 +159,7 @@ namespace spine {
 		/// properties keyed by the animation are set to the setup pose and the track is cleared.
 		///
 		/// It may be desired to use AnimationState::addEmptyAnimation(int, float, float) rather than have the animation
-		/// abruptly cease being applied.
+		/// abruptly cease being applied, leaving the current pose.
 		float getTrackEnd();
 
 		void setTrackEnd(float inValue);

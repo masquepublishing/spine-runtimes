@@ -85,7 +85,7 @@ namespace spine {
 		float getLimit();
 		void setLimit(float limit);
 
-		/// Determines how BonePose::getScaleY() changes when PhysicsConstraintData::getScaleX() sets BonePose::getScaleX().
+		/// Determines how BonePose::getScaleY() changes when getScaleX() sets BonePose::getScaleX().
 		ScaleYMode getScaleYMode();
 		void setScaleYMode(ScaleYMode scaleYMode);
 
