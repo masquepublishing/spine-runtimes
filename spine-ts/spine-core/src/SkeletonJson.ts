@@ -960,7 +960,7 @@ export class SkeletonJson {
 				let mixRotate = getValue(keyMap, "mixRotate", 1);
 				let mixX = getValue(keyMap, "mixX", 1), mixY = getValue(keyMap, "mixY", mixX);
 				let mixScaleX = getValue(keyMap, "mixScaleX", 1), mixScaleY = getValue(keyMap, "mixScaleY", 1);
-				const mixShearY = getValue(keyMap, "mixShearY", 1);
+				let mixShearY = getValue(keyMap, "mixShearY", 1);
 
 				for (let frame = 0, bezier = 0; ; frame++) {
 					timeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
@@ -991,7 +991,7 @@ export class SkeletonJson {
 					mixY = mixY2;
 					mixScaleX = mixScaleX2;
 					mixScaleY = mixScaleY2;
-					mixScaleX = mixScaleX2;
+					mixShearY = mixShearY2;
 					keyMap = nextMap;
 				}
 				timelines.push(timeline);

@@ -4,6 +4,7 @@
 
 ### spine-core
 
+- Fixed JSON transform constraint timelines to carry `mixShearY` forward between keyframes, and fixed world-space `ToShearY` scale-axis handling. (`cef55a40d`)
 - Port of 71999c27: Fixed draw order timelines not mixing out to setup pose.
 - Port of d463f340: Support nonessential slider max.
 
