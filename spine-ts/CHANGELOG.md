@@ -4,6 +4,7 @@
 
 ### spine-core
 
+- Port of 71999c27: Fixed draw order timelines not mixing out to setup pose.
 - Port of d463f340: Support nonessential slider max.
 
 ## 4.3.4 - 2026-05-25

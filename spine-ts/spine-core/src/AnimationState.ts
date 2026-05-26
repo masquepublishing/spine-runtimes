@@ -276,16 +276,16 @@ export class AnimationState {
 		for (let i = 0; i < timelineCount; i++) {
 			const timeline = timelines[i];
 			const mode = timelineMode[i];
+			const fromSetup = (mode & FIRST) !== 0;
 			let alpha = 0;
 			if ((mode & HOLD) !== 0) {
 				const holdMix = timelineHoldMix[i];
 				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
-				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+				if (!drawOrder && timeline instanceof DrawOrderTimeline && !fromSetup) continue;
 				alpha = alphaMix;
 			}
 			from.totalAlpha += alpha;
-			const fromSetup = (mode & FIRST) !== 0;
 			if (!shortestRotation && timeline instanceof RotateTimeline) {
 				this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 			} else if (timeline instanceof AttachmentTimeline)
