@@ -400,7 +400,6 @@ namespace Spine {
 
 							data.additive = GetBoolean(constraintMap, "additive", false);
 							data.loop = GetBoolean(constraintMap, "loop", false);
-							data.setupPose.time = GetFloat(constraintMap, "time", 0);
 							data.setupPose.mix = GetFloat(constraintMap, "mix", 1);
 
 							string boneName = GetString(constraintMap, "bone", null);
@@ -413,8 +412,10 @@ namespace Spine {
 								data.property.offset = GetFloat(constraintMap, "from", 0) * propertyScale;
 								data.offset = GetFloat(constraintMap, "to", 0);
 								data.scale = GetFloat(constraintMap, "scale", 1) / propertyScale;
+								//data.max = constraintMap.getFloat("max", 0); // non-essential
 								data.local = GetBoolean(constraintMap, "local", false);
-							}
+							} else
+								data.setupPose.time = GetFloat(constraintMap, "time", 0);
 
 							skeletonData.constraints.Add(data);
 							break;

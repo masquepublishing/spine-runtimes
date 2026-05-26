@@ -415,7 +415,11 @@ namespace Spine {
 						data.skinRequired = (flags & 1) != 0;
 						data.loop = (flags & 2) != 0;
 						data.additive = (flags & 4) != 0;
-						if ((flags & 8) != 0) data.setupPose.time = input.ReadFloat();
+						if ((flags & 8) != 0) {
+							float value = input.ReadFloat();
+							if (!(nonessential && (flags & 64) != 0)) // skipped non-essential data.max = value;
+								data.setupPose.time = value;
+						}
 						if ((flags & 16) != 0) data.setupPose.mix = (flags & 32) != 0 ? input.ReadFloat() : 1;
 						if ((flags & 64) != 0) {
 							data.local = (flags & 128) != 0;
