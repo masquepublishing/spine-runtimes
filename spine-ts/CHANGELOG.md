@@ -2,27 +2,31 @@
 
 ## Unreleased
 
+### spine-threejs
+
+- Set `forceSinglePass` by default for transparent double-sided Spine materials to preserve slot draw order when negative bone scales flip triangle winding. (`ea0d35121`)
+
 ## 4.3.5 - 2026-05-26
 
 ### spine-core
 
 - Fixed JSON transform constraint timelines to carry `mixShearY` forward between keyframes, and fixed world-space `ToShearY` scale-axis handling. (`cef55a40d`)
-- Port of 71999c27: Fixed draw order timelines not mixing out to setup pose.
-- Port of d463f340: Support nonessential slider max.
+- Port of 71999c27: Fixed draw order timelines not mixing out to setup pose. (`7f6f47cb4`)
+- Port of d463f340: Support nonessential slider max. (`39f6fc167`)
 
 ## 4.3.4 - 2026-05-25
 
 ### spine-core
 
-- Fixed `SkeletonClipping.clipTrianglesUnpacked()` to update its typed output views before returning from inverse clipping.
+- Fixed `SkeletonClipping.clipTrianglesUnpacked()` to update its typed output views before returning from inverse clipping. (`d1981317b`)
 
 ### spine-pixi-v8
 
-- Fixed clipped attachments to force a Pixi batch rebuild when triangle indices change without changing the index count, preventing rendering glitches.
+- Fixed clipped attachments to force a Pixi batch rebuild when triangle indices change without changing the index count, preventing rendering glitches. (`6fc9a8bd4`)
 
 ### spine-ts
 
-- Updated `publish.sh` to prompt for an npm one-time password and pass it to `npm publish`.
+- Updated `publish.sh` to prompt for an npm one-time password and pass it to `npm publish`. (`9624f105a`)
 
 ## 4.3.3 - 2026-05-21
 
