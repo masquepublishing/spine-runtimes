@@ -173,7 +173,7 @@ namespace Spine {
 		Rotate = 0, X, Y, ScaleX, ScaleY, ShearX, ShearY, Inherit, //
 		RGB, Alpha, RGB2, //
 		Attachment, Deform, //
-		Event, DrawOrder, //
+		Event, DrawOrder, DrawOrderFolder, //
 		IkConstraint, TransformConstraint, //
 		PathConstraintPosition, PathConstraintSpacing, PathConstraintMix, //
 		PhysicsConstraintInertia, PhysicsConstraintStrength, PhysicsConstraintDamping, PhysicsConstraintMass, //
@@ -1866,7 +1866,7 @@ namespace Spine {
 
 	/// <summary>Changes the <see cref="Skeleton.DrawOrder"/>.</summary>
 	public class DrawOrderTimeline : Timeline {
-		internal static readonly ulong propertyID = (ulong)Property.DrawOrder;
+		internal static readonly ulong propertyID = (ulong)Property.DrawOrder << 53;
 		new internal static readonly ulong[] propertyIds = { propertyID };
 
 		readonly int[][] drawOrders;
@@ -1920,6 +1920,8 @@ namespace Spine {
 
 	/// <summary>Changes a subset of the <see cref="Skeleton.DrawOrder">draw order</see>.</summary>
 	public class DrawOrderFolderTimeline : Timeline {
+		internal static readonly ulong propertyID = (ulong)Property.DrawOrderFolder << 53;
+
 		private readonly int[] slots;
 		private readonly bool[] inFolder;
 		private readonly int[][] drawOrders;
@@ -1940,7 +1942,7 @@ namespace Spine {
 			int n = slots.Length;
 			var ids = new ulong[n];
 			for (int i = 0; i < n; i++)
-				ids[i] = (ulong)(uint)slots[i];
+				ids[i] = propertyID | (ulong)(uint)slots[i];
 			return ids;
 		}
 
