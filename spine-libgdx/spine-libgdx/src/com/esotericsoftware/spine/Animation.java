@@ -175,7 +175,7 @@ public class Animation {
 		rotate, x, y, scaleX, scaleY, shearX, shearY, inherit, //
 		rgb, alpha, rgb2, //
 		attachment, deform, //
-		event, drawOrder, //
+		event, drawOrder, drawOrderFolder, //
 		ikConstraint, transformConstraint, //
 		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix, //
 		physicsConstraintInertia, physicsConstraintStrength, physicsConstraintDamping, physicsConstraintMass, //
@@ -1759,7 +1759,7 @@ public class Animation {
 
 	/** Changes the {@link Skeleton#getDrawOrder()}. */
 	static public class DrawOrderTimeline extends Timeline {
-		static final long propertyID = Property.drawOrder.ordinal();
+		static final long propertyID = (long)Property.drawOrder.ordinal() << 53;
 		static private final long[] propertyIds = {propertyID};
 
 		private final int[][] drawOrders;
@@ -1809,6 +1809,8 @@ public class Animation {
 
 	/** Changes a subset of the {@link Skeleton#getDrawOrder() draw order}. */
 	static public class DrawOrderFolderTimeline extends Timeline {
+		static private final long propertyID = (long)Property.drawOrderFolder.ordinal() << 53;
+
 		private final int[] slots;
 		private final boolean[] inFolder;
 		private final int[][] drawOrders;
@@ -1829,7 +1831,7 @@ public class Animation {
 			int n = slots.length;
 			var ids = new long[n];
 			for (int i = 0; i < n; i++)
-				ids[i] = slots[i];
+				ids[i] = propertyID | slots[i];
 			return ids;
 		}
 
