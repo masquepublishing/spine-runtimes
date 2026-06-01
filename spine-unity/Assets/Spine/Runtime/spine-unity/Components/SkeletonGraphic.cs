@@ -643,6 +643,7 @@ namespace Spine.Unity {
 		}
 
 		public void PrepareInstructionsAndRenderers (bool isInRebuild = false) {
+			skeleton.SetColor(this.color);
 			if (UsesSingleSubmesh) {
 				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, skeletonDataAsset.atlasAssets[0].PrimaryMaterial);
 				if (canvasRenderers.Count > 0)
