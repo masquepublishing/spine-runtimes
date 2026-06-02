@@ -873,7 +873,7 @@ namespace Spine.Unity {
 			meshGenerator.settings = meshSettings;
 			meshGenerator.Begin();
 
-			if (!currentInstructions.hasActiveClipping)
+			if (!currentInstructions.hasActiveClipping || workingSubmeshInstructions.Count == 0)
 				meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
 			else // if (UsesSingleSubmesh) is always true here in SkeletonGraphic, ensured by caller
 				meshGenerator.AddSubmesh(workingSubmeshInstructions.Items[0], updateTriangles);
