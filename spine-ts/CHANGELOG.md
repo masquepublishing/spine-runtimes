@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+### **BREAKING CHANGES**
+
+- `Animation.apply()` and `Timeline.apply()` now take a `MixFrom` value instead of a boolean `fromSetup` argument. Replace `true` with `MixFrom.setup` and `false` with `MixFrom.current`, and import `MixFrom` from `@esotericsoftware/spine-core`. Caused by port of 1ebd39eb. (`e411dc8ca`)
+
 ### spine-core
 
-- Port of 64606e48: Fixed timeline IDs for draw order. (`1ee8da644`)
+- Port of 1ebd39eb: Fixed mixing timelines without a key on frame 0. (`e411dc8ca`)
+- Port of 64606e48: Fixed timeline IDs for draw order. (`406d774a4`)
 
 ### spine-threejs
 
