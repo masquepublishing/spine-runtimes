@@ -31,6 +31,7 @@
 #define Spine_AnimationState_h
 
 #include <spine/Array.h>
+#include <spine/Map.h>
 #include <spine/Pool.h>
 #include <spine/Property.h>
 #include <spine/SpineObject.h>
@@ -558,7 +559,7 @@ namespace spine {
 		Array<Event *> _events;
 		EventQueue *_queue;
 
-		HashMap<PropertyId, bool> _propertyIDs;
+		Map<PropertyId, bool> _propertyIDs;
 		bool _animationsChanged;
 
 		AnimationStateListener _listener;

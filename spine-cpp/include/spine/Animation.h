@@ -32,7 +32,7 @@
 
 #include <spine/Array.h>
 #include <spine/Color.h>
-#include <spine/HashMap.h>
+#include <spine/Map.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 #include <spine/Property.h>
@@ -172,7 +172,7 @@ namespace spine {
 
 	protected:
 		Array<Timeline *> _timelines;
-		HashMap<PropertyId, bool> _timelineIds;
+		Map<PropertyId, bool> _timelineIds;
 		Array<int> _bones;
 		float _duration;
 		String _name;
