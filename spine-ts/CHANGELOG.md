@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### spine-core
+
+- Port of 64606e48: Fixed timeline IDs for draw order. (`1ee8da644`)
+
 ### spine-threejs
 
 - Set `forceSinglePass` by default for transparent double-sided Spine materials to preserve slot draw order when negative bone scales flip triangle winding. (`ea0d35121`)

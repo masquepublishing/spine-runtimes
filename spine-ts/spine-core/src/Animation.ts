@@ -173,6 +173,7 @@ export enum Property {
 	deform,
 	event,
 	drawOrder,
+	drawOrderFolder,
 	ikConstraint,
 	transformConstraint,
 	pathConstraintPosition,
@@ -1742,6 +1743,8 @@ export class DrawOrderTimeline extends Timeline {
 
 /** Changes a subset of the {@link Skeleton.getDrawOrder | draw order}. */
 export class DrawOrderFolderTimeline extends Timeline {
+	static readonly propertyID = `${Property.drawOrderFolder}`;
+
 	private readonly slots: number[];
 	private readonly inFolder: boolean[];
 	private readonly drawOrders: Array<Array<number> | null>;
@@ -1762,7 +1765,7 @@ export class DrawOrderFolderTimeline extends Timeline {
 		const n = slots.length;
 		const ids = new Array(n);
 		for (let i = 0; i < n; i++)
-			ids[i] = `d${slots[i]}`;
+			ids[i] = `${DrawOrderFolderTimeline.propertyID}|${slots[i]}`;
 		return ids;
 	}
 
