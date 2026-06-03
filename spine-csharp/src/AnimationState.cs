@@ -939,7 +939,8 @@ namespace Spine {
 		}
 
 		private static TValue PutMissing<TKey, TValue> (Dictionary<TKey, TValue> map, TKey key, TValue value) {
-			if (!map.TryGetValue(key, out var existing)) {
+			TValue existing;
+			if (!map.TryGetValue(key, out existing)) {
 				map.Add(key, value);
 				return default(TValue);
 			}

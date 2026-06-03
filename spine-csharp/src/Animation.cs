@@ -523,7 +523,7 @@ namespace Spine {
 			case MixFrom.Setup: return setup;
 			case MixFrom.First: return current + (setup - current) * alpha;
 			case MixFrom.Current: return current;
-			};
+			}
 		}
 	}
 
