@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.3.6 - 2026-06-03
+
 ### **BREAKING CHANGES**
 
 - `Animation.apply()` and `Timeline.apply()` now take a `MixFrom` value instead of a boolean `fromSetup` argument. Replace `true` with `MixFrom.setup` and `false` with `MixFrom.current`, and import `MixFrom` from `@esotericsoftware/spine-core`. Caused by port of 1ebd39eb. (`e411dc8ca`)
