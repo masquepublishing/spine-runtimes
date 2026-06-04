@@ -10,6 +10,7 @@ Recovered from the root `4.3` changelog up to the `4.3.0` release.
 
 ### spine-haxe
 
+- Updated `publish.sh` to optionally move unreleased changelog entries to the new version section with the release date.
 - Fixed mixing timelines without a key on frame 0, ported from spine-libgdx commit `1ebd39eb`. (`2e0d00998`)
 - Fixed timeline IDs for draw order, ported from spine-libgdx commit `64606e48`. (`ce3f4aa57`)
 - Fixed draw order timelines not mixing out to setup pose, ported from spine-libgdx commit `71999c27`. (`af9e14302`)
