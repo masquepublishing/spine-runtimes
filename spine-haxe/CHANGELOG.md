@@ -4,8 +4,13 @@ Recovered from the root `4.3` changelog up to the `4.3.0` release.
 
 ## Unreleased
 
+### **BREAKING CHANGES**
+
+- `Animation.apply()` and `Timeline.apply()` now take a `MixFrom` value instead of a boolean `fromSetup` argument. Replace `true` with `MixFrom.setup` and `false` with `MixFrom.current`, and import `spine.animation.MixFrom`. Caused by port of spine-libgdx commit `1ebd39eb`. (`2e0d00998`)
+
 ### spine-haxe
 
+- Fixed mixing timelines without a key on frame 0, ported from spine-libgdx commit `1ebd39eb`. (`2e0d00998`)
 - Fixed timeline IDs for draw order, ported from spine-libgdx commit `64606e48`. (`ce3f4aa57`)
 - Fixed draw order timelines not mixing out to setup pose, ported from spine-libgdx commit `71999c27`. (`af9e14302`)
 - Renamed the `BoundsProvider` source folder to `boundsprovider` to match its package name and fix compilation on case-sensitive filesystems. (`25c38723d`)

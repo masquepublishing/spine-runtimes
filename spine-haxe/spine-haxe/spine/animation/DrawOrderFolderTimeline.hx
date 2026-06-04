@@ -90,13 +90,12 @@ class DrawOrderFolderTimeline extends Timeline {
 		drawOrders[frame] = drawOrder;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
-			appliedPose:Bool) {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool, appliedPose:Bool) {
 		if (out) {
-			if (fromSetup)
+			if (from != MixFrom.current)
 				setupApply(skeleton, appliedPose);
 		} else if (time < frames[0]) {
-			if (fromSetup)
+			if (from != MixFrom.current)
 				setupApply(skeleton, appliedPose);
 		} else {
 			var order = drawOrders[Timeline.search1(frames, time)];

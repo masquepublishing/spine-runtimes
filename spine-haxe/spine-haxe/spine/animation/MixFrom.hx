@@ -29,13 +29,14 @@
 
 package spine.animation;
 
-/** Changes a bone's local spine.Bone.scaleY. */
-class ScaleYTimeline extends BoneTimeline1 {
-	public function new(frameCount:Int, bezierCount:Int, boneIndex:Int) {
-		super(frameCount, bezierCount, boneIndex, Property.scaleY);
-	}
+/** Controls whether alpha and add mix from current or setup pose values and what happens before the first key. */
+enum abstract MixFrom(Int) from Int to Int {
+	/** Alpha mixes from the current pose. Before the first key, no change is made. */
+	var current = 0;
 
-	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, from:MixFrom, add:Bool, out:Bool) {
-		pose.scaleY = getScaleValue(time, alpha, from, add, out, pose.scaleY, setup.scaleY);
-	}
+	/** Alpha mixes from the setup pose. Before the first key, the setup pose is used. */
+	var setup = 1;
+
+	/** Alpha mixes from the current pose. Before the first key, alpha mixes from the current pose to the setup pose. */
+	var first = 2;
 }
