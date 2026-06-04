@@ -35,6 +35,8 @@ import spine.Slot;
 
 /** Changes a subset of a skeleton's spine.Skeleton.drawOrder. */
 class DrawOrderFolderTimeline extends Timeline {
+	public static final propertyID = Property.drawOrderFolder;
+
 	private var slots:Array<Int>;
 	private var inFolder:Array<Bool>;
 	private var drawOrders:Array<Array<Int>>;
@@ -59,7 +61,7 @@ class DrawOrderFolderTimeline extends Timeline {
 		var n = slots.length;
 		var ids = new Array();
 		for (i in 0...n)
-			ids[i] = "d" + slots[i];
+			ids[i] = propertyID + "|" + slots[i];
 		return ids;
 	}
 
