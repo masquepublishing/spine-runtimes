@@ -6,7 +6,8 @@ Recovered from the root `4.3` changelog up to the `4.3.0` release.
 
 ### spine-haxe
 
-- Fixed draw order timelines not mixing out to setup pose, ported from spine-libgdx commit `71999c27`.
+- Fixed draw order timelines not mixing out to setup pose, ported from spine-libgdx commit `71999c27`. (`af9e14302`)
+- Renamed the `BoundsProvider` source folder to `boundsprovider` to match its package name and fix compilation on case-sensitive filesystems. (`25c38723d`)
 - Ported support for nonessential slider constraint `max` data from spine-libgdx commit `d463f3406`. (`b1a875db4`)
 - Fixed bones that don't inherit rotation when parent scale is near zero, ported from spine-libgdx commit `7dc4d495`. (`0f9a56929`)
 - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance, ported from spine-libgdx commit `6532b08b`. (`f046a8233`)
