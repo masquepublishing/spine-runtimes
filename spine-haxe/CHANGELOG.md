@@ -4,6 +4,8 @@ Recovered from the root `4.3` changelog up to the `4.3.0` release.
 
 ## Unreleased
 
+## 4.3.1 - 2026-06-04
+
 ### **BREAKING CHANGES**
 
 - `Animation.apply()` and `Timeline.apply()` now take a `MixFrom` value instead of a boolean `fromSetup` argument. Replace `true` with `MixFrom.setup` and `false` with `MixFrom.current`, and import `spine.animation.MixFrom`. Caused by port of spine-libgdx commit `1ebd39eb`. (`2e0d00998`)
