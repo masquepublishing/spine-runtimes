@@ -2,6 +2,8 @@ name: Build spine-ts
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'spine-ts/**'
   workflow_dispatch:

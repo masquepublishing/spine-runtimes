@@ -2,6 +2,8 @@ name: Build spine-haxe
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'spine-haxe/**'
   workflow_dispatch:
