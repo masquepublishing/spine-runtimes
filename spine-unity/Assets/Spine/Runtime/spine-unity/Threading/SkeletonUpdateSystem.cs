@@ -708,11 +708,11 @@ namespace Spine.Unity {
 					int rendererStartIndex = partition.rangeStart;
 					int countAtTask = partition.rangeEndExclusive - rendererStartIndex;
 #if READ_VOLATILE_ONCE
-					int updatedAtWorkerThread = skeletonsLateUpdatedAtTask[t];
+					int updatedAtWorkerThread = Volatile.Read(ref skeletonsLateUpdatedAtTask[t]);
 
 					while (mainThreadProcessedAtTask[t] < updatedAtWorkerThread) {
 #else
-					while (mainThreadProcessed[t] < skeletonsLateUpdatedAtThread[t]) {
+					while (mainThreadProcessedAtTask[t] < Volatile.Read(ref skeletonsLateUpdatedAtTask[t])) {
 #endif
 						wasWorkAvailable = true;
 						int r = mainThreadProcessedAtTask[t] + rendererStartIndex;
@@ -725,7 +725,7 @@ namespace Spine.Unity {
 #if READ_VOLATILE_ONCE
 					if (updatedAtWorkerThread < countAtTask) {
 #else
-					if (skeletonsLateUpdatedAtThread[t] < countAtTask) {
+					if (Volatile.Read(ref skeletonsLateUpdatedAtTask[t]) < countAtTask) {
 #endif
 						anySkeletonsLeft = true;
 					}
