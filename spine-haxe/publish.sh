@@ -19,12 +19,23 @@ minor=$(echo "$currentVersion" | cut -d. -f2)
 patch=$(echo "$currentVersion" | cut -d. -f3)
 newPatch=$((patch + 1))
 newVersion="$major.$minor.$newPatch"
+tag="spine-haxe-$newVersion"
 
 log_title "Spine-Haxe Publish"
 
 log_detail "Branch: $BRANCH"
 log_detail "Current version: $currentVersion"
 log_detail "New version: $newVersion"
+log_detail "Release tag: $tag"
+
+log_action "Validating release tag"
+if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+    log_fail
+    log_error_output "Tag $tag already exists."
+    exit 1
+else
+    log_ok
+fi
 
 CHANGELOG_FILE="CHANGELOG.md"
 if [ -f "$CHANGELOG_FILE" ]; then
@@ -112,8 +123,8 @@ else
     exit 1
 fi
 
-echo "Write Y if you want to commit and push the new version $newVersion."
-echo "This will trigger a pipeline that will publish the new version on esoteric software server."
+echo "Write Y if you want to commit, tag, and push the new version $newVersion."
+echo "This will create and push tag $tag, which triggers the CI pipeline that publishes the new version on the Esoteric Software server."
 echo "Do you want to proceed [y/n]?"
 
 read answer
@@ -126,11 +137,20 @@ if [ "$answer" = "Y" ] || [ "$answer" = "y" ]; then
         log_error_output "$COMMIT_OUTPUT"
         exit 1
     fi
-    
-    log_action "Pushing to origin"
-    if PUSH_OUTPUT=$(git push origin "$BRANCH" 2>&1); then
+
+    log_action "Creating tag $tag"
+    if TAG_OUTPUT=$(git tag "$tag" 2>&1); then
         log_ok
-        log_summary "✓ Version $newVersion published successfully"
+    else
+        log_fail
+        log_error_output "$TAG_OUTPUT"
+        exit 1
+    fi
+
+    log_action "Pushing release branch and tag to origin"
+    if PUSH_OUTPUT=$(git push --atomic origin "$BRANCH" "$tag" 2>&1); then
+        log_ok
+        log_summary "✓ Version $newVersion tagged and pushed successfully"
     else
         log_fail
         log_error_output "$PUSH_OUTPUT"
