@@ -101,13 +101,44 @@ You can then find an uber-jar of SkeletonViewer in `spine-skeletonviewer/build/l
 
 # Releasing
 
-`spine-libgdx` and `spine-android` are released together from a `spine-libgdx-<version>` tag. Before tagging, commit the release version in `spine-libgdx/gradle.properties` without the `-SNAPSHOT` suffix, for example `version=4.3.2`.
+`spine-libgdx` and `spine-android` are released together. `spine-android` uses the version from `spine-libgdx/gradle.properties`.
 
-After the release version commit is on the target branch, tag that exact commit and push the tag:
+1. Set the release version in `spine-libgdx/gradle.properties`:
 
 ```
-git tag spine-libgdx-4.3.2 <commit>
+version=4.3.2
+```
+
+Do not use `-SNAPSHOT` for a release.
+
+2. Commit and push the release version:
+
+```
+git add spine-libgdx/gradle.properties
+git commit -m "[libgdx][android] Release 4.3.2"
+git push origin 4.3
+```
+
+3. Tag that commit and push the tag:
+
+```
+git tag spine-libgdx-4.3.2
 git push origin spine-libgdx-4.3.2
 ```
 
-The GitHub Actions release workflow verifies that the tag version matches `spine-libgdx/gradle.properties`, publishes `spine-libgdx`, then publishes the lock-step `spine-android` artifact with the same version. After the release, bump `spine-libgdx/gradle.properties` to the next `-SNAPSHOT` version in a follow-up commit.
+The tag triggers the GitHub Actions release workflow. It verifies the tag version, publishes `spine-libgdx`, then publishes `spine-android`.
+
+4. Check the workflow result and Maven Central.
+
+If JReleaser fails before upload/validation, the artifacts were not published. If JReleaser uploads and validates successfully but later times out waiting for Central Portal's publishing step, the GitHub job may fail even though publishing still succeeds. Check Central Portal or Maven Central before retrying.
+
+5. Bump to the next snapshot and push:
+
+```
+# spine-libgdx/gradle.properties
+version=4.3.3-SNAPSHOT
+
+git add spine-libgdx/gradle.properties
+git commit -m "[libgdx][android] Begin 4.3.3-SNAPSHOT"
+git push origin 4.3
+```
