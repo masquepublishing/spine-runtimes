@@ -645,6 +645,12 @@ namespace Spine.Unity {
 				skeletonsLateUpdatedAtTask[t] = 0;
 			}
 #endif
+			if (exceptions == null) {
+				exceptions = new Exception[numThreads];
+				exceptionObjects = new UnityEngine.Object[numThreads];
+			}
+			numExceptionsSet = 0;
+
 			isProcessingRenderers = true;
 			MainThreadPrepareLateUpdate(endIndexThreaded);
 
