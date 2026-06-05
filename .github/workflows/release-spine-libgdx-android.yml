@@ -74,12 +74,15 @@ jobs:
       - name: Publish spine-libgdx release
         working-directory: spine-libgdx
         run: |
-          ./gradlew build publishRelease -PRELEASE \
+          ./gradlew build :spine-libgdx:publishReleasePublicationToSonaTypeRepository -PRELEASE \
             -PMAVEN_USERNAME="$MAVEN_USERNAME" \
             -PMAVEN_PASSWORD="$MAVEN_PASSWORD" \
             -Psigning.gnupg.keyId="$GPG_KEYID" \
             -Psigning.gnupg.passphrase="$GPG_PASSPHRASE" \
             -Psigning.gnupg.keyName="$GPG_KEYID"
+          ./gradlew jreleaserDeploy -PRELEASE \
+            -PMAVEN_USERNAME="$MAVEN_USERNAME" \
+            -PMAVEN_PASSWORD="$MAVEN_PASSWORD"
 
   publish-spine-android:
     name: Publish spine-android
@@ -145,9 +148,12 @@ jobs:
       - name: Publish spine-android release
         working-directory: spine-android
         run: |
-          ./gradlew :spine-android:assembleRelease :spine-android:publishRelease -PRELEASE \
+          ./gradlew :spine-android:assembleRelease :spine-android:publishReleasePublicationToSonaTypeRepository -PRELEASE \
             -PMAVEN_USERNAME="$MAVEN_USERNAME" \
             -PMAVEN_PASSWORD="$MAVEN_PASSWORD" \
             -Psigning.gnupg.keyId="$GPG_KEYID" \
             -Psigning.gnupg.passphrase="$GPG_PASSPHRASE" \
             -Psigning.gnupg.keyName="$GPG_KEYID"
+          ./gradlew :spine-android:jreleaserDeploy -PRELEASE \
+            -PMAVEN_USERNAME="$MAVEN_USERNAME" \
+            -PMAVEN_PASSWORD="$MAVEN_PASSWORD"
