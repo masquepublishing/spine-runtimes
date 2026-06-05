@@ -1,3 +1,10 @@
+# 4.3.3
+
+## Flutter
+
+- **Additions**
+  - Added GitHub Actions release automation for spine-flutter.
+
 # 4.3.2
 
 ## Flutter
