@@ -20,22 +20,30 @@ minor=$(echo "$currentVersion" | cut -d. -f2)
 patch=$(echo "$currentVersion" | cut -d. -f3)
 newPatch=$((patch + 1))
 newVersion="$major.$minor.$newPatch"
+tag="spine-ts-$newVersion"
 
 log_detail "Branch: $BRANCH"
 log_detail "Current version: $currentVersion"
 log_detail "New version: $newVersion"
+log_detail "Release tag: $tag"
+
+log_action "Validating release tag"
+if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+    log_fail
+    log_error_output "Tag $tag already exists."
+    exit 1
+else
+    log_ok
+fi
 
 CHANGELOG_FILE="CHANGELOG.md"
 if [ -f "$CHANGELOG_FILE" ]; then
-    unreleasedChanges=$(python3 - <<'PY'
-from pathlib import Path
-import re
-
-text = Path("CHANGELOG.md").read_text()
-match = re.search(r"(?ms)^## Unreleased\s*\n(?P<body>.*?)(?=^##\s+)", text)
-if match and match.group("body").strip():
-    print("yes")
-PY
+    unreleasedChanges=$(node <<'NODE'
+const fs = require("fs");
+const text = fs.readFileSync("CHANGELOG.md", "utf8");
+const match = text.match(/^## Unreleased\s*\n(?<body>.*?)(?=^##\s+)/ms);
+if (match?.groups?.body.trim()) console.log("yes");
+NODE
 )
 
     if [ "$unreleasedChanges" = "yes" ]; then
@@ -45,27 +53,22 @@ PY
             [yY]|[yY][eE][sS])
                 today=$(date +%Y-%m-%d)
                 log_action "Updating CHANGELOG.md"
-                if CHANGELOG_OUTPUT=$(NEW_VERSION="$newVersion" RELEASE_DATE="$today" python3 - <<'PY' 2>&1
-from pathlib import Path
-import os
-import re
-import sys
-
-path = Path("CHANGELOG.md")
-text = path.read_text()
-version = os.environ["NEW_VERSION"]
-date = os.environ["RELEASE_DATE"]
-match = re.search(r"(?ms)^## Unreleased\s*\n(?P<body>.*?)(?=^##\s+)", text)
-if not match:
-    print("Could not find an Unreleased section in CHANGELOG.md", file=sys.stderr)
-    sys.exit(1)
-body = match.group("body").strip()
-if not body:
-    sys.exit(0)
-replacement = f"## Unreleased\n\n## {version} - {date}\n\n{body}\n\n"
-text = text[:match.start()] + replacement + text[match.end():]
-path.write_text(text)
-PY
+                if CHANGELOG_OUTPUT=$(NEW_VERSION="$newVersion" RELEASE_DATE="$today" node <<'NODE' 2>&1
+const fs = require("fs");
+const path = "CHANGELOG.md";
+const text = fs.readFileSync(path, "utf8");
+const version = process.env.NEW_VERSION;
+const date = process.env.RELEASE_DATE;
+const match = /^## Unreleased\s*\n(?<body>.*?)(?=^##\s+)/ms.exec(text);
+if (!match) {
+    console.error("Could not find an Unreleased section in CHANGELOG.md");
+    process.exit(1);
+}
+const body = match.groups.body.trim();
+if (!body) process.exit(0);
+const replacement = `## Unreleased\n\n## ${version} - ${date}\n\n${body}\n\n`;
+fs.writeFileSync(path, text.slice(0, match.index) + replacement + text.slice(match.index + match[0].length));
+NODE
                 ); then
                     log_ok
                 else
@@ -102,27 +105,43 @@ packages=(
 
 for package in "${packages[@]}"; do
     log_action "Updating $package"
-    if SED_OUTPUT=$(sed -i '' "s/$currentVersion/$newVersion/" "$package" 2>&1); then
+    if UPDATE_OUTPUT=$(PACKAGE_PATH="$package" CURRENT_VERSION="$currentVersion" NEW_VERSION="$newVersion" node <<'NODE' 2>&1
+const fs = require("fs");
+const path = process.env.PACKAGE_PATH;
+const currentVersion = process.env.CURRENT_VERSION;
+const newVersion = process.env.NEW_VERSION;
+const text = fs.readFileSync(path, "utf8");
+if (!text.includes(currentVersion)) {
+    console.error(`${currentVersion} not found in ${path}`);
+    process.exit(1);
+}
+fs.writeFileSync(path, text.split(currentVersion).join(newVersion));
+NODE
+    ); then
         log_ok
     else
         log_fail
-        log_error_output "$SED_OUTPUT"
+        log_error_output "$UPDATE_OUTPUT"
         exit 1
     fi
 done
 
 log_action "Removing package-lock.json"
-if RM_OUTPUT=$(rm package-lock.json 2>&1); then
+if RM_OUTPUT=$(rm -f package-lock.json 2>&1); then
     log_ok
 else
-    log_warn
+    log_fail
+    log_error_output "$RM_OUTPUT"
+    exit 1
 fi
 
 log_action "Cleaning @esotericsoftware modules"
 if RM_OUTPUT=$(rm -rf node_modules/@esotericsoftware 2>&1); then
     log_ok
 else
-    log_warn
+    log_fail
+    log_error_output "$RM_OUTPUT"
+    exit 1
 fi
 
 log_action "Installing workspace dependencies"
@@ -134,14 +153,41 @@ else
     exit 1
 fi
 
-read -p "npm OTP: " NPM_OTP
+echo "Write Y if you want to commit, tag, and push the new version $newVersion."
+echo "This will create and push tag $tag, which triggers the CI pipeline that publishes the npm packages and uploads the web artifacts."
+echo "Do you want to proceed [y/n]?"
 
-log_action "Publishing all workspaces"
-if NPM_OUTPUT=$(npm publish --access public --workspaces --otp="$NPM_OTP" 2>&1); then
-    log_ok
-    log_summary "✓ TypeScript packages published successfully with version $newVersion"
+read answer
+if [ "$answer" = "Y" ] || [ "$answer" = "y" ]; then
+    log_action "Committing changes"
+    if COMMIT_OUTPUT=$(git add CHANGELOG.md package-lock.json "${packages[@]}" && git commit -m "[ts] Release $newVersion" 2>&1); then
+        log_ok
+    else
+        log_fail
+        log_error_output "$COMMIT_OUTPUT"
+        exit 1
+    fi
+
+    log_action "Creating tag $tag"
+    if TAG_OUTPUT=$(git tag "$tag" 2>&1); then
+        log_ok
+    else
+        log_fail
+        log_error_output "$TAG_OUTPUT"
+        exit 1
+    fi
+
+    log_action "Pushing release branch and tag to origin"
+    if PUSH_OUTPUT=$(git push --atomic origin "$BRANCH" "$tag" 2>&1); then
+        log_ok
+        log_summary "✓ Version $newVersion tagged and pushed successfully"
+    else
+        log_fail
+        log_error_output "$PUSH_OUTPUT"
+        exit 1
+    fi
 else
-    log_fail
-    log_error_output "$NPM_OUTPUT"
-    exit 1
+    log_action "Publishing version"
+    log_skip
+    log_summary "Version updated locally only"
 fi

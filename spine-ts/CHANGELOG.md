@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### spine-ts
+
+- Updated release automation to publish from `spine-ts-x.y.z` tags via GitHub Actions and npm trusted publishing.
+
 ## 4.3.7 - 2026-06-05
 
 ### spine-pixi-v8

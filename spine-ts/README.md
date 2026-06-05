@@ -151,3 +151,82 @@ The final command `npm run dev` will start a local web server at http://127.0.0.
 You can then open Visual Studio Code to inspect, edit, and debug the source code. We also supply launch configurations to start examples and demos in debug mode, so you can debug them right inside Visual Studio code.
 
 To build the artifacts as they are published to NPM, run `npm run build`.
+
+## Releasing
+
+`spine-ts` is released to [npm](https://www.npmjs.com/search?q=%40esotericsoftware) and as a web artifacts zip using GitHub Actions. The release workflow is triggered by tags from `EsotericSoftware/spine-runtimes` matching `spine-ts-x.y.z`, for example `spine-ts-4.3.8`.
+
+### One-time npm trusted publishing setup
+
+Before the GitHub Actions workflow can publish to npm, each published package must be configured on npmjs.com to trust this repository workflow. For each `@esotericsoftware` spine-ts package, open the package settings on npmjs.com and configure **Trusted Publisher**:
+
+- Publisher: `GitHub Actions`
+- Organization or user: `EsotericSoftware`
+- Repository: `spine-runtimes`
+- Workflow filename: `spine-ts.yml`
+- Environment name: leave empty unless the workflow is later changed to use a GitHub environment
+- Allowed actions: `npm publish`
+
+Configure this for:
+
+- `@esotericsoftware/spine-core`
+- `@esotericsoftware/spine-canvas`
+- `@esotericsoftware/spine-canvaskit`
+- `@esotericsoftware/spine-webgl`
+- `@esotericsoftware/spine-player`
+- `@esotericsoftware/spine-webcomponents`
+- `@esotericsoftware/spine-threejs`
+- `@esotericsoftware/spine-phaser-v3`
+- `@esotericsoftware/spine-phaser-v4`
+- `@esotericsoftware/spine-pixi-v7`
+- `@esotericsoftware/spine-pixi-v8`
+
+Trusted publishing lets the workflow publish using GitHub OIDC instead of a long-lived npm token. npm also automatically publishes provenance for public packages released this way, which should show the npm provenance/verified badge.
+
+### Release process
+
+The manual process is shown below for reference, but it is normally performed automatically by running `./publish.sh` from the `spine-ts/` folder on a release branch such as `4.3`. The script increments the patch version, optionally updates `CHANGELOG.md`, updates all workspace package versions and internal dependencies, refreshes `package-lock.json`, commits the changes, creates the matching `spine-ts-x.y.z` tag, and pushes the branch and tag.
+
+1. Set the release version in the root `spine-ts/package.json` and every workspace `package.json`. Internal `@esotericsoftware/spine-*` dependencies must use the same version:
+
+```json
+"version": "4.3.8"
+```
+
+2. Refresh `spine-ts/package-lock.json`:
+
+```bash
+cd spine-ts
+npm install --workspaces
+```
+
+3. Add a matching entry to `spine-ts/CHANGELOG.md`. If previous commits already documented the changes under `## Unreleased`, usually all you need to do is add the release heading below `## Unreleased` and move those entries under it:
+
+```md
+## Unreleased
+
+## 4.3.8 - 2026-06-05
+
+### spine-ts
+
+- Existing unreleased changelog entries...
+```
+
+4. Commit and push the release version:
+
+```bash
+git add spine-ts/package.json spine-ts/package-lock.json spine-ts/spine-*/package.json spine-ts/CHANGELOG.md
+git commit -m "[ts] Release 4.3.8"
+git push origin 4.3
+```
+
+5. Tag that commit and push the tag:
+
+```bash
+git tag spine-ts-4.3.8
+git push origin spine-ts-4.3.8
+```
+
+The tag triggers the GitHub Actions release workflow. It verifies the tag version matches every package, builds all packages, uploads `spine-ts.zip` to the Esoteric Software server for the matching release line, for example `4.3`, and publishes all npm workspaces using trusted publishing.
+
+6. Check the workflow result, the uploaded zip archive, and the npm package pages.
