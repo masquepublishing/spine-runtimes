@@ -437,6 +437,10 @@ namespace Spine.Unity {
 		protected void OnBecameVisible () {
 			UpdateMode previousUpdateMode = updateMode;
 			updateMode = UpdateMode.FullUpdate;
+
+			// onCullStateChanged(culled: false) may be called when the GameObject is still disabled
+			if (!this.isActiveAndEnabled) return;
+
 			// OnBecameVisible is called after Update and LateUpdate()
 			if (previousUpdateMode != UpdateMode.FullUpdate) {
 				if (skeletonAnimation != null)
@@ -774,7 +778,9 @@ namespace Spine.Unity {
 					if (canvasRenderer.transform.parent != parent.transform && !isInRebuild)
 						canvasRenderer.transform.SetParent(parent.transform, false);
 
-					canvasRenderer.transform.SetSiblingIndex(targetSiblingIndex++);
+					int s = targetSiblingIndex++;
+					if (canvasRenderer.transform.GetSiblingIndex() != s)
+						canvasRenderer.transform.SetSiblingIndex(s);
 				}
 
 				SkeletonSubmeshGraphic submeshGraphic = submeshGraphics[i];
