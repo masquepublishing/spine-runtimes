@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   validate-spine-flutter:
@@ -74,12 +75,6 @@ jobs:
       - name: Verify generated spine-flutter source files are committed
         run: git diff --exit-code -- spine-flutter ':!spine-flutter/lib/assets/libspine_flutter.wasm'
 
-  publish-spine-flutter:
-    name: Publish spine-flutter
-    needs: validate-spine-flutter
-    permissions:
-      id-token: write
-      contents: read
-    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
-    with:
-      working-directory: spine-flutter
+      - name: Publish spine-flutter release
+        working-directory: spine-flutter
+        run: dart pub publish --force

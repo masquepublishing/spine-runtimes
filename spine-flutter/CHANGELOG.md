@@ -1,3 +1,10 @@
+# 4.3.4
+
+## Flutter
+
+- **Bug fixes**
+  - Fixed automated release publishing so native source files are included in the pub.dev package.
+
 # 4.3.3
 
 ## Flutter
