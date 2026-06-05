@@ -98,3 +98,16 @@ To build SkeletonViewer, run:
 ```
 
 You can then find an uber-jar of SkeletonViewer in `spine-skeletonviewer/build/libs/spine-skeletonviewer.jar`. You can run it via `java -jar spine-skeletonviewer.jar` or double clicking it in the file explorer.
+
+# Releasing
+
+`spine-libgdx` and `spine-android` are released together from a `spine-libgdx-<version>` tag. Before tagging, commit the release version in `spine-libgdx/gradle.properties` without the `-SNAPSHOT` suffix, for example `version=4.3.2`.
+
+After the release version commit is on the target branch, tag that exact commit and push the tag:
+
+```
+git tag spine-libgdx-4.3.2 <commit>
+git push origin spine-libgdx-4.3.2
+```
+
+The GitHub Actions release workflow verifies that the tag version matches `spine-libgdx/gradle.properties`, publishes `spine-libgdx`, then publishes the lock-step `spine-android` artifact with the same version. After the release, bump `spine-libgdx/gradle.properties` to the next `-SNAPSHOT` version in a follow-up commit.

@@ -788,11 +788,11 @@ public class AnimationState {
 		LongMap<TrackEntry> propertyIds = this.propertyIds;
 		int from = SETUP;
 		for (int i = 0, n = ids.length; i < n; i++) {
-			TrackEntry owner = putMissing(propertyIds, ids[i], track);
+			TrackEntry owner = propertyIds.putMissing(ids[i], track);
 			if (owner != null) {
 				if (owner != track) {
 					while (++i < n)
-						putMissing(propertyIds, ids[i], track);
+						propertyIds.putMissing(ids[i], track);
 					return CURRENT;
 				}
 				from = FIRST;
@@ -803,12 +803,6 @@ public class AnimationState {
 			if (first != null) return first != track ? CURRENT : FIRST;
 		}
 		return from;
-	}
-
-	private TrackEntry putMissing (LongMap<TrackEntry> map, long key, TrackEntry value) {
-		TrackEntry existing = map.get(key);
-		if (existing == null) map.put(key, value);
-		return existing;
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
