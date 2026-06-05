@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.3.7 - 2026-06-05
+
 ### spine-pixi-v8
 
 - Optimize pixi v8 inactive slot rendering. See #3103.
