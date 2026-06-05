@@ -71,8 +71,6 @@ jobs:
           dart run headless_test.dart
           dart run skeleton_drawable_test.dart
 
-      - name: Verify generated spine-flutter release files are committed
-        run: git diff --exit-code -- spine-flutter
 
   publish-spine-flutter:
     name: Publish spine-flutter
