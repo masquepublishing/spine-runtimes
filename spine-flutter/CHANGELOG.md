@@ -1,3 +1,10 @@
+# 4.3.2
+
+## Flutter
+
+- **Bug fixes**
+  - Updated bundled spine-c/spine-cpp sources and WebAssembly assets for the 4.3 release.
+
 # 4.3.1
 
 ## Flutter
