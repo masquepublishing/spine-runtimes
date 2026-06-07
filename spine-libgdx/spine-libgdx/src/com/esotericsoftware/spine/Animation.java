@@ -240,7 +240,7 @@ public class Animation {
 		/** True if this timeline supports being applied additively.
 		 * <p>
 		 * See the <code>add</code> parameter in
-		 * {@link Timeline#apply(Skeleton, float, float, Array, float, MixFrom, boolean, boolean, boolean)}. */
+		 * {@link #apply(Skeleton, float, float, Array, float, MixFrom, boolean, boolean, boolean)}. */
 		public boolean getAdditive () {
 			return additive;
 		}
@@ -456,7 +456,7 @@ public class Animation {
 		/** Returns the interpolated value for properties relative to the setup value. The timeline value is added to the setup
 		 * value, rather than replacing it.
 		 * <p>
-		 * See {@link Timeline#apply(Skeleton, float, float, Array, float, MixFrom, boolean, boolean, boolean)}.
+		 * See {@link #apply(Skeleton, float, float, Array, float, MixFrom, boolean, boolean, boolean)}.
 		 * @param current The current value for the property.
 		 * @param setup The setup value for the property. */
 		public float getRelativeValue (float time, float alpha, MixFrom from, boolean add, float current, float setup) {
@@ -468,7 +468,7 @@ public class Animation {
 		/** Returns the interpolated value for properties set as absolute values. The timeline value replaces the setup value,
 		 * rather than being relative to it.
 		 * <p>
-		 * See {@link Timeline#apply(Skeleton, float, float, Array, float, MixFrom, boolean, boolean, boolean)}.
+		 * See {@link #apply(Skeleton, float, float, Array, float, MixFrom, boolean, boolean, boolean)}.
 		 * @param current The current value for the property.
 		 * @param setup The setup value for the property. */
 		public float getAbsoluteValue (float time, float alpha, MixFrom from, boolean add, float current, float setup) {
@@ -481,7 +481,7 @@ public class Animation {
 		/** Returns the interpolated value for properties set as absolute values, using the specified timeline value rather than
 		 * calling {@link #getCurveValue(float)}.
 		 * <p>
-		 * See {@link Timeline#apply(Skeleton, float, float, Array, float, MixFrom, boolean, boolean, boolean)}.
+		 * See {@link #apply(Skeleton, float, float, Array, float, MixFrom, boolean, boolean, boolean)}.
 		 * @param current The current value for the property.
 		 * @param setup The setup value for the property.
 		 * @param value The timeline value to apply. */
@@ -494,7 +494,7 @@ public class Animation {
 
 		/** Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.
 		 * <p>
-		 * See {@link Timeline#apply(Skeleton, float, float, Array, float, MixFrom, boolean, boolean, boolean)}.
+		 * See {@link #apply(Skeleton, float, float, Array, float, MixFrom, boolean, boolean, boolean)}.
 		 * @param current The current value for the property.
 		 * @param setup The setup value for the property. */
 		public float getScaleValue (float time, float alpha, MixFrom from, boolean add, boolean out, float current, float setup) {
