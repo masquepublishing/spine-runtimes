@@ -367,7 +367,8 @@ namespace Spine.Unity {
 				layerCount = animator.layerCount;
 				MigrateLayerBlendModes();
 #if UNITY_EDITOR
-				GetLayerBlendModes();
+				if (!Application.isPlaying)
+					GetLayerBlendModes();
 #endif
 				if (layerIsAdditive.Length < layerCount)
 					System.Array.Resize<bool>(ref layerIsAdditive, layerCount);
