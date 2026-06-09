@@ -622,7 +622,15 @@ namespace Spine.Unity {
 			if (canPrepareInstructions)
 				PrepareInstructionsAndRenderers();
 
+			bool hasGenerateMeshOverride = generateMeshOverride != null;
 			updateTriangles = UpdateBuffersToInstructions(calledFromMainThread);
+			if (hasGenerateMeshOverride && disableRenderingOnOverride) {
+#if USE_THREADED_SKELETON_UPDATE
+				requiresMeshBufferAssignmentMainThread = false;
+#endif
+				return;
+			}
+
 #if USE_THREADED_SKELETON_UPDATE
 			if (calledFromMainThread) {
 				requiresMeshBufferAssignmentMainThread = false;
