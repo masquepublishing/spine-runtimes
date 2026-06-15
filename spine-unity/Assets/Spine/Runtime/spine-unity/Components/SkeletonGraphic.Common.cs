@@ -196,6 +196,7 @@ namespace Spine.Unity {
 
 		// Overrides Properties
 		public bool HasGenerateMeshOverride { get { return generateMeshOverride != null; } }
+		public bool MaterialsNeedUpdate { get { return materialsNeedUpdate; } set { materialsNeedUpdate = value; } }
 
 		/// <summary>Allows separate code to take over rendering for this SkeletonRenderer component. The subscriber is passed a SkeletonRendererInstruction argument to determine how to render a skeleton.</summary>
 		public event InstructionDelegate GenerateMeshOverride {
