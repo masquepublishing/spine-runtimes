@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### spine-construct3
+
+- Added the official spine-construct3 runtime/plugin.
+
 ### spine-ts
 
 - Updated release automation to publish from `spine-ts-x.y.z` tags via GitHub Actions and npm trusted publishing.
