@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.3.8 - 2026-06-19
+
 ### spine-construct3
 
 - Added the official spine-construct3 runtime/plugin.
