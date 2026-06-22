@@ -13,7 +13,7 @@
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/esotericsoftware/spine-runtimes.git"
+    "url": "git+https://github.com/EsotericSoftware/spine-runtimes.git"
   },
   "keywords": [
     "gamedev",
