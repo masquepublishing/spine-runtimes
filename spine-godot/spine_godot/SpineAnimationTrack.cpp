@@ -38,6 +38,8 @@
 #include "scene/animation/animation_player.h"
 #include "scene/resources/animation.h"
 
+#include <cfloat>
+
 #ifdef TOOLS_ENABLED
 #if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 5)
 #include "editor/animation/animation_player_editor_plugin.h"
@@ -178,11 +180,19 @@ void SpineAnimationTrack::setup_animation_player() {
 		animation_player->set_owner(sprite->get_owner());
 	} else {
 #if VERSION_MAJOR > 3
+#if VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
+		LocalVector<StringName> animation_libraries;
+		animation_player->get_animation_library_list(&animation_libraries);
+		for (uint32_t i = 0; i < animation_libraries.size(); i++) {
+			animation_player->remove_animation_library(animation_libraries[i]);
+		}
+#else
 		List<StringName> animation_libraries;
 		animation_player->get_animation_library_list(&animation_libraries);
 		for (auto iter = animation_libraries.front(); iter; iter = iter->next()) {
 			animation_player->remove_animation_library(iter->get());
 		}
+#endif
 #else
 		List<StringName> animation_names;
 		animation_player->get_animation_list(&animation_names);

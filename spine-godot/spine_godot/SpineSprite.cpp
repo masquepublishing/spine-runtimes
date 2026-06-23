@@ -75,6 +75,9 @@
 
 #include "scene/gui/control.h"
 #include "scene/main/viewport.h"
+#if VERSION_MAJOR > 3
+#include "scene/main/scene_tree.h"
+#endif
 
 #if TOOLS_ENABLED
 
@@ -292,11 +295,20 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices, const Vector<Point
 		arrays[Mesh::ARRAY_TEX_UV] = uvs;
 		arrays[Mesh::ARRAY_COLOR] = colors;
 		arrays[Mesh::ARRAY_INDEX] = indices;
+#if VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
+		RenderingServerTypes::SurfaceData surface;
+#else
 		RS::SurfaceData surface;
+#endif
 		uint32_t skin_stride;
+#if VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
+		RS::get_singleton()->mesh_create_surface_data_from_arrays(&surface, RSE::PRIMITIVE_TRIANGLES, arrays, TypedArray<Array>(), Dictionary(),
+																  Mesh::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE);
+#else
 		RS::get_singleton()->mesh_create_surface_data_from_arrays(&surface, (RS::PrimitiveType) Mesh::PRIMITIVE_TRIANGLES, arrays,
 																  TypedArray<Array>(), Dictionary(),
 																  Mesh::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE);
+#endif
 		RS::get_singleton()->mesh_add_surface(mesh, surface);
 #if VERSION_MINOR > 1
 		RS::get_singleton()->mesh_surface_make_offsets_from_format(surface.format, surface.vertex_count, surface.index_count, surface_offsets,
@@ -327,9 +339,15 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices, const Vector<Point
 			}
 
 			float uv[2] = {(float) uvs[i].x, (float) uvs[i].y};
+#if VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
+			memcpy(&vertex_write_buffer[i * vertex_stride + surface_offsets[RSE::ARRAY_VERTEX]], &vertex, sizeof(float) * 2);
+			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RSE::ARRAY_COLOR]], color, 4);
+			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RSE::ARRAY_TEX_UV]], uv, 8);
+#else
 			memcpy(&vertex_write_buffer[i * vertex_stride + surface_offsets[RS::ARRAY_VERTEX]], &vertex, sizeof(float) * 2);
 			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_COLOR]], color, 4);
 			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_TEX_UV]], uv, 8);
+#endif
 		}
 		RS::get_singleton()->mesh_surface_update_vertex_region(mesh, 0, 0, vertex_buffer);
 		RS::get_singleton()->mesh_surface_update_attribute_region(mesh, 0, 0, attribute_buffer);

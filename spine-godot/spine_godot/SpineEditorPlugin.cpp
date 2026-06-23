@@ -43,6 +43,7 @@
 #include <godot_cpp/classes/spin_box.hpp>
 #else
 #include "editor/editor_undo_redo_manager.h"
+#include "scene/main/scene_tree.h"
 #endif
 #ifdef SPINE_GODOT_EXTENSION
 Error SpineAtlasResourceImportPlugin::_import(const String &source_file, const String &save_path, const Dictionary &options,

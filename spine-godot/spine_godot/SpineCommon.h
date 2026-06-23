@@ -74,6 +74,11 @@ using namespace godot;
 #if VERSION_MAJOR > 3
 #include "core/core_bind.h"
 #include "core/error/error_macros.h"
+#if VERSION_MAJOR > 4 || (VERSION_MAJOR == 4 && VERSION_MINOR >= 7)
+#include "core/object/callable_mp.h"
+#else
+#include "core/object/callable_method_pointer.h"
+#endif
 #define REFCOUNTED RefCounted
 #define EMPTY(x) ((x).is_empty())
 #define EMPTY_PTR(x) ((x)->is_empty())

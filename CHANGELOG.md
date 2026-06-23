@@ -314,6 +314,9 @@
   - Updated Godot 4.x CI builds to Godot 4.6.2.
   - Fixed Godot 4.6 Windows editor CI builds by installing Direct3D 12 SDK dependencies before building Godot.
   - Fixed Godot 4.6 GDExtension builds with the latest `godot-cpp` by including the required `Ref` support header in `SpineCommon.h`, updated `SpineEventData` for the `EventData.setupPose` API change, and refreshed vendored `spine-cpp` sources during clean setup.
+  - Fixed Godot 4.7 module and GDExtension build compatibility.
+  - Fixed Godot 4.7 Windows module CI builds by updating the Godot 4.x SCons dependency.
+  - Fixed Godot 3.6 Windows CI builds by not generating Visual Studio project files when building with MinGW.
   - Fixed Godot 3.x builds by avoiding the Godot 4-only `Transform2D(Vector2, Vector2, Vector2)` constructor.
 
 - **Breaking changes (since previous 4.3 beta)**
