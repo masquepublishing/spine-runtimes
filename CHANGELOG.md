@@ -312,6 +312,8 @@
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
 - **Bug fixes**
+  - Fixed Godot wrapper crashes from invalid skin attachment lookups, wrong constraint type filtering, stale cached bone/slot wrappers after skeleton rebuilds, dangling `SpineSlotNode` connections after unparenting, and stale Godot 3 wrapper signal connections.
+  - Fixed `SpineSprite` debug drawing and global bone transform helpers to work when a skeleton exists without an animation state.
   - Fixed draw order timelines not mixing out to the setup pose.
   - Fixed editor crashes when assigning skeleton data with slider animations that key slots or constraints.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
