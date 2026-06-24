@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### spine-core
+
+- Port of 50e82f31: Fixed constraints overwriting bone transforms from other constraints.
+
 ## 4.3.8 - 2026-06-19
 
 ### spine-construct3
