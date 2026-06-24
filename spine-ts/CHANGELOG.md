@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### spine-pixi-v8
+
+- Add unloadFromCache to unload SkeletonData from cache. See ##3054.
+
 ### spine-core
 
 - Port of 50e82f31: Fixed constraints overwriting bone transforms from other constraints.
