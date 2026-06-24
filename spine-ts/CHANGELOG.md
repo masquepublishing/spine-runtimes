@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.3.9 - 2026-06-24
+
 ### spine-pixi-v8
 
 - Add unloadFromCache to unload SkeletonData from cache. See ##3054.
