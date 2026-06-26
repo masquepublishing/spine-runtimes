@@ -266,6 +266,10 @@ namespace Spine.Unity {
 #if USE_THREADED_SKELETON_UPDATE
 		public float CanvasReferencePixelsPerUnit {
 			get {
+#if UNITY_EDITOR
+				if (!this.isUpdatedExternally)
+					return (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
+#endif
 				return canvasReferencePixelsPerUnit;
 			}
 		}
