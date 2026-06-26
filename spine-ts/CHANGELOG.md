@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### spine-core
+
+- Fixed `SkeletonRendererCore` clipping lifecycle and missing texture handling.
+
 ## 4.3.9 - 2026-06-24
 
 ### spine-pixi-v8
