@@ -1191,15 +1191,23 @@ namespace Spine.Unity {
 
 			bool hasSlotOverrides = customSlotMaterials.Count > 0;
 			for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
-				Material instructionMaterial = instructionItems[i].material;
+				SubmeshInstruction instruction = instructionItems[i];
+				Material instructionMaterial = instruction.material;
 				if (instructionMaterial == null) {
 					usedTextureItems[i] = null;
 					sharedMaterials[i] = null;
 					continue;
 				}
 				usedTextureItems[i] = instructionMaterial.mainTexture;
+
 				bool isExplicitSlotOverride = hasSlotOverrides && customSlotMaterials.ContainsValue(instructionMaterial);
 				sharedMaterials[i] = isExplicitSlotOverride ? instructionMaterial : modifiedRenderingMaterial;
+				if (isExplicitSlotOverride) {
+					Slot slot = skeleton.DrawOrder.AppliedPose.Items[instruction.startSlot];
+					Texture originalSlotTexture = GetOriginalSlotTexture(slot);
+					if (originalSlotTexture)
+						usedTextureItems[i] = originalSlotTexture;
+				}
 			}
 
 			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
@@ -1251,6 +1259,19 @@ namespace Spine.Unity {
 			} else {
 				canvasRenderer.SetMaterial(sharedMaterials.Length > 0 ? sharedMaterials[0] : material, usedTextures.Items[0]);
 			}
+		}
+
+		protected Texture GetOriginalSlotTexture (Slot slot) {
+			IHasSequence sequenceAttachment = slot.AppliedPose.Attachment as IHasSequence;
+			if (sequenceAttachment != null) {
+				Sequence sequence = sequenceAttachment.Sequence;
+				TextureRegion region = sequence.GetRegion(sequence.ResolveIndex(slot.AppliedPose));
+				if (region != null) {
+					Material regionMaterial = (Material)((AtlasRegion)region).page.rendererObject;
+					return regionMaterial.mainTexture;
+				}
+			}
+			return null;
 		}
 
 		/// <returns>True if any element of the given <c>instructions</c> list has
