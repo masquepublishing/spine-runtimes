@@ -5,6 +5,7 @@
 ### spine-core
 
 - Fixed `SkeletonRendererCore` clipping lifecycle and missing texture handling.
+- Port of 92be332e: Clipping performance improvements.
 
 ## 4.3.9 - 2026-06-24
 
