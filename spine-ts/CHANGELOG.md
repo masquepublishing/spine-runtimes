@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.3.10 - 2026-07-06
+
 ### spine-core
 
 - Fixed `SkeletonRendererCore` clipping lifecycle and missing texture handling.
