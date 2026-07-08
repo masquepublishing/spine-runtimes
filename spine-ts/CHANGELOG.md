@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### spine-construct3
+
+-  Add drag and drop support for a zip file containing skeleton assets.
+
 ## 4.3.10 - 2026-07-06
 
 ### spine-core
