@@ -147,11 +147,12 @@ protected:
 		spine_owner = nullptr;
 	}
 
-	SpineObjectWrapper() : spine_owner(nullptr), spine_object(nullptr)
+	SpineObjectWrapper() {
+		spine_owner = nullptr;
+		spine_object = nullptr;
 #if VERSION_MAJOR <= 3
-		, spine_owner_id(0)
+		spine_owner_id = 0;
 #endif
-	{
 	}
 
 #if VERSION_MAJOR <= 3
