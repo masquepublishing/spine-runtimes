@@ -323,6 +323,7 @@
   - Fixed `SpineAnimationTrack` editor preview paths for nested `AnimationPlayer` roots, and prevented inactive tracks from clearing `SpineSprite` preview animations.
   - Fixed GDExtension animation mix editing in the Godot inspector.
   - Fixed `SpineBoneNode` and `SpineSlotNode` transforms when bones use negative scale or shear, and applied `SpineBoneNode` Drive mode before world transforms are computed.
+  - Fixed `SpineSlotNode` and global bone transforms exposing the runtime Y-down coordinate conversion as negative Godot Node2D Y scale.
   - Updated Godot 4.x CI builds to Godot 4.6.2.
   - Fixed Godot 4.6 Windows editor CI builds by installing Direct3D 12 SDK dependencies before building Godot.
   - Fixed Godot 4.6 GDExtension builds with the latest `godot-cpp` by including the required `Ref` support header in `SpineCommon.h`, updated `SpineEventData` for the `EventData.setupPose` API change, and refreshed vendored `spine-cpp` sources during clean setup.
