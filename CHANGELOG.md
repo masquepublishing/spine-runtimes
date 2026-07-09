@@ -132,6 +132,7 @@
 - **Bug fixes**
   - Fixed draw order timelines not mixing out to the setup pose.
   - Fixed slider sorting crashes when slider animations key slot or constraint timelines.
+  - Fixed `SliderData` leaking its `FromProperty` by adding a destructor that frees `_property` and its `ToProperty` children, matching `TransformConstraintData`.
   - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose::updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance, plus related IK epsilon handling.
   - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
