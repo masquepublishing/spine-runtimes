@@ -22,6 +22,7 @@
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
   - Removed generated `spine_bone_pose_reset_world()` because resetWorld is an internal implementation detail.
@@ -138,6 +139,7 @@
   - Fixed `AnimationState` attachment timeline handling so deforms are applied correctly when an attachment is hidden in the setup pose.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Improved clipping performance by computing barycentric data lazily and reusing edge side tests.
 
 - **Breaking changes**
   - `MathUtil::Epsilon2` renamed to `MathUtil::EpsilonSq`.
@@ -581,6 +583,7 @@
   - Fixed `BonePose.updateLocalTransform(_:)` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
   - Removed generated `BonePose.resetWorld(_:)` because resetWorld is an internal implementation detail.
@@ -609,6 +612,7 @@
   - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
   - Removed generated `BonePose.resetWorld()` because resetWorld is an internal implementation detail.
@@ -648,6 +652,7 @@
   - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
   - Removed generated `BonePose.resetWorld()` because resetWorld is an internal implementation detail.
@@ -1020,6 +1025,8 @@
   - Updated the Gradle wrapper and fixed the headless test fat jar task to build included libgdx runtime classpath artifacts before packaging.
   - Gradle builds now delete stale Eclipse `bin/` output before compiling so removed classes don't linger on Java headless test classpaths.
   - Updated the libGDX dependency from `1.14.1-SNAPSHOT` to the released `1.14.1`.
+  - Fixed `TwoColorPolygonBatch` ignoring the configured maximum vertex count.
+  - Improved clipping performance by computing barycentric data lazily and reusing edge side tests.
 
 ### Android
 
@@ -1030,6 +1037,7 @@
   - Updated the Android atlas attachment loader to match the current `AttachmentLoader` method signatures.
   - Updated the Android examples to use `AnimationState.getTrack()` instead of the removed `getCurrent()` API.
   - Updated the libGDX dependency from `1.14.1-SNAPSHOT` to the released `1.14.1`.
+  - Updated the bundled spine-libgdx release with the `TwoColorPolygonBatch` max vertices fix and clipping performance improvements.
 
 ## Swift
 
