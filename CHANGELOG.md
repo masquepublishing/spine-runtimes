@@ -1030,6 +1030,7 @@
   - Updated the libGDX dependency from `1.14.1-SNAPSHOT` to the released `1.14.1`.
   - Fixed `TwoColorPolygonBatch` ignoring the configured maximum vertex count.
   - Improved clipping performance by computing barycentric data lazily and reusing edge side tests.
+  - Fixed binary skeleton loading from `FileHandle` to use buffered I/O, avoiding slow per-byte file reads.
 
 ### Android
 
@@ -1041,6 +1042,7 @@
   - Updated the Android examples to use `AnimationState.getTrack()` instead of the removed `getCurrent()` API.
   - Updated the libGDX dependency from `1.14.1-SNAPSHOT` to the released `1.14.1`.
   - Updated the bundled spine-libgdx release with the `TwoColorPolygonBatch` max vertices fix and clipping performance improvements.
+  - Fixed large binary skeleton files taking a long time to load from files by buffering spine-libgdx file reads.
 
 ## Swift
 
