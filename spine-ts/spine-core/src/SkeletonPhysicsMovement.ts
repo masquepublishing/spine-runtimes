@@ -154,10 +154,12 @@ export class SkeletonPhysicsMovement {
 	/** Resets the previous position used to calculate inherited translation. */
 	resetPosition (): void {
 		const transform = this.currentTransform;
-		this.adapter.readTransform(transform, false);
+		const readRotation = !this.hasLastTransform && this.rotationInheritanceFactor !== 0;
+		this.adapter.readTransform(transform, readRotation);
 		this.lastX = transform.x;
 		this.lastY = transform.y;
 		this.lastZ = transform.z;
+		if (readRotation) this.lastRotation = transform.rotation;
 		this.hasLastTransform = true;
 	}
 

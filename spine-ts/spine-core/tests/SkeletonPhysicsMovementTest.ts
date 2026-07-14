@@ -84,4 +84,30 @@ movement.resetTransform();
 assert.equal(rotationReads.length, readsBeforeReset + 1);
 assert.equal(rotationReads.at(-1), true);
 
+function testPositionResetEstablishesRotationBaseline (resetPosition: (movement: SkeletonPhysicsMovement) => void) {
+	const inheritedRotations: number[] = [];
+	const resetSkeleton = {
+		physicsTranslate: () => { },
+		physicsRotate: (_x: number, _y: number, degrees: number) => inheritedRotations.push(degrees),
+	} as unknown as Skeleton;
+	const resetHost = { x: 0, y: 0, z: 0, rotation: 45 };
+	const resetMovement = new SkeletonPhysicsMovement(resetSkeleton, {
+		readTransform: (out, readRotation) => {
+			out.x = resetHost.x;
+			out.y = resetHost.y;
+			out.z = resetHost.z;
+			if (readRotation) out.rotation = resetHost.rotation;
+		},
+		worldToSkeleton: () => { },
+	}, { rotationInheritance: 1 });
+
+	resetPosition(resetMovement);
+	resetHost.rotation = 50;
+	resetMovement.applyTransformMovement();
+	assert.deepEqual(inheritedRotations, [5]);
+}
+
+testPositionResetEstablishesRotationBaseline(movement => movement.resetPosition());
+testPositionResetEstablishesRotationBaseline(movement => movement.setPositionInheritance(1, 1));
+
 console.log("SkeletonPhysicsMovement tests passed");
