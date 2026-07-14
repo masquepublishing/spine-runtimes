@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### spine-core
+
+- Added the renderer-agnostic `SkeletonCoordinateConverter` and `SkeletonPhysicsMovement` APIs for converting runtime coordinates and optionally passing host-object translation and rotation to skeleton physics constraints. Movement adapters provide 3D world position, rotation around the skeleton plane normal, and world-to-skeleton conversion without exposing engine-specific matrix types; 2D runtimes use `z = 0`.
+
 ### spine-construct3
 
 -  Add drag and drop support for a zip file containing skeleton assets.
