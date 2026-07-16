@@ -320,7 +320,7 @@
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
 - **Bug fixes**
-  - Fixed skeleton data constraint getters returning null entries and dropping constraints when multiple constraint types are present.
+  - Fixed `SpineSkeletonDataResource` constraint getters returning null entries and dropping constraints when multiple constraint types are present.
   - Fixed physics constraint rotation pointing opposite to translation under gravity and vertical wind.
   - Fixed Godot wrapper crashes from invalid skin attachment lookups, wrong constraint type filtering, stale cached bone/slot wrappers after skeleton rebuilds, dangling `SpineSlotNode` connections after unparenting, and stale Godot 3 wrapper signal connections.
   - Fixed `SpineSprite` debug drawing and global bone transform helpers to work when a skeleton exists without an animation state.
