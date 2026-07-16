@@ -1343,6 +1343,12 @@
   - Updated skeleton and overlay component implementations
   - Removed `pma` property from `SpineWebComponentSkeleton` - PMA is handled automatically
 
+## Unreal Engine
+
+- **Bug fixes**
+  - Fixed Spine atlas and skeleton data reimport actions and automatic source change detection in recent Unreal Engine versions.
+  - Fixed editor crashes caused by parsing stale skeleton data while loading assets. Skeleton metadata is now validated and cached during import and reimport.
+
 # 4.2
 
 ## C
