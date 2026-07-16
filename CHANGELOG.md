@@ -296,6 +296,7 @@
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
 - **Bug fixes**
+  - Fixed `SpineBoneDriverComponent` failing to drive bones affected by constraints.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
 
 - **Breaking changes**
