@@ -22,6 +22,7 @@
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
@@ -141,6 +142,7 @@
   - Fixed `AnimationState` attachment timeline handling so deforms are applied correctly when an attachment is hidden in the setup pose.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance by computing barycentric data lazily and reusing edge side tests.
 
 - **Breaking changes**
@@ -299,6 +301,7 @@
 - **Bug fixes**
   - Fixed `SpineBoneDriverComponent` failing to drive bones affected by constraints.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
 
 - **Breaking changes**
   - Custom C++ `AttachmentLoader` implementations now receive both the skin `placeholder` and resolved attachment `name`.
@@ -317,6 +320,7 @@
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
 - **Bug fixes**
+  - Fixed skeleton data constraint getters returning null entries and dropping constraints when multiple constraint types are present.
   - Fixed physics constraint rotation pointing opposite to translation under gravity and vertical wind.
   - Fixed Godot wrapper crashes from invalid skin attachment lookups, wrong constraint type filtering, stale cached bone/slot wrappers after skeleton rebuilds, dangling `SpineSlotNode` connections after unparenting, and stale Godot 3 wrapper signal connections.
   - Fixed `SpineSprite` debug drawing and global bone transform helpers to work when a skeleton exists without an animation state.
@@ -324,6 +328,7 @@
   - Fixed editor crashes when assigning skeleton data with slider animations that key slots or constraints.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Fixed `SpineAnimationTrack` editor preview paths for nested `AnimationPlayer` roots, and prevented inactive tracks from clearing `SpineSprite` preview animations.
   - Fixed GDExtension animation mix editing in the Godot inspector.
   - Fixed `SpineBoneNode` and `SpineSlotNode` transforms when bones use negative scale or shear, and applied `SpineBoneNode` Drive mode before world transforms are computed.
@@ -592,6 +597,7 @@
   - Fixed `BonePose.updateLocalTransform(_:)` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
@@ -621,6 +627,7 @@
   - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
@@ -661,6 +668,7 @@
   - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
