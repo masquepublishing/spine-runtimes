@@ -27,17 +27,15 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import MetalKit
+import Foundation
 
-extension MTLClearColor {
-    init(_ color: SpineUIColor) {
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-
-        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-
-        self.init(red: Double(red), green: Double(green), blue: Double(blue), alpha: Double(alpha))
-    }
+/// Controls how textures are filtered by a ``SpineUIView``.
+@objc
+public enum SpineTextureFilter: Int {
+    /// Uses the minification and magnification filters stored on each atlas page.
+    case atlas
+    /// Uses nearest-neighbor filtering for every atlas page.
+    case nearest
+    /// Uses linear filtering for every atlas page.
+    case linear
 }

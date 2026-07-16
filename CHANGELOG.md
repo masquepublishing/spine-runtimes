@@ -575,12 +575,15 @@
 ## iOS
 
 - **Additions**
+  - Added native AppKit/macOS support to `SpineiOS` and the example app.
+  - Added `SpineTextureFilter` overrides to `SpineUIView` and `SpineView`.
   - Added generated slider data `max` APIs.
   - Added generated physics constraint `scaleYMode` APIs.
   - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
 - **Bug fixes**
+  - Fixed Metal rendering to honor each atlas page's texture filter, mipmap, and wrap settings.
   - Fixed draw order timelines not mixing out to the setup pose.
   - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose.updateLocalTransform(_:)` for `noScale` and `noScaleOrReflection` inheritance.

@@ -30,62 +30,60 @@
 import SpineiOS
 import SwiftUI
 
-struct DisableRendering: View {
+struct TextureFiltering: View {
+    @State private var textureFilter = SpineTextureFilter.atlas
 
     @StateObject
-    var controller = SpineController(
+    private var controller = SpineController(
         onInitialized: { controller in
             controller.animationState.setAnimation(0, "walk", true)
         }
     )
 
-    @State
-    var isRendering: Bool?
-
     var body: some View {
         VStack {
-            List {
-                VStack(alignment: .leading) {
-                    Text("Scroll spine boy out of the viewport")
-                    Text("Rendering is disabled when the spine view moves out of the viewport, preserving CPU/GPU resources.")
-                        .foregroundColor(.secondary)
-                }
-
-                SpineView(
-                    from: .bundle(atlasFileName: "spineboy-pma.atlas", skeletonFileName: "spineboy-pro.skel"),
-                    controller: controller,
-                    isRendering: $isRendering
-                )
-                .frame(minHeight: 200)
-                .onAppear {
-                    isRendering = true
-                    print("rendering enabled")
-                }
-                .onDisappear {
-                    isRendering = false
-                    print("rendering disabled")
-                }
-
-                Text("Foo")
-                    .frame(minHeight: 400)
-
-                Text("Bar")
-                    .frame(minHeight: 400)
-
-                Text("Baz")
-                    .frame(minHeight: 400)
+            Picker("Texture filter", selection: $textureFilter) {
+                Text("Atlas").tag(SpineTextureFilter.atlas)
+                Text("Nearest").tag(SpineTextureFilter.nearest)
+                Text("Linear").tag(SpineTextureFilter.linear)
             }
+            .pickerStyle(.segmented)
+            .padding()
+
+            SpineView(
+                from: .bundle(atlasFileName: "spineboy-pma.atlas", skeletonFileName: "spineboy-pro.skel"),
+                controller: controller,
+                mode: .fill,
+                textureFilter: textureFilter
+            )
+            // Texture filtering is selected when the renderer is created.
+            .id(textureFilter)
+
+            Text(description)
+                .font(.footnote)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding()
         }
         .onDisappear {
-            // SwiftUI may retain the @StateObject controller after the view disappears.
-            // Explicit disposal is only needed here so leak reporting runs after native teardown.
             controller.dispose()
         }
-        .navigationTitle("Disable Rendering")
+        .navigationTitle("Texture Filtering")
         .inlineNavigationTitle()
+    }
+
+    private var description: String {
+        switch textureFilter {
+        case .atlas:
+            return "Uses the minification and magnification filters exported in each atlas page. This atlas uses linear filtering."
+        case .nearest:
+            return "Overrides all atlas pages with nearest-neighbor filtering."
+        case .linear:
+            return "Overrides all atlas pages with linear filtering."
+        }
     }
 }
 
 #Preview {
-    DisableRendering()
+    TextureFiltering()
 }

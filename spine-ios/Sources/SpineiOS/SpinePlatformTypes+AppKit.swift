@@ -27,17 +27,17 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import MetalKit
+#if canImport(AppKit)
+import AppKit
 
-extension MTLClearColor {
-    init(_ color: SpineUIColor) {
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
+public typealias SpineUIImage = NSImage
+public typealias SpineUIColor = NSColor
+public typealias SpineUIScreen = NSScreen
 
-        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-
-        self.init(red: Double(red), green: Double(green), blue: Double(blue), alpha: Double(alpha))
+extension SpineUIScreen {
+    // UIKit-compatible accessor
+    var scale: CGFloat {
+        backingScaleFactor
     }
 }
+#endif
