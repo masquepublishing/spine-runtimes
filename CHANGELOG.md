@@ -130,6 +130,7 @@
   - Added `Animation::getColor()` and `BoneData` icon size/rotation accessors for nonessential editor data.
 
 - **Bug fixes**
+  - Fixed physics constraint rotation, shear, and scale forces using the wrong Y direction in Y-down runtimes.
   - Fixed draw order timelines not mixing out to the setup pose.
   - Fixed slider sorting crashes when slider animations key slot or constraint timelines.
   - Fixed `SliderData` leaking its `FromProperty` by adding a destructor that frees `_property` and its `ToProperty` children, matching `TransformConstraintData`.
@@ -316,6 +317,7 @@
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
 - **Bug fixes**
+  - Fixed physics constraint rotation pointing opposite to translation under gravity and vertical wind.
   - Fixed Godot wrapper crashes from invalid skin attachment lookups, wrong constraint type filtering, stale cached bone/slot wrappers after skeleton rebuilds, dangling `SpineSlotNode` connections after unparenting, and stale Godot 3 wrapper signal connections.
   - Fixed `SpineSprite` debug drawing and global bone transform helpers to work when a skeleton exists without an animation state.
   - Fixed draw order timelines not mixing out to the setup pose.
