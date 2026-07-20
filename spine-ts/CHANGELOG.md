@@ -5,8 +5,7 @@
 ### **BREAKING CHANGES**
 
 - `spine-phaser-v4` now requires Phaser 4.2.1 and uses Phaser's native `Mesh2D` renderer by default in WebGL games. Pass `{ renderer: "spine-webgl" }` when creating a `SpineGameObject` to retain the previous spine-webgl renderer. Phaser Canvas games use `renderer: "spine-canvas"`.
-- In `spine-phaser-v3` and `spine-phaser-v4`, game-object movement inheritance for skeleton physics constraints is now opt-in and defaults to `0`. The previous `SpineGameObject` physics inheritance fields and methods have been replaced by `SpineGameObject.skeletonPhysics`, using `setPositionInheritance()`, `rotationInheritance`, `resetPosition()`, `resetRotation()`, and `resetTransform()`.
-- In `spine-threejs`, physics movement inheritance is now opt-in and defaults to `0`; the previous properties and reset methods have been replaced by `SkeletonMesh.skeletonPhysics`.
+- In `spine-phaser-v3`, `spine-phaser-v4`, `spine-pixi-v7`, `spine-pixi-v8`, and `spine-threejs`, physics movement inheritance is now opt-in and defaults to `0`; the previous properties and methods have been replaced by the runtime object's `skeletonPhysics` API.
 
 ### spine-core
 
@@ -32,6 +31,10 @@
 ### spine-threejs
 
 - Added `SkeletonMesh.skeletonPhysics` with 3D transform movement inheritance.
+
+### spine-pixi-v7 / spine-pixi-v8
+
+- Added `Spine.skeletonPhysics` and fixed rotation inheritance under non-uniformly scaled containers.
 
 ### spine-construct3
 
