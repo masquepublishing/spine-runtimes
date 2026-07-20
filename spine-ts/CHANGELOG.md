@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.3.11 - 2026-07-20
+
 ### **BREAKING CHANGES**
 
 - `spine-phaser-v4` now requires Phaser 4.2.1 and uses Phaser's native `Mesh2D` renderer by default in WebGL games. Pass `{ renderer: "spine-webgl" }` when creating a `SpineGameObject` to retain the previous spine-webgl renderer. Phaser Canvas games use `renderer: "spine-canvas"`.
