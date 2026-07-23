@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### spine-core
+
+- Expose restore WebGL logic on ManagedWebGLRenderingContext, so applications that pass an existing WebGL context instead of a canvas can restore all registered WebGL resources.
+
 ### spine-construct3
 
 - Added planar 3D rotation for rendering; collisions, hit tests, and other gameplay logic remain 2D. Generated collision bodies synchronize their visual 3D transform.
