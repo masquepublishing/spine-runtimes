@@ -620,9 +620,11 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 			this._inst.GetX() + this.propOffsetX,
 			this._inst.GetY() + this.propOffsetY,
 			this._inst.GetTotalZ(),
-			this._inst.GetAngle() + this.propOffsetAngle,
+			this._inst.GetAngle(),
 			actualScaleX,
-			actualScaleY);
+			actualScaleY,
+			this._inst.GetQuaternion(),
+			this.propOffsetAngle);
 		skeleton.updateWorldTransform(spine.Physics.update);
 	}
 

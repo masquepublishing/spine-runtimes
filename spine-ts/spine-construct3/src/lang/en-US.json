@@ -809,11 +809,11 @@
           "set-collision-body-drives-object": {
             "list-name": "Set collision body drives object",
             "display-text": "Set collision body drives object to {0}",
-            "description": "When enabled, movement of the generated Sprite collision body moves the Spine object. Useful for putting movement behaviors on the collision body.",
+            "description": "When enabled, movement and 2D angle changes of the generated Sprite collision body move and rotate the Spine object. Useful for putting movement behaviors on the collision body.",
             "params": {
               "enabled": {
                 "name": "Enabled",
-                "desc": "Whether the generated collision body should drive the Spine object's position"
+                "desc": "Whether the generated collision body should drive the Spine object's position and 2D angle"
               }
             }
           },

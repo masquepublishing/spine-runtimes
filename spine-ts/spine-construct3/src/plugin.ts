@@ -82,6 +82,7 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 
 		this._info.SetIsResizable(true); // allow to be resized
 		this._info.SetIsRotatable(true); // allow to be rotated
+		this._info.SetIsRotatable3D(true); // allow the planar skeleton to be rotated in 3D
 		this._info.SetHasImage(false);
 		this._info.SetSupportsEffects(true); // allow effects
 		this._info.SetMustPreDraw(true);
@@ -91,6 +92,7 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 		this._info.AddCommonPositionACEs(); // Position: Set X/Y, Set position, etc.
 		this._info.AddCommonSizeACEs(); // Size: Set size, width, height
 		this._info.AddCommonAngleACEs(); // Angle: Set angle, rotate
+		this._info.AddCommon3DRotationACEs(); // 3D rotation: Euler angles and quaternion
 		this._info.AddCommonAppearanceACEs(); // Appearance: Set opacity, visible, color
 		this._info.AddCommonZOrderACEs(); // Z order: bring to front/back, move up/down
 		this._info.AddCommonSceneGraphACEs(); // Enables hierarchies: parent/children relations

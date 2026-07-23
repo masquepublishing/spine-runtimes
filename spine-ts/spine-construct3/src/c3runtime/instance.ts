@@ -85,6 +85,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private collisionBodyDrivesObject = false;
 	private collisionBodyPrevX = 0;
 	private collisionBodyPrevY = 0;
+	private collisionBodyPrevAngle = 0;
 	isPlaying = true;
 	physicsMode = spine.Physics.update;
 	customSkins: Record<string, Skin> = {};
@@ -104,6 +105,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private assetLoader: AssetLoader;
 	private skeletonRenderer?: C3RendererRuntime;
 	private matrix: C3Matrix;
+	private quaternion: Vec4Arr = [0, 0, 0, 1];
 	private requestRedraw = false;
 	private triggerSkeletonLoadedOnFirstTick = false;
 
@@ -178,13 +180,16 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	private updateMatrix () {
+		this.quaternion = this.getQuaternion();
 		this.matrix.update(
 			this.x + this.propOffsetX,
 			this.y + this.propOffsetY,
 			this.totalZ,
-			this.angle + this.propOffsetAngle,
+			this.angle,
 			this.width / this.spineBounds.width * this.propScaleX,
-			this.height / this.spineBounds.height * this.propScaleY);
+			this.height / this.spineBounds.height * this.propScaleY,
+			this.quaternion,
+			this.propOffsetAngle);
 	}
 
 	_tick (): void {
@@ -596,7 +601,24 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			throw new Error(`[Spine] Collision sprite object type "${this.collisionSpriteClassName}" not found`);
 
 		this.collisionSpriteInstance = objectType.createInstance(this.layer.name, this.x, this.y);
+		this.syncCollisionSprite3DTransform(this.collisionSpriteInstance, this.x, this.y);
+		this.collisionSpriteInstance.angle = this.angle;
 		this.collisionSpriteInstance.setOrigin(this.originX, this.originY);
+	}
+
+	private syncCollisionSprite3DTransform (collisionSpriteInstance: IWorldInstance, x: number, y: number, syncQuaternion = true) {
+		collisionSpriteInstance.setPosition3d(x, y, this.z);
+		if (syncQuaternion) {
+			collisionSpriteInstance.setQuaternion(...this.quaternion);
+		} else {
+			collisionSpriteInstance.setQuaternion(0, 0, 0, 1);
+		}
+	}
+
+	private captureCollisionBodyTransform (collisionSpriteInstance: IWorldInstance) {
+		this.collisionBodyPrevX = collisionSpriteInstance.x;
+		this.collisionBodyPrevY = collisionSpriteInstance.y;
+		this.collisionBodyPrevAngle = collisionSpriteInstance.angle;
 	}
 
 	private updateCollisionSprite () {
@@ -614,14 +636,11 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 
 		this.collisionSpriteInstance.isCollisionEnabled = true;
-		this.collisionSpriteInstance.setPosition(this.x, this.y);
-		if (this.collisionBodyDrivesObject) {
-			this.collisionBodyPrevX = this.collisionSpriteInstance.x;
-			this.collisionBodyPrevY = this.collisionSpriteInstance.y;
-		}
+		this.syncCollisionSprite3DTransform(this.collisionSpriteInstance, this.x, this.y);
 		this.collisionSpriteInstance.setSize(this.width, this.height);
-		this.collisionSpriteInstance.angleDegrees = this.angleDegrees;
+		this.collisionSpriteInstance.angle = this.angle;
 		this.collisionSpriteInstance.setOrigin(this.originX, this.originY);
+		if (this.collisionBodyDrivesObject) this.captureCollisionBodyTransform(this.collisionSpriteInstance);
 	}
 
 	private updateCollisionBoundingBoxSprite () {
@@ -679,14 +698,13 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 
 		collisionSpriteInstance.isCollisionEnabled = true;
-		collisionSpriteInstance.setPosition(minX, minY);
-		if (this.collisionBodyDrivesObject) {
-			this.collisionBodyPrevX = collisionSpriteInstance.x;
-			this.collisionBodyPrevY = collisionSpriteInstance.y;
-		}
+		// These mesh points are already transformed to game-space by the legacy
+		// 2D matrix, so applying the quaternion again would double-transform them.
+		this.syncCollisionSprite3DTransform(collisionSpriteInstance, minX, minY, false);
 		collisionSpriteInstance.setSize(width, height);
 		collisionSpriteInstance.angle = 0;
 		collisionSpriteInstance.setOrigin(0, 0);
+		if (this.collisionBodyDrivesObject) this.captureCollisionBodyTransform(collisionSpriteInstance);
 
 		const perimeterPointCount = meshWidth * 2;
 		for (let i = 0; i < perimeterPointCount; i++) {
@@ -835,8 +853,13 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.collisionBodyDrivesObject = false;
 			this.updateCollisionSprite();
 			this.collisionBodyDrivesObject = true;
-			this.collisionBodyPrevX = this.collisionSpriteInstance?.x ?? this.x;
-			this.collisionBodyPrevY = this.collisionSpriteInstance?.y ?? this.y;
+			if (this.collisionSpriteInstance) {
+				this.captureCollisionBodyTransform(this.collisionSpriteInstance);
+			} else {
+				this.collisionBodyPrevX = this.x;
+				this.collisionBodyPrevY = this.y;
+				this.collisionBodyPrevAngle = this.angle;
+			}
 		} else {
 			this.collisionBodyDrivesObject = false;
 			this.updateCollisionSprite();
@@ -849,11 +872,13 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		const dx = collisionSpriteInstance.x - this.collisionBodyPrevX;
 		const dy = collisionSpriteInstance.y - this.collisionBodyPrevY;
-		this.collisionBodyPrevX = collisionSpriteInstance.x;
-		this.collisionBodyPrevY = collisionSpriteInstance.y;
-		if (dx === 0 && dy === 0) return;
+		const angle = collisionSpriteInstance.angle;
+		const angleChanged = angle !== this.collisionBodyPrevAngle;
+		this.captureCollisionBodyTransform(collisionSpriteInstance);
+		if (dx === 0 && dy === 0 && !angleChanged) return;
 
-		this.offsetPosition(dx, dy);
+		if (dx !== 0 || dy !== 0) this.offsetPosition(dx, dy);
+		if (angleChanged) this.angle = angle;
 		this.updateMatrix();
 	}
 

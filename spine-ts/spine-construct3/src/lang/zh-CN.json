@@ -809,11 +809,11 @@
           "set-collision-body-drives-object": {
             "list-name": "设置碰撞体驱动对象",
             "display-text": "将碰撞体驱动对象设置为{0}",
-            "description": "启用时，生成的Sprite碰撞体的移动会移动Spine对象。适用于将移动行为添加到碰撞体。",
+            "description": "启用时，生成的Sprite碰撞体的位置移动和二维角度变化会移动并旋转Spine对象。适用于将移动行为添加到碰撞体。",
             "params": {
               "enabled": {
                 "name": "启用",
-                "desc": "生成的碰撞体是否应驱动Spine对象的位置"
+                "desc": "生成的碰撞体是否应驱动Spine对象的位置和二维角度"
               }
             }
           },
