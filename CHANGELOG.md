@@ -569,6 +569,7 @@
   - `SkeletonGraphicCustomMaterials` now exposes `Custom Slot Materials` property for slot material overrides.
   - Exposed `SpineVisualElement.Initialize` as `public`.
   - `SkeletonRenderer` and `SkeletonGraphic` classes now provide `PhysicsPositionInheritanceLimit` and `PhysicsRotationInheritanceLimit` properties, exposed in the component Inspector under `Physics Inheritance` as `Limit` properties, below `Position` and `Rotation`.
+  - `SkeletonGraphic` now provides a new method `MatchReferenceRectWithBounds` to adjust the reference rectangle bounds to the mesh bounds for use with automatic layout scale modes. The `Match RectTransform with Mesh` `Match` button is now available outside of `Edit Layout Bounds` mode as well and performs this adjustment for quick one-click setup.
 
 - **Deprecated**
 

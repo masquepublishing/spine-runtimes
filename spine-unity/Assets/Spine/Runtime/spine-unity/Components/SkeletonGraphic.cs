@@ -534,6 +534,43 @@ namespace Spine.Unity {
 			return boundsSet;
 		}
 
+		public bool MatchReferenceRectWithBounds () {
+			if (layoutScaleMode == LayoutMode.None || EditReferenceRect)
+				return MatchRectTransformWithBounds();
+
+			RectTransform targetRectTransform = this.rectTransform;
+#if USE_THREADED_SKELETON_UPDATE
+			SetCurrentRectSize();
+#endif
+			Vector2 savedPivot = targetRectTransform.pivot;
+			referenceScale *= GetLayoutScale(layoutScaleMode);
+			referenceSize = targetRectTransform.rect.size;  // required by UpdateMesh below
+
+			if (skeletonAnimation != null)
+				skeletonAnimation.UpdateOncePerFrame(0);
+			UpdateMesh();
+			Vector2 defaultSize = new Vector2(50f, 50f);
+			Bounds bounds = new Bounds(defaultSize * 0.5f, defaultSize);
+			bool boundsSet;
+			if (!allowMultipleCanvasRenderers)
+				boundsSet = GetMeshBoundsSingleRenderer(ref bounds);
+			else
+				boundsSet = GetMeshBoundsMultipleRenderers(ref bounds);
+
+			Vector3 size = bounds.size;
+			Vector3 center = bounds.center;
+			Vector2 matchedPivot = new Vector2(
+				0.5f - (center.x / size.x),
+				0.5f - (center.y / size.y));
+			referenceSize = size;
+			referenceScale *= layoutScale;
+			layoutScale = 1f;
+
+			pivotOffset += Vector2.Scale(matchedPivot - savedPivot, referenceSize);
+			UpdateMesh();
+			return boundsSet;
+		}
+
 		private void SetRectTransformBounds (Bounds combinedBounds) {
 			Vector3 size = combinedBounds.size;
 			Vector3 center = combinedBounds.center;
