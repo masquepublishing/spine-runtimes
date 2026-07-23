@@ -373,6 +373,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 			SpineHandles.DrawPivotOffsetHandle(skeletonGraphic, Color.green);
+			SpineHandles.DrawPivotHandle(skeletonGraphic, Color.blue);
 		}
 
 		#region Menus
