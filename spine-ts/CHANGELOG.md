@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.3.13 - 2026-07-24
+
 ### spine-construct3
 
 - Added an opt-in slot Z offset to mitigate z-fighting between overlapping attachments.
