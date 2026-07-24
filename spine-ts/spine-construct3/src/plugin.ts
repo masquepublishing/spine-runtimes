@@ -55,6 +55,7 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 	static PROP_RATIO_WIDTH = "spine-restore-ratio-width";
 	static PROP_RATIO_HEIGHT = "spine-restore-ratio-height";
 	static PROP_BOUNDS_PROVIDER_GROUP = "spine-bounds-provider-group";
+	static PROP_RENDERING_GROUP = "spine-rendering-group";
 	static PROP_BOUNDS_PROVIDER = "spine-bounds-provider";
 	static PROP_BOUNDS_PROVIDER_MOVE = "spine-bounds-provider-move";
 	static PROP_BOUNDS_OFFSET_X = "spine-bounds-offset-x";
@@ -62,6 +63,7 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 	static PROP_BOUNDS_OFFSET_ANGLE = "spine-bounds-offset-angle";
 	static PROP_SKELETON_OFFSET_SCALE_X = "spine-offset-scale-x";
 	static PROP_SKELETON_OFFSET_SCALE_Y = "spine-offset-scale-y";
+	static PROP_SLOT_Z_OFFSET = "spine-slot-z-offset";
 	static PROP_DEBUG_SKELETON = "spine-debug-skeleton";
 	static PROP_ENABLE_COLLISION = "spine-enable-collision";
 
@@ -151,6 +153,9 @@ const PLUGIN_CLASS = class SpineC3Plugin extends SDK.IPluginBase {
 				},
 				callbackType: "for-each-instance"
 			}),
+
+			new SDK.PluginProperty("group", SpineC3Plugin.PROP_RENDERING_GROUP),
+			new SDK.PluginProperty("float", SpineC3Plugin.PROP_SLOT_Z_OFFSET, 0),
 		]);
 
 		SDK.Lang.PopContext(); // .properties

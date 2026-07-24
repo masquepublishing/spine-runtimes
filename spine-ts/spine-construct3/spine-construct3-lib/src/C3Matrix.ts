@@ -48,6 +48,9 @@ export class C3Matrix {
 	public renderYAxisX = 0;
 	public renderYAxisY = 0;
 	public renderYAxisZ = 0;
+	public renderZAxisX = 0;
+	public renderZAxisY = 0;
+	public renderZAxisZ = 1;
 	public revision = 0;
 
 	private prevScaleX = Infinity;
@@ -108,6 +111,9 @@ export class C3Matrix {
 			this.renderYAxisX = this.c;
 			this.renderYAxisY = this.d;
 			this.renderYAxisZ = 0;
+			this.renderZAxisX = 0;
+			this.renderZAxisY = 0;
+			this.renderZAxisZ = 1;
 			this.revision++;
 			return true;
 		}
@@ -128,6 +134,8 @@ export class C3Matrix {
 		const quaternionYAxisX = (-rotation00 * offsetSin + rotation01 * offsetCos) * scaleY;
 		const quaternionYAxisY = (-rotation10 * offsetSin + rotation11 * offsetCos) * scaleY;
 
+		const rotation02 = 2 * (quaternionX * quaternionZ + quaternionW * quaternionY);
+		const rotation12 = 2 * (quaternionY * quaternionZ - quaternionW * quaternionX);
 		const rotation20 = 2 * (quaternionX * quaternionZ - quaternionW * quaternionY);
 		const rotation21 = 2 * (quaternionY * quaternionZ + quaternionW * quaternionX);
 
@@ -140,6 +148,9 @@ export class C3Matrix {
 		this.renderYAxisX = objectCos * quaternionYAxisX - objectSin * quaternionYAxisY;
 		this.renderYAxisY = objectSin * quaternionYAxisX + objectCos * quaternionYAxisY;
 		this.renderYAxisZ = (-rotation20 * offsetSin + rotation21 * offsetCos) * scaleY;
+		this.renderZAxisX = objectCos * rotation02 - objectSin * rotation12;
+		this.renderZAxisY = objectSin * rotation02 + objectCos * rotation12;
+		this.renderZAxisZ = 1 - 2 * (quaternionX * quaternionX + quaternionY * quaternionY);
 		this.revision++;
 		return true;
 	}

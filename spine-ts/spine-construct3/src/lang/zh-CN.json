@@ -43,6 +43,10 @@
             "name": "边界提供者",
             "desc": "选择所需的边界提供者并填写相应的属性。"
           },
+          "spine-rendering-group": {
+            "name": "渲染",
+            "desc": "渲染设置。"
+          },
           "spine-bounds-provider": {
             "name": "边界提供者",
             "desc": "要使用的边界提供者。",
@@ -62,6 +66,10 @@
           "spine-offset-scale-y": {
             "name": "偏移缩放Y",
             "desc": "偏移缩放Y"
+          },
+          "spine-slot-z-offset": {
+            "name": "插槽Z偏移",
+            "desc": "连续可见插槽之间可选的三维世界单位渲染间距。如果三维旋转导致Z冲突，请增大此值；保持为0可使所有插槽共面。"
           },
           "spine-debug-skeleton": {
             "name": "调试骨架",

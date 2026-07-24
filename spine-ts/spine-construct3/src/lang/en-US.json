@@ -43,6 +43,10 @@
             "name": "Bounds provider",
             "desc": "Select the desired bound provider and fill the respective properties."
           },
+          "spine-rendering-group": {
+            "name": "Rendering",
+            "desc": "Rendering settings."
+          },
           "spine-bounds-provider": {
             "name": "Bounds provider",
             "desc": "The bounds provider to use.",
@@ -62,6 +66,10 @@
           "spine-offset-scale-y": {
             "name": "Offset Scale Y",
             "desc": "Offset Scale Y"
+          },
+          "spine-slot-z-offset": {
+            "name": "Slot Z offset",
+            "desc": "Optional rendering distance in 3D world units between successive visible slots. Increase it if 3D rotation causes z-fighting; keep it at 0 to leave all slots coplanar."
           },
           "spine-debug-skeleton": {
             "name": "Debug skeleton",

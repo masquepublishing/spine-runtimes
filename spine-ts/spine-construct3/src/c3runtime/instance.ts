@@ -69,6 +69,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	propOffsetAngle = 0;
 	propScaleX = 1;
 	propScaleY = 1;
+	propSlotZOffset = 0;
 	propDebugSkeleton = false;
 	propBoundsProvider: SpineBoundsProviderType = "setup";
 	propEnableCollision = false;
@@ -155,6 +156,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.propOffsetAngle = properties[11] as number;
 			this.propScaleX = properties[12] as number;
 			this.propScaleY = properties[13] as number;
+			this.propSlotZOffset = (properties[14] as number | undefined) ?? 0;
 		}
 
 		this.collisionSpriteClassName = `${this.objectType.name}_CollisionBody`;
@@ -248,7 +250,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		if (!skeleton) return;
 
 		this.skeletonRenderer ||= new spine.C3RendererRuntime(renderer, this.matrix);
-		this.skeletonRenderer.draw(skeleton, this.colorRgb, this.opacity, this.requestRedraw);
+		const slotZOffset = this.layer.renderingMode === "3d" ? this.propSlotZOffset : 0;
+		this.skeletonRenderer.draw(skeleton, this.colorRgb, this.opacity, this.requestRedraw, slotZOffset);
 		this.requestRedraw = false;
 
 		if (this.propDebugSkeleton) this.skeletonRenderer.drawDebug(skeleton, this.x, this.y, this.getBoundingQuad(false));

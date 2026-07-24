@@ -61,7 +61,7 @@ abstract class C3SkeletonRenderer<
 		super();
 	}
 
-	draw (skeleton: Skeleton, inColors: [number, number, number], opacity = 1, requestRedraw = true) {
+	draw (skeleton: Skeleton, inColors: [number, number, number], opacity = 1, requestRedraw = true, slotZOffset = 0) {
 		const { inv255 } = this;
 		const requestRedrawForColor = this.prevRed !== inColors[0] || this.prevGreen !== inColors[1] || this.prevBlue !== inColors[2] || this.prevAlpha !== opacity;
 		this.prevRed = inColors[0];
@@ -70,7 +70,7 @@ abstract class C3SkeletonRenderer<
 		this.prevAlpha = opacity;
 
 		const newCommand = requestRedraw || requestRedrawForColor || !this.command;
-		if (newCommand) this.command = this.render(skeleton, true, [...inColors, opacity], 3);
+		if (newCommand) this.command = this.render(skeleton, true, [...inColors, opacity], 3, slotZOffset);
 		const transformPositions = newCommand || this.transformedMatrixRevision !== this.matrix.revision;
 		let command = this.command;
 		let commandIndex = 0;
@@ -294,6 +294,7 @@ abstract class C3SkeletonRenderer<
 			const {
 				renderXAxisX, renderXAxisY, renderXAxisZ,
 				renderYAxisX, renderYAxisY, renderYAxisZ,
+				renderZAxisX, renderZAxisY, renderZAxisZ,
 				tx, ty, tz,
 			} = this.matrix;
 			const source = command.positions;
@@ -301,9 +302,10 @@ abstract class C3SkeletonRenderer<
 			for (let i = 0; i < length; i += 3) {
 				const x = source[i];
 				const y = source[i + 1];
-				destination[i] = renderXAxisX * x + renderYAxisX * y + tx;
-				destination[i + 1] = renderXAxisY * x + renderYAxisY * y + ty;
-				destination[i + 2] = renderXAxisZ * x + renderYAxisZ * y + tz;
+				const z = source[i + 2];
+				destination[i] = renderXAxisX * x + renderYAxisX * y + renderZAxisX * z + tx;
+				destination[i + 1] = renderXAxisY * x + renderYAxisY * y + renderZAxisY * z + ty;
+				destination[i + 2] = renderXAxisZ * x + renderYAxisZ * y + renderZAxisZ * z + tz;
 			}
 		}
 		return cache.positions;
