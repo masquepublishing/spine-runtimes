@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### spine-phaser-v3
+
+- Automatically restored Spine WebGL resources, including atlas textures, after context restoration.
+
 ## 4.3.12 - 2026-07-23
 
 ### spine-core
