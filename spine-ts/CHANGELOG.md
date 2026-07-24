@@ -6,6 +6,10 @@
 
 - Automatically restored Spine WebGL resources, including atlas textures, after context restoration.
 
+### spine-phaser-v4
+
+- Restored the legacy `spine-webgl` backend after WebGL context restoration.
+
 ## 4.3.12 - 2026-07-23
 
 ### spine-core
