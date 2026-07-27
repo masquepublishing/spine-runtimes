@@ -571,6 +571,7 @@
   - `SkeletonRenderer` and `SkeletonGraphic` classes now provide `PhysicsPositionInheritanceLimit` and `PhysicsRotationInheritanceLimit` properties, exposed in the component Inspector under `Physics Inheritance` as `Limit` properties, below `Position` and `Rotation`.
   - `SkeletonGraphic` now provides a new method `MatchReferenceRectWithBounds` to adjust the reference rectangle bounds to the mesh bounds for use with automatic layout scale modes. The `Match RectTransform with Mesh` `Match` button is now available outside of `Edit Layout Bounds` mode as well and performs this adjustment for quick one-click setup.
   - `SkeletonGraphic`: You can now offset the pivot with automatic offset compensation via a newly added blue circle handle. This lets you move the pivot to the skeleton part that you want fixed when auto layout mode scales and moves your skeleton around to fit the RectTransform bounds. It also helps to visualize the current pivot position if you set the pivot numerically via the RectTransform Inspector.
+  - `SkeletonAnimation` received a `DeltaTimeOverride` callback. This allows advancing by custom delta time for e.g. stepped animation updates in a threaded context. The callback may change `UpdateMode` to disable or limit skeleton updates for certain frames. It is called on the main thread once before animation update.
 
 - **Deprecated**
 
