@@ -166,10 +166,7 @@ export class C3Matrix {
 	}
 
 	public gameToBone (x: number, y: number, bone: Bone) {
-		const point = this.gameToSkeleton(x, y);
-		if (bone.parent)
-			return bone.parent.appliedPose.worldToLocal(point);
-		return bone.appliedPose.worldToLocal(point);
+		return bone.appliedPose.worldToParent(this.gameToSkeleton(x, y));
 	}
 
 	public skeletonToGame = (skeletonX: number, skeletonY: number) => {
@@ -192,7 +189,10 @@ export class C3Matrix {
 		const rad = gameAngleDeg * Math.PI / 180;
 		const sin = Math.sin(rad), cos = Math.cos(rad);
 		const { a, b, c, d } = this;
-		return Math.atan2(a * sin - b * cos, d * cos - c * sin) * (180 / Math.PI);
+		const delta = a * d - b * c;
+		const x = (d * cos - c * sin) / delta;
+		const y = (a * sin - b * cos) / delta;
+		return Math.atan2(y, x) * (180 / Math.PI);
 	}
 
 }

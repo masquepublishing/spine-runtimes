@@ -31,6 +31,7 @@
     "aces.json",
     "addon.json",
     "icon.svg",
+    "LICENSE",
     "plugin.js",
     "c3runtime/spine-construct3-lib.js",
     "type.js",

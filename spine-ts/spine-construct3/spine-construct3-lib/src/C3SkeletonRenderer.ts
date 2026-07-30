@@ -43,6 +43,7 @@ abstract class C3SkeletonRenderer<
 	private command?: RenderCommand;
 	private transformedPositions: { buffer: Float32Array; positions: Float32Array }[] = [];
 	private transformedMatrixRevision = -1;
+	private inputColor: [number, number, number, number] = [1, 1, 1, 1];
 	private tempVertices = new Float32Array(4096);
 	private tempColors = new Float32Array(4096);
 	private tempPoint = new Vector2();
@@ -53,6 +54,7 @@ abstract class C3SkeletonRenderer<
 	private prevGreen = -1;
 	private prevBlue = -1;
 	private prevAlpha = -1;
+	private prevSlotZOffset = Number.NaN;
 
 	constructor (
 		protected renderer: Renderer,
@@ -63,20 +65,29 @@ abstract class C3SkeletonRenderer<
 
 	draw (skeleton: Skeleton, inColors: [number, number, number], opacity = 1, requestRedraw = true, slotZOffset = 0) {
 		const { inv255 } = this;
-		const requestRedrawForColor = this.prevRed !== inColors[0] || this.prevGreen !== inColors[1] || this.prevBlue !== inColors[2] || this.prevAlpha !== opacity;
+		const newCommand = requestRedraw ||
+			this.prevRed !== inColors[0] || this.prevGreen !== inColors[1] || this.prevBlue !== inColors[2] ||
+			this.prevAlpha !== opacity || this.prevSlotZOffset !== slotZOffset || !this.command;
 		this.prevRed = inColors[0];
 		this.prevGreen = inColors[1];
 		this.prevBlue = inColors[2];
 		this.prevAlpha = opacity;
+		this.prevSlotZOffset = slotZOffset;
 
-		const newCommand = requestRedraw || requestRedrawForColor || !this.command;
-		if (newCommand) this.command = this.render(skeleton, true, [...inColors, opacity], 3, slotZOffset);
+		if (newCommand) {
+			const inputColor = this.inputColor;
+			inputColor[0] = inColors[0];
+			inputColor[1] = inColors[1];
+			inputColor[2] = inColors[2];
+			inputColor[3] = opacity;
+			this.command = this.render(skeleton, true, inputColor, 3, slotZOffset);
+		}
 		const transformPositions = newCommand || this.transformedMatrixRevision !== this.matrix.revision;
 		let command = this.command;
 		let commandIndex = 0;
 
 		while (command) {
-			const { numVertices, uvs, colors, indices, numIndices, blendMode } = command;
+			const { numVertices, uvs, colors, indices, blendMode } = command;
 			const transformedPositions = this.getTransformedPositions(command, commandIndex++, transformPositions);
 			const c3colors = this.tempColors.length < numVertices * 4
 				? (this.tempColors = new Float32Array(numVertices * 4))
@@ -93,8 +104,8 @@ abstract class C3SkeletonRenderer<
 
 			this.renderSkeleton(
 				transformedPositions,
-				uvs.subarray(0, numVertices * 2),
-				indices.subarray(0, numIndices),
+				uvs,
+				indices,
 				c3colors.subarray(0, numVertices * 4),
 				command.texture,
 				blendMode)
@@ -173,6 +184,8 @@ abstract class C3SkeletonRenderer<
 			if (!slot.bone.active) continue;
 			const attachment = slot.appliedPose.attachment;
 			if (!(attachment instanceof MeshAttachment)) continue;
+			if (this.tempVertices.length < attachment.worldVerticesLength)
+				this.tempVertices = new Float32Array(attachment.worldVerticesLength);
 			const vertices = this.tempVertices;
 			attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
 			const triangles = attachment.triangles;
@@ -427,8 +440,9 @@ export class C3RendererRuntime extends C3SkeletonRenderer<IRenderer, C3TextureRu
 	}
 
 	protected renderSkeleton (vertices: Float32Array, uvs: Float32Array, indices: Uint16Array, colors: Float32Array, texture: C3TextureRuntime, blendMode: BlendMode) {
-		this.renderer.setTexture(texture.texture);
 		this.renderer.setBlendMode(BlendingModeSpineToC3[blendMode]);
+		this.renderer.setTextureFillMode();
+		this.renderer.setTexture(texture.texture);
 		this.renderer.drawMesh(vertices, uvs, indices, colors);
 	};
 
@@ -472,7 +486,6 @@ export class C3RendererEditor extends C3SkeletonRenderer<SDK.Gfx.IWebGLRenderer,
 	}
 
 	protected renderSkeleton (vertices: Float32Array, uvs: Float32Array, indices: Uint16Array, colors: Float32Array, texture: C3TextureEditor, blendMode: BlendMode) {
-		this.renderer.ResetColor();
 		this.renderer.SetBlendMode(BlendingModeSpineToC3[blendMode]);
 		this.renderer.SetTextureFillMode();
 		this.renderer.SetTexture(texture.texture);

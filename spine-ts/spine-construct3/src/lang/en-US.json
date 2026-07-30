@@ -141,9 +141,9 @@
             "description": "Check if the skeleton has finished loading"
           },
           "is-playing": {
-            "list-name": "Is playing",
-            "display-text": "Is playing",
-            "description": "Check if the animation is currently playing"
+            "list-name": "Is playback enabled",
+            "display-text": "Is playback enabled",
+            "description": "Check whether updates are enabled by Play or Stop. This does not require an animation on a track."
           },
           "has-collision-body": {
             "list-name": "Has collision body",
@@ -484,11 +484,11 @@
           "set-skeleton-color": {
             "list-name": "Set skeleton color",
             "display-text": "Set skeleton color to {0}",
-            "description": "Set the color of the entire skeleton. Accepts hex colors (#RRGGBB or #RRGGBBAA) or color names.",
+            "description": "Set the color of the entire skeleton. Accepts hex colors (#RRGGBB or #RRGGBBAA).",
             "params": {
               "color": {
                 "name": "Color",
-                "desc": "Color value (hex like #FF0000 or color name)"
+                "desc": "Hex color value, such as #FF0000 or #FF000080"
               }
             }
           },
@@ -521,7 +521,7 @@
           "set-slot-color": {
             "list-name": "Set slot color",
             "display-text": "Set slot {0} color to {1}",
-            "description": "Set the color of a slot. Accepts hex colors (#RRGGBB or #RRGGBBAA) or color names.",
+            "description": "Set the color of a slot. Accepts hex colors (#RRGGBB or #RRGGBBAA).",
             "params": {
               "slot-name": {
                 "name": "Slot name",
@@ -529,7 +529,7 @@
               },
               "color": {
                 "name": "Color",
-                "desc": "Color value (hex like #FF0000 or color name)"
+                "desc": "Hex color value, such as #FF0000 or #FF000080"
               }
             }
           },

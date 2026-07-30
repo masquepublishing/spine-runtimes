@@ -141,9 +141,9 @@
             "description": "检查骨架是否已完成加载"
           },
           "is-playing": {
-            "list-name": "是否正在播放",
-            "display-text": "是否正在播放",
-            "description": "检查动画是否正在播放"
+            "list-name": "是否启用播放",
+            "display-text": "是否启用播放",
+            "description": "检查是否已通过“播放”或“停止”启用更新。不要求轨道上存在动画。"
           },
           "has-collision-body": {
             "list-name": "有碰撞体",
@@ -484,11 +484,11 @@
           "set-skeleton-color": {
             "list-name": "设置骨架颜色",
             "display-text": "设置骨架颜色为{0}",
-            "description": "设置整个骨架的颜色。接受十六进制颜色（#RRGGBB 或 #RRGGBBAA）或颜色名称。",
+            "description": "设置整个骨架的颜色。接受十六进制颜色（#RRGGBB 或 #RRGGBBAA）。",
             "params": {
               "color": {
                 "name": "颜色",
-                "desc": "颜色值（十六进制如 #FF0000 或颜色名称）"
+                "desc": "十六进制颜色值，例如 #FF0000 或 #FF000080"
               }
             }
           },
@@ -521,7 +521,7 @@
           "set-slot-color": {
             "list-name": "设置插槽颜色",
             "display-text": "设置插槽{0}的颜色为{1}",
-            "description": "设置插槽的颜色。接受十六进制颜色（#RRGGBB 或 #RRGGBBAA）或颜色名称。",
+            "description": "设置插槽的颜色。接受十六进制颜色（#RRGGBB 或 #RRGGBBAA）。",
             "params": {
               "slot-name": {
                 "name": "插槽名称",
@@ -529,7 +529,7 @@
               },
               "color": {
                 "name": "颜色",
-                "desc": "颜色值（十六进制如 #FF0000 或颜色名称）"
+                "desc": "十六进制颜色值，例如 #FF0000 或 #FF000080"
               }
             }
           },
