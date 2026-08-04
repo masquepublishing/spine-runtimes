@@ -136,7 +136,7 @@ namespace Spine.Unity {
 
 				if (animationName == value) {
 					TrackEntry entry = state.GetTrack(0);
-					if (entry != null && entry.Loop == loop)
+					if (entry != null && entry.Loop == loop && entry.Animation.Name == value)
 						return;
 				}
 				animationName = value;
