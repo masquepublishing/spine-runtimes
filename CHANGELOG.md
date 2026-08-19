@@ -573,6 +573,7 @@
   - `SkeletonGraphic`: You can now offset the pivot with automatic offset compensation via a newly added blue circle handle. This lets you move the pivot to the skeleton part that you want fixed when auto layout mode scales and moves your skeleton around to fit the RectTransform bounds. It also helps to visualize the current pivot position if you set the pivot numerically via the RectTransform Inspector.
   - `SkeletonAnimation` received a `DeltaTimeOverride` callback. This allows advancing by custom delta time for e.g. stepped animation updates in a threaded context. The callback may change `UpdateMode` to disable or limit skeleton updates for certain frames. It is called on the main thread once before animation update.
   - Added sample component `SkeletonAnimationFixedTimestepThreaded` as a replacement component for `SkeletonAnimationFixedTimestep` which was limited to single-threaded use only. This component is using the new `DeltaTimeOverride` event and is thus compatible with both single-threaded and multi-threaded animation.
+  - Added sample component `SkeletonAnimationStaticPoseOptimizer` which automatically skips animation and mesh updates while a SkeletonAnimation's `AnimationState` retains a static pose. It is compatible with threaded animation and mesh updates. The component modifies `SkeletonAnimation.UpdateMode`, so watch out for side effects if multiple components modify this same property.
 
 - **Deprecated**
 
