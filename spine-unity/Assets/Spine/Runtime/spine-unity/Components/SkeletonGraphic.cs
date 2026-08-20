@@ -1650,15 +1650,16 @@ namespace Spine.Unity {
 
 		#region Transfer of Deprecated Fields
 #if UNITY_EDITOR && AUTO_UPGRADE_TO_43_COMPONENTS
-		// compatibility layer for new split animation component architecture,
-		// automatically transfer serialized attributes.
+		// compatibility layer for new split animation component architecture, automatically transfer serialized attributes.
 		public void UpgradeTo43 () {
-			UpgradeTo43Components();
-			TransferDeprecatedFields();
+			if (!Application.isPlaying && !wasDeprecatedTransferred) {
+				UpgradeTo43Components();
+				TransferDeprecatedFields();
+			}
 		}
 
 		protected void UpgradeTo43Components () {
-			if (gameObject.GetComponent<SkeletonAnimation>() == null) {
+			if (meshGeneratorDeprecated != null && gameObject.GetComponent<ISkeletonAnimation>() == null) {
 				gameObject.AddComponent<SkeletonAnimation>();
 				EditorBridge.RequestMarkDirty(gameObject);
 				Debug.Log(string.Format("{0}: Auto-migrated old SkeletonGraphic component to split SkeletonAnimation + SkeletonGraphic components.",
@@ -1676,6 +1677,7 @@ namespace Spine.Unity {
 
 			SkeletonAnimation skeletonAnimationComponent = skeletonAnimation as SkeletonAnimation;
 			if (skeletonAnimationComponent) {
+				skeletonAnimationComponent.UpdateTiming = updateTimingDeprecated;
 				skeletonAnimationComponent.AnimationName = startingAnimationDeprecated;
 				skeletonAnimationComponent.loop = startingLoopDeprecated;
 				skeletonAnimationComponent.timeScale = timeScaleDeprecated;
@@ -1686,6 +1688,7 @@ namespace Spine.Unity {
 		[SerializeField] protected bool wasDeprecatedTransferred = false;
 
 		[FormerlySerializedAs("meshGenerator")] [SerializeField] private MeshGenerator meshGeneratorDeprecated;
+		[FormerlySerializedAs("updateTiming")] [SerializeField] private UpdateTiming updateTimingDeprecated = UpdateTiming.InUpdate;
 		[FormerlySerializedAs("startingAnimation")] [SerializeField] private string startingAnimationDeprecated;
 		[FormerlySerializedAs("startingLoop")] [SerializeField] private bool startingLoopDeprecated;
 		[FormerlySerializedAs("timeScale")] [SerializeField] private float timeScaleDeprecated = 1;

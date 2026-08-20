@@ -619,6 +619,7 @@ namespace Spine.Unity {
 		}
 
 		public virtual void UpdateMesh (bool calledFromMainThread = true) {
+			if (skeleton == null) return;
 #if USE_THREADED_SKELETON_UPDATE
 			bool canPrepareInstructions = calledFromMainThread || !NeedsMainThreadRendererPreparation;
 #else

@@ -279,7 +279,7 @@ namespace Spine.Unity {
 		}
 
 #if UNITY_EDITOR && AUTO_UPGRADE_TO_43_COMPONENTS
-		// compatibility layer between 4.1 and 4.2, automatically transfer serialized attributes.
+		// compatibility layer for new split animation component architecture, automatically transfer serialized attributes.
 		public abstract void UpgradeTo43 ();
 #endif
 

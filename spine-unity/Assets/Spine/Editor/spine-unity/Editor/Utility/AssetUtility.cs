@@ -1648,8 +1648,6 @@ namespace Spine.Unity.Editor {
 		public static GameObject NewSkeletonGraphicGameObject (string gameObjectName, System.Type animationComponentType) {
 			GameObject go = EditorInstantiation.NewGameObject(gameObjectName, true, typeof(RectTransform),
 				typeof(CanvasRenderer), typeof(SkeletonGraphic));
-			// Note: SkeletonAnimation component was already implicitly added by
-			// SkeletonGraphic.Awake() above, calling UpgradeTo43Components().
 			if (go.GetComponent(animationComponentType) == null)
 				EditorInstantiation.AddComponent(go, true, animationComponentType);
 
