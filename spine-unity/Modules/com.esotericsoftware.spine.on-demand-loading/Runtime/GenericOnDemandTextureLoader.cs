@@ -368,33 +368,44 @@ namespace Spine.Unity {
 			MaterialOnDemandData materialData, int textureIndex, Material materialToUpdate,
 			System.Action<Texture> onTextureLoaded);
 
+		protected virtual bool HasRequestFailed (TextureRequest textureRequest) {
+			return false;
+		}
+
 		public virtual void UnloadUnusedTextures () {
+			if (loadedDataAtMaterial == null) return;
+
 			int currentFrameCount = Time.frameCount;
 			float timePerFrame = Time.smoothDeltaTime;
 			float deltaFramesToUnload = unloadAfterSecondsUnused / timePerFrame;
 
 			for (int materialIndex = 0, materialCount = loadedDataAtMaterial.Length; materialIndex < materialCount; ++materialIndex) {
 				MaterialOnDemandData materialData = loadedDataAtMaterial[materialIndex];
+				if (materialData.textureRequests == null) continue;
 				int textureCount = materialData.textureRequests.Length;
 
 				for (int textureIndex = 0; textureIndex < textureCount; ++textureIndex) {
 					TextureRequest textureRequest = materialData.textureRequests[textureIndex];
-					if (textureRequest.WasSuccessfullyLoaded &&
-						currentFrameCount - materialData.lastFrameRequested > deltaFramesToUnload) {
+					if (!textureRequest.WasRequested) continue;
+
+					bool failed = HasRequestFailed(textureRequest);
+					bool unusedLongEnough = currentFrameCount - materialData.lastFrameRequested > deltaFramesToUnload;
+					if (failed || unusedLongEnough)
 						RequestUnloadTexture(materialIndex, textureIndex);
-					}
 				}
 			}
 		}
 
 		public virtual void RequestUnloadTexture (int materialIndex, int textureIndex) {
-			if (materialIndex >= loadedDataAtMaterial.Length) return;
+			if (loadedDataAtMaterial == null || materialIndex >= loadedDataAtMaterial.Length) return;
 
 			bool wasReleased = false;
 			PlaceholderTextureMapping[] placeholderTextures = placeholderMap[materialIndex].textures;
 			MaterialOnDemandData materialData = loadedDataAtMaterial[materialIndex];
+			if (materialData.textureRequests == null || textureIndex >= materialData.textureRequests.Length) return;
 			if (materialData.textureRequests[textureIndex].WasRequested) {
 				materialData.textureRequests[textureIndex].Release();
+				materialData.textureRequests[textureIndex] = default(TextureRequest);
 				wasReleased = true;
 			}
 

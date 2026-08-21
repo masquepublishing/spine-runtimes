@@ -574,7 +574,8 @@
   - `SkeletonAnimation` received a `DeltaTimeOverride` callback. This allows advancing by custom delta time for e.g. stepped animation updates in a threaded context. The callback may change `UpdateMode` to disable or limit skeleton updates for certain frames. It is called on the main thread once before animation update.
   - Added sample component `SkeletonAnimationFixedTimestepThreaded` as a replacement component for `SkeletonAnimationFixedTimestep` which was limited to single-threaded use only. This component is using the new `DeltaTimeOverride` event and is thus compatible with both single-threaded and multi-threaded animation.
   - Added sample component `SkeletonAnimationStaticPoseOptimizer` which automatically skips animation and mesh updates while a SkeletonAnimation's `AnimationState` retains a static pose. It is compatible with threaded animation and mesh updates. The component modifies `SkeletonAnimation.UpdateMode`, so watch out for side effects if multiple components modify this same property.
-
+  - On-demand loading modules: Added method `HasRequestFailed` to `GenericOnDemandTextureLoader`, automatically handling when requests fail to be processed. It provides a default implementation returning `false` to maintain the existing behaviour without code change. `AddressableTextureLoader` implements this method accordingly to cover Addressable request failure. Be sure to update both `com.esotericsoftware.spine.addressables` and `com.esotericsoftware.spine.on-demand-loading` UPM packages.
+  
 - **Deprecated**
 
 - **Restructuring (Non-Breaking)**
