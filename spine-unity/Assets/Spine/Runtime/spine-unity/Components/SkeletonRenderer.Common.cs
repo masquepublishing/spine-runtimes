@@ -678,6 +678,13 @@ namespace Spine.Unity {
 			UpdateMeshAndMaterialsToBuffers(workingSubmeshInstructions, currentSmartMesh, updateTriangles);
 		}
 
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+		void HandleOnDemandLoadingWithoutMeshUpdate () {
+			if (Application.isPlaying)
+				HandleOnDemandLoading();
+		}
+#endif
+
 		protected virtual void UpdateMeshAndMaterialsToBuffers (
 			ExposedList<SubmeshInstruction> workingSubmeshInstructions, MeshRendererBuffers.SmartMesh currentSmartMesh,
 			bool updateTriangles) {

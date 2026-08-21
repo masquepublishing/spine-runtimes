@@ -702,7 +702,12 @@ namespace Spine.Unity {
 #if USE_THREADED_SKELETON_UPDATE
 		public virtual void MainThreadPrepareLateUpdateInternal () {
 			if (!valid) return;
-			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) return;
+			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) {
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+				HandleOnDemandLoadingWithoutMeshUpdate();
+#endif
+				return;
+			}
 
 			if (NeedsMainThreadRendererPreparation)
 				PrepareInstructionsAndRenderers();
@@ -743,8 +748,19 @@ namespace Spine.Unity {
 				skeletonAnimation.UpdateOncePerFrame(0);
 
 			// Generate mesh once, required to update mesh bounds for visibility
-			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) return;
-			if (calledFromMainThread && !NeedsToGenerateMesh) return;
+			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) {
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+				if (calledFromMainThread)
+					HandleOnDemandLoadingWithoutMeshUpdate();
+#endif
+				return;
+			}
+			if (calledFromMainThread && !NeedsToGenerateMesh) {
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+				HandleOnDemandLoadingWithoutMeshUpdate();
+#endif
+				return;
+			}
 			UpdateMesh(calledFromMainThread);
 		}
 		#endregion Internal Methods
