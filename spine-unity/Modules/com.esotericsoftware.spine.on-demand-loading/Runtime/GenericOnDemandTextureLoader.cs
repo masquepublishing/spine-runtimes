@@ -61,6 +61,14 @@ namespace Spine.Unity {
 		void Release ();
 	}
 
+	/// <summary>Interface for on-demand texture loaders which support deferred cleanup of unused texture requests.</summary>
+	public interface IDeferredCleanupOnDemandTextureLoader {
+		UnityEngine.Object UnityObject { get; }
+		bool HasUnreleasedRequests { get; }
+		void UnloadAllTextures ();
+		void RunCleanupIteration ();
+	}
+
 	/// <summary>
 	/// Base class to derive your own OnDemandTextureLoader subclasses from which already provides
 	/// the general loading and unloading framework.
@@ -72,7 +80,7 @@ namespace Spine.Unity {
 	/// <typeparam name="TextureRequest">The implementation struct covering a single texture loading request,
 	/// derived from IOnDemandRequest</typeparam>
 	[System.Serializable]
-	public abstract class GenericOnDemandTextureLoader<TargetReference, TextureRequest> : OnDemandTextureLoader
+	public abstract class GenericOnDemandTextureLoader<TargetReference, TextureRequest> : OnDemandTextureLoader, IDeferredCleanupOnDemandTextureLoader
 		where TargetReference : ITargetTextureReference
 		where TextureRequest : IOnDemandRequest {
 
@@ -102,7 +110,24 @@ namespace Spine.Unity {
 			Clear(clearAtlasAsset: true);
 		}
 
+		/// <summary>Unload all textures when the ScriptableObject is unloaded or destroyed.</summary>
+		protected virtual void OnDisable () {
+			OnDemandTextureLoaderCleanup.Unregister(this);
+			UnloadAllTextures();
+		}
+
+		UnityEngine.Object IDeferredCleanupOnDemandTextureLoader.UnityObject {
+			get { return this; }
+		}
+
+		void IDeferredCleanupOnDemandTextureLoader.RunCleanupIteration () {
+			BeginCustomTextureLoading();
+			EndCustomTextureLoading();
+		}
+
 		public override void Clear (bool clearAtlasAsset = false) {
+			OnDemandTextureLoaderCleanup.Unregister(this);
+			UnloadAllTextures();
 			if (clearAtlasAsset) atlasAsset = null;
 			placeholderMap = null;
 			loadedDataAtMaterial = null;
@@ -234,6 +259,8 @@ namespace Spine.Unity {
 		}
 
 		public override void BeginCustomTextureLoading () {
+			if (placeholderMap == null) return;
+
 			if (loadedDataAtMaterial == null || (loadedDataAtMaterial.Length == 0 && placeholderMap.Length > 0)) {
 				loadedDataAtMaterial = new MaterialOnDemandData[placeholderMap.Length];
 				for (int i = 0, count = loadedDataAtMaterial.Length; i < count; ++i) {
@@ -359,6 +386,8 @@ namespace Spine.Unity {
 			}
 
 			CreateTextureRequest(targetReference, materialData, textureIndex, material, onTextureLoaded);
+			if (materialData.textureRequests[textureIndex].WasRequested)
+				OnDemandTextureLoaderCleanup.Register(this);
 			return null;
 		}
 
@@ -370,6 +399,37 @@ namespace Spine.Unity {
 
 		protected virtual bool HasRequestFailed (TextureRequest textureRequest) {
 			return false;
+		}
+
+		public virtual bool HasUnreleasedRequests {
+			get {
+				if (loadedDataAtMaterial == null) return false;
+
+				for (int materialIndex = 0, materialCount = loadedDataAtMaterial.Length; materialIndex < materialCount; ++materialIndex) {
+					TextureRequest[] textureRequests = loadedDataAtMaterial[materialIndex].textureRequests;
+					if (textureRequests == null) continue;
+
+					for (int textureIndex = 0, textureCount = textureRequests.Length; textureIndex < textureCount; ++textureIndex) {
+						if (textureRequests[textureIndex].WasRequested)
+							return true;
+					}
+				}
+				return false;
+			}
+		}
+
+		public virtual void UnloadAllTextures () {
+			if (loadedDataAtMaterial == null) return;
+
+			for (int materialIndex = 0, materialCount = loadedDataAtMaterial.Length; materialIndex < materialCount; ++materialIndex) {
+				TextureRequest[] textureRequests = loadedDataAtMaterial[materialIndex].textureRequests;
+				if (textureRequests == null) continue;
+
+				for (int textureIndex = 0, textureCount = textureRequests.Length; textureIndex < textureCount; ++textureIndex) {
+					if (textureRequests[textureIndex].WasRequested)
+						RequestUnloadTexture(materialIndex, textureIndex);
+				}
+			}
 		}
 
 		public virtual void UnloadUnusedTextures () {
@@ -399,45 +459,69 @@ namespace Spine.Unity {
 		public virtual void RequestUnloadTexture (int materialIndex, int textureIndex) {
 			if (loadedDataAtMaterial == null || materialIndex >= loadedDataAtMaterial.Length) return;
 
-			bool wasReleased = false;
-			PlaceholderTextureMapping[] placeholderTextures = placeholderMap[materialIndex].textures;
 			MaterialOnDemandData materialData = loadedDataAtMaterial[materialIndex];
 			if (materialData.textureRequests == null || textureIndex >= materialData.textureRequests.Length) return;
-			if (materialData.textureRequests[textureIndex].WasRequested) {
-				materialData.textureRequests[textureIndex].Release();
+			TextureRequest textureRequest = materialData.textureRequests[textureIndex];
+			bool hasActiveRequest = textureRequest.WasRequested;
+			if (hasActiveRequest)
 				materialData.textureRequests[textureIndex] = default(TextureRequest);
-				wasReleased = true;
+
+			List<Material> restoredMaterials = null;
+			try {
+				if (placeholderMap == null || materialIndex >= placeholderMap.Length) return;
+				PlaceholderTextureMapping[] placeholderTextures = placeholderMap[materialIndex].textures;
+				if (placeholderTextures == null || textureIndex >= placeholderTextures.Length) return;
+
+				Texture placeholderTexture = placeholderTextures[textureIndex].placeholderTexture;
+				Material targetMaterial = atlasAsset ? atlasAsset.Materials.ElementAtOrDefault(materialIndex) : null;
+				Texture targetMaterialTexture = targetMaterial ? targetMaterial.mainTexture : null;
+				RestorePlaceholderIfTargetTexture(targetMaterial, textureRequest, hasActiveRequest,
+					targetMaterialTexture, placeholderTexture, ref restoredMaterials);
+
+				// also reset material textures of blend mode materials
+				if ((hasActiveRequest || targetMaterialTexture != null) && skeletonDataAsset != null) {
+					BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
+					foreach (ReplacementMaterial replacementMaterial in blendModeMaterials.additiveMaterials) {
+						Material replacement = replacementMaterial != null ? replacementMaterial.material : null;
+						RestorePlaceholderIfTargetTexture(replacement, textureRequest, hasActiveRequest,
+							targetMaterialTexture, placeholderTexture, ref restoredMaterials);
+					}
+					foreach (ReplacementMaterial replacementMaterial in blendModeMaterials.multiplyMaterials) {
+						Material replacement = replacementMaterial != null ? replacementMaterial.material : null;
+						RestorePlaceholderIfTargetTexture(replacement, textureRequest, hasActiveRequest,
+							targetMaterialTexture, placeholderTexture, ref restoredMaterials);
+					}
+					foreach (ReplacementMaterial replacementMaterial in blendModeMaterials.screenMaterials) {
+						Material replacement = replacementMaterial != null ? replacementMaterial.material : null;
+						RestorePlaceholderIfTargetTexture(replacement, textureRequest, hasActiveRequest,
+							targetMaterialTexture, placeholderTexture, ref restoredMaterials);
+					}
+				}
+			} finally {
+				if (hasActiveRequest)
+					textureRequest.Release();
 			}
 
-			// reset material textures to placeholder textures.
-			Material targetMaterial = atlasAsset.Materials.ElementAt(materialIndex);
-			Texture targetTexture = null;
-			Texture placeholderTexture = null;
-			if (targetMaterial) {
-				targetTexture = targetMaterial.mainTexture;
-				placeholderTexture = placeholderTextures[textureIndex].placeholderTexture;
-				targetMaterial.mainTexture = placeholderTexture;
-				if (wasReleased)
-					OnTextureUnloaded(targetMaterial, textureIndex);
-			}
-			// also reset material textures of blend mode materials
-			if (targetTexture != null && skeletonDataAsset != null) {
-				BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
-				foreach (ReplacementMaterial replacementMaterial in blendModeMaterials.additiveMaterials) {
-					replacementMaterial.material.mainTexture = placeholderTexture;
-					if (wasReleased && replacementMaterial.material.mainTexture == targetTexture)
-						OnTextureUnloaded(targetMaterial, textureIndex);
-				}
-				foreach (ReplacementMaterial replacementMaterial in blendModeMaterials.multiplyMaterials) {
-					replacementMaterial.material.mainTexture = placeholderTexture;
-					if (wasReleased && replacementMaterial.material.mainTexture == targetTexture)
-						OnTextureUnloaded(targetMaterial, textureIndex);
-				}
-				foreach (ReplacementMaterial replacementMaterial in blendModeMaterials.screenMaterials) {
-					replacementMaterial.material.mainTexture = placeholderTexture;
-					if (wasReleased && replacementMaterial.material.mainTexture == targetTexture)
-						OnTextureUnloaded(targetMaterial, textureIndex);
-				}
+			if (restoredMaterials == null) return;
+			foreach (Material restoredMaterial in restoredMaterials)
+				OnTextureUnloaded(restoredMaterial, textureIndex);
+		}
+
+		void RestorePlaceholderIfTargetTexture (Material material, TextureRequest textureRequest,
+			bool hasActiveRequest, Texture targetMaterialTexture, Texture placeholderTexture,
+			ref List<Material> restoredMaterials) {
+
+			if (!material) return;
+			Texture currentTexture = material.mainTexture;
+			bool isTargetTexture = hasActiveRequest ?
+				currentTexture != null && textureRequest.IsTarget(currentTexture) :
+				currentTexture == targetMaterialTexture;
+			if (!isTargetTexture) return;
+
+			material.mainTexture = placeholderTexture;
+			if (hasActiveRequest) {
+				if (restoredMaterials == null) restoredMaterials = new List<Material>();
+				restoredMaterials.Add(material);
 			}
 		}
 
