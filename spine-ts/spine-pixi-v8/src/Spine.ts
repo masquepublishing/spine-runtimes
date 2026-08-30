@@ -963,13 +963,14 @@ export class Spine extends ViewContainer {
 
 	private initCachedData (slot: Slot, attachment: RegionAttachment | MeshAttachment): AttachmentCacheData {
 		let vertices: Float32Array;
+		const sequence = attachment.sequence;
+		const texture = (sequence.regions[0]?.texture as SpineTexture)?.texture;
 
 		this.spineAttachmentsDirty = true;
 
 		if (attachment instanceof RegionAttachment) {
 			vertices = new Float32Array(8);
 
-			const sequence = attachment.sequence;
 			this.attachmentCacheData[slot.data.index][attachment.name] = {
 				id: this.getRenderableCacheId(slot, attachment),
 				vertices,
@@ -979,13 +980,12 @@ export class Spine extends ViewContainer {
 				color: new Color(1, 1, 1, 1),
 				darkColor: new Color(0, 0, 0, 0),
 				darkTint: this.darkTint,
-				skipRender: false,
-				texture: (sequence.regions[0]?.texture as SpineTexture)?.texture,
+				skipRender: !texture,
+				texture: texture ?? Texture.EMPTY,
 			};
 		} else {
 			vertices = new Float32Array(attachment.worldVerticesLength);
 
-			const sequence = attachment.sequence;
 			this.attachmentCacheData[slot.data.index][attachment.name] = {
 				id: this.getRenderableCacheId(slot, attachment),
 				vertices,
@@ -995,8 +995,8 @@ export class Spine extends ViewContainer {
 				color: new Color(1, 1, 1, 1),
 				darkColor: new Color(0, 0, 0, 0),
 				darkTint: this.darkTint,
-				skipRender: false,
-				texture: (sequence.regions[0]?.texture as SpineTexture)?.texture,
+				skipRender: !texture,
+				texture: texture ?? Texture.EMPTY,
 			};
 		}
 
